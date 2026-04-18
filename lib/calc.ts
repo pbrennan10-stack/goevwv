@@ -83,9 +83,7 @@ function stateAnnualFee(
 }
 
 function federalCredit(vehicle: Vehicle, fed: FederalData): number {
-  // Simple heuristic: if the catalog marks it tax-credit-eligible, assume user
-  // qualifies and claims the full $7,500 via point-of-sale. We show this as an
-  // assumption in the UI and link to the IRS page.
+  if (fed.federal_ev_tax_credits.new_ev_credit.active === false) return 0;
   if (!vehicle.tax_credit_eligible) return 0;
   const msrpCap =
     vehicle.class === "suv" || vehicle.class === "truck" || vehicle.class === "minivan"
@@ -148,11 +146,6 @@ export function calculate(input: CalcInput, ctx: CalcContext): CalcReturn {
     if (v.epa_range_mi && v.winter_range_mi && v.winter_range_mi < input.daily_round_trip_mi) {
       warnings.push(
         `Estimated WV winter range (${v.winter_range_mi} mi) is less than your daily round trip. Plan for mid-day charging in January/February.`,
-      );
-    }
-    if (!v.tax_credit_eligible) {
-      warnings.push(
-        "Not eligible for the federal $7,500 IRA tax credit (manufacturing / battery sourcing rules).",
       );
     }
     if (mode === "tou" && ctx.utility.residential.tou_requires_separate_meter) {

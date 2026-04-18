@@ -4,6 +4,11 @@
 
 federal_ev_tax_credits:
   new_ev_credit:
+    active: false
+    status_note: >
+      The IRC 30D clean vehicle credit was repealed in 2025 as part of federal
+      budget reconciliation. It is no longer available to new-vehicle buyers.
+      Update this flag to true if Congress reinstates it.
     code_section: "IRC 30D"
     max_amount_usd: 7500
     breakdown:
@@ -27,6 +32,10 @@ federal_ev_tax_credits:
     url: "https://www.irs.gov/credits-deductions/credits-for-new-clean-vehicles-purchased-in-2023-or-after"
 
   used_ev_credit:
+    active: false
+    status_note: >
+      The IRC 25E used clean vehicle credit was repealed alongside 30D in 2025.
+      No longer available. Update active to true if reinstated.
     code_section: "IRC 25E"
     max_amount_usd: 4000
     structure: "30% of sale price, capped at $4,000"

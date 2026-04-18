@@ -88,6 +88,8 @@ export interface Utility {
 export interface FederalData {
   federal_ev_tax_credits: {
     new_ev_credit: {
+      active?: boolean;
+      status_note?: string;
       max_amount_usd: number;
       income_caps: { single: number; head_of_household: number; joint: number };
       msrp_caps: { cars: number; suvs_trucks_vans: number };
@@ -95,6 +97,8 @@ export interface FederalData {
       url: string;
     };
     used_ev_credit: {
+      active?: boolean;
+      status_note?: string;
       max_amount_usd: number;
       structure: string;
       url: string;

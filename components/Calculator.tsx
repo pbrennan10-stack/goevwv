@@ -483,9 +483,9 @@ function Assumptions({
             . Added to total operating cost.
           </li>
           <li>
-            Federal IRA $7,500 tax credit: shown when the vehicle is flagged
-            eligible in our catalog and MSRP is under the $55k car / $80k
-            SUV/truck cap. We assume buyers take the point-of-sale option.
+            Federal EV tax credit (IRC 30D): <strong>repealed in 2025</strong>{" "}
+            and not included in these estimates. If Congress reinstates it, this
+            site will reflect that.
           </li>
           <li>
             PHEVs: assumed 65% of miles on electric, 35% on gas (industry
