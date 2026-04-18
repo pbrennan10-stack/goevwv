@@ -15,26 +15,35 @@ aep:
   customer_service_phone: "1-800-956-4237"
 
   residential:
-    # All-in average including base + fuel/rider adjustments. Source: EnergySage / AEP public filings, March 2026.
-    # VERIFY_BEFORE_LAUNCH against current AEP tariff schedule "R.S."
-    flat_rate_per_kwh: 0.172
-    monthly_customer_charge: 11.38  # VERIFY_BEFORE_LAUNCH
+    # Source: AEP WV bill examples page (effective Dec 12, 2025) and AEP off-peak EV page.
+    # Bill examples: 1,000 kWh = $176.43; 2,000 kWh = $332.13.
+    # Deriving: fixed charges = $20.73/mo; marginal variable rate = $0.1557/kWh.
+    # The marginal rate is what EV charging actually costs (each additional kWh).
+    # The all-in average at 1,000 kWh is ~$0.176/kWh (matches AEP's "17.6 cents" quote).
+    flat_rate_per_kwh: 0.156  # marginal rate — correct for EV cost calculations
+    all_in_rate_per_kwh_at_1000kwh: 0.176  # displayed average; higher because it spreads fixed charges
+    monthly_customer_charge: 20.73  # all fixed charges combined (base + all riders, Dec 2025)
     rate_notes: >
-      AEP WV residential rates have risen notably in 2025-2026 due to PSC-approved
-      base rate increases. Average monthly bill for 1000 kWh is ~$172. A further
-      rate case is pending at the WV PSC as of early 2026.
+      AEP WV residential rates effective December 12, 2025. Bill examples: 1,000 kWh = $176.43;
+      2,000 kWh = $332.13. This implies ~$20.73/month in fixed charges and a marginal
+      variable rate of ~$0.156/kWh. The calculator uses the marginal rate because that
+      is the actual cost of each additional kWh from EV charging — using the all-in
+      average would overstate EV charging costs by ~13%. AEP rates have risen sharply
+      since 2019 (+33%) and a further rate case was filed in 2025.
 
     tou_available: true
-    tou_program_name: "WV Off-Peak Charging"
+    tou_program_name: "WV Off-Peak EV Charging"
     tou_url: "https://www.appalachianpower.com/clean-energy/electric-cars/wv-off-peak"
-    # VERIFY_BEFORE_LAUNCH - exact on-peak/off-peak windows and rate differentials
-    # are published on the AEP off-peak charging page; these are approximate.
     tou_schedule:
-      off_peak_hours: "9:00 PM - 5:00 AM (weekdays and all weekend)"
-      off_peak_rate_per_kwh: 0.065  # APPROXIMATE - verify
-      on_peak_rate_per_kwh: 0.210   # APPROXIMATE - verify
-    tou_requires_separate_meter: true  # VERIFY
-    tou_enrollment_notes: "Requires enrollment via TakeChargeWV program"
+      off_peak_hours: "8:00 PM - 6:00 AM (Mon-Fri), all day Sat, Sun, and federal holidays"
+      off_peak_rate_per_kwh: 0.129   # source: AEP off-peak page, current as of Apr 2026
+      on_peak_rate_per_kwh: 0.227    # normal rate $0.176 + on-peak surcharge $0.051
+    tou_requires_separate_meter: true
+    tou_enrollment_notes: >
+      Requires a separate EV meter on your charging circuit. AEP provides the meter
+      hardware at no charge, but you must hire a licensed electrician to install the
+      meter base and pass an electrical inspection before AEP installs the meter.
+      No enrollment fee. Apply at appalachianpower.com or call 1-800-956-4237.
 
   rebates:
     - id: "aep-charge-forward-l2"

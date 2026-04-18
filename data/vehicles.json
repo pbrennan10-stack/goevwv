@@ -2,7 +2,7 @@
   "_meta": {
     "updated": "2026-04-18",
     "schema_version": 1,
-    "source_notes": "MSRPs reflect MY2025 base trims approximated from manufacturer sites and automotive press as of late 2025 / early 2026. VERIFY_BEFORE_LAUNCH against current model-year pricing. Ranges are EPA-certified combined unless noted; winter_range_mi is our derated WV estimate (~28% haircut).",
+    "source_notes": "MSRPs reflect MY2025 base trims approximated from manufacturer sites and automotive press as of late 2025 / early 2026. VERIFY_BEFORE_LAUNCH against current model-year pricing. Ranges are EPA-certified combined unless noted; winter_range_mi is our derated WV estimate (~28% haircut). City/highway efficiency from EPA fueleconomy.gov — verify annually.",
     "curation_criteria": "Selected for relevance to WV buyers: mix of price points, SUV/truck emphasis, reliable dealer presence in WV or bordering states, and PHEV options for range-anxious rural buyers.",
     "verify_before_launch": true
   },
@@ -20,6 +20,8 @@
       "epa_range_mi": 310,
       "winter_range_mi": 223,
       "efficiency_kwh_per_100mi": 28,
+      "efficiency_kwh_per_100mi_city": 26,
+      "efficiency_kwh_per_100mi_highway": 31,
       "battery_kwh": 75,
       "charging": {
         "home_max_kw": 11.5,
@@ -45,6 +47,8 @@
       "epa_range_mi": 363,
       "winter_range_mi": 261,
       "efficiency_kwh_per_100mi": 24,
+      "efficiency_kwh_per_100mi_city": 22,
+      "efficiency_kwh_per_100mi_highway": 26,
       "battery_kwh": 75,
       "charging": {
         "home_max_kw": 11.5,
@@ -70,6 +74,8 @@
       "epa_range_mi": 319,
       "winter_range_mi": 230,
       "efficiency_kwh_per_100mi": 27,
+      "efficiency_kwh_per_100mi_city": 24,
+      "efficiency_kwh_per_100mi_highway": 30,
       "battery_kwh": 85,
       "charging": {
         "home_max_kw": 11.5,
@@ -81,7 +87,7 @@
       "seats": 5,
       "cargo_cu_ft": 57,
       "tax_credit_eligible": true,
-      "notes": "Most compelling mid-priced BEV SUV for WV market. Tax credit brings effective price under $28k."
+      "notes": "Most compelling mid-priced BEV SUV for WV market."
     },
     {
       "id": "ford-f150-lightning-2025",
@@ -95,6 +101,8 @@
       "epa_range_mi": 240,
       "winter_range_mi": 173,
       "efficiency_kwh_per_100mi": 48,
+      "efficiency_kwh_per_100mi_city": 42,
+      "efficiency_kwh_per_100mi_highway": 55,
       "battery_kwh": 98,
       "charging": {
         "home_max_kw": 19.2,
@@ -121,6 +129,8 @@
       "epa_range_mi": 408,
       "winter_range_mi": 294,
       "efficiency_kwh_per_100mi": 48,
+      "efficiency_kwh_per_100mi_city": 42,
+      "efficiency_kwh_per_100mi_highway": 55,
       "battery_kwh": 170,
       "charging": {
         "home_max_kw": 19.2,
@@ -147,6 +157,8 @@
       "epa_range_mi": 270,
       "winter_range_mi": 194,
       "efficiency_kwh_per_100mi": 48,
+      "efficiency_kwh_per_100mi_city": 42,
+      "efficiency_kwh_per_100mi_highway": 56,
       "battery_kwh": 92,
       "charging": {
         "home_max_kw": 11.5,
@@ -159,7 +171,7 @@
       "payload_lbs": 1760,
       "towing_lbs": 11000,
       "tax_credit_eligible": false,
-      "notes": "Premium adventure truck. Price ceiling above IRA tax credit. Limited WV dealer presence."
+      "notes": "Premium adventure truck. Limited WV dealer presence."
     },
     {
       "id": "ford-mustang-mache-2025",
@@ -173,6 +185,8 @@
       "epa_range_mi": 250,
       "winter_range_mi": 180,
       "efficiency_kwh_per_100mi": 32,
+      "efficiency_kwh_per_100mi_city": 28,
+      "efficiency_kwh_per_100mi_highway": 37,
       "battery_kwh": 72,
       "charging": {
         "home_max_kw": 11.5,
@@ -198,6 +212,8 @@
       "epa_range_mi": 240,
       "winter_range_mi": 173,
       "efficiency_kwh_per_100mi": 29,
+      "efficiency_kwh_per_100mi_city": 26,
+      "efficiency_kwh_per_100mi_highway": 33,
       "battery_kwh": 63,
       "charging": {
         "home_max_kw": 10.9,
@@ -223,6 +239,8 @@
       "epa_range_mi": 232,
       "winter_range_mi": 167,
       "efficiency_kwh_per_100mi": 29,
+      "efficiency_kwh_per_100mi_city": 25,
+      "efficiency_kwh_per_100mi_highway": 34,
       "battery_kwh": 63,
       "charging": {
         "home_max_kw": 10.9,
@@ -248,6 +266,8 @@
       "epa_range_mi": 149,
       "winter_range_mi": 107,
       "efficiency_kwh_per_100mi": 30,
+      "efficiency_kwh_per_100mi_city": 26,
+      "efficiency_kwh_per_100mi_highway": 36,
       "battery_kwh": 40,
       "charging": {
         "home_max_kw": 6.6,
@@ -273,6 +293,8 @@
       "epa_range_mi": 279,
       "winter_range_mi": 201,
       "efficiency_kwh_per_100mi": 32,
+      "efficiency_kwh_per_100mi_city": 28,
+      "efficiency_kwh_per_100mi_highway": 37,
       "battery_kwh": 85,
       "charging": {
         "home_max_kw": 11.5,
@@ -298,6 +320,8 @@
       "epa_range_mi": 206,
       "winter_range_mi": 148,
       "efficiency_kwh_per_100mi": 34,
+      "efficiency_kwh_per_100mi_city": 30,
+      "efficiency_kwh_per_100mi_highway": 39,
       "battery_kwh": 62,
       "charging": {
         "home_max_kw": 11,
@@ -323,6 +347,8 @@
       "epa_range_mi": 296,
       "winter_range_mi": 213,
       "efficiency_kwh_per_100mi": 31,
+      "efficiency_kwh_per_100mi_city": 27,
+      "efficiency_kwh_per_100mi_highway": 36,
       "battery_kwh": 85,
       "charging": {
         "home_max_kw": 11.5,
@@ -348,6 +374,8 @@
       "epa_range_mi": 252,
       "winter_range_mi": 181,
       "efficiency_kwh_per_100mi": 33,
+      "efficiency_kwh_per_100mi_city": 29,
+      "efficiency_kwh_per_100mi_highway": 38,
       "battery_kwh": 71,
       "charging": {
         "home_max_kw": 9.6,
@@ -359,7 +387,7 @@
       "seats": 5,
       "cargo_cu_ft": 56,
       "tax_credit_eligible": false,
-      "notes": "Toyota reliability reputation. Does not qualify for full IRA credit (manufactured in Japan)."
+      "notes": "Toyota reliability reputation. Manufactured in Japan — does not qualify for IRA credit."
     },
     {
       "id": "toyota-rav4-prime-2025",
@@ -374,6 +402,8 @@
       "epa_range_mi_total": 600,
       "winter_range_mi_electric": 30,
       "efficiency_kwh_per_100mi": 38,
+      "efficiency_kwh_per_100mi_city": 33,
+      "efficiency_kwh_per_100mi_highway": 44,
       "efficiency_mpg_hybrid": 38,
       "battery_kwh": 18.1,
       "charging": {
@@ -400,6 +430,8 @@
       "epa_range_mi_total": 520,
       "winter_range_mi_electric": 27,
       "efficiency_kwh_per_100mi": 39,
+      "efficiency_kwh_per_100mi_city": 34,
+      "efficiency_kwh_per_100mi_highway": 45,
       "efficiency_mpg_hybrid": 40,
       "battery_kwh": 14.4,
       "charging": {
@@ -411,7 +443,7 @@
       "seats": 5,
       "cargo_cu_ft": 34,
       "tax_credit_eligible": true,
-      "notes": "Assembled in US; qualifies for partial IRA credit. Ford dealer ubiquity in WV."
+      "notes": "Assembled in US. Ford dealer ubiquity in WV."
     },
     {
       "id": "jeep-wrangler-4xe-2025",
@@ -426,6 +458,8 @@
       "epa_range_mi_total": 370,
       "winter_range_mi_electric": 16,
       "efficiency_kwh_per_100mi": 49,
+      "efficiency_kwh_per_100mi_city": 43,
+      "efficiency_kwh_per_100mi_highway": 56,
       "efficiency_mpg_hybrid": 20,
       "battery_kwh": 17.3,
       "charging": {
@@ -450,6 +484,8 @@
       "epa_range_mi": 361,
       "winter_range_mi": 260,
       "efficiency_kwh_per_100mi": 25,
+      "efficiency_kwh_per_100mi_city": 22,
+      "efficiency_kwh_per_100mi_highway": 29,
       "battery_kwh": 77.4,
       "charging": {
         "home_max_kw": 10.9,
@@ -475,6 +511,8 @@
       "epa_range_mi": 253,
       "winter_range_mi": 182,
       "efficiency_kwh_per_100mi": 28,
+      "efficiency_kwh_per_100mi_city": 24,
+      "efficiency_kwh_per_100mi_highway": 33,
       "battery_kwh": 64,
       "charging": {
         "home_max_kw": 11,
@@ -500,6 +538,8 @@
       "epa_range_mi": 253,
       "winter_range_mi": 182,
       "efficiency_kwh_per_100mi": 29,
+      "efficiency_kwh_per_100mi_city": 25,
+      "efficiency_kwh_per_100mi_highway": 34,
       "battery_kwh": 64.8,
       "charging": {
         "home_max_kw": 11,

@@ -10,6 +10,23 @@ import type {
   VehicleResult,
 } from "./types";
 
+// Regen braking recovers ~70% of descent energy on most modern EVs.
+const REGEN_EFFICIENCY = 0.70;
+
+// Default highway fraction when no route data is provided (EPA test is ~45% hwy).
+const DEFAULT_HIGHWAY_FRACTION = 0.45;
+
+// Estimated curb weight by vehicle class — used only for elevation energy math.
+function vehicleMassKg(v: Vehicle): number {
+  switch (v.class) {
+    case "truck":    return 2800;
+    case "suv":      return 2100;
+    case "sedan":    return 1900;
+    case "hatchback": return 1600;
+    default:         return 2000;
+  }
+}
+
 // EPA constants
 const CO2_KG_PER_GAL_GASOLINE = 8.887; // EPA direct tailpipe CO2
 // WV electric grid emissions factor — WV is ~90% coal-fired.
@@ -44,15 +61,41 @@ function effectiveRatePerKwh(
   return { rate: r.flat_rate_per_kwh, mode: "flat" };
 }
 
-function kwhPerYear(vehicle: Vehicle, miles: number, derate: boolean): number {
-  const basePerMile = vehicle.efficiency_kwh_per_100mi / 100;
+function blendedKwhPer100mi(vehicle: Vehicle, highway_fraction: number): number {
+  const city = vehicle.efficiency_kwh_per_100mi_city ?? vehicle.efficiency_kwh_per_100mi;
+  const hwy  = vehicle.efficiency_kwh_per_100mi_highway ?? vehicle.efficiency_kwh_per_100mi;
+  return (1 - highway_fraction) * city + highway_fraction * hwy;
+}
+
+function kwhPerYear(
+  vehicle: Vehicle,
+  miles: number,
+  derate: boolean,
+  highway_fraction: number,
+): number {
+  const basePerMile = blendedKwhPer100mi(vehicle, highway_fraction) / 100;
   const annualMult = derate ? ANNUAL_WINTER_KWH_MULTIPLIER : 1.0;
   if (vehicle.powertrain === "phev") {
-    // Assume 65% of miles on electric (real-world average per Argonne/INL studies).
     const electricShare = 0.65;
     return miles * electricShare * basePerMile * annualMult;
   }
   return miles * basePerMile * annualMult;
+}
+
+// Extra kWh per year from climbing hills.
+// On a round-trip commute the ascent one way is the descent the other way,
+// so we multiply gain by 2. Regen recovers REGEN_EFFICIENCY of descent energy;
+// the remainder is the net loss.
+function elevationExtraKwhPerYear(
+  vehicle: Vehicle,
+  elevation_gain_m: number,
+  trips_per_year: number,
+): number {
+  if (elevation_gain_m <= 0) return 0;
+  const mass = vehicleMassKg(vehicle);
+  const climbJoules = mass * 9.81 * elevation_gain_m; // per one-way trip
+  const roundTripNet = climbJoules * 2 * (1 - REGEN_EFFICIENCY); // round trip, after regen
+  return (roundTripNet / 3_600_000) * trips_per_year;
 }
 
 function gallonsPerYear(vehicle: Vehicle, miles: number): number {
@@ -110,6 +153,9 @@ export interface CalcReturn {
 
 export function calculate(input: CalcInput, ctx: CalcContext): CalcReturn {
   const miles = annualMiles(input.daily_round_trip_mi, input.days_per_week);
+  const trips_per_year = input.days_per_week * 52;
+  const highway_fraction = input.route?.highway_fraction ?? DEFAULT_HIGHWAY_FRACTION;
+  const elevation_gain_m = input.route?.elevation_gain_m ?? 0;
   const { rate, mode } = effectiveRatePerKwh(ctx.utility, input.use_tou);
 
   // Current-car baseline
@@ -118,7 +164,8 @@ export function calculate(input: CalcInput, ctx: CalcContext): CalcReturn {
   const currentCo2 = currentGallons * CO2_KG_PER_GAL_GASOLINE;
 
   const results: VehicleResult[] = ctx.vehicles.map((v) => {
-    const kwh = kwhPerYear(v, miles, input.apply_winter_derate);
+    const kwh = kwhPerYear(v, miles, input.apply_winter_derate, highway_fraction)
+              + elevationExtraKwhPerYear(v, elevation_gain_m, trips_per_year);
     const energyCost = kwh * rate;
     const phevGas = gallonsPerYear(v, miles);
     const phevGasCost = phevGas * input.current.gas_price_per_gal;

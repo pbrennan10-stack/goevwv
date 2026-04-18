@@ -13,21 +13,14 @@ export default function HomePage() {
       <header className="mb-10">
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <Logo className="text-2xl" />
-          <nav className="text-sm text-ink-soft">
-            <a href="#calculator" className="hover:text-ink transition">
+          <nav className="text-sm text-ink-soft flex items-center">
+            <a href="#calculator" className="hover:text-ink transition px-2 py-2">
               Calculator
             </a>
-            <span className="mx-2 text-slate-300">·</span>
-            <Link href="/about" className="hover:text-ink transition">
+            <span className="text-slate-300">·</span>
+            <Link href="/about" className="hover:text-ink transition px-2 py-2">
               About
             </Link>
-            <span className="mx-2 text-slate-300">·</span>
-            <a
-              href="https://github.com/pbrennan10-stack/goevwv"
-              className="hover:text-ink transition"
-            >
-              Source
-            </a>
           </nav>
         </div>
       </header>
@@ -49,6 +42,7 @@ export default function HomePage() {
           vehicles={vehicles}
           utilities={utilities}
           federal={federal}
+          mapboxToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
         />
       </div>
 
@@ -56,15 +50,7 @@ export default function HomePage() {
         <p>
           GoEV WV is an independent, non-commercial project. Numbers are
           estimates based on publicly filed utility rates, EPA vehicle data,
-          and IRS rules; not financial advice. Data reviewed quarterly — if
-          something looks off, open an issue on{" "}
-          <a
-            className="underline hover:text-ink"
-            href="https://github.com/pbrennan10-stack/goevwv"
-          >
-            GitHub
-          </a>
-          .
+          and IRS rules; not financial advice. Data reviewed quarterly.
         </p>
       </footer>
     </main>

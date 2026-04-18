@@ -16,26 +16,19 @@ export default function AboutPage() {
           <Link href="/">
             <Logo className="text-2xl" />
           </Link>
-          <nav className="text-sm text-ink-soft">
-            <Link href="/" className="hover:text-ink transition">
+          <nav className="text-sm text-ink-soft flex items-center">
+            <Link href="/" className="hover:text-ink transition px-2 py-2">
               Calculator
             </Link>
-            <span className="mx-2 text-slate-300">·</span>
-            <Link href="/about" className="text-ink font-medium transition">
+            <span className="text-slate-300">·</span>
+            <Link href="/about" className="text-ink font-medium transition px-2 py-2">
               About
             </Link>
-            <span className="mx-2 text-slate-300">·</span>
-            <a
-              href="https://github.com/pbrennan10-stack/goevwv"
-              className="hover:text-ink transition"
-            >
-              Source
-            </a>
           </nav>
         </div>
       </header>
 
-      <article className="prose prose-slate max-w-prose">
+      <article className="max-w-prose">
         <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-ink leading-tight mb-2">
           Why EVs Are an{" "}
           <span className="text-brand">Important Decision</span>

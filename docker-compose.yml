@@ -6,7 +6,10 @@
 
 services:
   app:
-    build: .
+    build:
+      context: .
+      args:
+        NEXT_PUBLIC_MAPBOX_TOKEN: ${NEXT_PUBLIC_MAPBOX_TOKEN}
     image: goevwv:latest
     container_name: goevwv-app
     restart: unless-stopped

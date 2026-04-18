@@ -11,15 +11,18 @@ import {
 import type {
   CalcInput,
   FederalData,
+  RouteData,
   Utility,
   Vehicle,
   VehicleResult,
 } from "@/lib/types";
+import { RouteHelper } from "@/components/RouteHelper";
 
 interface Props {
   vehicles: Vehicle[];
   utilities: Utility[];
   federal: FederalData;
+  mapboxToken?: string;
 }
 
 const DEFAULT_INPUT: Omit<CalcInput, "vehicle_ids"> = {
@@ -34,7 +37,7 @@ const DEFAULT_INPUT: Omit<CalcInput, "vehicle_ids"> = {
   apply_winter_derate: true,
 };
 
-export function Calculator({ vehicles, utilities, federal }: Props) {
+export function Calculator({ vehicles, utilities, federal, mapboxToken }: Props) {
   const [daily, setDaily] = useState(DEFAULT_INPUT.daily_round_trip_mi);
   const [days, setDays] = useState(DEFAULT_INPUT.days_per_week);
   const [utilityId, setUtilityId] = useState(DEFAULT_INPUT.utility_id);
@@ -44,6 +47,7 @@ export function Calculator({ vehicles, utilities, federal }: Props) {
   const [gasPrice, setGasPrice] = useState(
     DEFAULT_INPUT.current.gas_price_per_gal,
   );
+  const [route, setRoute] = useState<RouteData | null>(null);
 
   // Hydrate from URL on first load so shareable URLs work.
   useEffect(() => {
@@ -91,6 +95,11 @@ export function Calculator({ vehicles, utilities, federal }: Props) {
     [vehicles, selectedIds],
   );
 
+  const onRouteFill = useCallback((r: RouteData) => {
+    setDaily(Math.round(r.distance_mi));
+    setRoute(r);
+  }, []);
+
   const out: CalcReturn | null = useMemo(() => {
     if (selectedVehicles.length === 0) return null;
     return calculate(
@@ -102,10 +111,11 @@ export function Calculator({ vehicles, utilities, federal }: Props) {
         current: { mpg, gas_price_per_gal: gasPrice },
         apply_winter_derate: winter,
         vehicle_ids: selectedIds,
+        route: route ?? undefined,
       },
       { vehicles: selectedVehicles, utility, fed: federal },
     );
-  }, [daily, days, utilityId, useTOU, winter, mpg, gasPrice, selectedVehicles, utility, federal, selectedIds]);
+  }, [daily, days, utilityId, useTOU, winter, mpg, gasPrice, selectedVehicles, utility, federal, selectedIds, route]);
 
   // Sync state to URL so results are shareable.
   useEffect(() => {
@@ -139,15 +149,30 @@ export function Calculator({ vehicles, utilities, federal }: Props) {
         </h2>
 
         <div className="grid gap-5 sm:grid-cols-2">
-          <NumField
-            label="Daily round-trip miles"
-            value={daily}
-            onChange={setDaily}
-            min={1}
-            max={500}
-            step={1}
-            hint="Home to work and back, typical weekday."
-          />
+          <div className="flex flex-col gap-1">
+            <NumField
+              label="Daily round-trip miles"
+              value={daily}
+              onChange={(v) => { setDaily(v); setRoute(null); }}
+              min={1}
+              max={500}
+              step={1}
+              hint={route ? undefined : "Home to work and back, typical weekday."}
+            />
+            {route ? (
+              <div className="flex items-center gap-2 text-xs text-sky-800 bg-sky-50 rounded-md px-2 py-1 ring-1 ring-sky-200">
+                <span className="font-medium">Route:</span> {route.summary}
+                <button
+                  type="button"
+                  onClick={() => setRoute(null)}
+                  className="ml-auto text-sky-500 hover:text-sky-700"
+                  aria-label="Clear route"
+                >✕</button>
+              </div>
+            ) : mapboxToken ? (
+              <RouteHelper token={mapboxToken} onFill={onRouteFill} />
+            ) : null}
+          </div>
           <NumField
             label="Days per week you drive it"
             value={days}
@@ -165,14 +190,14 @@ export function Calculator({ vehicles, utilities, federal }: Props) {
             options={utilities.map((u) => ({ value: u.id, label: u.name }))}
           />
 
-          <div className="flex flex-col gap-2">
-            <label className="flex items-center gap-2 text-sm text-ink">
+          <div className="flex flex-col gap-1">
+            <label className="flex items-center gap-2 text-sm text-ink py-1.5 cursor-pointer">
               <input
                 type="checkbox"
                 checked={useTOU}
                 onChange={(e) => setUseTOU(e.target.checked)}
                 disabled={!utility.residential.tou_available}
-                className="h-4 w-4 rounded accent-brand disabled:opacity-50"
+                className="h-4 w-4 rounded accent-brand disabled:opacity-50 shrink-0"
               />
               <span>
                 Use time-of-use (off-peak) EV rate
@@ -181,12 +206,12 @@ export function Calculator({ vehicles, utilities, federal }: Props) {
                 )}
               </span>
             </label>
-            <label className="flex items-center gap-2 text-sm text-ink">
+            <label className="flex items-center gap-2 text-sm text-ink py-1.5 cursor-pointer">
               <input
                 type="checkbox"
                 checked={winter}
                 onChange={(e) => setWinter(e.target.checked)}
-                className="h-4 w-4 rounded accent-brand"
+                className="h-4 w-4 rounded accent-brand shrink-0"
               />
               <span>Apply WV winter range/efficiency derate (~12%/yr)</span>
             </label>
@@ -249,10 +274,10 @@ export function Calculator({ vehicles, utilities, federal }: Props) {
                     )}
                   </div>
                   <div className="min-w-0">
-                    <div className="font-medium text-ink text-sm truncate">
+                    <div className="font-medium text-ink text-sm leading-snug">
                       {v.year} {v.make} {v.model}
                     </div>
-                    <div className="text-xs text-ink-soft truncate">
+                    <div className="text-xs text-ink-soft leading-snug">
                       {v.trim} · {powertrainLabel(v.powertrain)} ·{" "}
                       {fmtUSD(v.msrp_usd)}
                     </div>
@@ -271,6 +296,7 @@ export function Calculator({ vehicles, utilities, federal }: Props) {
         winter={winter}
         useTOU={useTOU}
         fed={federal}
+        route={route}
       />
     </div>
   );
@@ -445,11 +471,13 @@ function Assumptions({
   winter,
   useTOU,
   fed,
+  route,
 }: {
   utility: Utility;
   winter: boolean;
   useTOU: boolean;
   fed: FederalData;
+  route: import("@/lib/types").RouteData | null;
 }) {
   return (
     <section className="rounded-2xl bg-surface-sunken ring-1 ring-slate-200 p-5 text-sm text-ink-muted">
@@ -471,6 +499,25 @@ function Assumptions({
                   )}¢ on-peak, 75% off-peak share)`
                 : `flat ${fmtNum(utility.residential.flat_rate_per_kwh * 100, 1)}¢/kWh`}
             </strong>
+          </li>
+          <li>
+            {route ? (
+              <>
+                City/highway efficiency: blended from your actual route (
+                <strong>{Math.round(route.highway_fraction * 100)}% highway</strong>).
+                EVs use more energy at highway speeds due to aerodynamic drag — opposite of gas cars.
+                {route.elevation_gain_m > 5 && (
+                  <> Elevation: <strong>{Math.round(route.elevation_gain_m * 3.281)} ft of climbing per trip</strong> adds
+                  extra energy; ~70% is recovered via regenerative braking on the way down.</>
+                )}
+              </>
+            ) : (
+              <>
+                City/highway efficiency: blended at the EPA default split (55% city / 45% highway)
+                using each vehicle's separate EPA city and highway ratings.
+                Use the &ldquo;calculate from route&rdquo; option for a commute-specific estimate.
+              </>
+            )}
           </li>
           <li>
             Winter derate: <strong>{winter ? "on" : "off"}</strong>. When on we
@@ -537,7 +584,7 @@ function NumField({
         min={min}
         max={max}
         step={step}
-        className="w-full rounded-lg border border-slate-300 px-3 py-2 text-ink shadow-sm focus:border-brand focus:ring-brand"
+        className="w-full rounded-lg border border-slate-300 px-3 py-3 text-ink shadow-sm focus:border-brand focus:ring-brand"
       />
       {hint && <span className="text-xs text-ink-soft">{hint}</span>}
     </label>
@@ -561,7 +608,7 @@ function SelectField({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-lg border border-slate-300 px-3 py-2 text-ink shadow-sm focus:border-brand focus:ring-brand bg-white"
+        className="w-full rounded-lg border border-slate-300 px-3 py-3 text-ink shadow-sm focus:border-brand focus:ring-brand bg-white"
       >
         {options.map((o) => (
           <option key={o.value} value={o.value}>

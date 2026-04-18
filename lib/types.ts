@@ -22,6 +22,8 @@ export interface Vehicle {
   epa_range_mi?: number;
   winter_range_mi?: number;
   efficiency_kwh_per_100mi: number;
+  efficiency_kwh_per_100mi_city?: number;
+  efficiency_kwh_per_100mi_highway?: number;
   battery_kwh?: number;
   // PHEV specs
   epa_range_mi_electric?: number;
@@ -140,6 +142,13 @@ export interface CurrentVehicleInput {
   gas_price_per_gal: number;
 }
 
+export interface RouteData {
+  distance_mi: number;
+  highway_fraction: number; // 0–1
+  elevation_gain_m: number; // one-way cumulative climb in metres
+  summary: string;          // human-readable display string
+}
+
 export interface CalcInput {
   daily_round_trip_mi: number;
   days_per_week: number;
@@ -148,4 +157,5 @@ export interface CalcInput {
   current: CurrentVehicleInput;
   apply_winter_derate: boolean;
   vehicle_ids: string[];
+  route?: RouteData;
 }

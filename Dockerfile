@@ -15,7 +15,9 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-# Next.js standalone output is configured in next.config.mjs
+# NEXT_PUBLIC_* vars are embedded at build time by Next.js, not runtime.
+ARG NEXT_PUBLIC_MAPBOX_TOKEN
+ENV NEXT_PUBLIC_MAPBOX_TOKEN=$NEXT_PUBLIC_MAPBOX_TOKEN
 RUN npm run build
 
 # -------- Stage 3: runtime --------
