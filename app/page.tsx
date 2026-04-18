@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Calculator } from "@/components/Calculator";
 import { Logo } from "@/components/Logo";
 import { getFederalData, getUtilities, getVehicles } from "@/lib/data";
@@ -13,12 +14,13 @@ export default function HomePage() {
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <Logo className="text-2xl" />
           <nav className="text-sm text-ink-soft">
-            <a
-              href="#calculator"
-              className="hover:text-ink transition"
-            >
+            <a href="#calculator" className="hover:text-ink transition">
               Calculator
             </a>
+            <span className="mx-2 text-slate-300">·</span>
+            <Link href="/about" className="hover:text-ink transition">
+              About
+            </Link>
             <span className="mx-2 text-slate-300">·</span>
             <a
               href="https://github.com/pbrennan10-stack/goevwv"
