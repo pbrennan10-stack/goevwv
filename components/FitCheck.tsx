@@ -5,20 +5,22 @@ import { useState } from "react";
 export type FitCheckResult = {
   charging: "yes" | "no" | "unsure";
   miles: "under40" | "40-80" | "over80";
-  trips: "rarely" | "monthly" | "weekly";
+  trips: "rarely" | "routine" | "varied";
   verdict: "fit" | "likely" | "maybe" | "notyet";
   hasHomeCharging: boolean;
 };
 
 type ChargingAnswer = "yes" | "no" | "unsure";
 type MilesAnswer = "under40" | "40-80" | "over80";
-type TripsAnswer = "rarely" | "monthly" | "weekly";
+type TripsAnswer = "rarely" | "routine" | "varied";
 type Verdict = "fit" | "likely" | "maybe" | "notyet";
 
 function computeVerdict(charging: ChargingAnswer, miles: MilesAnswer, trips: TripsAnswer): Verdict {
   if (charging === "yes") {
     if (miles !== "over80") return "fit";
-    if (trips === "weekly") return "maybe";
+    // Same-place repeat trips become routine once scoped; varied destinations
+    // keep adding planning overhead each time.
+    if (trips === "varied") return "maybe";
     return "likely";
   }
   // no or unsure — treat both conservatively
@@ -69,31 +71,43 @@ function VerdictDetail({
   if (verdict === "likely") {
     return (
       <p className="text-sm text-ink-muted">
-        Home charging covers your daily driving. For high-mileage days, BEVs may occasionally need
-        a public top-up. WV winters cut range ~28% on the coldest days — check each
-        vehicle&rsquo;s winter range in the calculator. PHEVs handle longer days more flexibly.
+        Home charging handles your daily driving. Long trips to the same handful of places — a
+        cabin, family visits, a regular work destination — become routine once you scope out the
+        charging stops the first time (5 minutes on PlugShare or your in-car route planner before
+        you leave). WV winters cut range ~28% on the coldest days, so check each vehicle&rsquo;s
+        winter range in the calculator. A PHEV works well here too if you&rsquo;d rather skip
+        long-trip planning entirely.
       </p>
     );
   }
   if (verdict === "maybe" && charging === "yes") {
     return (
       <p className="text-sm text-ink-muted">
-        You drive a lot and take frequent long trips. A PHEV may suit you better than a BEV: it
-        runs on electric for daily commutes and switches to gas for highway runs, avoiding range
-        anxiety. A BEV would need careful planning given WV&rsquo;s DCFC gaps on I-77 south and
-        rural I-79.
+        You drive a lot and your long trips go to <em>varied</em> destinations — each new route
+        means reviewing charger locations ahead of time. A PHEV likely fits better: it runs on
+        electric daily and switches to gas for unfamiliar highway runs, so you don&rsquo;t think
+        about charging mid-trip. A BEV still works, but expect to spend ~5 minutes on PlugShare
+        or your in-car route planner before each first visit to a new place. Trips you repeat
+        settle into routine after the first run — the friction is mostly first-time routes.
       </p>
     );
   }
   if (verdict === "maybe") {
     return (
-      <p className="text-sm text-ink-muted">
-        Short daily drive and rare long trips — this could work if you&rsquo;re in or near
-        Morgantown, Charleston, Huntington, Parkersburg, Wheeling, or Martinsburg, which have
-        workable public charging. Rural WV without home charging is genuinely difficult. Even a
-        standard 120V outdoor outlet adds 3–5 miles of range per hour overnight and changes the
-        math significantly.
-      </p>
+      <div className="text-sm text-ink-muted space-y-2">
+        <p>
+          Short daily drive and rare long trips — this could work if you&rsquo;re in or near
+          Morgantown, Charleston, Huntington, Parkersburg, Wheeling, or Martinsburg, which have
+          workable public charging. Rural WV without home charging is genuinely difficult.
+        </p>
+        <p>
+          <strong>Check what outlets you already have before ruling it out.</strong> If you have
+          a 240V outlet at home (dryer, welder, RV hookup, garage 50-amp), a portable Level 2
+          charger is $200–$500 and works the day it arrives — no electrician needed. That adds
+          ~20 miles of range per hour and changes the picture significantly. Even a standard
+          120V outlet adds 3–5 mi/hr overnight and is enough for a short daily drive.
+        </p>
+      </div>
     );
   }
   // notyet
@@ -110,11 +124,26 @@ function VerdictDetail({
         <strong>Earliest new stations: 2027 at best.</strong> This may change — check back as
         infrastructure improves.
       </p>
-      <p>
-        If you&rsquo;re close to installing a home outlet, that changes the picture: a Level 2
-        charger ($800–$3,200 installed) adds 20–30 miles of range per hour. AEP customers can get
-        $500 back toward installation.
-      </p>
+      <div className="space-y-1">
+        <p className="font-medium text-ink">Three home-charging tiers, cheapest first:</p>
+        <ul className="list-disc list-inside space-y-1 pl-1">
+          <li>
+            <strong>Already have a 240V outlet?</strong> (dryer, welder, RV hookup, or a
+            50-amp circuit in the garage) — a <strong>portable Level 2 charger is
+            $200–$500</strong> and works the day it arrives. No electrician. Adds ~20 mi of
+            range per hour. This is the option most people overlook.
+          </li>
+          <li>
+            <strong>Wall-mounted Level 2 install:</strong> $800–$3,200 for hardware plus a
+            licensed electrician. <strong>AEP customers can get $500 back.</strong> Fastest
+            (up to 48 amps) and cleanest install.
+          </li>
+          <li>
+            <strong>Standard 120V outlet:</strong> slow — 3–5 mi/hr overnight — but works
+            for short commutes.
+          </li>
+        </ul>
+      </div>
     </div>
   );
 }
@@ -204,15 +233,19 @@ export function FitCheck() {
         <div>
           <p className="text-xs text-ink-soft mb-3">Questions 1–2 of 3 answered</p>
           <p className="text-sm font-medium text-ink mb-3">
-            3. How often do you take long drives — 150+ miles one way? (WV to Pittsburgh, DC,
-            Charlotte, etc.)
+            3. When you take long drives (150+ mi one-way — WV → Pittsburgh, DC, Charlotte,
+            Columbus), what&rsquo;s the pattern?
           </p>
-          <div className="flex flex-col sm:flex-row gap-2">
+          <p className="text-xs text-ink-soft mb-3">
+            Repeat trips to the same place become routine after you scope the route once. Varied
+            destinations mean planning fresh each time.
+          </p>
+          <div className="flex flex-col gap-2">
             {(
               [
                 ["rarely", "Rarely — a few times a year"],
-                ["monthly", "Monthly-ish"],
-                ["weekly", "Weekly or more"],
+                ["routine", "Regularly, but mostly the same destinations (you know the route)"],
+                ["varied", "Regularly, different destinations each time"],
               ] as const
             ).map(([val, label]) => (
               <button

@@ -21,6 +21,10 @@ export interface Vehicle {
   // BEV specs
   epa_range_mi?: number;
   winter_range_mi?: number;
+  // Realistic sustained highway range at ~70 mph with some elevation + buffer.
+  // Curated (not derived) because manufacturers' EPA inflation varies by brand —
+  // Tesla in particular overstates more than most. WV-specific calibration.
+  highway_range_mi?: number;
   efficiency_kwh_per_100mi: number;
   efficiency_kwh_per_100mi_city?: number;
   efficiency_kwh_per_100mi_highway?: number;
@@ -259,4 +263,5 @@ export interface CalcInput {
   vehicle_ids: string[];
   route?: RouteData;
   long_trips_per_year: number; // trips where one-way distance ≈ 200 mi, requiring DCFC
+  long_trip_one_way_mi?: number; // default 200; user can override for route-specific analysis
 }

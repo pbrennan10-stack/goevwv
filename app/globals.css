@@ -31,3 +31,33 @@ body {
 input[type="range"] {
   accent-color: #059669;
 }
+
+/* --- Print styles: used by the /report page --- */
+@media print {
+  html,
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+  @page {
+    margin: 0.5in;
+    size: letter;
+  }
+  .no-print {
+    display: none !important;
+  }
+  a,
+  a:visited {
+    color: #000 !important;
+    text-decoration: none !important;
+  }
+  /* Prevent orphaned cards across pages */
+  .break-inside-avoid {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  /* Keep the container wide on paper */
+  main {
+    max-width: 100% !important;
+  }
+}

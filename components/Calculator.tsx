@@ -40,6 +40,7 @@ const DEFAULT_INPUT: Omit<CalcInput, "vehicle_ids"> = {
   },
   apply_winter_derate: true,
   long_trips_per_year: 4,
+  long_trip_one_way_mi: 200,
 };
 
 export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxToken }: Props) {
@@ -53,6 +54,7 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
   const [iceVehicleId, setIceVehicleId] = useState("");
   const [route, setRoute] = useState<RouteData | null>(null);
   const [longTrips, setLongTrips] = useState(DEFAULT_INPUT.long_trips_per_year);
+  const [longTripMi, setLongTripMi] = useState(DEFAULT_INPUT.long_trip_one_way_mi ?? 200);
   const [gasSensitivityPrice, setGasSensitivityPrice] = useState(DEFAULT_INPUT.current.gas_price_per_gal);
 
   // Keep sensitivity slider in sync when user updates the main gas price input.
@@ -81,11 +83,14 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
     setMpg(num("mpg", DEFAULT_INPUT.current.mpg));
     setGasPrice(num("gas", DEFAULT_INPUT.current.gas_price_per_gal));
     setLongTrips(num("lt", DEFAULT_INPUT.long_trips_per_year));
+    setLongTripMi(num("ltm", DEFAULT_INPUT.long_trip_one_way_mi ?? 200));
     const vids = p.get("v");
     if (vids) {
       const ids = vids.split(",").filter(Boolean).slice(0, 3);
       setSelectedIds(ids);
     }
+    const iv = p.get("iv");
+    if (iv) setIceVehicleId(iv);
   }, []);
 
   // Default selected vehicles (picked to be interesting for WV).
@@ -146,10 +151,11 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
         vehicle_ids: selectedIds,
         route: route ?? undefined,
         long_trips_per_year: longTrips,
+        long_trip_one_way_mi: longTripMi,
       },
       { vehicles: selectedVehicles, utility, fed: federal },
     );
-  }, [daily, days, utilityId, useTOU, winter, mpg, gasPrice, selectedIceVehicle, selectedVehicles, utility, federal, selectedIds, route, longTrips]);
+  }, [daily, days, utilityId, useTOU, winter, mpg, gasPrice, selectedIceVehicle, selectedVehicles, utility, federal, selectedIds, route, longTrips, longTripMi]);
 
   const outSensitivity: CalcReturn | null = useMemo(() => {
     if (selectedVehicles.length === 0) return null;
@@ -168,10 +174,11 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
         vehicle_ids: selectedIds,
         route: route ?? undefined,
         long_trips_per_year: longTrips,
+        long_trip_one_way_mi: longTripMi,
       },
       { vehicles: selectedVehicles, utility, fed: federal },
     );
-  }, [daily, days, utilityId, useTOU, winter, mpg, gasSensitivityPrice, selectedIceVehicle, selectedVehicles, utility, federal, selectedIds, route, longTrips]);
+  }, [daily, days, utilityId, useTOU, winter, mpg, gasSensitivityPrice, selectedIceVehicle, selectedVehicles, utility, federal, selectedIds, route, longTrips, longTripMi]);
 
   // Sync state to URL so results are shareable.
   useEffect(() => {
@@ -186,9 +193,11 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
     p.set("gas", String(gasPrice));
     p.set("v", selectedIds.join(","));
     if (longTrips !== DEFAULT_INPUT.long_trips_per_year) p.set("lt", String(longTrips));
+    if (longTripMi !== (DEFAULT_INPUT.long_trip_one_way_mi ?? 200)) p.set("ltm", String(longTripMi));
+    if (iceVehicleId) p.set("iv", iceVehicleId);
     const newUrl = `${window.location.pathname}?${p.toString()}`;
     window.history.replaceState({}, "", newUrl);
-  }, [daily, days, utilityId, useTOU, winter, mpg, gasPrice, selectedIds, longTrips]);
+  }, [daily, days, utilityId, useTOU, winter, mpg, gasPrice, selectedIds, longTrips, longTripMi, iceVehicleId]);
 
   const toggleVehicle = useCallback((id: string) => {
     setSelectedIds((prev) => {
@@ -247,7 +256,16 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
             min={0}
             max={52}
             step={1}
-            hint="Trips where one-way distance is ~200 mi or more (e.g., WV → Pittsburgh, DC, Charlotte). Used for charging time estimates."
+            hint="e.g., WV → Pittsburgh, DC, Charlotte, Columbus. Used for DCFC stop estimates."
+          />
+          <NumField
+            label="Typical one-way distance (mi)"
+            value={longTripMi}
+            onChange={setLongTripMi}
+            min={50}
+            max={600}
+            step={10}
+            hint="Default 200. Adjust for your actual destination (e.g., Charleston→Pittsburgh ≈ 250, Charleston→DC ≈ 350)."
           />
 
           <SelectField
@@ -475,56 +493,27 @@ function Results({
     <section className="space-y-4">
       <div className="flex items-baseline justify-between flex-wrap gap-2">
         <h2 className="text-lg font-semibold text-ink">Results</h2>
-        <div className="text-sm text-ink-soft">
-          At {fmtNum(out.annual_miles)} mi/yr · rate{" "}
-          <strong>{fmtNum(out.rate_per_kwh * 100, 1)}¢/kWh</strong>{" "}
-          ({out.rate_mode === "tou" ? "TOU off-peak" : "flat"}) via{" "}
-          <strong>{utility.name}</strong>
+        <div className="flex items-center gap-3 flex-wrap">
+          <div className="text-sm text-ink-soft">
+            At {fmtNum(out.annual_miles)} mi/yr · rate{" "}
+            <strong>{fmtNum(out.rate_per_kwh * 100, 1)}¢/kWh</strong>{" "}
+            ({out.rate_mode === "tou" ? "TOU off-peak" : "flat"}) via{" "}
+            <strong>{utility.name}</strong>
+          </div>
+          <ReportLink />
         </div>
       </div>
 
-      {/* Current vehicle baseline */}
-      <div className="rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 p-5">
-        <div className="text-sm text-ink-muted mb-2">
-          Your current vehicle{selectedIceVehicle ? ` — ${selectedIceVehicle.year} ${selectedIceVehicle.make} ${selectedIceVehicle.model}` : ""}
-        </div>
-        {iceMaint ? (
-          <div>
-            <div className="flex justify-between items-baseline flex-wrap gap-2 mb-2">
-              <div className="text-2xl font-semibold text-ink">
-                {fmtUSD(out.current_annual_total_usd)}
-                <span className="text-sm font-normal text-ink-soft"> /year total</span>
-              </div>
-              <div className="text-sm text-ink-soft">
-                {fmtNum(out.current_annual_co2_kg / 1000, 2)} tons CO₂/yr
-              </div>
-            </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-1 text-sm text-ink-muted">
-              <div>{fmtUSD(out.current_annual_gas_cost)} gas</div>
-              <div>{fmtUSD(iceMaint.oil_usd)} oil changes</div>
-              <div>{fmtUSD(iceMaint.tires_usd)} tires</div>
-              <div>{fmtUSD(iceMaint.brakes_usd + iceMaint.misc_usd)} brakes + misc</div>
-              {out.current_annual_insurance_usd > 0 && (
-                <div>{fmtUSD(out.current_annual_insurance_usd)} insurance (est.)</div>
-              )}
-            </div>
-          </div>
-        ) : (
-          <div className="flex justify-between items-baseline flex-wrap gap-2">
-            <div className="text-2xl font-semibold text-ink">
-              {fmtUSD(out.current_annual_gas_cost)}
-              <span className="text-sm font-normal text-ink-soft"> /year in gas</span>
-            </div>
-            <div className="text-sm text-ink-soft">
-              {fmtNum(out.current_annual_co2_kg / 1000, 2)} tons CO₂/yr
-            </div>
-          </div>
-        )}
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      {/* Cards grid: baseline (current vehicle) + each EV, side-by-side for comparison */}
+      <div className={["grid gap-4 md:grid-cols-2", gridColsFor(out.results.length + 1)].join(" ")}>
+        <BaselineCard
+          out={out}
+          iceMaint={iceMaint}
+          iceVehicle={selectedIceVehicle}
+          mpg={mpg}
+        />
         {out.results.map((r) => (
-          <ResultCard key={r.vehicle.id} r={r} showMaintenance={!!iceMaint} iceVehicle={selectedIceVehicle} />
+          <ResultCard key={r.vehicle.id} r={r} showMaintenance={!!iceMaint} iceVehicle={selectedIceVehicle} currentAnnualCo2Kg={out.current_annual_co2_kg} />
         ))}
       </div>
 
@@ -540,7 +529,82 @@ function Results({
   );
 }
 
-function ResultCard({ r, showMaintenance, iceVehicle }: { r: VehicleResult; showMaintenance: boolean; iceVehicle?: IceVehicle | null }) {
+// Tailwind JIT needs class names as literal strings.
+function gridColsFor(cardCount: number): string {
+  if (cardCount >= 4) return "lg:grid-cols-4";
+  if (cardCount === 3) return "lg:grid-cols-3";
+  return "lg:grid-cols-2";
+}
+
+function BaselineCard({
+  out,
+  iceMaint,
+  iceVehicle,
+  mpg,
+}: {
+  out: CalcReturn;
+  iceMaint: MaintenanceCosts | null;
+  iceVehicle: IceVehicle | null;
+  mpg: number;
+}) {
+  const hasIce = !!iceMaint && !!iceVehicle;
+  const annualTotal = hasIce ? out.current_annual_total_usd : out.current_annual_gas_cost;
+  return (
+    <article className="rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 p-5 flex flex-col gap-3">
+      <header>
+        <div className="text-xs uppercase tracking-wider text-ink-soft font-semibold">
+          Current baseline
+        </div>
+        <div className="font-semibold text-ink text-lg leading-tight">
+          {iceVehicle ? `${iceVehicle.year} ${iceVehicle.make} ${iceVehicle.model}` : "Your current vehicle"}
+        </div>
+        <div className="text-sm text-ink-soft">
+          {iceVehicle ? `${iceVehicle.trim} · ${iceVehicle.mpg_combined} mpg` : `${mpg} mpg (entered manually)`}
+        </div>
+      </header>
+
+      <div className="rounded-lg p-3 font-mono text-sm bg-slate-100 text-slate-800">
+        <div className="text-xs uppercase tracking-wide opacity-70 mb-0.5">
+          Annual total (baseline)
+        </div>
+        <div className="text-xl font-bold tabular-nums">
+          {fmtUSD(annualTotal)}
+          <span className="text-xs font-normal opacity-70"> /year</span>
+        </div>
+        <div className="text-xs opacity-75">
+          {fmtUSD(annualTotal * 5)} over 5 yr
+        </div>
+      </div>
+
+      <dl className="grid grid-cols-2 gap-x-3 gap-y-2 text-sm">
+        <Row label="Annual fuel/energy" value={fmtUSD(out.current_annual_gas_cost)} />
+        <Row label="WV annual fee" value="—" muted />
+        <Row
+          label="Maintenance"
+          value={hasIce && iceMaint ? fmtUSD(iceMaint.total_usd) : "—"}
+          muted
+        />
+        <Row
+          label="Insurance (est.)"
+          value={out.current_annual_insurance_usd > 0 ? fmtUSD(out.current_annual_insurance_usd) : "—"}
+          muted
+        />
+        <Row label="Total /yr" value={fmtUSD(annualTotal)} strong />
+        <Row
+          label="CO₂ /yr"
+          value={`${fmtNum(out.current_annual_co2_kg / 1000, 2)} t`}
+        />
+        <Row label="MSRP" value="Already owned" muted />
+        <Row label="Fed IRA credit" value="—" muted />
+        <Row label="Effective price" value="—" muted />
+        <Row label="Assembly" value="—" muted />
+        <Row label="US/CA parts" value="—" muted />
+      </dl>
+    </article>
+  );
+}
+
+function ResultCard({ r, showMaintenance, iceVehicle, currentAnnualCo2Kg }: { r: VehicleResult; showMaintenance: boolean; iceVehicle?: IceVehicle | null; currentAnnualCo2Kg: number }) {
   const savings = r.annual_savings_vs_current_usd;
   const positive = savings >= 0;
   return (
@@ -576,54 +640,60 @@ function ResultCard({ r, showMaintenance, iceVehicle }: { r: VehicleResult; show
       </div>
 
       <dl className="grid grid-cols-2 gap-x-3 gap-y-2 text-sm">
-        <Row label="Annual energy" value={fmtUSD(r.annual_energy_cost_usd)} />
-        {r.annual_state_fee_usd > 0 && (
-          <Row label="WV annual fee" value={fmtUSD(r.annual_state_fee_usd)} muted />
-        )}
-        {showMaintenance && r.annual_maintenance_usd > 0 && (
-          <Row label="EV maintenance" value={fmtUSD(r.annual_maintenance_usd)} muted />
-        )}
-        {showMaintenance && r.annual_insurance_usd > 0 && (
-          <Row label="Insurance (est.)" value={fmtUSD(r.annual_insurance_usd)} muted />
-        )}
+        <Row label="Annual fuel/energy" value={fmtUSD(r.annual_energy_cost_usd)} />
+        <Row
+          label="WV annual fee"
+          value={r.annual_state_fee_usd > 0 ? fmtUSD(r.annual_state_fee_usd) : "—"}
+          muted
+        />
+        <Row
+          label="Maintenance"
+          value={showMaintenance && r.annual_maintenance_usd > 0 ? fmtUSD(r.annual_maintenance_usd) : "—"}
+          muted
+        />
+        <Row
+          label="Insurance (est.)"
+          value={showMaintenance && r.annual_insurance_usd > 0 ? fmtUSD(r.annual_insurance_usd) : "—"}
+          muted
+        />
         <Row label="Total /yr" value={fmtUSD(r.annual_total_usd)} strong />
         <Row
-          label="CO₂ avoided /yr"
-          value={`${fmtNum(r.co2_saved_vs_current_kg_per_year / 1000, 2)} t`}
+          label="CO₂ /yr"
+          value={`${fmtNum(r.co2_kg_per_year / 1000, 2)} t${currentAnnualCo2Kg > 0 ? ` (−${fmtNum((currentAnnualCo2Kg - r.co2_kg_per_year) / 1000, 2)} vs baseline)` : ""}`}
         />
         <Row
           label="MSRP"
           value={fmtUSD(r.vehicle.msrp_usd)}
           muted={r.federal_credit_usd > 0}
         />
-        {r.federal_credit_usd > 0 && (
-          <>
-            <Row
-              label="Fed IRA credit"
-              value={`-${fmtUSD(r.federal_credit_usd)}`}
-              className="text-brand-dark"
-            />
-            <Row
-              label="Effective price"
-              value={fmtUSD(r.effective_msrp_usd)}
-              strong
-            />
-          </>
-        )}
-        {r.vehicle.assembly_location && (
-          <Row
-            label="Assembly"
-            value={r.vehicle.assembly_location}
-            muted
-          />
-        )}
-        {r.vehicle.us_canadian_parts_pct !== undefined && (
-          <Row
-            label="US/CA parts"
-            value={r.vehicle.us_canadian_parts_pct === null ? "N/A (exempt)" : `${r.vehicle.us_canadian_parts_pct}%`}
-            muted
-          />
-        )}
+        <Row
+          label="Fed IRA credit"
+          value={r.federal_credit_usd > 0 ? `-${fmtUSD(r.federal_credit_usd)}` : "—"}
+          className={r.federal_credit_usd > 0 ? "text-brand-dark" : undefined}
+          muted={r.federal_credit_usd === 0}
+        />
+        <Row
+          label="Effective price"
+          value={r.federal_credit_usd > 0 ? fmtUSD(r.effective_msrp_usd) : "—"}
+          strong={r.federal_credit_usd > 0}
+          muted={r.federal_credit_usd === 0}
+        />
+        <Row
+          label="Assembly"
+          value={r.vehicle.assembly_location ?? "—"}
+          muted
+        />
+        <Row
+          label="US/CA parts"
+          value={
+            r.vehicle.us_canadian_parts_pct === undefined
+              ? "—"
+              : r.vehicle.us_canadian_parts_pct === null
+              ? "N/A (exempt)"
+              : `${r.vehicle.us_canadian_parts_pct}%`
+          }
+          muted
+        />
       </dl>
 
       {r.warnings.length > 0 && (
@@ -677,9 +747,11 @@ function FuelingTimePanel({
         Time spent fueling vs. charging
       </h3>
       <p className="text-xs text-ink-soft mb-4">
-        Based on {out.long_trips_per_year} long road trip{out.long_trips_per_year !== 1 ? "s" : ""}/yr
-        (~200-mile one-way). Home charging time is passive — you plug in when you get home and
-        walk away. Only DCFC stops (and any PHEV gas fill-ups) are time you spend waiting.
+        Based on {out.long_trips_per_year} long road trip{out.long_trips_per_year !== 1 ? "s" : ""}/yr at ~{out.long_trip_one_way_mi} mi one-way.
+        Uses each EV&rsquo;s <strong>realistic sustained highway range</strong> (not EPA) — Tesla&rsquo;s EPA
+        numbers in particular overstate real-world WV highway range considerably. DCFC stops top up to
+        ~80% (past that the taper is painfully slow), so each stop adds less range than a full home
+        charge. Home charging is passive; DCFC stops and PHEV gas fill-ups are active waiting time.
       </p>
 
       {/* ICE baseline */}
@@ -1083,6 +1155,23 @@ function SelectField({
         ))}
       </select>
     </label>
+  );
+}
+
+function ReportLink() {
+  // Uses the live URL — Calculator keeps search params in sync with state.
+  const onClick = () => {
+    if (typeof window === "undefined") return;
+    window.open(`/report${window.location.search}`, "_blank", "noopener");
+  };
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="text-sm font-medium text-brand hover:underline whitespace-nowrap"
+    >
+      Printable report →
+    </button>
   );
 }
 

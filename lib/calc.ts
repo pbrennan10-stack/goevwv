@@ -54,12 +54,27 @@ function homeChargeSessions(daily_mi: number, days_per_week: number, range_mi: n
   return Math.ceil((days_per_week * 52) / daysPerCharge);
 }
 
-function dcfcStopsPerRoundTrip(range_mi: number): number {
-  // Highway efficiency + safety buffer: assume 85% of rated range usable on a long trip.
-  const highwayUsable = range_mi * 0.85;
-  if (LONG_TRIP_ONE_WAY_MI <= highwayUsable) return 0;
-  const stopsOneWay = Math.ceil(LONG_TRIP_ONE_WAY_MI / highwayUsable) - 1;
-  return stopsOneWay * 2; // round trip
+function dcfcStopsPerRoundTrip(highwayRangeMi: number, oneWayMi: number): number {
+  // Counts *mid-route* DCFC stops needed to complete one leg, then × 2 for the
+  // round trip (assumes destination has overnight charging — hotel L2, family
+  // garage, Supercharger near hotel, etc.).
+  //
+  // Asymmetric usable windows matter:
+  //   - First tank (home → first stop): 100% SOC → ~15% buffer = 85% usable
+  //   - Subsequent DCFC stops top to 80% only (past 80% the taper is painful)
+  //     → 80% → 15% buffer = 65% usable
+  //
+  // highwayRangeMi is the curated realistic sustained highway range at ~70 mph
+  // (not EPA combined). This reflects aero drag at highway speeds, HVAC, WV
+  // elevation, and — for Tesla specifically — empirical reports that EPA is
+  // overstated more than for other brands.
+  if (!highwayRangeMi || highwayRangeMi <= 0) return 0;
+  if (!oneWayMi || oneWayMi <= 0) return 0;
+  const firstSegMi = highwayRangeMi * 0.85;
+  if (oneWayMi <= firstSegMi) return 0;
+  const perStopMi = highwayRangeMi * 0.65;
+  const stopsOneWay = Math.ceil((oneWayMi - firstSegMi) / perStopMi);
+  return stopsOneWay * 2;
 }
 
 function annualMiles(daily: number, daysPerWeek: number): number {
@@ -226,6 +241,7 @@ export interface CalcReturn {
   current_annual_fillups: number;
   current_annual_fueling_min: number;
   long_trips_per_year: number;
+  long_trip_one_way_mi: number;
 }
 
 export function calculate(input: CalcInput, ctx: CalcContext): CalcReturn {
@@ -284,9 +300,13 @@ export function calculate(input: CalcInput, ctx: CalcContext): CalcReturn {
     let gasFillupsEv = 0;
     let gasFuelingMinEv = 0;
     if (v.powertrain === "bev") {
-      const range = v.epa_range_mi ?? 200;
-      homeChargeSess = homeChargeSessions(input.daily_round_trip_mi, input.days_per_week, range);
-      dcfcStops = dcfcStopsPerRoundTrip(range) * input.long_trips_per_year;
+      const dailyRange = v.epa_range_mi ?? 200;
+      // DCFC math uses a curated realistic highway range. Fall back to
+      // 80% of EPA for any BEV that hasn't been curated yet.
+      const hwyRange = v.highway_range_mi ?? Math.round(dailyRange * 0.80);
+      const oneWayMi = input.long_trip_one_way_mi ?? LONG_TRIP_ONE_WAY_MI;
+      homeChargeSess = homeChargeSessions(input.daily_round_trip_mi, input.days_per_week, dailyRange);
+      dcfcStops = dcfcStopsPerRoundTrip(hwyRange, oneWayMi) * input.long_trips_per_year;
       dcfcMin = dcfcStops * (v.charging.dcfc_10_to_80_min ?? DCFC_DEFAULT_MIN);
     } else if (v.powertrain === "phev") {
       const eRange = v.epa_range_mi_electric ?? 40;
@@ -298,12 +318,21 @@ export function calculate(input: CalcInput, ctx: CalcContext): CalcReturn {
     const homeChargeMin = homeChargeSess * EV_HOME_PLUG_MIN;
 
     const warnings: string[] = [];
-    if (v.epa_range_mi && v.epa_range_mi < input.daily_round_trip_mi * 1.5) {
+    if (v.epa_range_mi && input.daily_round_trip_mi > v.epa_range_mi) {
+      warnings.push(
+        `Daily round-trip of ${input.daily_round_trip_mi} mi EXCEEDS this vehicle's ${v.epa_range_mi}-mi EPA range. You can't do this commute on one charge — not viable unless you can reliably charge at your destination every day.`,
+      );
+    } else if (v.epa_range_mi && v.epa_range_mi < input.daily_round_trip_mi * 1.5) {
       warnings.push(
         `Daily round-trip of ${input.daily_round_trip_mi} mi is close to the ${v.epa_range_mi}-mi EPA range — you'll want reliable home charging and a buffer.`,
       );
     }
-    if (v.epa_range_mi && v.winter_range_mi && v.winter_range_mi < input.daily_round_trip_mi) {
+    if (
+      v.epa_range_mi &&
+      v.winter_range_mi &&
+      v.winter_range_mi < input.daily_round_trip_mi &&
+      input.daily_round_trip_mi <= v.epa_range_mi // already flagged above if exceeds EPA
+    ) {
       warnings.push(
         `Estimated WV winter range (${v.winter_range_mi} mi) is less than your daily round trip. Plan for mid-day charging in January/February.`,
       );
@@ -354,6 +383,7 @@ export function calculate(input: CalcInput, ctx: CalcContext): CalcReturn {
     current_annual_fillups: currentFillups,
     current_annual_fueling_min: currentFuelingMin,
     long_trips_per_year: input.long_trips_per_year,
+    long_trip_one_way_mi: input.long_trip_one_way_mi ?? LONG_TRIP_ONE_WAY_MI,
   };
 }
 

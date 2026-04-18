@@ -22,8 +22,8 @@ export default function HomePage() {
               Calculator
             </a>
             <span className="text-slate-300">·</span>
-            <Link href="/about" className="hover:text-ink transition px-2 py-2">
-              About
+            <Link href="/about" className="font-medium text-ink hover:text-brand transition px-2 py-2">
+              Why EVs Matter
             </Link>
           </nav>
         </div>
@@ -38,6 +38,15 @@ export default function HomePage() {
           A fair, WV-specific look at the numbers. We factor in your utility,
           our cold winters, the $200 annual EV fee, and federal tax credits —
           so you can decide with open eyes.
+        </p>
+        <p className="mt-4 text-sm text-ink-soft max-w-prose">
+          Why I built this:{" "}
+          <Link
+            href="/about"
+            className="font-medium text-brand hover:underline"
+          >
+            an honest case for EV adoption in WV →
+          </Link>
         </p>
       </section>
 
