@@ -1,0 +1,186 @@
+# WV utility data for GoEV WV
+# Updated: 2026-04-18
+# IMPORTANT: Rates marked VERIFY_BEFORE_LAUNCH are approximate and should be
+# cross-checked against the utility's current tariff sheets or WV PSC filings
+# before public launch. A quarterly refresh cadence is recommended.
+
+# ---------------------------------------------------------------
+# APPALACHIAN POWER (AEP) - serves southern & central WV
+# ---------------------------------------------------------------
+aep:
+  name: "Appalachian Power"
+  parent_company: "American Electric Power"
+  website: "https://www.appalachianpower.com"
+  service_area: "Southern and central West Virginia"
+  customer_service_phone: "1-800-956-4237"
+
+  residential:
+    # All-in average including base + fuel/rider adjustments. Source: EnergySage / AEP public filings, March 2026.
+    # VERIFY_BEFORE_LAUNCH against current AEP tariff schedule "R.S."
+    flat_rate_per_kwh: 0.172
+    monthly_customer_charge: 11.38  # VERIFY_BEFORE_LAUNCH
+    rate_notes: >
+      AEP WV residential rates have risen notably in 2025-2026 due to PSC-approved
+      base rate increases. Average monthly bill for 1000 kWh is ~$172. A further
+      rate case is pending at the WV PSC as of early 2026.
+
+    tou_available: true
+    tou_program_name: "WV Off-Peak Charging"
+    tou_url: "https://www.appalachianpower.com/clean-energy/electric-cars/wv-off-peak"
+    # VERIFY_BEFORE_LAUNCH - exact on-peak/off-peak windows and rate differentials
+    # are published on the AEP off-peak charging page; these are approximate.
+    tou_schedule:
+      off_peak_hours: "9:00 PM - 5:00 AM (weekdays and all weekend)"
+      off_peak_rate_per_kwh: 0.065  # APPROXIMATE - verify
+      on_peak_rate_per_kwh: 0.210   # APPROXIMATE - verify
+    tou_requires_separate_meter: true  # VERIFY
+    tou_enrollment_notes: "Requires enrollment via TakeChargeWV program"
+
+  rebates:
+    - id: "aep-charge-forward-l2"
+      name: "Charge Forward Level 2 Charger Rebate"
+      type: "l2_charger"
+      amount_usd: 250
+      description: >
+        Rebate of up to $250 for purchase and installation of an ENERGY STAR
+        certified Level 2 EV charger.
+      eligibility:
+        - "Must be AEP residential customer"
+        - "Charger must be ENERGY STAR certified"
+      url: "https://takechargewv.com/programs/for-your-home/chargeforward"
+      expires: "VERIFY - program was set to end 2024-12-31 per AFDC; check for extension"
+      stackable_with_federal: true
+
+    - id: "aep-charge-forward-licensed-electrician"
+      name: "Charge Forward Licensed Electrician Bonus"
+      type: "installation"
+      amount_usd: 250
+      description: >
+        Additional rebate of up to $250 if the Level 2 charger is installed by
+        a licensed electrician.
+      eligibility:
+        - "Must be AEP residential customer"
+        - "Installation by licensed electrician"
+        - "Stacks with the L2 charger rebate above"
+      url: "https://takechargewv.com/programs/for-your-home/chargeforward"
+      expires: "VERIFY - program status 2026"
+      stackable_with_federal: true
+
+  coverage_zip_prefixes: ["247", "248", "249", "253", "254", "255", "256", "257", "258", "259"]
+  # VERIFY - this is an approximation of southern/central WV ZIPs served by AEP
+
+# ---------------------------------------------------------------
+# MON POWER (FirstEnergy) - serves northern WV
+# ---------------------------------------------------------------
+mon_power:
+  name: "Mon Power"
+  parent_company: "FirstEnergy"
+  website: "https://www.firstenergycorp.com/mon_power.html"
+  service_area: "Northern and north-central West Virginia (34 counties)"
+  customer_service_phone: "1-800-686-0022"
+
+  residential:
+    # VERIFY_BEFORE_LAUNCH - source: March 2026 average per utility-rates.com
+    flat_rate_per_kwh: 0.138
+    monthly_customer_charge: 8.00  # per FirstEnergy 2023-09 WV tariff; VERIFY current
+    rate_notes: >
+      Mon Power WV residential rates are lower than AEP's, averaging ~13.8¢/kWh
+      in early 2026. Recent rate cases have approved double-digit increases; trend
+      is upward. Customers include approximately 395,000 accounts across 34 counties.
+
+    # Mon Power TOU program for residential EV customers - VERIFY current status
+    # FirstEnergy has explored TOU pilots but a standing EV TOU tariff in WV is not confirmed
+    tou_available: false  # VERIFY_BEFORE_LAUNCH
+    tou_program_name: null
+    tou_notes: "As of early 2026, no confirmed residential EV TOU tariff in WV. Check firstenergycorp.com/help/saving_energy/electric-vehicles/wv-ev.html"
+
+  rebates:
+    - id: "mon-power-ev-charger-placeholder"
+      name: "Mon Power / FirstEnergy EV program"
+      type: "unknown"
+      amount_usd: null
+      description: >
+        As of this data update, FirstEnergy's specific WV EV rebate offerings were
+        not clearly published. This entry is a placeholder pending direct contact
+        with FirstEnergy customer service.
+      url: "https://www.firstenergycorp.com/help/saving_energy/electric-vehicles/wv-ev.html"
+      expires: null
+      verify_before_display: true
+
+  coverage_zip_prefixes: ["262", "263", "264", "265", "266", "267", "268", "269"]
+  # VERIFY - approximation of northern WV
+
+# ---------------------------------------------------------------
+# WHEELING POWER - AEP subsidiary serving northern panhandle
+# ---------------------------------------------------------------
+wheeling_power:
+  name: "Wheeling Power"
+  parent_company: "American Electric Power"
+  website: "https://www.wheelingpower.com"
+  service_area: "Northern panhandle (Wheeling and surrounding areas)"
+  customer_service_phone: "1-800-982-4237"
+
+  residential:
+    # Wheeling Power is a small AEP subsidiary; rates track AEP closely but have
+    # separate tariffs filed. VERIFY_BEFORE_LAUNCH.
+    flat_rate_per_kwh: 0.165  # APPROXIMATE - typically similar to or slightly below AEP
+    monthly_customer_charge: 9.00  # VERIFY
+    rate_notes: >
+      Wheeling Power is a small AEP subsidiary serving ~40,000 customers in the
+      northern panhandle. Rates are filed separately from AEP but follow similar
+      patterns.
+
+    tou_available: true
+    tou_notes: "Same Charge Forward / Off-Peak program as AEP via TakeChargeWV"
+
+  rebates:
+    - id: "wheeling-power-charge-forward-l2"
+      name: "Charge Forward Level 2 Charger Rebate (Wheeling Power)"
+      type: "l2_charger"
+      amount_usd: 250
+      description: "Same program as AEP Charge Forward, administered jointly."
+      url: "https://takechargewv.com/programs/for-your-home/chargeforward"
+      expires: "VERIFY 2026 status"
+
+  coverage_zip_prefixes: ["260", "261"]
+
+# ---------------------------------------------------------------
+# RURAL ELECTRIC COOPERATIVES
+# ---------------------------------------------------------------
+rural_coops:
+  name: "Rural Electric Cooperatives"
+  type: "aggregate"
+  service_area: "Various rural WV counties"
+  coops:
+    - id: "harrison-rural"
+      name: "Harrison Rural Electrification Association"
+      website: "https://www.harrisonrea.com"
+      estimated_rate_per_kwh: 0.115  # VERIFY - coops typically at-cost, rates vary
+
+    - id: "black-diamond-power"
+      name: "Black Diamond Power"
+      website: "https://www.blackdiamondpower.com"
+      estimated_rate_per_kwh: 0.120  # VERIFY
+
+    - id: "craig-botetourt"
+      name: "Craig-Botetourt Electric Cooperative"
+      website: "https://www.cbec.coop"
+      estimated_rate_per_kwh: 0.140  # VERIFY - serves small portion of WV
+
+  v1_strategy: >
+    For v1, show a "Contact your coop" card instead of specific rate calculations
+    for users whose ZIP resolves to a coop service area. Display the coop name
+    and website. Collect rate data and add specific calculations in v1.2.
+
+  generic_fallback:
+    flat_rate_per_kwh: 0.120  # WV coop average approximation
+    disclaimer: "Coop rates vary. Contact your specific cooperative for accurate pricing."
+
+# ---------------------------------------------------------------
+# WV PUBLIC SERVICE COMMISSION
+# ---------------------------------------------------------------
+wvpsc:
+  name: "West Virginia Public Service Commission"
+  website: "https://www.psc.state.wv.us"
+  role: "Approves utility rates and riders for investor-owned utilities"
+  note: "Tariff sheets for AEP, Mon Power, Wheeling Power are filed here."

@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GoEV WV — Coming Soon</title>
+  <meta name="description" content="GoEV WV: honest, West Virginia-specific guidance on electric vehicles. Launching soon." />
+  <meta name="color-scheme" content="light dark" />
+  <style>
+    :root {
+      --bg: #0b1220;
+      --fg: #e6edf3;
+      --accent: #4ade80;
+      --muted: #94a3b8;
+    }
+    @media (prefers-color-scheme: light) {
+      :root { --bg: #f7fafc; --fg: #0f172a; --accent: #059669; --muted: #475569; }
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; height: 100%; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      line-height: 1.6;
+      display: flex;
+      min-height: 100vh;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+    main {
+      max-width: 640px;
+      width: 100%;
+    }
+    h1 {
+      font-size: clamp(2rem, 5vw, 3.25rem);
+      font-weight: 800;
+      margin: 0 0 0.5rem 0;
+      letter-spacing: -0.02em;
+    }
+    .accent { color: var(--accent); }
+    .tag {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding: 0.25rem 0.75rem;
+      border-radius: 999px;
+      background: rgba(74, 222, 128, 0.15);
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+    p {
+      color: var(--muted);
+      font-size: 1.05rem;
+    }
+    .features {
+      margin: 2rem 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+    .features li {
+      background: rgba(255, 255, 255, 0.03);
+      padding: 1rem;
+      border-radius: 0.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .features strong { display: block; color: var(--fg); font-size: 0.95rem; }
+    .features span { display: block; color: var(--muted); font-size: 0.85rem; margin-top: 0.25rem; }
+    footer {
+      margin-top: 2.5rem;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    footer a { color: var(--accent); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <main>
+    <span class="tag">Launching 2026</span>
+    <h1>Go<span class="accent">EV</span> WV</h1>
+    <p>Honest, West Virginia-specific guidance on whether an electric vehicle makes sense for you — your commute, your utility, your wallet.</p>
+    <ul class="features">
+      <li><strong>Your commute</strong><span>Real range math for your route, derated for WV winters.</span></li>
+      <li><strong>Your utility</strong><span>AEP, Mon Power, Wheeling Power, and rural coop rates.</span></li>
+      <li><strong>Your rebates</strong><span>Federal credits, local utility programs, stacked.</span></li>
+      <li><strong>Your charger</strong><span>Home install costs, public charger maps, metering.</span></li>
+    </ul>
+    <footer>
+      <p>A West Virginia project. Questions? <a href="mailto:pbrennan10@gmail.com">pbrennan10@gmail.com</a></p>
+    </footer>
+  </main>
+</body>
+</html>

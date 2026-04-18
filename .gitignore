@@ -1,0 +1,30 @@
+node_modules/
+.next/
+out/
+.env
+.env.local
+.env.production
+.env.development
+*.log
+.DS_Store
+dist/
+build/
+coverage/
+
+# Next.js
+next-env.d.ts
+.vercel
+
+# SQLite runtime data (future use, created on server)
+/data/runtime/
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Editor
+.vscode/
+.idea/
+
+# OS
+Thumbs.db

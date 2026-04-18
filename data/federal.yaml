@@ -1,0 +1,101 @@
+# Federal tax credits and WV state fees relevant to EV ownership
+# Updated: 2026-04-18
+# VERIFY_BEFORE_LAUNCH - tax credit rules shift with legislation; confirm with IRS guidance
+
+federal_ev_tax_credits:
+  new_ev_credit:
+    code_section: "IRC 30D"
+    max_amount_usd: 7500
+    breakdown:
+      critical_minerals_component: 3750
+      battery_components_component: 3750
+    structure: >
+      Up to $7,500 for qualifying new EVs and PHEVs. Half depends on battery
+      critical-minerals sourcing, the other half on battery component sourcing.
+      Both halves are required to get the full $7,500.
+    income_caps:
+      single: 150000
+      head_of_household: 225000
+      joint: 300000
+    msrp_caps:
+      cars: 55000
+      suvs_trucks_vans: 80000
+    point_of_sale_option: true
+    point_of_sale_notes: >
+      Since Jan 2024, buyers can transfer the credit to the dealer at point of
+      sale as a down-payment discount, rather than waiting for tax filing.
+    url: "https://www.irs.gov/credits-deductions/credits-for-new-clean-vehicles-purchased-in-2023-or-after"
+
+  used_ev_credit:
+    code_section: "IRC 25E"
+    max_amount_usd: 4000
+    structure: "30% of sale price, capped at $4,000"
+    eligibility:
+      - "Vehicle model year must be at least 2 years old"
+      - "Sale price under $25,000"
+      - "Purchased from a licensed dealer"
+      - "First resale after Aug 16 2022"
+    income_caps:
+      single: 75000
+      head_of_household: 112500
+      joint: 150000
+    url: "https://www.irs.gov/credits-deductions/used-clean-vehicle-credit"
+
+  refueling_property_credit:
+    code_section: "IRC 30C"
+    residential:
+      max_amount_usd: 1000
+      structure: "30% of cost, up to $1,000, for home EV charging equipment"
+      eligibility_notes: "Must be located in eligible census tract (low-income or non-urban)"
+    commercial:
+      max_amount_per_port_usd: 100000
+      structure: "30% of cost per port, up to $100,000/port"
+      expiration: "2026-06-30"
+      expiration_notes: >
+        Commercial 30C credit for charging infrastructure is scheduled to expire
+        June 30, 2026 absent Congressional extension. URGENT FLAG for business-mode
+        users in v2.
+    url: "https://www.irs.gov/credits-deductions/alternative-fuel-vehicle-refueling-property-credit"
+
+wv_state_fees:
+  bev_annual_fee:
+    amount_usd: 200
+    description: >
+      Battery-electric vehicles pay an annual fee of $200 in addition to
+      standard registration fees. Passed to offset lost gasoline tax revenue.
+    statute: "WV Code §17A-10-3c"
+    important_note: >
+      This fee materially changes the TCO calculation. A WV EV owner driving
+      10,000 miles/year effectively pays 2¢/mile in state road tax vs. a
+      gasoline vehicle paying ~1.4¢/mile at 25 mpg at the state gas tax rate.
+
+  phev_annual_fee:
+    amount_usd: 100
+    description: "Plug-in hybrid EVs pay an annual $100 fee."
+    statute: "WV Code §17A-10-3c"
+
+  standard_registration_fee:
+    amount_usd: 51.50  # VERIFY
+    description: "Standard WV passenger vehicle registration (separate from EV fee)"
+
+wv_state_incentives:
+  status: "NONE"
+  notes: >
+    West Virginia does not currently offer state-level tax credits, rebates,
+    or purchase incentives for new or used EVs. The only WV-level financial
+    levers are: (1) utility rebates (see utilities.yaml), (2) the $200/$100
+    annual EV/PHEV fee (negative), and (3) any local initiatives from
+    municipalities or economic development programs.
+
+calculation_notes:
+  winter_range_derating:
+    default_percent: 0.28
+    rationale: >
+      WV winters reach sub-freezing regularly. Industry research (AAA, Recurrent,
+      Geotab) shows 20-40% range loss at cold temps depending on model and HVAC
+      use. We default to 28% for conservative estimates and show the un-derated
+      range alongside.
+
+  gas_price_baseline_per_gal:
+    current: 3.15  # VERIFY - WV AAA average, update quarterly
+    source: "AAA West Virginia average"

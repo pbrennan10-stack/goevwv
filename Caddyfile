@@ -1,0 +1,37 @@
+# GoEV WV reverse proxy + auto-SSL
+# Caddy automatically provisions and renews Let's Encrypt certificates.
+
+goevwv.com, www.goevwv.com {
+    encode zstd gzip
+
+    # Apex redirect: www -> non-www
+    @www host www.goevwv.com
+    redir @www https://goevwv.com{uri} permanent
+
+    # Reverse proxy to the Next.js app container
+    reverse_proxy app:3000 {
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-Proto {scheme}
+    }
+
+    # Security headers
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        -Server
+    }
+
+    # Access log to stdout (collected by `docker compose logs caddy`)
+    log {
+        output stdout
+        format console
+    }
+}
+
+# Catch-all on port 80 for any other hostnames pointing here.
+# Prevents accidental sites (like stale DNS from retired domains) from serving content.
+:80 {
+    respond "Not Found" 404
+}
