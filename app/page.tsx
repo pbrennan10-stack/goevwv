@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { Calculator } from "@/components/Calculator";
 import { Logo } from "@/components/Logo";
-import { getFederalData, getUtilities, getVehicles } from "@/lib/data";
+import { getFederalData, getIceVehicles, getUtilities, getVehicles } from "@/lib/data";
 
 export default function HomePage() {
   const vehicles = getVehicles();
+  const iceVehicles = getIceVehicles();
   const utilities = getUtilities();
   const federal = getFederalData();
 
@@ -40,6 +41,7 @@ export default function HomePage() {
       <div id="calculator">
         <Calculator
           vehicles={vehicles}
+          iceVehicles={iceVehicles}
           utilities={utilities}
           federal={federal}
           mapboxToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}

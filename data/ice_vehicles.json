@@ -1,0 +1,188 @@
+{
+  "_meta": {
+    "updated": "2026-04-18",
+    "note": "Common WV vehicles with maintenance estimates. Oil/tire/brake costs are WV-area averages (RepairPal, AAA Your Driving Costs 2024, adjusted +5% for WV mountain road conditions). Verify locally before referencing in marketing copy."
+  },
+  "ice_vehicles": [
+    {
+      "id": "ford-f150-2024",
+      "year": 2024,
+      "make": "Ford",
+      "model": "F-150",
+      "trim": "XLT 4x4 2.7L EcoBoost",
+      "class": "truck",
+      "mpg_combined": 22,
+      "maintenance": {
+        "oil_change_usd": 85,
+        "oil_changes_per_year": 4,
+        "tire_set_usd": 950,
+        "tire_life_miles": 50000,
+        "brake_service_usd": 650,
+        "brake_life_miles": 55000,
+        "misc_annual_usd": 300
+      }
+    },
+    {
+      "id": "chevy-silverado-2024",
+      "year": 2024,
+      "make": "Chevrolet",
+      "model": "Silverado 1500",
+      "trim": "LT 4WD 5.3L",
+      "class": "truck",
+      "mpg_combined": 17,
+      "maintenance": {
+        "oil_change_usd": 80,
+        "oil_changes_per_year": 3,
+        "tire_set_usd": 900,
+        "tire_life_miles": 50000,
+        "brake_service_usd": 680,
+        "brake_life_miles": 55000,
+        "misc_annual_usd": 280
+      }
+    },
+    {
+      "id": "ram-1500-2024",
+      "year": 2024,
+      "make": "Ram",
+      "model": "1500",
+      "trim": "Tradesman 4x4 5.7L Hemi",
+      "class": "truck",
+      "mpg_combined": 17,
+      "maintenance": {
+        "oil_change_usd": 85,
+        "oil_changes_per_year": 3,
+        "tire_set_usd": 880,
+        "tire_life_miles": 50000,
+        "brake_service_usd": 720,
+        "brake_life_miles": 50000,
+        "misc_annual_usd": 280
+      }
+    },
+    {
+      "id": "gmc-sierra-2024",
+      "year": 2024,
+      "make": "GMC",
+      "model": "Sierra 1500",
+      "trim": "SLE 4x4 5.3L",
+      "class": "truck",
+      "mpg_combined": 17,
+      "maintenance": {
+        "oil_change_usd": 80,
+        "oil_changes_per_year": 3,
+        "tire_set_usd": 900,
+        "tire_life_miles": 50000,
+        "brake_service_usd": 680,
+        "brake_life_miles": 55000,
+        "misc_annual_usd": 280
+      }
+    },
+    {
+      "id": "jeep-grand-cherokee-2024",
+      "year": 2024,
+      "make": "Jeep",
+      "model": "Grand Cherokee",
+      "trim": "Laredo 4x4 3.6L V6",
+      "class": "suv",
+      "mpg_combined": 22,
+      "maintenance": {
+        "oil_change_usd": 80,
+        "oil_changes_per_year": 3,
+        "tire_set_usd": 800,
+        "tire_life_miles": 50000,
+        "brake_service_usd": 580,
+        "brake_life_miles": 55000,
+        "misc_annual_usd": 280
+      }
+    },
+    {
+      "id": "ford-explorer-2024",
+      "year": 2024,
+      "make": "Ford",
+      "model": "Explorer",
+      "trim": "XLT 4x4 2.3L EcoBoost",
+      "class": "suv",
+      "mpg_combined": 23,
+      "maintenance": {
+        "oil_change_usd": 75,
+        "oil_changes_per_year": 3,
+        "tire_set_usd": 780,
+        "tire_life_miles": 55000,
+        "brake_service_usd": 540,
+        "brake_life_miles": 60000,
+        "misc_annual_usd": 250
+      }
+    },
+    {
+      "id": "toyota-rav4-2024",
+      "year": 2024,
+      "make": "Toyota",
+      "model": "RAV4",
+      "trim": "LE AWD 2.5L",
+      "class": "suv",
+      "mpg_combined": 30,
+      "maintenance": {
+        "oil_change_usd": 65,
+        "oil_changes_per_year": 2,
+        "tire_set_usd": 700,
+        "tire_life_miles": 55000,
+        "brake_service_usd": 480,
+        "brake_life_miles": 65000,
+        "misc_annual_usd": 200
+      }
+    },
+    {
+      "id": "honda-crv-2024",
+      "year": 2024,
+      "make": "Honda",
+      "model": "CR-V",
+      "trim": "LX AWD 1.5T",
+      "class": "suv",
+      "mpg_combined": 30,
+      "maintenance": {
+        "oil_change_usd": 65,
+        "oil_changes_per_year": 2,
+        "tire_set_usd": 700,
+        "tire_life_miles": 60000,
+        "brake_service_usd": 460,
+        "brake_life_miles": 70000,
+        "misc_annual_usd": 180
+      }
+    },
+    {
+      "id": "chevy-equinox-2024",
+      "year": 2024,
+      "make": "Chevrolet",
+      "model": "Equinox",
+      "trim": "LT FWD 1.5T",
+      "class": "suv",
+      "mpg_combined": 28,
+      "maintenance": {
+        "oil_change_usd": 65,
+        "oil_changes_per_year": 2,
+        "tire_set_usd": 650,
+        "tire_life_miles": 55000,
+        "brake_service_usd": 450,
+        "brake_life_miles": 65000,
+        "misc_annual_usd": 200
+      }
+    },
+    {
+      "id": "toyota-camry-2024",
+      "year": 2024,
+      "make": "Toyota",
+      "model": "Camry",
+      "trim": "LE FWD 2.5L",
+      "class": "sedan",
+      "mpg_combined": 32,
+      "maintenance": {
+        "oil_change_usd": 60,
+        "oil_changes_per_year": 2,
+        "tire_set_usd": 580,
+        "tire_life_miles": 60000,
+        "brake_service_usd": 400,
+        "brake_life_miles": 70000,
+        "misc_annual_usd": 150
+      }
+    }
+  ]
+}

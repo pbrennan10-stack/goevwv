@@ -5,10 +5,24 @@ import type { RouteData } from "@/lib/types";
 
 const GEO_URL = "https://api.mapbox.com/geocoding/v5/mapbox.places";
 const DIR_URL = "https://api.mapbox.com/directions/v5/mapbox/driving";
+const USGS_ELEV_URL = "https://epqs.nationalmap.gov/v1/json";
 // Bounding box covering WV + neighbouring border areas
 const BBOX = "-84,36.5,-76,41";
 // Segment speed ≥ 24.6 m/s (≈55 mph) counted as highway
 const HIGHWAY_MS = 24.6;
+
+async function getElevationM(lon: number, lat: number): Promise<number> {
+  try {
+    const url = `${USGS_ELEV_URL}?x=${lon}&y=${lat}&wkid=4326&units=Meters&includeDate=false`;
+    const res = await fetch(url, { signal: AbortSignal.timeout(4000) });
+    if (!res.ok) return 0;
+    const data = await res.json();
+    const val = parseFloat(data.value);
+    return isFinite(val) && val > -500 ? val : 0;
+  } catch {
+    return 0;
+  }
+}
 
 interface Suggestion {
   id: string;
@@ -123,16 +137,17 @@ export function RouteHelper({ token, onFill }: Props) {
       });
       const highway_fraction = totDist > 0 ? hwDist / totDist : 0.45;
 
-      // Elevation gain from GeoJSON geometry: coords are [lon, lat, alt_m]
-      const pts: number[][] = route.geometry.coordinates ?? [];
-      let elevation_gain_m = 0;
-      for (let i = 1; i < pts.length; i++) {
-        const delta = (pts[i][2] ?? 0) - (pts[i - 1][2] ?? 0);
-        if (delta > 0) elevation_gain_m += delta;
-      }
+      // Elevation: Mapbox Directions returns 2D coordinates only.
+      // Query USGS NED for start and end point elevations instead.
+      const [homeEle, workEle] = await Promise.all([
+        getElevationM(homeCoords[0], homeCoords[1]),
+        getElevationM(workCoords[0], workCoords[1]),
+      ]);
+      const elevation_gain_m = Math.abs(homeEle - workEle);
 
       const elevFt = Math.round(elevation_gain_m * 3.281);
-      const summary = `${distance_mi.toFixed(1)} mi · ${Math.round(highway_fraction * 100)}% highway · ${elevFt} ft climbing`;
+      const elevStr = elevFt >= 20 ? ` · ${elevFt} ft elevation change` : "";
+      const summary = `${distance_mi.toFixed(1)} mi · ${Math.round(highway_fraction * 100)}% highway${elevStr}`;
 
       const r: RouteData = { distance_mi, highway_fraction, elevation_gain_m, summary };
       setResult(r);

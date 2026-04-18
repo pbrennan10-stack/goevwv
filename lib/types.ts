@@ -125,8 +125,9 @@ export interface VehicleResult {
   annual_miles: number;
   annual_energy_cost_usd: number;
   annual_state_fee_usd: number;
-  annual_total_usd: number;
-  annual_savings_vs_current_usd: number; // +ve = EV saves money
+  annual_maintenance_usd: number;    // EV maintenance (tires + brakes + misc, no oil)
+  annual_total_usd: number;          // energy + fee + maintenance
+  annual_savings_vs_current_usd: number; // +ve = EV saves money (vs current total incl. maintenance)
   five_year_operating_usd: number;
   five_year_savings_vs_current_usd: number;
   federal_credit_usd: number;
@@ -137,9 +138,39 @@ export interface VehicleResult {
   warnings: string[];
 }
 
+export interface IceVehicleMaintenance {
+  oil_change_usd: number;
+  oil_changes_per_year: number;
+  tire_set_usd: number;
+  tire_life_miles: number;
+  brake_service_usd: number;
+  brake_life_miles: number;
+  misc_annual_usd: number;
+}
+
+export interface IceVehicle {
+  id: string;
+  year: number;
+  make: string;
+  model: string;
+  trim: string;
+  class: VehicleClass;
+  mpg_combined: number;
+  maintenance: IceVehicleMaintenance;
+}
+
+export interface MaintenanceCosts {
+  oil_usd: number;
+  tires_usd: number;
+  brakes_usd: number;
+  misc_usd: number;
+  total_usd: number;
+}
+
 export interface CurrentVehicleInput {
   mpg: number;
   gas_price_per_gal: number;
+  ice_vehicle?: IceVehicle;
 }
 
 export interface RouteData {

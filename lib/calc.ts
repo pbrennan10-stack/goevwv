@@ -5,6 +5,8 @@
 import type {
   CalcInput,
   FederalData,
+  IceVehicle,
+  MaintenanceCosts,
   Utility,
   Vehicle,
   VehicleResult,
@@ -136,6 +138,30 @@ function federalCredit(vehicle: Vehicle, fed: FederalData): number {
   return fed.federal_ev_tax_credits.new_ev_credit.max_amount_usd;
 }
 
+export function annualIceMaintenance(v: IceVehicle, annual_miles: number): MaintenanceCosts {
+  const oil = v.maintenance.oil_change_usd * v.maintenance.oil_changes_per_year;
+  const tires = (v.maintenance.tire_set_usd / v.maintenance.tire_life_miles) * annual_miles;
+  const brakes = (v.maintenance.brake_service_usd / v.maintenance.brake_life_miles) * annual_miles;
+  const misc = v.maintenance.misc_annual_usd;
+  return { oil_usd: oil, tires_usd: tires, brakes_usd: brakes, misc_usd: misc, total_usd: oil + tires + brakes + misc };
+}
+
+export function annualEvMaintenance(vehicle: Vehicle, annual_miles: number): MaintenanceCosts {
+  // Tires: similar to ICE but slightly shorter life due to regenerative torque
+  // Brakes: ~70% cheaper because regen braking extends pad/rotor life 3-5x
+  // No oil changes. Misc = cabin air filter + wiper fluid only.
+  const isTruck = vehicle.class === "truck";
+  const isSuv = vehicle.class === "suv" || vehicle.class === "minivan";
+  const tireSet = isTruck ? 950 : isSuv ? 750 : 620;
+  const tireMi = 48000;
+  const brakeSvc = isTruck ? 280 : isSuv ? 200 : 160;
+  const brakeMi = 100000;
+  const misc = 100;
+  const tires = (tireSet / tireMi) * annual_miles;
+  const brakes = (brakeSvc / brakeMi) * annual_miles;
+  return { oil_usd: 0, tires_usd: tires, brakes_usd: brakes, misc_usd: misc, total_usd: tires + brakes + misc };
+}
+
 export interface CalcContext {
   vehicles: Vehicle[];
   utility: Utility;
@@ -147,6 +173,8 @@ export interface CalcReturn {
   rate_mode: "flat" | "tou";
   rate_per_kwh: number;
   current_annual_gas_cost: number;
+  current_annual_maintenance_usd: number; // 0 when no ICE vehicle selected
+  current_annual_total_usd: number;       // gas + maintenance
   current_annual_co2_kg: number;
   annual_miles: number;
 }
@@ -162,6 +190,11 @@ export function calculate(input: CalcInput, ctx: CalcContext): CalcReturn {
   const currentGallons = miles / Math.max(input.current.mpg, 1);
   const currentGasCost = currentGallons * input.current.gas_price_per_gal;
   const currentCo2 = currentGallons * CO2_KG_PER_GAL_GASOLINE;
+  const currentMaint = input.current.ice_vehicle
+    ? annualIceMaintenance(input.current.ice_vehicle, miles)
+    : null;
+  const currentMaintUsd = currentMaint?.total_usd ?? 0;
+  const currentTotalUsd = currentGasCost + currentMaintUsd;
 
   const results: VehicleResult[] = ctx.vehicles.map((v) => {
     const kwh = kwhPerYear(v, miles, input.apply_winter_derate, highway_fraction)
@@ -172,8 +205,11 @@ export function calculate(input: CalcInput, ctx: CalcContext): CalcReturn {
     const totalEnergyCost = energyCost + phevGasCost;
 
     const fee = stateAnnualFee(v, ctx.fed);
-    const annualTotal = totalEnergyCost + fee.usd;
-    const savings = currentGasCost - annualTotal;
+    // Include EV maintenance only when an ICE vehicle is selected (apples-to-apples comparison)
+    const evMaint = currentMaint ? annualEvMaintenance(v, miles) : null;
+    const evMaintUsd = evMaint?.total_usd ?? 0;
+    const annualTotal = totalEnergyCost + fee.usd + evMaintUsd;
+    const savings = currentTotalUsd - annualTotal;
     const fiveYrOp = annualTotal * 5;
     const fiveYrSave = savings * 5;
 
@@ -206,6 +242,7 @@ export function calculate(input: CalcInput, ctx: CalcContext): CalcReturn {
       annual_miles: miles,
       annual_energy_cost_usd: totalEnergyCost,
       annual_state_fee_usd: fee.usd,
+      annual_maintenance_usd: evMaintUsd,
       annual_total_usd: annualTotal,
       annual_savings_vs_current_usd: savings,
       five_year_operating_usd: fiveYrOp,
@@ -224,6 +261,8 @@ export function calculate(input: CalcInput, ctx: CalcContext): CalcReturn {
     rate_mode: mode,
     rate_per_kwh: rate,
     current_annual_gas_cost: currentGasCost,
+    current_annual_maintenance_usd: currentMaintUsd,
+    current_annual_total_usd: currentTotalUsd,
     current_annual_co2_kg: currentCo2,
     annual_miles: miles,
   };
