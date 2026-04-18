@@ -1,0 +1,22 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    name: Deploy to droplet
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s' "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H 174.138.53.28 >> ~/.ssh/known_hosts
+
+      - name: Pull & rebuild
+        run: |
+          ssh -i ~/.ssh/deploy_key root@174.138.53.28 \
+            "cd /opt/goevwv && git pull origin main && docker compose up -d --build && docker compose ps"
