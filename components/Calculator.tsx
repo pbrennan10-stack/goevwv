@@ -56,6 +56,7 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
   const [longTrips, setLongTrips] = useState(DEFAULT_INPUT.long_trips_per_year);
   const [longTripMi, setLongTripMi] = useState(DEFAULT_INPUT.long_trip_one_way_mi ?? 200);
   const [gasSensitivityPrice, setGasSensitivityPrice] = useState(DEFAULT_INPUT.current.gas_price_per_gal);
+  const [ownershipPlan, setOwnershipPlan] = useState<"replace" | "keep">("replace");
 
   // Keep sensitivity slider in sync when user updates the main gas price input.
   useEffect(() => { setGasSensitivityPrice(gasPrice); }, [gasPrice]);
@@ -91,6 +92,8 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
     }
     const iv = p.get("iv");
     if (iv) setIceVehicleId(iv);
+    const op = p.get("op");
+    if (op === "keep") setOwnershipPlan("keep");
   }, []);
 
   // Default selected vehicles (picked to be interesting for WV).
@@ -152,10 +155,11 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
         route: route ?? undefined,
         long_trips_per_year: longTrips,
         long_trip_one_way_mi: longTripMi,
+        ownership_plan: ownershipPlan,
       },
       { vehicles: selectedVehicles, utility, fed: federal },
     );
-  }, [daily, days, utilityId, useTOU, winter, mpg, gasPrice, selectedIceVehicle, selectedVehicles, utility, federal, selectedIds, route, longTrips, longTripMi]);
+  }, [daily, days, utilityId, useTOU, winter, mpg, gasPrice, selectedIceVehicle, selectedVehicles, utility, federal, selectedIds, route, longTrips, longTripMi, ownershipPlan]);
 
   const outSensitivity: CalcReturn | null = useMemo(() => {
     if (selectedVehicles.length === 0) return null;
@@ -175,10 +179,11 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
         route: route ?? undefined,
         long_trips_per_year: longTrips,
         long_trip_one_way_mi: longTripMi,
+        ownership_plan: ownershipPlan,
       },
       { vehicles: selectedVehicles, utility, fed: federal },
     );
-  }, [daily, days, utilityId, useTOU, winter, mpg, gasSensitivityPrice, selectedIceVehicle, selectedVehicles, utility, federal, selectedIds, route, longTrips, longTripMi]);
+  }, [daily, days, utilityId, useTOU, winter, mpg, gasSensitivityPrice, selectedIceVehicle, selectedVehicles, utility, federal, selectedIds, route, longTrips, longTripMi, ownershipPlan]);
 
   // Sync state to URL so results are shareable.
   useEffect(() => {
@@ -195,9 +200,10 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
     if (longTrips !== DEFAULT_INPUT.long_trips_per_year) p.set("lt", String(longTrips));
     if (longTripMi !== (DEFAULT_INPUT.long_trip_one_way_mi ?? 200)) p.set("ltm", String(longTripMi));
     if (iceVehicleId) p.set("iv", iceVehicleId);
+    if (ownershipPlan !== "replace") p.set("op", ownershipPlan);
     const newUrl = `${window.location.pathname}?${p.toString()}`;
     window.history.replaceState({}, "", newUrl);
-  }, [daily, days, utilityId, useTOU, winter, mpg, gasPrice, selectedIds, longTrips, longTripMi, iceVehicleId]);
+  }, [daily, days, utilityId, useTOU, winter, mpg, gasPrice, selectedIds, longTrips, longTripMi, iceVehicleId, ownershipPlan]);
 
   const toggleVehicle = useCallback((id: string) => {
     setSelectedIds((prev) => {
@@ -308,80 +314,155 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
       <section className="rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 p-5 sm:p-7">
         <h2 className="text-lg font-semibold text-ink mb-5">Your current vehicle</h2>
 
-        <div className="grid gap-5 sm:grid-cols-2">
-          <div className="sm:col-span-2">
+        {/* Sub-block 1: Identification */}
+        <div>
+          <div className="text-xs font-semibold uppercase tracking-wider text-ink-soft mb-3">
+            Identification
+          </div>
+          <div className="grid gap-5 sm:grid-cols-2">
+            <div className="sm:col-span-2">
+              <SelectField
+                label="Pick your vehicle for a full cost comparison"
+                value={iceVehicleId}
+                onChange={handleIceVehicleChange}
+                options={[
+                  { value: "", label: "— enter MPG manually below —" },
+                  ...iceVehicles.map((v) => ({
+                    value: v.id,
+                    label: `${v.year} ${v.make} ${v.model} — ${v.mpg_combined} mpg`,
+                  })),
+                ]}
+              />
+            </div>
+
+            <NumField
+              label={selectedIceVehicle ? `MPG — ${selectedIceVehicle.make} ${selectedIceVehicle.model}` : "Your car's MPG (EPA combined)"}
+              value={mpg}
+              onChange={setMpg}
+              min={5}
+              max={100}
+              step={1}
+              hint={
+                selectedIceVehicle
+                  ? mpg !== selectedIceVehicle.mpg_combined
+                    ? `EPA combined: ${selectedIceVehicle.mpg_combined} mpg — you've entered your real-world number.`
+                    : "EPA combined. Edit if your real-world MPG differs."
+                  : "Or pick your vehicle above to auto-fill."
+              }
+            />
+
+            {selectedIceVehicle && (
+              <div className="flex flex-col gap-1">
+                <span className="text-sm font-medium text-ink">Fuel tank</span>
+                <div className="w-full rounded-lg bg-slate-50 ring-1 ring-slate-200 px-3 py-3 text-ink">
+                  <span className="font-medium">{selectedIceVehicle.tank_gallons} gal</span>
+                </div>
+                <span className="text-xs text-ink-soft">
+                  ~{fmtNum(Math.round(mpg * selectedIceVehicle.tank_gallons))} mi per tank at {mpg} mpg
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="border-t border-slate-200 my-6"></div>
+
+        {/* Sub-block 2: Fuel & ownership plan */}
+        <div>
+          <div className="text-xs font-semibold uppercase tracking-wider text-ink-soft mb-3">
+            Fuel &amp; ownership plan
+          </div>
+          <div className="grid gap-5 sm:grid-cols-2">
+            <NumField
+              label="Gas price ($/gal)"
+              value={gasPrice}
+              onChange={setGasPrice}
+              min={1}
+              max={10}
+              step={0.05}
+              decimals={2}
+              hint="WV average ~$3.15 (AAA)."
+            />
             <SelectField
-              label="Pick your vehicle for a full cost comparison"
-              value={iceVehicleId}
-              onChange={handleIceVehicleChange}
+              label="If you switch to an EV, what happens to this vehicle?"
+              value={ownershipPlan}
+              onChange={(v) => setOwnershipPlan(v === "keep" ? "keep" : "replace")}
               options={[
-                { value: "", label: "— enter MPG manually below —" },
-                ...iceVehicles.map((v) => ({
-                  value: v.id,
-                  label: `${v.year} ${v.make} ${v.model} — ${v.mpg_combined} mpg`,
-                })),
+                { value: "replace", label: "Sell or trade in when switching" },
+                { value: "keep", label: "Keep as a second vehicle" },
               ]}
             />
           </div>
-
-          <NumField
-            label={selectedIceVehicle ? `MPG — ${selectedIceVehicle.make} ${selectedIceVehicle.model}` : "Your car's MPG (EPA combined)"}
-            value={mpg}
-            onChange={(v) => { setMpg(v); if (iceVehicleId) setIceVehicleId(""); }}
-            min={5}
-            max={100}
-            step={1}
-            hint={selectedIceVehicle ? undefined : "Or pick your vehicle above to auto-fill."}
-          />
-          <NumField
-            label="Gas price ($/gal)"
-            value={gasPrice}
-            onChange={setGasPrice}
-            min={1}
-            max={10}
-            step={0.05}
-            decimals={2}
-            hint="WV average ~$3.15 (AAA)."
-          />
+          {ownershipPlan === "keep" && (
+            <div className="mt-3 rounded-lg bg-amber-50 ring-1 ring-amber-200 p-3 text-xs text-amber-900">
+              <strong>Two-car household note:</strong> the 5-year savings shown below assume you
+              fully replace your current vehicle with an EV. If you keep the gas vehicle as a
+              second car, its insurance, registration, and reduced-mileage operating costs continue
+              alongside the EV — combined household operating cost will be higher than either
+              number alone. This is the realistic scenario for many WV buyers keeping a gas truck
+              for towing/hauling while commuting on an EV. Full two-car scenario math coming in a
+              future update.
+            </div>
+          )}
         </div>
 
+        {/* Sub-block 3: Annual costs (only when ICE vehicle selected) */}
         {iceMaint && selectedIceVehicle && (
-          <div className="mt-5 rounded-xl bg-slate-50 ring-1 ring-slate-200 p-4">
-            <div className="text-xs font-semibold uppercase tracking-wider text-ink-soft mb-3">
-              Estimated annual maintenance — {selectedIceVehicle.year} {selectedIceVehicle.make} {selectedIceVehicle.model}
-            </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-2 text-sm">
-              <div>
-                <div className="text-ink-soft text-xs">Oil changes</div>
-                <div className="font-medium text-ink">{fmtUSD(iceMaint.oil_usd)}/yr</div>
-                <div className="text-xs text-ink-soft">{selectedIceVehicle.maintenance.oil_changes_per_year}× at {fmtUSD(selectedIceVehicle.maintenance.oil_change_usd)}</div>
-              </div>
-              <div>
-                <div className="text-ink-soft text-xs">Tires</div>
-                <div className="font-medium text-ink">{fmtUSD(iceMaint.tires_usd)}/yr</div>
-                <div className="text-xs text-ink-soft">amortized at {fmtNum(annual_miles)} mi/yr</div>
-              </div>
-              <div>
-                <div className="text-ink-soft text-xs">Brakes</div>
-                <div className="font-medium text-ink">{fmtUSD(iceMaint.brakes_usd)}/yr</div>
-                <div className="text-xs text-ink-soft">amortized at {fmtNum(annual_miles)} mi/yr</div>
-              </div>
-              <div>
-                <div className="text-ink-soft text-xs">Misc</div>
-                <div className="font-medium text-ink">{fmtUSD(iceMaint.misc_usd)}/yr</div>
-                <div className="text-xs text-ink-soft">filters, wipers, fluids</div>
-              </div>
-            </div>
+          <>
+            <div className="border-t border-slate-200 my-6"></div>
             <div>
-              <div className="text-ink-soft text-xs">Insurance (est.)</div>
-              <div className="font-medium text-ink">{fmtUSD(selectedIceVehicle.annual_insurance_usd)}/yr</div>
-              <div className="text-xs text-ink-soft">full coverage, 35-45yo WV avg</div>
+              <div className="text-xs font-semibold uppercase tracking-wider text-ink-soft mb-3">
+                Annual ownership costs — {selectedIceVehicle.year} {selectedIceVehicle.make} {selectedIceVehicle.model}
+              </div>
+              <div className="rounded-xl bg-slate-50 ring-1 ring-slate-200 p-4">
+                {/* Maintenance breakdown */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-3 text-sm">
+                  <div>
+                    <div className="text-ink-soft text-xs">Oil changes</div>
+                    <div className="font-medium text-ink">{fmtUSD(iceMaint.oil_usd)}/yr</div>
+                    <div className="text-xs text-ink-soft">{selectedIceVehicle.maintenance.oil_changes_per_year}× at {fmtUSD(selectedIceVehicle.maintenance.oil_change_usd)}</div>
+                  </div>
+                  <div>
+                    <div className="text-ink-soft text-xs">Tires</div>
+                    <div className="font-medium text-ink">{fmtUSD(iceMaint.tires_usd)}/yr</div>
+                    <div className="text-xs text-ink-soft">amortized at {fmtNum(annual_miles)} mi/yr</div>
+                  </div>
+                  <div>
+                    <div className="text-ink-soft text-xs">Brakes</div>
+                    <div className="font-medium text-ink">{fmtUSD(iceMaint.brakes_usd)}/yr</div>
+                    <div className="text-xs text-ink-soft">amortized at {fmtNum(annual_miles)} mi/yr</div>
+                  </div>
+                  <div>
+                    <div className="text-ink-soft text-xs">Misc</div>
+                    <div className="font-medium text-ink">{fmtUSD(iceMaint.misc_usd)}/yr</div>
+                    <div className="text-xs text-ink-soft">filters, wipers, fluids</div>
+                  </div>
+                </div>
+
+                {/* Insurance + Registration */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-3 text-sm mt-4 pt-4 border-t border-slate-200">
+                  <div>
+                    <div className="text-ink-soft text-xs">Insurance (est.)</div>
+                    <div className="font-medium text-ink">{fmtUSD(selectedIceVehicle.annual_insurance_usd)}/yr</div>
+                    <div className="text-xs text-ink-soft">full coverage, 35–45yo WV avg</div>
+                  </div>
+                  <div>
+                    <div className="text-ink-soft text-xs">WV registration</div>
+                    <div className="font-medium text-ink">{fmtUSD(federal.wv_state_fees.standard_registration_fee?.amount_usd ?? 0)}/yr</div>
+                    <div className="text-xs text-ink-soft">Class A passenger vehicle</div>
+                  </div>
+                </div>
+
+                {/* Total */}
+                <div className="mt-4 pt-4 border-t border-slate-200 flex items-baseline justify-between flex-wrap gap-2">
+                  <span className="text-sm font-semibold text-ink">
+                    Total ownership costs: {fmtUSD(iceMaint.total_usd + selectedIceVehicle.annual_insurance_usd + (federal.wv_state_fees.standard_registration_fee?.amount_usd ?? 0))}/yr
+                  </span>
+                  <span className="text-xs text-ink-soft">excludes fuel · included in Results below</span>
+                </div>
+              </div>
             </div>
-            <div className="mt-3 pt-3 border-t border-slate-200 col-span-2 sm:col-span-4 flex items-baseline gap-2">
-              <span className="text-sm font-semibold text-ink">Total maintenance + insurance: {fmtUSD(iceMaint.total_usd + selectedIceVehicle.annual_insurance_usd)}/yr</span>
-              <span className="text-xs text-ink-soft">included in comparison below</span>
-            </div>
-          </div>
+          </>
         )}
       </section>
 
@@ -578,7 +659,11 @@ function BaselineCard({
 
       <dl className="grid grid-cols-2 gap-x-3 gap-y-2 text-sm">
         <Row label="Annual fuel/energy" value={fmtUSD(out.current_annual_gas_cost)} />
-        <Row label="WV annual fee" value="—" muted />
+        <Row
+          label="WV annual fee"
+          value={out.current_annual_registration_usd > 0 ? fmtUSD(out.current_annual_registration_usd) : "—"}
+          muted
+        />
         <Row
           label="Maintenance"
           value={hasIce && iceMaint ? fmtUSD(iceMaint.total_usd) : "—"}
@@ -595,8 +680,6 @@ function BaselineCard({
           value={`${fmtNum(out.current_annual_co2_kg / 1000, 2)} t`}
         />
         <Row label="MSRP" value="Already owned" muted />
-        <Row label="Fed IRA credit" value="—" muted />
-        <Row label="Effective price" value="—" muted />
         <Row label="Assembly" value="—" muted />
         <Row label="US/CA parts" value="—" muted />
       </dl>
@@ -664,19 +747,6 @@ function ResultCard({ r, showMaintenance, iceVehicle, currentAnnualCo2Kg }: { r:
         <Row
           label="MSRP"
           value={fmtUSD(r.vehicle.msrp_usd)}
-          muted={r.federal_credit_usd > 0}
-        />
-        <Row
-          label="Fed IRA credit"
-          value={r.federal_credit_usd > 0 ? `-${fmtUSD(r.federal_credit_usd)}` : "—"}
-          className={r.federal_credit_usd > 0 ? "text-brand-dark" : undefined}
-          muted={r.federal_credit_usd === 0}
-        />
-        <Row
-          label="Effective price"
-          value={r.federal_credit_usd > 0 ? fmtUSD(r.effective_msrp_usd) : "—"}
-          strong={r.federal_credit_usd > 0}
-          muted={r.federal_credit_usd === 0}
         />
         <Row
           label="Assembly"

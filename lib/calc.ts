@@ -234,7 +234,8 @@ export interface CalcReturn {
   current_annual_gas_cost: number;
   current_annual_maintenance_usd: number;  // 0 when no ICE vehicle selected
   current_annual_insurance_usd: number;    // 0 when no ICE vehicle selected
-  current_annual_total_usd: number;        // gas + maintenance + insurance
+  current_annual_registration_usd: number; // WV passenger vehicle registration fee
+  current_annual_total_usd: number;        // gas + maintenance + insurance + registration
   current_annual_co2_kg: number;
   annual_miles: number;
   highway_avg_speed_mph: number;           // for display in UI
@@ -266,7 +267,13 @@ export function calculate(input: CalcInput, ctx: CalcContext): CalcReturn {
     : null;
   const currentMaintUsd = currentMaint?.total_usd ?? 0;
   const currentInsuranceUsd = input.current.ice_vehicle?.annual_insurance_usd ?? 0;
-  const currentTotalUsd = currentGasCost + currentMaintUsd + currentInsuranceUsd;
+  // WV Class A passenger vehicle registration (separate from EV state fees).
+  // Only charged if the user has picked a specific ICE vehicle — if they're
+  // typing MPG manually without a vehicle, we don't know their situation.
+  const currentRegUsd = input.current.ice_vehicle
+    ? ctx.fed.wv_state_fees.standard_registration_fee?.amount_usd ?? 0
+    : 0;
+  const currentTotalUsd = currentGasCost + currentMaintUsd + currentInsuranceUsd + currentRegUsd;
 
   const results: VehicleResult[] = ctx.vehicles.map((v) => {
     const kwh = kwhPerYear(v, miles, input.apply_winter_derate, highway_fraction, highway_avg_speed_mph)
@@ -376,6 +383,7 @@ export function calculate(input: CalcInput, ctx: CalcContext): CalcReturn {
     current_annual_gas_cost: currentGasCost,
     current_annual_maintenance_usd: currentMaintUsd,
     current_annual_insurance_usd: currentInsuranceUsd,
+    current_annual_registration_usd: currentRegUsd,
     current_annual_total_usd: currentTotalUsd,
     current_annual_co2_kg: currentCo2,
     annual_miles: miles,

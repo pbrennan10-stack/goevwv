@@ -120,6 +120,7 @@ export interface FederalData {
   wv_state_fees: {
     bev_annual_fee: { amount_usd: number; description: string };
     phev_annual_fee: { amount_usd: number; description: string };
+    standard_registration_fee?: { amount_usd: number; description: string };
   };
   calculation_notes: {
     winter_range_derating: { default_percent: number };
@@ -264,4 +265,5 @@ export interface CalcInput {
   route?: RouteData;
   long_trips_per_year: number; // trips where one-way distance ≈ 200 mi, requiring DCFC
   long_trip_one_way_mi?: number; // default 200; user can override for route-specific analysis
+  ownership_plan?: "replace" | "keep"; // default "replace"; "keep" = two-car household scenario
 }

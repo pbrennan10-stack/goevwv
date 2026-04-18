@@ -28,7 +28,7 @@ export default function AboutPage() {
         </div>
       </header>
 
-      <article className="max-w-prose">
+      <article className="max-w-3xl mx-auto">
         <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-ink leading-tight mb-2">
           Why EVs Are an{" "}
           <span className="text-brand">Important Decision</span>
@@ -93,22 +93,44 @@ export default function AboutPage() {
             </p>
           </Section>
 
-          <Section num="03" title="Cost and the China question">
+          <Section num="03" title="Cost, simplicity, and the China question">
             <p>
-              Chinese automakers can produce a capable electric vehicle for
-              under $10,000. American manufacturers cannot — yet. The gap is
-              real and it has several causes, but one of them is scale.
-              High-volume production drives down per-unit battery costs, which
-              are still the most expensive component in an EV. China has that
-              scale. The US is building toward it.
+              An electric drivetrain is mechanically much simpler than a gasoline
+              one. A modern ICE powertrain has roughly 2,000 moving parts in its
+              engine, transmission, cooling system, exhaust, and fuel delivery.
+              An EV drivetrain has closer to 20. No spark plugs, no timing belts,
+              no oxygen sensors, no multi-speed transmission, no oil pump, no
+              radiator for engine cooling, no catalytic converter, no exhaust
+              system, no fuel injectors, no alternator. Regenerative braking
+              removes most wear from the brake pads too.
+            </p>
+            <p className="mt-4">
+              That simplicity compounds across the lifecycle. Engineering is
+              cheaper because there&rsquo;s less to design. Assembly is cheaper
+              because there are fewer parts to install and align. Ongoing
+              maintenance is cheaper — no oil changes, no timing services, no
+              transmission flushes, brake pads lasting three to five times
+              longer. None of that is marketing copy; those are the line items
+              that fall out of the bill of materials and the shop invoice.
+              Over enough vehicles produced, that simpler BOM lets an EV reach
+              price points an ICE drivetrain structurally cannot.
+            </p>
+            <p className="mt-4">
+              Which is why China&rsquo;s position matters. Chinese automakers
+              can produce a capable electric vehicle for under $10,000 today.
+              American manufacturers cannot — yet. The gap is real and it has
+              several causes, but the primary one is scale: high-volume
+              production drives down per-unit battery costs, which are still
+              the most expensive component in an EV. China has that scale.
+              The US is building toward it.
             </p>
             <p className="mt-4">
               Domestic demand is what makes the investment in US scale
               defensible. Every gigafactory that opens, every battery cell
-              produced in America rather than imported, moves the cost curve in
-              the right direction. The path to an affordable American EV runs
-              through the purchase decisions Americans make today. This is not
-              a comfortable thing to say, but it is honest.
+              produced in America rather than imported, moves the cost curve
+              in the right direction. The path to an affordable American EV
+              runs through the purchase decisions Americans make today. That
+              is not a comfortable thing to say, but it is honest.
             </p>
           </Section>
 
