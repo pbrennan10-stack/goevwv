@@ -33,6 +33,9 @@
       "seats": 5,
       "cargo_cu_ft": 76,
       "tax_credit_eligible": true,
+      "us_canadian_parts_pct": 70,
+      "assembly_location": "Fremont, CA",
+      "assembly_country": "US",
       "notes": "Dominant US EV SUV. Supercharger access. Verify pricing after recent Tesla adjustments."
     },
     {
@@ -60,6 +63,9 @@
       "seats": 5,
       "cargo_cu_ft": 23,
       "tax_credit_eligible": true,
+      "us_canadian_parts_pct": 75,
+      "assembly_location": "Fremont, CA",
+      "assembly_country": "US",
       "notes": "Efficient sedan, strong Supercharger network."
     },
     {
@@ -87,6 +93,9 @@
       "seats": 5,
       "cargo_cu_ft": 57,
       "tax_credit_eligible": true,
+      "us_canadian_parts_pct": 12,
+      "assembly_location": "Ingersoll, Ontario, Canada",
+      "assembly_country": "Canada",
       "notes": "Most compelling mid-priced BEV SUV for WV market."
     },
     {
@@ -115,6 +124,9 @@
       "payload_lbs": 2000,
       "towing_lbs": 7700,
       "tax_credit_eligible": true,
+      "us_canadian_parts_pct": 50,
+      "assembly_location": "Dearborn, MI",
+      "assembly_country": "US",
       "notes": "Pickup is the top-selling body style in WV. Home-backup power feature is a real selling point."
     },
     {
@@ -143,6 +155,9 @@
       "payload_lbs": 1440,
       "towing_lbs": 10000,
       "tax_credit_eligible": true,
+      "us_canadian_parts_pct": 36,
+      "assembly_location": "Detroit, MI (Factory ZERO)",
+      "assembly_country": "US",
       "notes": "Longest-range electric truck available. Strong for contractors / fleet use."
     },
     {
@@ -171,7 +186,10 @@
       "payload_lbs": 1760,
       "towing_lbs": 11000,
       "tax_credit_eligible": false,
-      "notes": "Premium adventure truck. Limited WV dealer presence."
+      "us_canadian_parts_pct": null,
+      "assembly_location": "Normal, IL",
+      "assembly_country": "US",
+      "notes": "Premium adventure truck. Limited WV dealer presence. AALA-exempt (GVWR >8,500 lbs — heavy vehicles not required to disclose parts content)."
     },
     {
       "id": "ford-mustang-mache-2025",
@@ -198,6 +216,9 @@
       "seats": 5,
       "cargo_cu_ft": 59,
       "tax_credit_eligible": true,
+      "us_canadian_parts_pct": 13,
+      "assembly_location": "Cuautitlán, Mexico",
+      "assembly_country": "Mexico",
       "notes": "Established Ford dealer network in WV makes service convenient."
     },
     {
@@ -225,7 +246,10 @@
       "seats": 5,
       "cargo_cu_ft": 59,
       "tax_credit_eligible": true,
-      "notes": "Class-leading DCFC speed. Assembled in Georgia for full IRA credit."
+      "us_canadian_parts_pct": 38,
+      "assembly_location": "Ellabell, GA (Hyundai Metaplant America)",
+      "assembly_country": "US",
+      "notes": "Class-leading DCFC speed. Assembled in Georgia (Metaplant opened 2024)."
     },
     {
       "id": "kia-ev6-2025",
@@ -252,7 +276,10 @@
       "seats": 5,
       "cargo_cu_ft": 50,
       "tax_credit_eligible": true,
-      "notes": "Shares 800V platform with Ioniq 5. Fast DCFC."
+      "us_canadian_parts_pct": 80,
+      "assembly_location": "West Point, GA (Kia Manufacturing Georgia)",
+      "assembly_country": "US",
+      "notes": "Shares 800V platform with Ioniq 5. Fast DCFC. Highest US/CA parts content of any EV on this list (MY2025 AALA)."
     },
     {
       "id": "nissan-leaf-2025",
@@ -279,6 +306,9 @@
       "seats": 5,
       "cargo_cu_ft": 24,
       "tax_credit_eligible": false,
+      "us_canadian_parts_pct": 30,
+      "assembly_location": "Smyrna, TN",
+      "assembly_country": "US",
       "notes": "Cheapest new BEV option. CHAdeMO DCFC is a drawback (shrinking network). Best for short-range commuters with home charging only."
     },
     {
@@ -306,6 +336,9 @@
       "seats": 5,
       "cargo_cu_ft": 59,
       "tax_credit_eligible": true,
+      "us_canadian_parts_pct": 12,
+      "assembly_location": "Ramos Arizpe, Mexico",
+      "assembly_country": "Mexico",
       "notes": "Larger, more traditional SUV format."
     },
     {
@@ -333,6 +366,9 @@
       "seats": 5,
       "cargo_cu_ft": 64,
       "tax_credit_eligible": true,
+      "us_canadian_parts_pct": 73,
+      "assembly_location": "Chattanooga, TN",
+      "assembly_country": "US",
       "notes": "Assembled in Tennessee. Includes 3 years of free Electrify America charging."
     },
     {
@@ -360,7 +396,10 @@
       "seats": 5,
       "cargo_cu_ft": 57,
       "tax_credit_eligible": true,
-      "notes": "GM platform under Honda skin. Strong Honda dealer network in WV."
+      "us_canadian_parts_pct": 38,
+      "assembly_location": "Ramos Arizpe, Mexico",
+      "assembly_country": "Mexico",
+      "notes": "GM platform under Honda skin. Strong Honda dealer network in WV. Assembled in Mexico despite Honda branding."
     },
     {
       "id": "toyota-bz4x-2025",
@@ -387,6 +426,9 @@
       "seats": 5,
       "cargo_cu_ft": 56,
       "tax_credit_eligible": false,
+      "us_canadian_parts_pct": 0,
+      "assembly_location": "Japan",
+      "assembly_country": "Japan",
       "notes": "Toyota reliability reputation. Manufactured in Japan — does not qualify for IRA credit."
     },
     {
@@ -415,7 +457,10 @@
       "seats": 5,
       "cargo_cu_ft": 33,
       "tax_credit_eligible": false,
-      "notes": "Excellent WV option: 42 mi electric covers most commutes, gas backup eliminates range anxiety. No DCFC."
+      "us_canadian_parts_pct": 0,
+      "assembly_location": "Japan",
+      "assembly_country": "Japan",
+      "notes": "Excellent WV option: 42 mi electric covers most commutes, gas backup eliminates range anxiety. No DCFC. Assembled in Japan."
     },
     {
       "id": "ford-escape-phev-2025",
@@ -443,7 +488,10 @@
       "seats": 5,
       "cargo_cu_ft": 34,
       "tax_credit_eligible": true,
-      "notes": "Assembled in US. Ford dealer ubiquity in WV."
+      "us_canadian_parts_pct": 35,
+      "assembly_location": "Louisville, KY",
+      "assembly_country": "US",
+      "notes": "Ford dealer ubiquity in WV."
     },
     {
       "id": "jeep-wrangler-4xe-2025",
@@ -470,6 +518,9 @@
       },
       "seats": 5,
       "tax_credit_eligible": true,
+      "us_canadian_parts_pct": 74,
+      "assembly_location": "Toledo, OH",
+      "assembly_country": "US",
       "notes": "Off-road capable with electric assist. Popular body style in WV; shorter EV-only range."
     },
     {
@@ -497,7 +548,10 @@
       "seats": 5,
       "cargo_cu_ft": 11,
       "tax_credit_eligible": true,
-      "notes": "Most efficient non-Tesla EV. Aerodynamic sedan shape."
+      "us_canadian_parts_pct": 0,
+      "assembly_location": "Asan, South Korea",
+      "assembly_country": "South Korea",
+      "notes": "Most efficient non-Tesla EV. Aerodynamic sedan shape. Assembled in South Korea — 0% US/CA content."
     },
     {
       "id": "volvo-ex30-2025",
@@ -524,6 +578,9 @@
       "seats": 5,
       "cargo_cu_ft": 32,
       "tax_credit_eligible": false,
+      "us_canadian_parts_pct": 0,
+      "assembly_location": "Zhangjiakou, China",
+      "assembly_country": "China",
       "notes": "Small premium crossover. Chinese-assembled; does not qualify for IRA credit."
     },
     {
@@ -551,7 +608,10 @@
       "seats": 5,
       "cargo_cu_ft": 23,
       "tax_credit_eligible": false,
-      "notes": "Practical, reliable. Slower DCFC than Kia EV6."
+      "us_canadian_parts_pct": 1,
+      "assembly_location": "Hwaseong, South Korea",
+      "assembly_country": "South Korea",
+      "notes": "Practical, reliable. Slower DCFC than Kia EV6. Assembled in South Korea."
     }
   ]
 }

@@ -76,7 +76,7 @@ docker compose logs app --tail 50 -f
 ## Calculation methodology (important — document in UI if you change)
 
 - **Winter derate:** +12% annual kWh (4 cold months × ~28% range loss, averaged). Toggleable in UI; default ON.
-- **TOU blending:** 75% off-peak / 25% on-peak share (based on AEP/Xcel EV-rate studies).
+- **TOU rate:** 100% off-peak rate assumed — users who opt into TOU are committed to overnight charging.
 - **PHEV split:** 65% electric miles / 35% gas miles (Argonne/INL fleet data).
 - **WV grid CO₂ factor:** 0.67 kg/kWh (EIA state profile; WV is heavily coal-fired).
 - **Federal $7,500 IRA credit:** applied when `vehicle.tax_credit_eligible = true` AND MSRP ≤ $55k (cars) / $80k (SUVs/trucks). Assumes point-of-sale claim.

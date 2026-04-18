@@ -5,7 +5,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import yaml from "js-yaml";
-import type { FederalData, IceVehicle, Utility, Vehicle } from "./types";
+import type { ChargingInfraData, FederalData, IceVehicle, Utility, Vehicle } from "./types";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 
@@ -97,4 +97,8 @@ interface IceVehiclesFile {
 export function getIceVehicles(): IceVehicle[] {
   const data = readJson<IceVehiclesFile>("ice_vehicles.json");
   return data.ice_vehicles;
+}
+
+export function getChargingInfra(): ChargingInfraData {
+  return readYaml<ChargingInfraData>("charging_corridors.yaml");
 }

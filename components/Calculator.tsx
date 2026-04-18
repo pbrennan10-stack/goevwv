@@ -39,6 +39,7 @@ const DEFAULT_INPUT: Omit<CalcInput, "vehicle_ids"> = {
     gas_price_per_gal: 3.15,
   },
   apply_winter_derate: true,
+  long_trips_per_year: 4,
 };
 
 export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxToken }: Props) {
@@ -51,6 +52,11 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
   const [gasPrice, setGasPrice] = useState(DEFAULT_INPUT.current.gas_price_per_gal);
   const [iceVehicleId, setIceVehicleId] = useState("");
   const [route, setRoute] = useState<RouteData | null>(null);
+  const [longTrips, setLongTrips] = useState(DEFAULT_INPUT.long_trips_per_year);
+  const [gasSensitivityPrice, setGasSensitivityPrice] = useState(DEFAULT_INPUT.current.gas_price_per_gal);
+
+  // Keep sensitivity slider in sync when user updates the main gas price input.
+  useEffect(() => { setGasSensitivityPrice(gasPrice); }, [gasPrice]);
 
   // Hydrate from URL on first load so shareable URLs work.
   useEffect(() => {
@@ -74,6 +80,7 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
     setWinter(bool("w", DEFAULT_INPUT.apply_winter_derate));
     setMpg(num("mpg", DEFAULT_INPUT.current.mpg));
     setGasPrice(num("gas", DEFAULT_INPUT.current.gas_price_per_gal));
+    setLongTrips(num("lt", DEFAULT_INPUT.long_trips_per_year));
     const vids = p.get("v");
     if (vids) {
       const ids = vids.split(",").filter(Boolean).slice(0, 3);
@@ -112,7 +119,7 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
   }, [iceVehicles]);
 
   const onRouteFill = useCallback((r: RouteData) => {
-    setDaily(Math.round(r.distance_mi));
+    setDaily(Math.round(r.distance_mi * 2)); // one-way → round trip
     setRoute(r);
   }, []);
 
@@ -138,10 +145,33 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
         apply_winter_derate: winter,
         vehicle_ids: selectedIds,
         route: route ?? undefined,
+        long_trips_per_year: longTrips,
       },
       { vehicles: selectedVehicles, utility, fed: federal },
     );
-  }, [daily, days, utilityId, useTOU, winter, mpg, gasPrice, selectedIceVehicle, selectedVehicles, utility, federal, selectedIds, route]);
+  }, [daily, days, utilityId, useTOU, winter, mpg, gasPrice, selectedIceVehicle, selectedVehicles, utility, federal, selectedIds, route, longTrips]);
+
+  const outSensitivity: CalcReturn | null = useMemo(() => {
+    if (selectedVehicles.length === 0) return null;
+    return calculate(
+      {
+        daily_round_trip_mi: daily,
+        days_per_week: days,
+        utility_id: utilityId,
+        use_tou: useTOU,
+        current: {
+          mpg,
+          gas_price_per_gal: gasSensitivityPrice,
+          ice_vehicle: selectedIceVehicle ?? undefined,
+        },
+        apply_winter_derate: winter,
+        vehicle_ids: selectedIds,
+        route: route ?? undefined,
+        long_trips_per_year: longTrips,
+      },
+      { vehicles: selectedVehicles, utility, fed: federal },
+    );
+  }, [daily, days, utilityId, useTOU, winter, mpg, gasSensitivityPrice, selectedIceVehicle, selectedVehicles, utility, federal, selectedIds, route, longTrips]);
 
   // Sync state to URL so results are shareable.
   useEffect(() => {
@@ -155,9 +185,10 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
     p.set("mpg", String(mpg));
     p.set("gas", String(gasPrice));
     p.set("v", selectedIds.join(","));
+    if (longTrips !== DEFAULT_INPUT.long_trips_per_year) p.set("lt", String(longTrips));
     const newUrl = `${window.location.pathname}?${p.toString()}`;
     window.history.replaceState({}, "", newUrl);
-  }, [daily, days, utilityId, useTOU, winter, mpg, gasPrice, selectedIds]);
+  }, [daily, days, utilityId, useTOU, winter, mpg, gasPrice, selectedIds, longTrips]);
 
   const toggleVehicle = useCallback((id: string) => {
     setSelectedIds((prev) => {
@@ -208,6 +239,15 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
             max={7}
             step={1}
             hint={`= ${fmtNum(daily * days * 52)} miles/year`}
+          />
+          <NumField
+            label="Long road trips per year"
+            value={longTrips}
+            onChange={setLongTrips}
+            min={0}
+            max={52}
+            step={1}
+            hint="Trips where one-way distance is ~200 mi or more (e.g., WV → Pittsburgh, DC, Charlotte). Used for charging time estimates."
           />
 
           <SelectField
@@ -370,6 +410,11 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
                       {v.trim} · {powertrainLabel(v.powertrain)} ·{" "}
                       {fmtUSD(v.msrp_usd)}
                     </div>
+                    {v.assembly_location && (
+                      <div className="text-xs text-ink-soft leading-snug mt-0.5">
+                        {assemblyBadge(v.assembly_country, v.us_canadian_parts_pct)}
+                      </div>
+                    )}
                   </div>
                 </div>
               </button>
@@ -378,12 +423,17 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
         </div>
       </section>
 
-      {out && (
+      {out && outSensitivity && (
         <Results
           out={out}
           utility={utility}
           iceMaint={iceMaint}
           selectedIceVehicle={selectedIceVehicle}
+          mpg={mpg}
+          gasPrice={gasPrice}
+          gasSensitivityPrice={gasSensitivityPrice}
+          onSensitivityChange={setGasSensitivityPrice}
+          outSensitivity={outSensitivity}
         />
       )}
 
@@ -405,11 +455,21 @@ function Results({
   utility,
   iceMaint,
   selectedIceVehicle,
+  mpg,
+  gasPrice,
+  gasSensitivityPrice,
+  onSensitivityChange,
+  outSensitivity,
 }: {
   out: CalcReturn;
   utility: Utility;
   iceMaint: MaintenanceCosts | null;
   selectedIceVehicle: IceVehicle | null;
+  mpg: number;
+  gasPrice: number;
+  gasSensitivityPrice: number;
+  onSensitivityChange: (p: number) => void;
+  outSensitivity: CalcReturn;
 }) {
   return (
     <section className="space-y-4">
@@ -418,7 +478,7 @@ function Results({
         <div className="text-sm text-ink-soft">
           At {fmtNum(out.annual_miles)} mi/yr · rate{" "}
           <strong>{fmtNum(out.rate_per_kwh * 100, 1)}¢/kWh</strong>{" "}
-          ({out.rate_mode === "tou" ? "blended TOU" : "flat"}) via{" "}
+          ({out.rate_mode === "tou" ? "TOU off-peak" : "flat"}) via{" "}
           <strong>{utility.name}</strong>
         </div>
       </div>
@@ -464,14 +524,23 @@ function Results({
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {out.results.map((r) => (
-          <ResultCard key={r.vehicle.id} r={r} showMaintenance={!!iceMaint} />
+          <ResultCard key={r.vehicle.id} r={r} showMaintenance={!!iceMaint} iceVehicle={selectedIceVehicle} />
         ))}
       </div>
+
+      <FuelingTimePanel out={out} mpg={mpg} selectedIceVehicle={selectedIceVehicle} />
+      <GasSensitivitySlider
+        gasPrice={gasPrice}
+        sensitivityPrice={gasSensitivityPrice}
+        onSensitivityChange={onSensitivityChange}
+        out={out}
+        outSensitivity={outSensitivity}
+      />
     </section>
   );
 }
 
-function ResultCard({ r, showMaintenance }: { r: VehicleResult; showMaintenance: boolean }) {
+function ResultCard({ r, showMaintenance, iceVehicle }: { r: VehicleResult; showMaintenance: boolean; iceVehicle?: IceVehicle | null }) {
   const savings = r.annual_savings_vs_current_usd;
   const positive = savings >= 0;
   return (
@@ -541,6 +610,20 @@ function ResultCard({ r, showMaintenance }: { r: VehicleResult; showMaintenance:
             />
           </>
         )}
+        {r.vehicle.assembly_location && (
+          <Row
+            label="Assembly"
+            value={r.vehicle.assembly_location}
+            muted
+          />
+        )}
+        {r.vehicle.us_canadian_parts_pct !== undefined && (
+          <Row
+            label="US/CA parts"
+            value={r.vehicle.us_canadian_parts_pct === null ? "N/A (exempt)" : `${r.vehicle.us_canadian_parts_pct}%`}
+            muted
+          />
+        )}
       </dl>
 
       {r.warnings.length > 0 && (
@@ -550,7 +633,231 @@ function ResultCard({ r, showMaintenance }: { r: VehicleResult; showMaintenance:
           ))}
         </ul>
       )}
+
+      {iceVehicle?.class === "truck" && r.vehicle.class === "truck" && (
+        <div className="rounded-lg bg-amber-50 ring-1 ring-amber-200 p-3 text-xs text-amber-800 space-y-1.5">
+          <div className="font-semibold">Towing significantly cuts EV range</div>
+          <p>
+            Towing near max capacity typically cuts range 40–50%.
+            {r.vehicle.epa_range_mi
+              ? ` The ${r.vehicle.model} has a ${r.vehicle.epa_range_mi}-mi EPA range — towing reduces that to roughly ${Math.round(r.vehicle.epa_range_mi * 0.55)} miles.`
+              : ""}
+            {" "}WV&rsquo;s thin DCFC coverage on I-77 south and rural I-79 requires careful planning for long towing routes.
+          </p>
+          <p>
+            Many WV EV owners keep their gas truck for hauling and use an EV for daily commutes — that often pencils out better than replacing the truck entirely.
+          </p>
+        </div>
+      )}
+
+      <div className="text-xs text-ink-soft bg-slate-50 rounded-md p-2 leading-snug">
+        Resale: EVs typically depreciate 50–65% over 5 years nationally. WV has ~1,900 registered EVs — a thin local resale market may mean steeper depreciation. Factor into any long-term financial plan.
+      </div>
     </article>
+  );
+}
+
+function FuelingTimePanel({
+  out,
+  mpg,
+  selectedIceVehicle,
+}: {
+  out: CalcReturn;
+  mpg: number;
+  selectedIceVehicle: IceVehicle | null;
+}) {
+  const iceHrs = out.current_annual_fueling_min / 60;
+  const iceName = selectedIceVehicle
+    ? `${selectedIceVehicle.year} ${selectedIceVehicle.make} ${selectedIceVehicle.model}`
+    : `your current car (${mpg} mpg)`;
+
+  return (
+    <div className="rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 p-5 sm:p-7">
+      <h3 className="text-base font-semibold text-ink mb-1">
+        Time spent fueling vs. charging
+      </h3>
+      <p className="text-xs text-ink-soft mb-4">
+        Based on {out.long_trips_per_year} long road trip{out.long_trips_per_year !== 1 ? "s" : ""}/yr
+        (~200-mile one-way). Home charging time is passive — you plug in when you get home and
+        walk away. Only DCFC stops (and any PHEV gas fill-ups) are time you spend waiting.
+      </p>
+
+      {/* ICE baseline */}
+      <div className="mb-4 rounded-xl bg-amber-50 ring-1 ring-amber-200 p-4 flex flex-wrap items-center gap-x-6 gap-y-1">
+        <div>
+          <div className="text-xs text-amber-700 font-semibold uppercase tracking-wider mb-0.5">
+            {iceName} — gas
+          </div>
+          <div className="text-2xl font-bold text-amber-900 tabular-nums">
+            {fmtNum(iceHrs, 1)} hrs/yr
+          </div>
+          <div className="text-xs text-amber-700">
+            {fmtNum(out.current_annual_fillups, 0)} fill-ups × ~5 min each · all active standing time
+          </div>
+        </div>
+      </div>
+
+      <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+        {out.results.map((r) => (
+          <ChargingCard key={r.vehicle.id} r={r} iceHrs={iceHrs} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ChargingCard({ r, iceHrs }: { r: VehicleResult; iceHrs: number }) {
+  const isBev = r.vehicle.powertrain === "bev";
+  const isPhev = r.vehicle.powertrain === "phev";
+
+  // Active waiting time: DCFC for BEVs, gas fill-ups for PHEVs
+  const activeMin = r.annual_dcfc_min + r.annual_gas_fueling_min;
+  const activeHrs = activeMin / 60;
+  const savedHrs = iceHrs - activeHrs;
+
+  return (
+    <article className="rounded-xl ring-1 ring-slate-200 p-4 flex flex-col gap-3">
+      <div>
+        <div className="text-xs text-ink-soft font-semibold uppercase tracking-wider">
+          {r.vehicle.year} {r.vehicle.make}
+        </div>
+        <div className="text-sm font-semibold text-ink leading-tight">
+          {r.vehicle.model} · {powertrainLabel(r.vehicle.powertrain)}
+        </div>
+      </div>
+
+      {/* Home charging — passive */}
+      {(isBev || isPhev) && (
+        <div className="rounded-lg bg-brand-bg p-3">
+          <div className="text-xs text-brand-dark font-medium mb-0.5">
+            Home charging — passive
+          </div>
+          <div className="text-sm font-semibold text-ink">
+            {r.annual_home_charge_sessions} sessions/yr
+          </div>
+          <div className="text-xs text-ink-soft">
+            ~{fmtNum(r.annual_home_charge_min, 0)} min total · plug in &amp; walk away
+          </div>
+        </div>
+      )}
+
+      {/* Active waiting time */}
+      {isBev && (
+        <div className="rounded-lg bg-slate-50 ring-1 ring-slate-200 p-3">
+          <div className="text-xs text-ink-soft font-medium mb-0.5">
+            Road trip fast charging — active
+          </div>
+          {r.annual_dcfc_stops === 0 ? (
+            <div className="text-sm font-semibold text-brand-dark">
+              0 stops — drives through on one charge
+            </div>
+          ) : (
+            <>
+              <div className="text-sm font-semibold text-ink">
+                {r.annual_dcfc_stops} DCFC stop{r.annual_dcfc_stops !== 1 ? "s" : ""}/yr
+              </div>
+              <div className="text-xs text-ink-soft">
+                ~{fmtNum(r.annual_dcfc_min / 60, 1)} hrs/yr at the charger
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
+      {isPhev && (
+        <div className="rounded-lg bg-slate-50 ring-1 ring-slate-200 p-3">
+          <div className="text-xs text-ink-soft font-medium mb-0.5">
+            Gas fill-ups (35% gas miles) — active
+          </div>
+          <div className="text-sm font-semibold text-ink">
+            {fmtNum(r.annual_gas_fillups, 1)} fill-ups/yr
+          </div>
+          <div className="text-xs text-ink-soft">
+            ~{fmtNum(r.annual_gas_fueling_min / 60, 1)} hrs/yr · road trips use gas (no DCFC stops)
+          </div>
+        </div>
+      )}
+
+      {/* Net vs ICE */}
+      <div
+        className={[
+          "rounded-lg p-3 text-sm font-semibold",
+          savedHrs >= 0 ? "bg-brand-bg text-brand-dark" : "bg-amber-50 text-amber-900",
+        ].join(" ")}
+      >
+        {savedHrs >= 0
+          ? `Saves ~${fmtNum(savedHrs, 1)} hrs/yr of active fueling time`
+          : `~${fmtNum(-savedHrs, 1)} more hrs/yr of active time than gas`}
+      </div>
+    </article>
+  );
+}
+
+function GasSensitivitySlider({
+  gasPrice,
+  sensitivityPrice,
+  onSensitivityChange,
+  out,
+  outSensitivity,
+}: {
+  gasPrice: number;
+  sensitivityPrice: number;
+  onSensitivityChange: (p: number) => void;
+  out: CalcReturn;
+  outSensitivity: CalcReturn;
+}) {
+  const atBase = Math.abs(sensitivityPrice - gasPrice) < 0.01;
+  return (
+    <div className="rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 p-5 sm:p-7">
+      <h3 className="text-base font-semibold text-ink mb-1">What if gas prices change?</h3>
+      <p className="text-xs text-ink-soft mb-4">
+        WV gas is currently ${gasPrice.toFixed(2)}/gal. Drag to see how your savings shift.
+      </p>
+      <div className="flex items-center gap-3 mb-5">
+        <span className="text-xs text-ink-soft shrink-0">$2.00</span>
+        <input
+          type="range"
+          min={2.0}
+          max={6.0}
+          step={0.05}
+          value={sensitivityPrice}
+          onChange={(e) => onSensitivityChange(Number(e.target.value))}
+          className="flex-1 accent-brand"
+        />
+        <span className="text-xs text-ink-soft shrink-0">$6.00</span>
+        <span className="text-sm font-bold text-ink w-16 text-right shrink-0">
+          ${sensitivityPrice.toFixed(2)}/gal
+        </span>
+      </div>
+      <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+        {outSensitivity.results.map((r, i) => {
+          const base = out.results[i];
+          const delta5yr = r.five_year_savings_vs_current_usd - base.five_year_savings_vs_current_usd;
+          return (
+            <div key={r.vehicle.id} className="rounded-xl ring-1 ring-slate-200 p-3">
+              <div className="text-xs text-ink-soft font-medium leading-snug mb-1">
+                {r.vehicle.year} {r.vehicle.make} {r.vehicle.model}
+              </div>
+              <div className="text-base font-semibold text-ink tabular-nums">
+                {fmtUSDsigned(r.five_year_savings_vs_current_usd)}
+                <span className="text-xs font-normal text-ink-soft"> 5-yr savings</span>
+              </div>
+              {!atBase && Math.abs(delta5yr) > 10 ? (
+                <div
+                  className={`text-xs tabular-nums mt-0.5 ${delta5yr >= 0 ? "text-brand-dark" : "text-amber-700"}`}
+                >
+                  {fmtUSDsigned(delta5yr)} vs your current estimate
+                </div>
+              ) : (
+                atBase && (
+                  <div className="text-xs text-ink-soft mt-0.5">Move slider to see impact</div>
+                )
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
   );
 }
 
@@ -614,13 +921,10 @@ function Assumptions({
             Utility rate:{" "}
             <strong>
               {utility.name} — {useTOU && utility.residential.tou_available
-                ? `TOU blended (${fmtNum(
+                ? `TOU off-peak rate: ${fmtNum(
                     (utility.residential.tou_schedule?.off_peak_rate_per_kwh ?? 0) * 100,
                     1,
-                  )}¢ off-peak, ${fmtNum(
-                    (utility.residential.tou_schedule?.on_peak_rate_per_kwh ?? 0) * 100,
-                    1,
-                  )}¢ on-peak, 75% off-peak share)`
+                  )}¢/kWh (100% off-peak charging assumed)`
                 : `flat ${fmtNum(utility.residential.flat_rate_per_kwh * 100, 1)}¢/kWh`}
             </strong>
           </li>
@@ -690,8 +994,19 @@ function Assumptions({
             average from INL/Argonne fleet data).
           </li>
           <li>
-            WV grid CO₂ factor: 0.67 kg/kWh (EIA state profile — WV is heavily
-            coal-fired, so EV emissions here are higher than the US average).
+            WV grid CO₂ factor: 0.67 kg/kWh (EIA state profile). WV is part of
+            the <strong>PJM Interconnection</strong> — the grid serving 13 states
+            plus DC. PJM&rsquo;s actual fuel mix is more diverse than WV&rsquo;s
+            in-state generation: roughly 40% gas, 22% nuclear, 18% coal, and
+            17%+ wind/solar/hydro from neighboring states. When PJM dispatches
+            gas or nuclear instead of coal, your EV&rsquo;s real-time emissions
+            drop. The 0.67 kg/kWh figure reflects WV&rsquo;s heavy coal exports
+            and is the conservative assumption; the actual PJM marginal factor
+            at night (when most EVs charge) is typically lower.{" "}
+            <strong>
+              As the grid adds renewables, EV emissions fall automatically —
+              a gas car&rsquo;s emissions never change.
+            </strong>
           </li>
           <li>
             These are honest estimates, not professional financial advice.
@@ -778,4 +1093,17 @@ function powertrainLabel(p: string): string {
     case "hybrid": return "Hybrid";
     default:       return p.toUpperCase();
   }
+}
+
+function assemblyBadge(country?: string, pct?: number | null): string {
+  const loc = country === "US" ? "🇺🇸 US-assembled"
+    : country === "Canada" ? "🇨🇦 Canada-assembled"
+    : country === "Mexico" ? "🇲🇽 Mexico-assembled"
+    : country === "South Korea" ? "🇰🇷 Korea-assembled"
+    : country === "Japan" ? "🇯🇵 Japan-assembled"
+    : country === "China" ? "🇨🇳 China-assembled"
+    : country ?? "—";
+  if (pct === null) return `${loc} · parts content N/A (AALA-exempt)`;
+  if (pct === undefined) return loc;
+  return `${loc} · ${pct}% US/CA parts`;
 }

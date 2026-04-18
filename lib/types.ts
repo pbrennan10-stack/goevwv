@@ -42,6 +42,10 @@ export interface Vehicle {
   payload_lbs?: number;
   towing_lbs?: number;
   tax_credit_eligible: boolean;
+  // NHTSA American Automobile Labeling Act (AALA) data
+  us_canadian_parts_pct?: number | null; // null = AALA-exempt (GVWR > 8,500 lbs)
+  assembly_location?: string;            // e.g. "Dearborn, MI" or "Cuautitlán, Mexico"
+  assembly_country?: string;             // e.g. "US", "Canada", "Mexico", "South Korea"
   notes: string;
 }
 
@@ -137,6 +141,13 @@ export interface VehicleResult {
   co2_kg_per_year: number;
   co2_saved_vs_current_kg_per_year: number;
   warnings: string[];
+  // Fueling/charging time
+  annual_home_charge_sessions: number;
+  annual_home_charge_min: number;   // passive: plug in/out at home while parked
+  annual_dcfc_stops: number;        // active: sitting at a public fast charger
+  annual_dcfc_min: number;
+  annual_gas_fillups: number;       // 0 for BEV; gas portion fill-ups for PHEV
+  annual_gas_fueling_min: number;   // 0 for BEV; gas portion station time for PHEV
 }
 
 export interface IceVehicleMaintenance {
@@ -157,6 +168,7 @@ export interface IceVehicle {
   trim: string;
   class: VehicleClass;
   mpg_combined: number;
+  tank_gallons: number;
   annual_insurance_usd: number;
   maintenance: IceVehicleMaintenance;
 }
@@ -183,6 +195,60 @@ export interface RouteData {
   summary: string;                 // human-readable display string
 }
 
+export interface ChargingStation {
+  city: string;
+  network: string;
+  stalls: number;
+  kw: number;
+  note?: string;
+}
+
+export interface CorridorGap {
+  description: string;
+  severity: "moderate" | "high";
+  note?: string;
+}
+
+export interface ChargingCorridor {
+  id: string;
+  name: string;
+  description: string;
+  coverage: "good" | "moderate" | "thin";
+  length_wv_mi: number;
+  stations: ChargingStation[];
+  gaps: CorridorGap[];
+}
+
+export interface NeviStatus {
+  allocation_usd: number;
+  allocation_note?: string;
+  rfp_issued: boolean;
+  rfp_expected?: string;
+  stations_planned: number;
+  estimated_stations_open: string;
+  note: string;
+}
+
+export interface StatewideSummary {
+  public_ports_approx: number;
+  dcfc_approx: number;
+  as_of: string;
+  bev_registrations: number;
+  bev_pct_of_vehicles: number;
+}
+
+export interface ChargingInfraData {
+  nevi_status: NeviStatus;
+  statewide_summary: StatewideSummary;
+  corridors: ChargingCorridor[];
+  live_data_links: {
+    plugshare: string;
+    chargepoint: string;
+    tesla_supercharger: string;
+    note: string;
+  };
+}
+
 export interface CalcInput {
   daily_round_trip_mi: number;
   days_per_week: number;
@@ -192,4 +258,5 @@ export interface CalcInput {
   apply_winter_derate: boolean;
   vehicle_ids: string[];
   route?: RouteData;
+  long_trips_per_year: number; // trips where one-way distance ≈ 200 mi, requiring DCFC
 }

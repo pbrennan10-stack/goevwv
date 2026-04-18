@@ -158,7 +158,8 @@ export function RouteHelper({ token, onFill }: Props) {
       const speedStr = highway_fraction > 0.15 && highway_avg_speed_mph > 62
         ? ` · avg ${Math.round(highway_avg_speed_mph)} mph hwy`
         : "";
-      const summary = `${distance_mi.toFixed(1)} mi · ${Math.round(highway_fraction * 100)}% highway${speedStr}${elevStr}`;
+      const roundTripMi = distance_mi * 2;
+      const summary = `${roundTripMi.toFixed(1)} mi round-trip · ${Math.round(highway_fraction * 100)}% highway${speedStr}${elevStr}`;
 
       const r: RouteData = { distance_mi, highway_fraction, highway_avg_speed_mph, elevation_gain_m, summary };
       setResult(r);

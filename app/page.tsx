@@ -1,13 +1,16 @@
 import Link from "next/link";
 import { Calculator } from "@/components/Calculator";
+import { ChargingStatus } from "@/components/ChargingStatus";
+import { FitCheck } from "@/components/FitCheck";
 import { Logo } from "@/components/Logo";
-import { getFederalData, getIceVehicles, getUtilities, getVehicles } from "@/lib/data";
+import { getChargingInfra, getFederalData, getIceVehicles, getUtilities, getVehicles } from "@/lib/data";
 
 export default function HomePage() {
   const vehicles = getVehicles();
   const iceVehicles = getIceVehicles();
   const utilities = getUtilities();
   const federal = getFederalData();
+  const chargingInfra = getChargingInfra();
 
   return (
     <main className="mx-auto max-w-content px-4 sm:px-6 py-8 sm:py-12">
@@ -38,6 +41,8 @@ export default function HomePage() {
         </p>
       </section>
 
+      <FitCheck />
+
       <div id="calculator">
         <Calculator
           vehicles={vehicles}
@@ -46,6 +51,10 @@ export default function HomePage() {
           federal={federal}
           mapboxToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
         />
+      </div>
+
+      <div className="mt-8">
+        <ChargingStatus data={chargingInfra} />
       </div>
 
       <footer className="mt-16 pb-8 border-t border-slate-200 pt-6 text-sm text-ink-soft">

@@ -1,7 +1,7 @@
 {
   "_meta": {
     "updated": "2026-04-18",
-    "note": "Maintenance: WV-area averages (RepairPal + AAA Your Driving Costs 2024, +5% for mountain road conditions). Insurance: estimated full-coverage annual premium for a 35-45 year old with clean record in WV — actual rates vary widely by driver history, coverage level, and ZIP code."
+    "note": "Maintenance: WV-area averages (RepairPal + AAA Your Driving Costs 2024, +5% for mountain road conditions). Insurance: estimated full-coverage annual premium for a 35-45 year old with clean record in WV — actual rates vary widely by driver history, coverage level, and ZIP code. tank_gallons: usable tank capacity for refueling-time calculation."
   },
   "ice_vehicles": [
     {
@@ -12,6 +12,7 @@
       "trim": "XLT 4x4 2.7L EcoBoost",
       "class": "truck",
       "mpg_combined": 22,
+      "tank_gallons": 23,
       "annual_insurance_usd": 1850,
       "maintenance": {
         "oil_change_usd": 85,
@@ -31,6 +32,7 @@
       "trim": "LT 4WD 5.3L",
       "class": "truck",
       "mpg_combined": 17,
+      "tank_gallons": 24,
       "annual_insurance_usd": 1800,
       "maintenance": {
         "oil_change_usd": 80,
@@ -50,6 +52,7 @@
       "trim": "Tradesman 4x4 5.7L Hemi",
       "class": "truck",
       "mpg_combined": 17,
+      "tank_gallons": 26,
       "annual_insurance_usd": 1850,
       "maintenance": {
         "oil_change_usd": 85,
@@ -69,6 +72,7 @@
       "trim": "SLE 4x4 5.3L",
       "class": "truck",
       "mpg_combined": 17,
+      "tank_gallons": 24,
       "annual_insurance_usd": 1800,
       "maintenance": {
         "oil_change_usd": 80,
@@ -88,6 +92,7 @@
       "trim": "TRD Off-Road 4x4 2.4T",
       "class": "truck",
       "mpg_combined": 23,
+      "tank_gallons": 21,
       "annual_insurance_usd": 1700,
       "maintenance": {
         "oil_change_usd": 75,
@@ -107,6 +112,7 @@
       "trim": "XLT 4x4 7.3L V8",
       "class": "truck",
       "mpg_combined": 14,
+      "tank_gallons": 26,
       "annual_insurance_usd": 1950,
       "maintenance": {
         "oil_change_usd": 110,
@@ -126,6 +132,7 @@
       "trim": "Sport 4x4 3.6L V6",
       "class": "suv",
       "mpg_combined": 20,
+      "tank_gallons": 21,
       "annual_insurance_usd": 1850,
       "maintenance": {
         "oil_change_usd": 80,
@@ -145,6 +152,7 @@
       "trim": "TRD Off-Road 4x4 4.0L V6",
       "class": "suv",
       "mpg_combined": 17,
+      "tank_gallons": 23,
       "annual_insurance_usd": 1750,
       "maintenance": {
         "oil_change_usd": 80,
@@ -164,6 +172,7 @@
       "trim": "SXT AWD 3.6L V6",
       "class": "suv",
       "mpg_combined": 22,
+      "tank_gallons": 24,
       "annual_insurance_usd": 1700,
       "maintenance": {
         "oil_change_usd": 80,
@@ -183,6 +192,7 @@
       "trim": "Laredo 4x4 3.6L V6",
       "class": "suv",
       "mpg_combined": 22,
+      "tank_gallons": 24,
       "annual_insurance_usd": 1750,
       "maintenance": {
         "oil_change_usd": 80,
@@ -202,6 +212,7 @@
       "trim": "XLT 4x4 2.3L EcoBoost",
       "class": "suv",
       "mpg_combined": 23,
+      "tank_gallons": 18,
       "annual_insurance_usd": 1650,
       "maintenance": {
         "oil_change_usd": 75,
@@ -221,6 +232,7 @@
       "trim": "LT 4WD 5.3L",
       "class": "suv",
       "mpg_combined": 17,
+      "tank_gallons": 24,
       "annual_insurance_usd": 1900,
       "maintenance": {
         "oil_change_usd": 90,
@@ -240,6 +252,7 @@
       "trim": "EX-L AWD 3.5L",
       "class": "suv",
       "mpg_combined": 23,
+      "tank_gallons": 19,
       "annual_insurance_usd": 1600,
       "maintenance": {
         "oil_change_usd": 80,
@@ -259,6 +272,7 @@
       "trim": "EX AWD 3.8L V6",
       "class": "suv",
       "mpg_combined": 23,
+      "tank_gallons": 18,
       "annual_insurance_usd": 1650,
       "maintenance": {
         "oil_change_usd": 80,
@@ -278,6 +292,7 @@
       "trim": "LE AWD 2.5L",
       "class": "suv",
       "mpg_combined": 30,
+      "tank_gallons": 15,
       "annual_insurance_usd": 1550,
       "maintenance": {
         "oil_change_usd": 65,
@@ -297,6 +312,7 @@
       "trim": "LX AWD 1.5T",
       "class": "suv",
       "mpg_combined": 30,
+      "tank_gallons": 14,
       "annual_insurance_usd": 1500,
       "maintenance": {
         "oil_change_usd": 65,
@@ -316,6 +332,7 @@
       "trim": "LT FWD 1.5T",
       "class": "suv",
       "mpg_combined": 28,
+      "tank_gallons": 15,
       "annual_insurance_usd": 1500,
       "maintenance": {
         "oil_change_usd": 65,
@@ -335,6 +352,7 @@
       "trim": "Active AWD 2.0L EcoBoost",
       "class": "suv",
       "mpg_combined": 26,
+      "tank_gallons": 15,
       "annual_insurance_usd": 1450,
       "maintenance": {
         "oil_change_usd": 70,
@@ -354,6 +372,7 @@
       "trim": "Premium AWD 2.5L",
       "class": "suv",
       "mpg_combined": 29,
+      "tank_gallons": 19,
       "annual_insurance_usd": 1400,
       "maintenance": {
         "oil_change_usd": 65,
@@ -373,6 +392,7 @@
       "trim": "SV AWD 1.5T",
       "class": "suv",
       "mpg_combined": 33,
+      "tank_gallons": 15,
       "annual_insurance_usd": 1450,
       "maintenance": {
         "oil_change_usd": 65,
@@ -392,6 +412,7 @@
       "trim": "LE FWD 2.5L",
       "class": "sedan",
       "mpg_combined": 32,
+      "tank_gallons": 14,
       "annual_insurance_usd": 1450,
       "maintenance": {
         "oil_change_usd": 60,
@@ -411,6 +432,7 @@
       "trim": "EX FWD 1.5T",
       "class": "sedan",
       "mpg_combined": 32,
+      "tank_gallons": 14,
       "annual_insurance_usd": 1500,
       "maintenance": {
         "oil_change_usd": 65,
@@ -430,6 +452,7 @@
       "trim": "SE FWD 2.5L",
       "class": "sedan",
       "mpg_combined": 32,
+      "tank_gallons": 15,
       "annual_insurance_usd": 1450,
       "maintenance": {
         "oil_change_usd": 60,
@@ -449,6 +472,7 @@
       "trim": "SV FWD 2.5L",
       "class": "sedan",
       "mpg_combined": 32,
+      "tank_gallons": 16,
       "annual_insurance_usd": 1400,
       "maintenance": {
         "oil_change_usd": 60,
@@ -468,6 +492,7 @@
       "trim": "LE FWD 2.0L",
       "class": "sedan",
       "mpg_combined": 34,
+      "tank_gallons": 13,
       "annual_insurance_usd": 1300,
       "maintenance": {
         "oil_change_usd": 55,
@@ -487,6 +512,7 @@
       "trim": "LS FWD 1.5T",
       "class": "sedan",
       "mpg_combined": 30,
+      "tank_gallons": 15,
       "annual_insurance_usd": 1350,
       "maintenance": {
         "oil_change_usd": 60,
@@ -506,6 +532,7 @@
       "trim": "EX FWD 3.5L",
       "class": "minivan",
       "mpg_combined": 22,
+      "tank_gallons": 19,
       "annual_insurance_usd": 1550,
       "maintenance": {
         "oil_change_usd": 80,

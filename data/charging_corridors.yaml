@@ -1,0 +1,146 @@
+# WV EV Charging Infrastructure — curated quarterly alongside vehicle MSRPs
+# Last updated: 2026-04-18
+# Sources: Tesla.com/findus, PlugShare, ChargePoint, WVDOT NEVI plan documents
+# Coverage rating: good = no gaps >50 mi, moderate = some gaps 50-80 mi, thin = gaps >80 mi
+
+nevi_status:
+  allocation_usd: 45700000
+  allocation_note: "Allocated over 5 years under IIJA/BIL"
+  rfp_issued: false
+  rfp_expected: "Q2–Q3 2026"
+  stations_planned: 15
+  estimated_stations_open: "2027–2028"
+  note: >
+    WV has not issued an RFP as of April 2026 — nearly two years behind schedule.
+    The federal NEVI program was frozen in February 2025 and partially restored in
+    August 2025, but WV did not join the states' lawsuit and faces additional
+    uncertainty. Planned stations follow I-64, I-77, I-79, I-81, and I-70 corridors.
+    Do not count on these stations existing until 2027 at the earliest.
+
+statewide_summary:
+  public_ports_approx: 550
+  dcfc_approx: 55
+  as_of: "late 2025"
+  bev_registrations: 1870
+  bev_pct_of_vehicles: 0.13
+
+corridors:
+  - id: i64
+    name: "I-64 — East-West Spine"
+    description: "Huntington to Lewisburg. Main corridor for Charleston and most of central WV."
+    coverage: good
+    length_wv_mi: 180
+    stations:
+      - city: Huntington
+        network: Tesla Supercharger
+        stalls: 8
+        kw: 150
+        note: "Open to non-Tesla with CCS adapter"
+      - city: Charleston
+        network: Tesla Supercharger
+        stalls: 8
+        kw: 150
+        note: "Kanawha City; open to non-Tesla"
+      - city: Beckley
+        network: "Multiple (ChargePoint, Tesla)"
+        stalls: 6
+        kw: 50
+        note: "Near Tamarack; NEVI planned stop"
+      - city: Princeton
+        network: Tesla Supercharger
+        stalls: 4
+        kw: 150
+      - city: Lewisburg
+        network: Tesla Supercharger
+        stalls: 6
+        kw: 150
+        note: "Greenbrier Valley; also NEVI planned stop"
+    gaps:
+      - description: "Princeton to Lewisburg — ~65 miles with limited non-Tesla DCFC"
+        severity: moderate
+        note: "Tesla covers this gap; non-Tesla CCS options are sparse"
+
+  - id: i79
+    name: "I-79 — North-South Backbone"
+    description: "Morgantown to Charleston. Most traveled N-S route in WV."
+    coverage: thin
+    length_wv_mi: 160
+    stations:
+      - city: Morgantown
+        network: Tesla Supercharger
+        stalls: 8
+        kw: 150
+        note: "Multiple locations; Sheetz DCFC also available"
+      - city: Fairmont
+        network: Tesla Supercharger
+        stalls: 6
+        kw: 150
+      - city: Clarksburg
+        network: ChargePoint
+        stalls: 2
+        kw: 50
+        note: "Level 2 only at some locations"
+      - city: Charleston
+        network: Tesla Supercharger
+        stalls: 8
+        kw: 150
+    gaps:
+      - description: "Clarksburg to Charleston — ~100 miles; limited DCFC mid-route"
+        severity: high
+        note: "Weston and Sutton are NEVI planned stops (2027+). Current gap is real."
+
+  - id: i77
+    name: "I-77 — WV Turnpike (North-South)"
+    description: "Beckley to Parkersburg. Main route for southern WV and Ohio border."
+    coverage: thin
+    length_wv_mi: 130
+    stations:
+      - city: Beckley
+        network: "Multiple (ChargePoint, Tesla)"
+        stalls: 6
+        kw: 50
+      - city: Ripley
+        network: Planned NEVI
+        stalls: 0
+        kw: 0
+        note: "NEVI planned stop; not built as of 2026"
+      - city: Parkersburg
+        network: Tesla Supercharger
+        stalls: 6
+        kw: 150
+    gaps:
+      - description: "Beckley to Ripley to Parkersburg — sparse non-Tesla DCFC across ~130 miles"
+        severity: high
+        note: "Ripley NEVI station is planned but not yet built. Use PlugShare to check current status."
+
+  - id: i81
+    name: "I-81 — Eastern Panhandle"
+    description: "Martinsburg area. Short WV segment; benefits from Pennsylvania and Virginia spillover."
+    coverage: good
+    length_wv_mi: 24
+    stations:
+      - city: Martinsburg
+        network: Tesla Supercharger
+        stalls: 8
+        kw: 250
+        note: "V3 Supercharger; excellent coverage for this short corridor"
+    gaps: []
+
+  - id: i70
+    name: "I-70 — Northern Panhandle"
+    description: "Wheeling and surrounds. Benefits from Ohio and Pennsylvania DCFC network spillover."
+    coverage: good
+    length_wv_mi: 20
+    stations:
+      - city: Wheeling
+        network: "Multiple (Tesla, ChargePoint, Electrify America)"
+        stalls: 10
+        kw: 150
+        note: "NEVI planned expansion; currently well-served by OH/PA corridor chargers"
+    gaps: []
+
+live_data_links:
+  plugshare: "https://www.plugshare.com/"
+  chargepoint: "https://www.chargepoint.com/find-a-charger/"
+  tesla_supercharger: "https://www.tesla.com/findus"
+  note: "Always check PlugShare for real-time charger availability before a long trip. Station status can change."

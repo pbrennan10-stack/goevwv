@@ -40,9 +40,27 @@ const CO2_KG_PER_KWH_WV_GRID = 0.67;
 // (0.28 * 4/12 = ~0.093, rounded up for HVAC and slower DCFC losses)
 const ANNUAL_WINTER_KWH_MULTIPLIER = 1.12;
 
-// How much of an EV owner's charging realistically happens on off-peak TOU.
-// Industry studies (AEP, Xcel) show 70-85% with separate-meter EV rates.
-const TOU_OFF_PEAK_SHARE = 0.75;
+// -- Fueling / charging time constants --
+const ICE_TANK_GAL = 14;           // US average passenger car tank
+const ICE_FILLUP_MIN = 5;          // drive in, pump, pay, drive out
+const EV_HOME_PLUG_MIN = 1.5;      // plug in + unplug (at home, passive)
+const LONG_TRIP_ONE_WAY_MI = 200;  // WV → Pittsburgh / DC / Charlotte typical
+const DCFC_DEFAULT_MIN = 30;       // 10→80% on a 50–150 kW charger
+
+function homeChargeSessions(daily_mi: number, days_per_week: number, range_mi: number): number {
+  // Charge when battery drops below ~20% capacity (usable = 80% of rated range).
+  const usable = Math.max(range_mi * 0.8, 1);
+  const daysPerCharge = Math.max(1, Math.floor(usable / Math.max(daily_mi, 1)));
+  return Math.ceil((days_per_week * 52) / daysPerCharge);
+}
+
+function dcfcStopsPerRoundTrip(range_mi: number): number {
+  // Highway efficiency + safety buffer: assume 85% of rated range usable on a long trip.
+  const highwayUsable = range_mi * 0.85;
+  if (LONG_TRIP_ONE_WAY_MI <= highwayUsable) return 0;
+  const stopsOneWay = Math.ceil(LONG_TRIP_ONE_WAY_MI / highwayUsable) - 1;
+  return stopsOneWay * 2; // round trip
+}
 
 function annualMiles(daily: number, daysPerWeek: number): number {
   return daily * daysPerWeek * 52;
@@ -54,11 +72,8 @@ function effectiveRatePerKwh(
 ): { rate: number; mode: "flat" | "tou" } {
   const r = utility.residential;
   if (useTOU && r.tou_available && r.tou_schedule) {
-    const tou = r.tou_schedule;
-    const blended =
-      TOU_OFF_PEAK_SHARE * tou.off_peak_rate_per_kwh +
-      (1 - TOU_OFF_PEAK_SHARE) * tou.on_peak_rate_per_kwh;
-    return { rate: blended, mode: "tou" };
+    // Users who opt into TOU charge overnight (off-peak) by design — use 100% off-peak rate.
+    return { rate: r.tou_schedule.off_peak_rate_per_kwh, mode: "tou" };
   }
   return { rate: r.flat_rate_per_kwh, mode: "flat" };
 }
@@ -208,6 +223,9 @@ export interface CalcReturn {
   current_annual_co2_kg: number;
   annual_miles: number;
   highway_avg_speed_mph: number;           // for display in UI
+  current_annual_fillups: number;
+  current_annual_fueling_min: number;
+  long_trips_per_year: number;
 }
 
 export function calculate(input: CalcInput, ctx: CalcContext): CalcReturn {
@@ -217,6 +235,11 @@ export function calculate(input: CalcInput, ctx: CalcContext): CalcReturn {
   const highway_avg_speed_mph = input.route?.highway_avg_speed_mph ?? 55;
   const elevation_gain_m = input.route?.elevation_gain_m ?? 0;
   const { rate, mode } = effectiveRatePerKwh(ctx.utility, input.use_tou);
+
+  // Current ICE fueling time — use vehicle's actual tank size if known
+  const currentTankGal = input.current.ice_vehicle?.tank_gallons ?? ICE_TANK_GAL;
+  const currentFillups = miles / (Math.max(input.current.mpg, 1) * currentTankGal);
+  const currentFuelingMin = currentFillups * ICE_FILLUP_MIN;
 
   // Current-car baseline
   const currentGallons = miles / Math.max(input.current.mpg, 1);
@@ -254,6 +277,26 @@ export function calculate(input: CalcInput, ctx: CalcContext): CalcReturn {
       kwh * CO2_KG_PER_KWH_WV_GRID + phevGas * CO2_KG_PER_GAL_GASOLINE;
     const co2Saved = currentCo2 - co2;
 
+    // Charging / fueling time breakdown
+    let homeChargeSess = 0;
+    let dcfcStops = 0;
+    let dcfcMin = 0;
+    let gasFillupsEv = 0;
+    let gasFuelingMinEv = 0;
+    if (v.powertrain === "bev") {
+      const range = v.epa_range_mi ?? 200;
+      homeChargeSess = homeChargeSessions(input.daily_round_trip_mi, input.days_per_week, range);
+      dcfcStops = dcfcStopsPerRoundTrip(range) * input.long_trips_per_year;
+      dcfcMin = dcfcStops * (v.charging.dcfc_10_to_80_min ?? DCFC_DEFAULT_MIN);
+    } else if (v.powertrain === "phev") {
+      const eRange = v.epa_range_mi_electric ?? 40;
+      homeChargeSess = homeChargeSessions(input.daily_round_trip_mi, input.days_per_week, eRange);
+      // PHEVs use gas on long trips — no DCFC stops, but gas fill-ups from annual gas consumption
+      gasFillupsEv = phevGas / ICE_TANK_GAL;
+      gasFuelingMinEv = gasFillupsEv * ICE_FILLUP_MIN;
+    }
+    const homeChargeMin = homeChargeSess * EV_HOME_PLUG_MIN;
+
     const warnings: string[] = [];
     if (v.epa_range_mi && v.epa_range_mi < input.daily_round_trip_mi * 1.5) {
       warnings.push(
@@ -288,6 +331,12 @@ export function calculate(input: CalcInput, ctx: CalcContext): CalcReturn {
       co2_kg_per_year: co2,
       co2_saved_vs_current_kg_per_year: co2Saved,
       warnings,
+      annual_home_charge_sessions: homeChargeSess,
+      annual_home_charge_min: homeChargeMin,
+      annual_dcfc_stops: dcfcStops,
+      annual_dcfc_min: dcfcMin,
+      annual_gas_fillups: gasFillupsEv,
+      annual_gas_fueling_min: gasFuelingMinEv,
     };
   });
 
@@ -302,6 +351,9 @@ export function calculate(input: CalcInput, ctx: CalcContext): CalcReturn {
     current_annual_co2_kg: currentCo2,
     annual_miles: miles,
     highway_avg_speed_mph,
+    current_annual_fillups: currentFillups,
+    current_annual_fueling_min: currentFuelingMin,
+    long_trips_per_year: input.long_trips_per_year,
   };
 }
 
