@@ -314,8 +314,13 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
                 <div className="text-xs text-ink-soft">filters, wipers, fluids</div>
               </div>
             </div>
-            <div className="mt-3 pt-3 border-t border-slate-200 flex items-baseline gap-2">
-              <span className="text-sm font-semibold text-ink">Total maintenance: {fmtUSD(iceMaint.total_usd)}/yr</span>
+            <div>
+              <div className="text-ink-soft text-xs">Insurance (est.)</div>
+              <div className="font-medium text-ink">{fmtUSD(selectedIceVehicle.annual_insurance_usd)}/yr</div>
+              <div className="text-xs text-ink-soft">full coverage, 35-45yo WV avg</div>
+            </div>
+            <div className="mt-3 pt-3 border-t border-slate-200 col-span-2 sm:col-span-4 flex items-baseline gap-2">
+              <span className="text-sm font-semibold text-ink">Total maintenance + insurance: {fmtUSD(iceMaint.total_usd + selectedIceVehicle.annual_insurance_usd)}/yr</span>
               <span className="text-xs text-ink-soft">included in comparison below</span>
             </div>
           </div>
@@ -389,6 +394,7 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
         fed={federal}
         route={route}
         hasIceVehicle={!!selectedIceVehicle}
+        highwayAvgSpeedMph={out?.highway_avg_speed_mph}
       />
     </div>
   );
@@ -433,11 +439,14 @@ function Results({
                 {fmtNum(out.current_annual_co2_kg / 1000, 2)} tons CO₂/yr
               </div>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-1 text-sm text-ink-muted">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-1 text-sm text-ink-muted">
               <div>{fmtUSD(out.current_annual_gas_cost)} gas</div>
               <div>{fmtUSD(iceMaint.oil_usd)} oil changes</div>
               <div>{fmtUSD(iceMaint.tires_usd)} tires</div>
               <div>{fmtUSD(iceMaint.brakes_usd + iceMaint.misc_usd)} brakes + misc</div>
+              {out.current_annual_insurance_usd > 0 && (
+                <div>{fmtUSD(out.current_annual_insurance_usd)} insurance (est.)</div>
+              )}
             </div>
           </div>
         ) : (
@@ -504,6 +513,9 @@ function ResultCard({ r, showMaintenance }: { r: VehicleResult; showMaintenance:
         )}
         {showMaintenance && r.annual_maintenance_usd > 0 && (
           <Row label="EV maintenance" value={fmtUSD(r.annual_maintenance_usd)} muted />
+        )}
+        {showMaintenance && r.annual_insurance_usd > 0 && (
+          <Row label="Insurance (est.)" value={fmtUSD(r.annual_insurance_usd)} muted />
         )}
         <Row label="Total /yr" value={fmtUSD(r.annual_total_usd)} strong />
         <Row
@@ -581,6 +593,7 @@ function Assumptions({
   fed,
   route,
   hasIceVehicle,
+  highwayAvgSpeedMph,
 }: {
   utility: Utility;
   winter: boolean;
@@ -588,6 +601,7 @@ function Assumptions({
   fed: FederalData;
   route: RouteData | null;
   hasIceVehicle: boolean;
+  highwayAvgSpeedMph?: number;
 }) {
   return (
     <section className="rounded-2xl bg-surface-sunken ring-1 ring-slate-200 p-5 text-sm text-ink-muted">
@@ -629,6 +643,18 @@ function Assumptions({
               </>
             )}
           </li>
+          {route && (highwayAvgSpeedMph ?? 55) > 62 && (
+            <li>
+              Speed correction: your route averages{" "}
+              <strong>{Math.round(highwayAvgSpeedMph!)} mph on highway segments</strong>.
+              At that speed EV energy use is roughly{" "}
+              <strong>
+                {Math.round(((0.60 + 0.40 * Math.pow(highwayAvgSpeedMph! / 55, 2)) - 1) * 100)}% higher
+              </strong>{" "}
+              than the EPA highway test (55 mph) because aerodynamic drag scales with the square of speed.
+              This is already factored into the energy cost shown above.
+            </li>
+          )}
           <li>
             Winter derate: <strong>{winter ? "on" : "off"}</strong>. When on we
             add ~12% to annual kWh to reflect 4 cold-weather months with ~28%
@@ -650,6 +676,13 @@ function Assumptions({
               no oil changes, ~70% lower brake costs from regenerative braking,
               similar tire costs, $100/yr misc (cabin filter + wipers only).
               Numbers are WV-area averages; actual costs vary by shop and driving habits.
+            </li>
+          )}
+          {hasIceVehicle && (
+            <li>
+              Insurance: ICE estimate is from vehicle data (full coverage, 35–45 year old WV driver with a clean record).
+              EV insurance is estimated by vehicle class at 15–25% above comparable ICE due to higher parts and repair costs.
+              Your actual rate will vary based on driving history, coverage level, and ZIP code — get a real quote before deciding.
             </li>
           )}
           <li>

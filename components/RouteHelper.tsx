@@ -126,16 +126,23 @@ export function RouteHelper({ token, onFill }: Props) {
       const route = data.routes[0];
       const distance_mi = route.distance / 1609.344;
 
-      // Highway fraction from per-segment speed annotations
+      // Highway fraction + average highway speed from per-segment annotations
       const speeds: number[] = route.legs?.[0]?.annotation?.speed ?? [];
       const dists: number[] = route.legs?.[0]?.annotation?.distance ?? [];
-      let hwDist = 0, totDist = 0;
+      let hwDist = 0, totDist = 0, hwSpeedWeightedSum = 0;
       speeds.forEach((s, i) => {
         const d = dists[i] ?? 0;
         totDist += d;
-        if (s >= HIGHWAY_MS) hwDist += d;
+        if (s >= HIGHWAY_MS) {
+          hwDist += d;
+          hwSpeedWeightedSum += s * d;
+        }
       });
       const highway_fraction = totDist > 0 ? hwDist / totDist : 0.45;
+      // Distance-weighted average speed on highway segments (m/s → mph)
+      const highway_avg_speed_mph = hwDist > 0
+        ? (hwSpeedWeightedSum / hwDist) * 2.237
+        : 55;
 
       // Elevation: Mapbox Directions returns 2D coordinates only.
       // Query USGS NED for start and end point elevations instead.
@@ -146,10 +153,14 @@ export function RouteHelper({ token, onFill }: Props) {
       const elevation_gain_m = Math.abs(homeEle - workEle);
 
       const elevFt = Math.round(elevation_gain_m * 3.281);
-      const elevStr = elevFt >= 20 ? ` · ${elevFt} ft elevation change` : "";
-      const summary = `${distance_mi.toFixed(1)} mi · ${Math.round(highway_fraction * 100)}% highway${elevStr}`;
+      const elevStr = elevFt >= 20 ? ` · ${elevFt} ft elevation` : "";
+      // Show highway speed when it meaningfully exceeds the EPA test baseline (~55 mph)
+      const speedStr = highway_fraction > 0.15 && highway_avg_speed_mph > 62
+        ? ` · avg ${Math.round(highway_avg_speed_mph)} mph hwy`
+        : "";
+      const summary = `${distance_mi.toFixed(1)} mi · ${Math.round(highway_fraction * 100)}% highway${speedStr}${elevStr}`;
 
-      const r: RouteData = { distance_mi, highway_fraction, elevation_gain_m, summary };
+      const r: RouteData = { distance_mi, highway_fraction, highway_avg_speed_mph, elevation_gain_m, summary };
       setResult(r);
       onFill(r);
     } catch (e) {

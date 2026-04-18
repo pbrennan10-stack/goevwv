@@ -126,8 +126,9 @@ export interface VehicleResult {
   annual_energy_cost_usd: number;
   annual_state_fee_usd: number;
   annual_maintenance_usd: number;    // EV maintenance (tires + brakes + misc, no oil)
-  annual_total_usd: number;          // energy + fee + maintenance
-  annual_savings_vs_current_usd: number; // +ve = EV saves money (vs current total incl. maintenance)
+  annual_insurance_usd: number;      // EV insurance estimate (0 when no ICE vehicle selected)
+  annual_total_usd: number;          // energy + fee + maintenance + insurance
+  annual_savings_vs_current_usd: number; // +ve = EV saves money (vs current total incl. maintenance + insurance)
   five_year_operating_usd: number;
   five_year_savings_vs_current_usd: number;
   federal_credit_usd: number;
@@ -156,6 +157,7 @@ export interface IceVehicle {
   trim: string;
   class: VehicleClass;
   mpg_combined: number;
+  annual_insurance_usd: number;
   maintenance: IceVehicleMaintenance;
 }
 
@@ -175,9 +177,10 @@ export interface CurrentVehicleInput {
 
 export interface RouteData {
   distance_mi: number;
-  highway_fraction: number; // 0–1
-  elevation_gain_m: number; // one-way cumulative climb in metres
-  summary: string;          // human-readable display string
+  highway_fraction: number;        // 0–1
+  highway_avg_speed_mph: number;   // distance-weighted avg speed on highway segments; 55 = EPA baseline
+  elevation_gain_m: number;        // one-way absolute altitude difference in metres
+  summary: string;                 // human-readable display string
 }
 
 export interface CalcInput {
