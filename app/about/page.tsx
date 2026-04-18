@@ -74,22 +74,35 @@ export default function AboutPage() {
             </p>
           </Section>
 
-          <Section num="02" title="Energy flexibility">
+          <Section num="02" title="Energy flexibility and independence">
             <p>
               A gasoline car runs on one fuel source. An electric vehicle can
               run on coal, natural gas, nuclear, hydro, solar, or wind —
               whatever the grid is generating, and whatever your rooftop
               produces. That flexibility is strategically valuable in a way
-              that doesn&rsquo;t show up in a monthly fuel bill comparison.
+              that doesn&rsquo;t show up in a monthly fuel bill comparison,
+              and it is the practical foundation of energy independence.
             </p>
             <p className="mt-4">
-              In 2021, Texas&rsquo;s gas supply froze and millions lost heat
-              and power. In 2022, fuel prices spiked globally because of a war
-              in Eastern Europe. A transportation system that can draw from
-              multiple energy sources is more resilient to those shocks than
-              one that depends on a single refined commodity with a global spot
-              price. Energy independence, at the national level, requires
-              flexibility at the vehicle level.
+              Gasoline is a single refined commodity with a global spot
+              price. When something disrupts that supply — a war in Eastern
+              Europe, a storm on the Gulf Coast, a pipeline outage, an OPEC
+              decision made in a room Americans aren&rsquo;t in — the price
+              at every pump in West Virginia moves within days. In 2021,
+              Texas&rsquo;s natural-gas heating supply froze and millions
+              lost heat and power. In 2022, global fuel prices spiked because
+              of the invasion of Ukraine. A transportation system that can
+              draw from multiple domestic energy sources — much of it
+              generated right here in the Appalachian basin — is more
+              resilient to those shocks than one tethered to a single
+              internationally-priced fuel.
+            </p>
+            <p className="mt-4">
+              Energy independence at the national level requires flexibility
+              at the vehicle level. The more household transportation runs on
+              domestically-generated electricity, the less leverage any
+              foreign oil producer, refining cartel, or spot-market
+              speculator has over the American driver.
             </p>
           </Section>
 

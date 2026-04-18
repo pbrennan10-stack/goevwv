@@ -327,10 +327,17 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
                 onChange={handleIceVehicleChange}
                 options={[
                   { value: "", label: "— enter MPG manually below —" },
-                  ...iceVehicles.map((v) => ({
-                    value: v.id,
-                    label: `${v.year} ${v.make} ${v.model} — ${v.mpg_combined} mpg`,
-                  })),
+                  ...[...iceVehicles]
+                    .sort(
+                      (a, b) =>
+                        a.make.localeCompare(b.make) ||
+                        a.model.localeCompare(b.model) ||
+                        a.year - b.year,
+                    )
+                    .map((v) => ({
+                      value: v.id,
+                      label: `${v.make} ${v.model} — ${v.year} · ${v.mpg_combined} mpg`,
+                    })),
                 ]}
               />
             </div>
@@ -509,6 +516,11 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
                       {v.trim} · {powertrainLabel(v.powertrain)} ·{" "}
                       {fmtUSD(v.msrp_usd)}
                     </div>
+                    {rangeLabel(v) && (
+                      <div className="text-xs text-ink leading-snug mt-0.5 font-medium">
+                        {rangeLabel(v)}
+                      </div>
+                    )}
                     {v.assembly_location && (
                       <div className="text-xs text-ink-soft leading-snug mt-0.5">
                         {assemblyBadge(v.assembly_country, v.us_canadian_parts_pct)}
@@ -1179,15 +1191,31 @@ function NumField({
   hint?: string;
   decimals?: number;
 }) {
+  // Local draft state so the user can transiently empty the field while typing
+  // (e.g. clear "30" to type "150") without React snapping it back to "0".
+  const [draft, setDraft] = useState<string>(String(value));
+
+  useEffect(() => {
+    setDraft(String(value));
+  }, [value]);
+
   return (
     <label className="flex flex-col gap-1">
       <span className="text-sm font-medium text-ink">{label}</span>
       <input
         type="number"
-        value={value}
+        value={draft}
         onChange={(e) => {
-          const n = Number(e.target.value);
+          const s = e.target.value;
+          setDraft(s);
+          if (s === "") return; // user is mid-edit; don't commit yet
+          const n = Number(s);
           if (Number.isFinite(n)) onChange(n);
+        }}
+        onBlur={() => {
+          if (draft === "" || !Number.isFinite(Number(draft))) {
+            setDraft(String(value)); // snap back to last valid value
+          }
         }}
         min={min}
         max={max}
@@ -1252,6 +1280,22 @@ function powertrainLabel(p: string): string {
     case "hybrid": return "Hybrid";
     default:       return p.toUpperCase();
   }
+}
+
+function rangeLabel(v: Vehicle): string {
+  if (v.powertrain === "phev") {
+    if (v.epa_range_mi_electric && v.epa_range_mi_total) {
+      return `${v.epa_range_mi_electric} mi electric · ${v.epa_range_mi_total} mi total`;
+    }
+    return "";
+  }
+  if (v.powertrain === "bev" && v.epa_range_mi) {
+    if (v.highway_range_mi) {
+      return `${v.epa_range_mi} mi EPA · ~${v.highway_range_mi} mi realistic hwy`;
+    }
+    return `${v.epa_range_mi} mi EPA`;
+  }
+  return "";
 }
 
 function assemblyBadge(country?: string, pct?: number | null): string {

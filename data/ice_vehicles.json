@@ -543,6 +543,246 @@
         "brake_life_miles": 62000,
         "misc_annual_usd": 220
       }
+    },
+    {
+      "id": "ford-ranger-2024",
+      "year": 2024,
+      "make": "Ford",
+      "model": "Ranger",
+      "trim": "XLT SuperCrew 4x4 2.3L EcoBoost",
+      "class": "truck",
+      "mpg_combined": 22,
+      "tank_gallons": 18,
+      "annual_insurance_usd": 1680,
+      "maintenance": {
+        "oil_change_usd": 85,
+        "oil_changes_per_year": 2,
+        "tire_set_usd": 780,
+        "tire_life_miles": 50000,
+        "brake_service_usd": 540,
+        "brake_life_miles": 60000,
+        "misc_annual_usd": 240
+      }
+    },
+    {
+      "id": "chevy-colorado-2024",
+      "year": 2024,
+      "make": "Chevrolet",
+      "model": "Colorado",
+      "trim": "LT Crew Cab 4x4 2.7L Turbo",
+      "class": "truck",
+      "mpg_combined": 19,
+      "tank_gallons": 21,
+      "annual_insurance_usd": 1700,
+      "maintenance": {
+        "oil_change_usd": 80,
+        "oil_changes_per_year": 2,
+        "tire_set_usd": 780,
+        "tire_life_miles": 50000,
+        "brake_service_usd": 540,
+        "brake_life_miles": 60000,
+        "misc_annual_usd": 240
+      }
+    },
+    {
+      "id": "ford-maverick-2024",
+      "year": 2024,
+      "make": "Ford",
+      "model": "Maverick",
+      "trim": "XLT Hybrid FWD",
+      "class": "truck",
+      "mpg_combined": 37,
+      "tank_gallons": 13.8,
+      "annual_insurance_usd": 1450,
+      "maintenance": {
+        "oil_change_usd": 70,
+        "oil_changes_per_year": 2,
+        "tire_set_usd": 620,
+        "tire_life_miles": 50000,
+        "brake_service_usd": 420,
+        "brake_life_miles": 85000,
+        "misc_annual_usd": 180
+      }
+    },
+    {
+      "id": "nissan-frontier-2024",
+      "year": 2024,
+      "make": "Nissan",
+      "model": "Frontier",
+      "trim": "SV Crew Cab 4x4 3.8L V6",
+      "class": "truck",
+      "mpg_combined": 20,
+      "tank_gallons": 21,
+      "annual_insurance_usd": 1650,
+      "maintenance": {
+        "oil_change_usd": 75,
+        "oil_changes_per_year": 2,
+        "tire_set_usd": 720,
+        "tire_life_miles": 50000,
+        "brake_service_usd": 520,
+        "brake_life_miles": 60000,
+        "misc_annual_usd": 230
+      }
+    },
+    {
+      "id": "toyota-tundra-2024",
+      "year": 2024,
+      "make": "Toyota",
+      "model": "Tundra",
+      "trim": "SR5 CrewMax 4x4 3.4L Twin-Turbo V6",
+      "class": "truck",
+      "mpg_combined": 19,
+      "tank_gallons": 23,
+      "annual_insurance_usd": 1850,
+      "maintenance": {
+        "oil_change_usd": 80,
+        "oil_changes_per_year": 2,
+        "tire_set_usd": 880,
+        "tire_life_miles": 55000,
+        "brake_service_usd": 600,
+        "brake_life_miles": 62000,
+        "misc_annual_usd": 260
+      }
+    },
+    {
+      "id": "toyota-highlander-2024",
+      "year": 2024,
+      "make": "Toyota",
+      "model": "Highlander",
+      "trim": "XLE AWD 2.4L Turbo",
+      "class": "suv",
+      "mpg_combined": 24,
+      "tank_gallons": 17.1,
+      "annual_insurance_usd": 1620,
+      "maintenance": {
+        "oil_change_usd": 75,
+        "oil_changes_per_year": 2,
+        "tire_set_usd": 720,
+        "tire_life_miles": 55000,
+        "brake_service_usd": 500,
+        "brake_life_miles": 70000,
+        "misc_annual_usd": 210
+      }
+    },
+    {
+      "id": "kia-sorento-2024",
+      "year": 2024,
+      "make": "Kia",
+      "model": "Sorento",
+      "trim": "LX FWD 2.5L",
+      "class": "suv",
+      "mpg_combined": 26,
+      "tank_gallons": 18.8,
+      "annual_insurance_usd": 1580,
+      "maintenance": {
+        "oil_change_usd": 75,
+        "oil_changes_per_year": 2,
+        "tire_set_usd": 680,
+        "tire_life_miles": 55000,
+        "brake_service_usd": 480,
+        "brake_life_miles": 70000,
+        "misc_annual_usd": 200
+      }
+    },
+    {
+      "id": "hyundai-santafe-2024",
+      "year": 2024,
+      "make": "Hyundai",
+      "model": "Santa Fe",
+      "trim": "SEL AWD 2.5L Turbo",
+      "class": "suv",
+      "mpg_combined": 23,
+      "tank_gallons": 18.8,
+      "annual_insurance_usd": 1600,
+      "maintenance": {
+        "oil_change_usd": 75,
+        "oil_changes_per_year": 2,
+        "tire_set_usd": 680,
+        "tire_life_miles": 55000,
+        "brake_service_usd": 480,
+        "brake_life_miles": 70000,
+        "misc_annual_usd": 200
+      }
+    },
+    {
+      "id": "chevy-suburban-2024",
+      "year": 2024,
+      "make": "Chevrolet",
+      "model": "Suburban",
+      "trim": "LS 4WD 5.3L V8",
+      "class": "suv",
+      "mpg_combined": 17,
+      "tank_gallons": 28,
+      "annual_insurance_usd": 1880,
+      "maintenance": {
+        "oil_change_usd": 85,
+        "oil_changes_per_year": 2,
+        "tire_set_usd": 880,
+        "tire_life_miles": 55000,
+        "brake_service_usd": 620,
+        "brake_life_miles": 62000,
+        "misc_annual_usd": 260
+      }
+    },
+    {
+      "id": "subaru-forester-2024",
+      "year": 2024,
+      "make": "Subaru",
+      "model": "Forester",
+      "trim": "Premium AWD 2.5L",
+      "class": "suv",
+      "mpg_combined": 29,
+      "tank_gallons": 16.6,
+      "annual_insurance_usd": 1500,
+      "maintenance": {
+        "oil_change_usd": 75,
+        "oil_changes_per_year": 2,
+        "tire_set_usd": 620,
+        "tire_life_miles": 55000,
+        "brake_service_usd": 460,
+        "brake_life_miles": 75000,
+        "misc_annual_usd": 190
+      }
+    },
+    {
+      "id": "toyota-sienna-2024",
+      "year": 2024,
+      "make": "Toyota",
+      "model": "Sienna",
+      "trim": "LE AWD Hybrid",
+      "class": "minivan",
+      "mpg_combined": 35,
+      "tank_gallons": 18,
+      "annual_insurance_usd": 1620,
+      "maintenance": {
+        "oil_change_usd": 80,
+        "oil_changes_per_year": 2,
+        "tire_set_usd": 720,
+        "tire_life_miles": 55000,
+        "brake_service_usd": 500,
+        "brake_life_miles": 90000,
+        "misc_annual_usd": 210
+      }
+    },
+    {
+      "id": "honda-civic-2024",
+      "year": 2024,
+      "make": "Honda",
+      "model": "Civic",
+      "trim": "LX Sedan 2.0L",
+      "class": "sedan",
+      "mpg_combined": 36,
+      "tank_gallons": 12.4,
+      "annual_insurance_usd": 1470,
+      "maintenance": {
+        "oil_change_usd": 65,
+        "oil_changes_per_year": 2,
+        "tire_set_usd": 560,
+        "tire_life_miles": 55000,
+        "brake_service_usd": 420,
+        "brake_life_miles": 75000,
+        "misc_annual_usd": 170
+      }
     }
   ]
 }
