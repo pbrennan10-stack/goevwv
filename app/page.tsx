@@ -40,11 +40,13 @@ export default function HomePage() {
           <span className="text-brand">in West Virginia?</span>
         </h1>
         <p className="mt-3 text-base sm:text-lg text-ink-muted max-w-prose">
-          A fair, WV-specific look at the numbers. Your utility, our winters,
-          realistic highway range, and what daily life actually looks like —
-          time at gas stations vs. home charging, long trips that need a
-          fast-charge stop vs. ones that don&rsquo;t — so you can decide with
-          open eyes.
+          Every vehicle has its use cases. EVs shine on the long commutes
+          West Virginians rack up — cheap miles, quiet power, a full battery
+          every morning. They have real drawbacks too: cold-weather range,
+          towing, thin rural DCFC coverage. The public EV conversation is
+          loud in both directions — hype from one side, dismissal from the
+          other — so this tool does an honest evaluation for how you
+          actually drive.
         </p>
 
         <div className="mt-6 flex flex-col sm:flex-row gap-3 sm:items-center">
