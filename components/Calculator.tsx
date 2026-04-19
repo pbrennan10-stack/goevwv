@@ -770,14 +770,14 @@ function ResultCard({ r, showMaintenance, iceVehicle, currentAnnualCo2Kg }: { r:
         ].join(" ")}
       >
         <div className="text-xs uppercase tracking-wide opacity-70 mb-0.5">
-          vs your current {showMaintenance ? "total cost" : "gas bill"}
+          {positive ? "Annual savings" : "Annual extra cost"} vs your current {showMaintenance ? "vehicle" : "gas bill"}
         </div>
         <div className="text-xl font-bold tabular-nums">
-          {fmtUSDsigned(savings)}
+          {fmtUSD(Math.abs(savings))}
           <span className="text-xs font-normal opacity-70"> /year</span>
         </div>
         <div className="text-xs opacity-75">
-          {fmtUSDsigned(r.five_year_savings_vs_current_usd)} over 5 yr
+          {fmtUSD(Math.abs(r.five_year_savings_vs_current_usd))} {positive ? "saved" : "more"} over 5 yr
         </div>
       </div>
 
@@ -1048,7 +1048,7 @@ function GasSensitivitySlider({
                 <div
                   className={`text-xs tabular-nums mt-0.5 ${delta5yr >= 0 ? "text-brand-dark" : "text-amber-700"}`}
                 >
-                  {fmtUSDsigned(delta5yr)} vs your current estimate
+                  {fmtUSD(Math.abs(delta5yr))} {delta5yr >= 0 ? "more savings" : "less savings"} vs your current estimate
                 </div>
               ) : (
                 atBase && (

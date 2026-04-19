@@ -263,14 +263,14 @@ function ReportCard({ r, hasIce }: { r: VehicleResult; hasIce: boolean }) {
 
       <div className={["rounded-lg p-2.5 text-sm", positive ? "bg-brand-bg text-brand-dark" : "bg-amber-50 text-amber-900"].join(" ")}>
         <div className="text-[10px] uppercase tracking-wide opacity-70">
-          vs your current {hasIce ? "total" : "gas bill"}
+          {positive ? "Annual savings" : "Annual extra cost"} vs your current {hasIce ? "vehicle" : "gas bill"}
         </div>
         <div className="text-lg font-bold tabular-nums">
-          {fmtUSDsigned(savings)}
+          {fmtUSD(Math.abs(savings))}
           <span className="text-[10px] font-normal opacity-70"> /yr</span>
         </div>
         <div className="text-[10px] opacity-75">
-          {fmtUSDsigned(r.five_year_savings_vs_current_usd)} over 5 yr
+          {fmtUSD(Math.abs(r.five_year_savings_vs_current_usd))} {positive ? "saved" : "more"} over 5 yr
         </div>
       </div>
 
