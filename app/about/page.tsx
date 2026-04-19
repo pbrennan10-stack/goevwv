@@ -5,7 +5,7 @@ import { Logo } from "@/components/Logo";
 export const metadata: Metadata = {
   title: "Why EVs Matter",
   description:
-    "Patrick Brennan on why EV adoption matters beyond fuel savings — manufacturing sovereignty, energy independence, cost and simplicity, and why legislation alone can't get us there.",
+    "Patrick Brennan on why EV adoption matters beyond fuel savings — energy independence, manufacturing sovereignty, cost and simplicity, and why legislation alone can't get us there.",
 };
 
 export default function AboutPage() {
@@ -55,37 +55,7 @@ export default function AboutPage() {
             plain-language explanation.
           </p>
 
-          <Section num="01" title="Manufacturing sovereignty and national security">
-            <p>
-              The battery is to the 21st century what steel was to the 20th.
-              Whoever controls battery manufacturing controls electric vehicles,
-              autonomous drones, grid storage, and the supply chains that
-              underpin modern military capability. China understood this early.
-              They built the factories, secured the raw material supply chains,
-              and now produce the majority of the world&rsquo;s lithium-ion cells.
-            </p>
-            <PullQuote>
-              The battery is to the 21st century what steel was to the 20th.
-            </PullQuote>
-            <p>
-              The United States is competing to rebuild that capability
-              domestically. That competition isn&rsquo;t theoretical — it shows
-              up in drone warfare, in grid resilience after extreme weather,
-              and in the industrial capacity to scale production during a
-              crisis. The factories being built in Georgia, Kentucky, and
-              Michigan depend on a domestic market large enough to justify the
-              investment. Consumer EV adoption is what creates that market.
-              Without it, the investment thesis for domestic battery
-              manufacturing weakens, and the supply chain dependency on China
-              deepens.
-            </p>
-            <p className="mt-4">
-              Buying an American-assembled EV is a small act with a real
-              connection to a large strategic question.
-            </p>
-          </Section>
-
-          <Section num="02" title="Energy flexibility and independence">
+          <Section num="01" title="Energy flexibility and independence">
             <p>
               A gasoline car runs on one fuel source. An electric vehicle can
               run on coal, natural gas, nuclear, hydro, solar, or wind —
@@ -114,6 +84,36 @@ export default function AboutPage() {
               domestically-generated electricity, the less leverage any
               foreign oil producer, refining cartel, or spot-market
               speculator has over the American driver.
+            </p>
+          </Section>
+
+          <Section num="02" title="Manufacturing sovereignty and national security">
+            <p>
+              The battery is to the 21st century what steel was to the 20th.
+              Whoever controls battery manufacturing controls electric vehicles,
+              autonomous drones, grid storage, and the supply chains that
+              underpin modern military capability. China understood this early.
+              They built the factories, secured the raw material supply chains,
+              and now produce the majority of the world&rsquo;s lithium-ion cells.
+            </p>
+            <PullQuote>
+              The battery is to the 21st century what steel was to the 20th.
+            </PullQuote>
+            <p>
+              The United States is competing to rebuild that capability
+              domestically. That competition isn&rsquo;t theoretical — it shows
+              up in drone warfare, in grid resilience after extreme weather,
+              and in the industrial capacity to scale production during a
+              crisis. The factories being built in Georgia, Kentucky, and
+              Michigan depend on a domestic market large enough to justify the
+              investment. Consumer EV adoption is what creates that market.
+              Without it, the investment thesis for domestic battery
+              manufacturing weakens, and the supply chain dependency on China
+              deepens.
+            </p>
+            <p className="mt-4">
+              Buying an American-assembled EV is a small act with a real
+              connection to a large strategic question.
             </p>
           </Section>
 
