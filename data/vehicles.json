@@ -1,10 +1,10 @@
 {
   "_meta": {
-    "updated": "2026-04-18",
+    "updated": "2026-04-19",
     "schema_version": 1,
-    "source_notes": "MSRPs reflect MY2025 base trims approximated from manufacturer sites and automotive press as of late 2025 / early 2026. VERIFY_BEFORE_LAUNCH against current model-year pricing. Ranges are EPA-certified combined unless noted; winter_range_mi is our derated WV estimate (~28% haircut). City/highway efficiency from EPA fueleconomy.gov — verify annually.",
-    "curation_criteria": "Selected for relevance to WV buyers: mix of price points, SUV/truck emphasis, reliable dealer presence in WV or bordering states, and PHEV options for range-anxious rural buyers.",
-    "verify_before_launch": true
+    "confidence": "approximate",
+    "source_notes": "MSRPs reflect MY2025 base trims approximated from manufacturer sites and automotive press as of late 2025 / early 2026. Ranges are EPA-certified combined unless noted; winter_range_mi is our derated WV estimate (~28% haircut); highway_range_mi is curated for realistic sustained 70-mph driving. City/highway efficiency from EPA fueleconomy.gov. Per-field confidence and methodology are documented at /state-of-the-data — refresh MSRPs quarterly.",
+    "curation_criteria": "Selected for relevance to WV buyers: mix of price points, SUV/truck emphasis, reliable dealer presence in WV or bordering states, PHEV options for range-anxious rural buyers, and several long-range luxury BEVs that also serve the used-market shopper."
   },
 
   "vehicles": [

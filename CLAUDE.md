@@ -86,10 +86,10 @@ These constants live in `lib/calc.ts`. If you adjust any, also update the "Assum
 
 ## Data conventions
 
-- Fields marked `VERIFY_BEFORE_LAUNCH` in YAML/JSON are approximate; confirm against current source before using in prod claims. Example: `aep.residential.flat_rate_per_kwh` is from March 2026 data.
-- Vehicle MSRPs are MY2025 base-trim approximations. Verify quarterly.
-- Rebate `expires` dates: many were "VERIFY" flags — actual program end dates change; check utility sites.
-- Do not add unverified rebates without a `verify_before_display: true` flag.
+- Per-field confidence (Verified / Approximate / Pending) and source provenance is documented at `/state-of-the-data`. That page is the source of truth for "where does this number come from?" — keep it updated when data files change.
+- Vehicle MSRPs are MY2025 base-trim approximations. Refresh quarterly.
+- Rebate `expires` dates change on utility schedules; verify against the utility's own program page, not aggregators.
+- When adding a new rebate that isn't fully confirmed, mark it with `confidence: "approximate"` in the YAML (free-form; not yet schema-enforced) and document the verification gap on `/state-of-the-data` — don't ship it silently.
 
 ## Deployment workflow
 
@@ -126,7 +126,7 @@ The first-time droplet setup is in `docs/REBUILD_RUNBOOK.md` (parent folder in C
 - [ ] v1.2: optional Decap CMS admin at /admin for YAML-averse editing
 - [ ] v2.0: business-mode toggle + fleet TCO (multi-vehicle input, depot charging, commercial tariff, Section 179/bonus depreciation)
 - [ ] Eventually: favicons, OG images, sitemap.xml, robots.txt
-- [ ] Verify all `VERIFY_BEFORE_LAUNCH` values in data files against current utility filings
+- [x] `VERIFY_BEFORE_LAUNCH` markers cleaned up (v1.0.6); per-field confidence now lives on `/state-of-the-data`
 
 ## Principles
 

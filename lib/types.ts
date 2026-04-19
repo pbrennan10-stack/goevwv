@@ -63,7 +63,6 @@ export interface UtilityRebate {
   url: string;
   expires: string | null;
   stackable_with_federal?: boolean;
-  verify_before_display?: boolean;
 }
 
 export interface UtilityResidential {

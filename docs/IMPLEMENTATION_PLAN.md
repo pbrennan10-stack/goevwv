@@ -6,17 +6,17 @@
 **Owner:** Patrick Brennan
 **GitHub:** pbrennan10-stack
 **Alert email:** pbrennan10@gmail.com
-**Date drafted:** April 18, 2026
-**Last updated:** April 18, 2026 (v1.0.5 shipped)
-**Status:** v1.0 + v1.0.5 live on goevwv.com. v1.1 (charger map + dealer directory) next.
+**Date drafted:** April 2026
+**Last updated:** April 19, 2026 (v1.0.6 shipped — data accuracy pass + DCFC cost/time + long-range catalog)
+**Status:** v1.0 + v1.0.5 + v1.0.6 live on goevwv.com. Auto-deploy on push to `main` is active via `.github/workflows/deploy.yml`. Open infra items: UptimeRobot, Next.js security patch, analytics choice. v1.1 (charger map + dealer directory) is the next feature.
 
 ---
 
 ## 1. Executive Summary
 
-GoEV WV is a public, anonymous-use website that helps West Virginians (residential and small-business) decide whether an EV makes sense for them — tailored to West Virginia's utilities, rebates, dealer network, and charging infrastructure. The user enters their commute, picks vehicles to compare, and sees real numbers: fuel savings, payback period, home-charging setup cost, and utility-specific rate implications.
+GoEV WV is a public, anonymous-use website that helps West Virginians (residential and small-business) decide whether an EV makes sense for them — new or used — tailored to West Virginia's utilities, rebates, dealer network, and charging infrastructure. The user enters their commute, picks vehicles to compare, and sees real numbers: fuel savings, payback period, home-charging setup cost, and utility-specific rate implications.
 
-The site is designed around a low-maintenance operating model. Once deployed, updates happen by editing a single configuration file in a GitHub repository; the server rebuilds itself automatically. No manual SSH work is required for routine changes.
+The site is designed around a low-maintenance operating model. Once deployed, updates happen by editing a single configuration file in a GitHub repository. Currently deploys are manual (`git pull && docker compose up -d --build` on the droplet); GitHub Actions auto-deploy is the next infrastructure step.
 
 ---
 
@@ -24,17 +24,18 @@ The site is designed around a low-maintenance operating model. Once deployed, up
 
 **Primary goals**
 
-1. Give a WV resident a defensible, honest estimate of EV ownership cost vs. their current vehicle within 90 seconds of landing on the site.
+1. Give a WV resident a defensible, transparent estimate of EV ownership cost vs. their current vehicle within 90 seconds of landing on the site.
 2. Let a WV small-business owner model a 1–10 vehicle fleet transition with realistic assumptions for their utility and location.
 3. Surface local, actionable next steps: nearby dealers, installers, chargers, and current rebate programs.
-4. Stay under $15/month in ongoing operating cost.
-5. Require no more than ~1 hour/month of owner maintenance to keep data fresh.
+4. Serve used-EV shoppers with the same math and transparency as new-buyers — used-market pricing relevance is a first-class concern, not an afterthought.
+5. Stay under $15/month in ongoing operating cost.
+6. Require no more than ~1 hour/month of owner maintenance to keep data fresh.
 
 **Measurable success criteria (6 months post-launch)**
 
-- 500+ unique monthly visitors (Google Analytics or Plausible)
+- 500+ unique monthly visitors (analytics tool TBD — see §13)
 - &lt;2 second page-load time on mobile (Lighthouse)
-- Quarterly rebate/rate data-freshness check completed each quarter
+- Quarterly rebate/rate data-freshness check completed each quarter, documented on `/state-of-the-data`
 - Zero unplanned downtime events &gt;1 hour
 
 **Explicit non-goals (v1)**
@@ -50,142 +51,189 @@ The site is designed around a low-maintenance operating model. Once deployed, up
 ## 3. User Personas
 
 **Reba — Residential commuter (Charleston)**
-Drives a 2015 Altima ~40 mi/day to work and back. Curious about the Equinox EV but worried about charging at her 1960s ranch house. Needs: honest savings estimate, home charger install cost, local dealer contact.
+Drives a 2015 Altima ~40 mi/day to work and back. Curious about the Equinox EV but worried about charging at her 1960s ranch house. Needs: transparent savings estimate, home charger install cost, local dealer contact.
 
 **Derek — Small business owner (Morgantown)**
-Runs a 4-van plumbing outfit. Fuel is eating his margins. Needs: realistic fleet TCO comparison, depot-charging feasibility, MonPower commercial rate analysis, federal + state tax credit stacking.
+Runs a 4-van plumbing outfit. Fuel is eating his margins. Needs: realistic fleet TCO comparison, depot-charging feasibility, Mon Power commercial rate analysis, federal + state tax credit stacking (noting federal §30D is now terminated).
 
 **Janet — Rural retiree (Pendleton County)**
 Heard EVs "don't work out here." Needs: plain-English answer about whether a PHEV or BEV fits her mostly-local driving, with a coop-specific rate picture.
+
+**Marcus — Used EV shopper (Huntington)** *(added v1.0.6)*
+Thinking about a 2023 Tesla Model 3 or used Lucid Air off a dealer lot. Doesn't qualify for (and doesn't need) a federal credit — wants honest TCO based on current gas and electric rates, and wants to know how much the DCFC cost on road trips eats into the savings.
 
 ---
 
 ## 4. Feature Roadmap (Phased)
 
-The MVP ships fast, then features roll out in small, testable increments. Each phase is independently launchable.
+The MVP shipped fast, then features roll out in small, testable increments. Each phase is independently launchable.
 
-### v1.0 — Core Calculator (Weeks 1–3)
+### v1.0 — Core Calculator (shipped)
 
 - Residential-only flow (business toggle hidden for now)
-- Commute entry: home address + work address (geocoded)
-- Vehicle comparison: pick up to 3 vehicles from a curated list (~20 models)
+- Commute entry: home address + work address (geocoded via Mapbox)
+- Vehicle comparison: pick up to 3 vehicles from a curated list (43 models as of v1.0.6)
 - Utility selector: AEP, Mon Power, Wheeling Power, or "rural coop"
 - Output card: annual fuel savings, 5-year TCO delta, CO₂ avoided, break-even month
-- Shareable result URL (state encoded in query string)
+- Shareable result URL (state encoded in query string, hydrated on load)
 - Mobile-responsive, accessible, fast
 
-### v1.0.5 — "I live here" enhancements (shipped April 2026)
+### v1.0.5 — "I live here" enhancements (shipped)
 
-A post-MVP round of WV-specific honesty and the narrative/decision framing that
+A post-MVP round of WV-specific transparency and the narrative/decision framing that
 generic EV calculators all miss. Shipped after live review showed users wanted a
 more human, more local, more willing-to-say-no tool.
 
 **FitCheck pre-calculator** — three-question fit quiz (home charging access, daily
 miles, long-trip pattern) producing a plain-English verdict: `fit` / `likely` /
-`maybe` / `notyet`. The `notyet` verdict is deliberately honest — WV public
+`maybe` / `notyet`. The `notyet` verdict is deliberately transparent — WV public
 charging is too thin to support life without home charging today, and the tool
-says so. Q3 distinguishes *routine* same-destination repeat trips (become routine
-after the first planning session) from *varied* destinations (ongoing planning
-overhead) — a critical distinction the original design missed.
+says so. Q3 distinguishes *routine* same-destination repeat trips from *varied*
+destinations.
 
-**Three-tier home charging framing** — most users don't realize a portable Level 2
-charger ($200–$500, plugs into an existing 240V outlet like a dryer/welder/RV
-hookup) is a viable middle path between a permanent L2 install ($800–$3,200
-with electrician) and a standard 120V outlet (slow but workable for short
-commutes). Surfaced in FitCheck verdicts where it can flip a "not yet" into a
-"yes."
+**Three-tier home charging framing** — portable Level 2 ($200–$500 on existing
+240V outlet) as a middle path between permanent L2 install ($800–$3,200) and
+standard 120V. Surfaced in FitCheck verdicts where it can flip a "not yet" into
+a "yes."
 
-**WV Charging Infrastructure section** — corridor-by-corridor honest status of
-I-64, I-77, I-79, I-70, I-81 with coverage ratings ("good" / "moderate" /
-"thin"), gap callouts, and NEVI program status. WV's $45.7M NEVI allocation has
-no RFP issued as of April 2026; earliest new stations 2027–2028. First WV EV
-resource to say this plainly.
+**WV Charging Infrastructure section** — corridor-by-corridor status of
+I-64, I-77, I-79, I-70, I-81 with coverage ratings, gap callouts, and NEVI
+program status.
 
-**Fueling time panel** — translates annual miles into concrete lived time: hours
-per year at the pump vs. passive home charging time vs. active DCFC time on long
-trips. Makes the daily-life comparison visible in a way no competitor tool does.
+**Fueling time panel** — translates annual miles into lived time: hours at the
+pump vs. passive home charging vs. active DCFC time on long trips.
 
-**Realistic highway range** — the DCFC stop calculator now uses a curated
-`highway_range_mi` per vehicle (not EPA combined). Tesla gets the deepest derate
-(~35% off EPA — Model 3 LR at 230 mi, Model Y LR at 210 mi) reflecting
-well-documented real-world reports; other BEVs derate ~15–20%. Math models
-asymmetric usable windows: first tank from home uses 85% (100% → 15% SOC);
-subsequent DCFC stops use 65% (80% fast-charge cap → 15% SOC, reflecting that
-charging past 80% is painfully slow).
+**Realistic highway range** — DCFC stop calculator uses a curated
+`highway_range_mi` per vehicle (not EPA combined). Tesla gets ~35% off EPA; other
+BEVs derate ~15–20%. Math models asymmetric usable windows: first tank from home
+uses 85% (100% → 15% SOC); subsequent DCFC stops use 65% (80% fast-charge cap →
+15% SOC).
 
 **Route-specific long-trip distance** — user enters actual one-way distance
-(Charleston→Pittsburgh ≈ 250 mi, →DC ≈ 350 mi) instead of a hardcoded 200 mi
-assumption. Default 200, range 50–600.
+(default 200 mi, range 50–600).
 
-**Side-by-side baseline vs EV comparison** — the current-vehicle card renders in
-the same grid as the EV cards with identical row labels and order (fuel, fee,
-maintenance, insurance, total, CO₂, MSRP, IRA credit, effective price, assembly,
-parts %). Users can scan left-to-right across all options.
+**Side-by-side baseline vs EV comparison** — current-vehicle card renders in the
+same grid as EV cards with identical row labels and order.
 
 **Gas price sensitivity slider** — recalculates 5-year savings at any gas price
-from $2–$6/gal, showing the delta vs. the baseline estimate.
+from $2–$6/gal.
 
 **NHTSA American-Made Index data** — per-vehicle US/Canadian parts content
-percentage and assembly location from the NHTSA MY2025 AALA document. Surfaces
-non-obvious findings: Kia EV6 (West Point, GA) at 80% US/CA content vs. Chevy
-Equinox EV (Canada-assembled) at 12%, Honda Prologue assembled in Mexico, etc.
-Rendered on vehicle picker buttons and result cards.
+percentage and assembly location from NHTSA MY2025 AALA document.
 
-**Six extended-range variants added** — larger battery trims for F-150 Lightning
-(320 mi), Mach-E Premium ER (320 mi), Ioniq 5 LR (303 mi), EV6 Wind LR (310 mi),
-ID.4 Pro S (291 mi), Rivian R1T Large Pack (352 mi). Often the WV-appropriate
-choice given highway-range requirements.
+**Six extended-range variants added** — F-150 Lightning (320 mi), Mach-E Premium
+ER (320 mi), Ioniq 5 LR (303 mi), EV6 Wind LR (310 mi), ID.4 Pro S (291 mi),
+Rivian R1T Large Pack (352 mi).
 
-**Printable report** — `/report` route renders a clean, shareable summary
-(inputs + per-vehicle comparison + assumptions) with print CSS and a "Copy
-share link" button. Inherits all URL state from the calculator. Letter-sized
-page layout, serif-clean, no navigation chrome when printed.
+**Printable report** — `/report` route renders a clean, shareable summary with
+print CSS and a "Copy share link" button.
 
-**Honest guardrails added**:
-- Range warning tiers — "EXCEEDS range" (not viable) vs. "close to range" (buffer advised)
-- Towing range penalty warning for truck-on-truck comparisons + two-car household framing
-- Resale depreciation note on each EV card (WV has ~1,900 registered EVs — thin local market)
-- PJM grid note: WV is part of the 13-state PJM network; as the grid cleans up,
-  EV emissions fall automatically. Gas-car emissions never change.
-- Route-helper round-trip fix — entering home/work addresses now correctly doubles
-  to round-trip mileage.
-- TOU methodology: 100% off-peak rate assumed (users who opt into TOU charge overnight
-  exclusively, which is the actual enrollment requirement).
+**Transparency guardrails** — range warning tiers, towing range penalty note,
+resale depreciation note, PJM grid note (as the grid cleans up, EV emissions
+fall automatically), route-helper round-trip fix, TOU methodology note.
 
-**Why EVs Matter essay** — [`/about`](goevwv/app/about/page.tsx) is now presented as a
-proper editorial piece: numbered sections (01–05), lead paragraph with brand-color
-accent, pull quotes for thesis lines ("The battery is to the 21st century what
-steel was to the 20th"). Renamed nav entry from "About" to "Why EVs Matter" and
-added a kicker on the home page: *"Why I built this: an honest case for EV
-adoption in WV →"*.
+**Why EVs Matter essay** — `/about` presented as editorial with numbered
+sections, pull quotes, brand-color accents.
 
-### v1.1 — Charger & Dealer Map (Weeks 4–5)
+### v1.0.6 — Data accuracy & transparency pass (shipped April 19, 2026)
+
+**Data corrections** (verified against authoritative sources):
+
+- WV BEV fee corrected **$250 → $200** per WV Code §17A-10-3c and AFDC registry.
+  The $250-ish figure common in casual sources is the *total* annual registration
+  for a BEV ($51.50 base + $200 surcharge = $251.50 total); the statute surcharge
+  is $200. Calculator uses $200 since the ICE baseline also excludes the base.
+- Gas price baseline **$3.15 → $3.90** (AAA West Virginia average, April 2026).
+- **Federal §30D and §25E terminated** for vehicles acquired after 2025-09-30 per
+  P.L. 119-21 (OBBB, enacted July 4, 2025). Calculator no longer applies the
+  $7,500 credit to new-purchase math.
+- **Federal §30C (home/commercial charger credit) terminates 2026-06-30** — a
+  near-term deadline flagged in Assumptions and on the State of the Data page.
+- Mon Power WV EV rebate placeholder removed (AFDC + FirstEnergy direct confirm
+  no program). Charge Forward L2 rebate confirmed active with no stated end
+  date (previous "expires 2024-12-31 VERIFY" flag cleared).
+
+**New `/state-of-the-data` route** — collapsible per-source audit trail for every
+rate, fee, credit, and calculation assumption. Each row shows value, source URL,
+retrieval date, and a Verified / Approximate / Pending confidence tag. Covers:
+federal credits, WV state fees (including the $51.50 base + surcharge breakdown),
+AEP / Mon Power / Wheeling / rural coop rates, utility rebates and programs, gas
+price baseline, DCFC assumptions, calculation constants, vehicle data methodology,
+and known gaps.
+
+**Opening-page / calculator route split** — `/` is now hero + FitCheck + CTA
+button to `/calculator`; the calculator lives at `/calculator` as its own route
+with ChargingStatus panel alongside. Nav normalized to 4 items across every
+page: Home · Calculator · Why EVs Matter · State of the Data. FitCheck's
+verdict screen CTA prefills the calculator's daily-miles via `?mi=` query
+param.
+
+**DCFC cost + charge-time accuracy** — BEV energy split into home-rate kWh
+(commute + long-trip first tank) and DCFC-rate kWh (mid-route charging stops)
+at **$0.48/kWh** (Electrify America Pass walk-up, conservative no-subscription
+default). Long-trip miles now flow symmetrically into both baselines — ICE gas
+cost and BEV energy both scale across commute + road trips. DCFC stop time
+layers a 4-min plug-in/auth/unplug overhead plus 8% annualized winter slowdown
+(when winter derate toggle is on). BEV result cards show a `↳ DCFC` sub-row
+in the cost breakdown with kWh and effective $/kWh.
+
+**Long-range EV additions (39 → 43 vehicles)** — Lucid Air Grand Touring (512 mi
+EPA, market range champion), Lucid Gravity Grand Touring (450 mi, 3-row SUV, 400
+kW DCFC), Mercedes-Benz EQS 450+ Sedan (390 mi, 118 kWh pack), Tesla Model S
+Long Range (410 mi). All four also serve the used-market shopper — Lucid and
+EQS early-adopter depreciation has been steep, making them interesting on the
+used market at a fraction of MSRP.
+
+**Copy cleanup** — reduced tagline repetition of "honest" (8 → 5 user-facing
+uses); SEO meta, Open Graph description, and ChargingStatus heading now use
+"impartial." Hero subtitle link swapped "WV" → "USA" for the Why EVs Matter
+essay (the argument is USA-scale). FitCheck and disclaimer "honest" uses
+preserved where rhetorically load-bearing.
+
+### v1.1 — Charger & Dealer Map (next)
 
 - Interactive WV map showing public chargers (OpenChargeMap data, cached daily)
 - Filter by connector type (CCS, NACS, CHAdeMO) and speed (L2, DCFC)
 - Curated dealer/installer directory as map overlay + list
 - "Distance from your route" filter
+- Mapbox is already wired and credentialed; OpenChargeMap is free and keyless
 
-### v1.2 — Rebates & Rate Explainer (Weeks 6–7)
+### v1.2 — Rebates, §30C Countdown, Used-EV Angle (revised scope)
 
-- Utility-specific rebate page per utility (current programs, eligibility, how to apply)
-- TOU vs flat-rate explainer with break-even calculator
-- Federal IRA tax-credit eligibility checker (point-of-sale vs. return)
-- State/federal rebate stacking examples
+Original v1.2 featured a "Federal IRA tax-credit eligibility checker" — that's
+now obsolete since §30D and §25E were terminated 2025-09-30 by OBBB. Revised
+scope:
 
-### v2.0 — Business Mode Toggle (Weeks 8–10)
+- **§30C home charger credit countdown** — prominent deadline tracker for the
+  2026-06-30 termination; eligibility walkthrough (30% of cost up to $1,000,
+  residential census-tract requirement), applicable to installs placed in
+  service before the cliff
+- **Per-utility rebate detail pages** — one route per utility with current
+  programs, eligibility, and how to apply (deeper than the utility picker
+  currently shows)
+- **TOU vs flat-rate explainer with break-even calculator** — meaningful for
+  AEP customers since AEP is the only WV utility with a standing residential EV
+  TOU tariff
+- **Used-EV focus page** — per Marcus persona; factors depreciation curves,
+  battery health concerns, "did this model qualify for §30D when new" historical
+  lookup for buyers evaluating used inventory
+- **Optional Decap CMS admin** at `/admin` for YAML-averse editing (still a good
+  idea, deferred but tracked)
+
+### v2.0 — Business Mode Toggle
 
 - Top-of-page toggle: Residential / Business
-- Business mode: multi-vehicle fleet input, depot charging sizing, demand-charge modeling, commercial tariff comparison
+- Business mode: multi-vehicle fleet input, depot charging sizing, demand-charge
+  modeling, commercial tariff comparison
 - Depreciation and Section 179/Bonus depreciation modeling
-- Printable/PDF-exportable TCO report
+- PDF-exportable TCO report
 
 ### Post-v2 candidates (documented, not committed)
 
 - WV-specific "dealer of the month" editorial content
 - User-submitted charger reviews (moderated)
 - Spanish translation
-- Used-EV focus page (important for WV affordability)
+- Fleet electrification case studies from real WV small businesses
 
 ---
 
@@ -193,78 +241,79 @@ adoption in WV →"*.
 
 The stack is chosen around one priority: **minimize what you have to manage.**
 
-**Recommended stack**
+**Current stack**
 
-- **Next.js 14** (React + Node.js) — single codebase handles frontend and API routes; mature, well-documented, large community
-- **SQLite** via `better-sqlite3` — single file database, zero admin overhead, handles the traffic we expect for years
-- **Docker + Docker Compose** — the entire app runs as one `docker compose up -d` command; perfectly isolated from anything else on the droplet
-- **Caddy** as reverse proxy — automatic Let's Encrypt SSL certificate issuance and renewal, zero-config HTTPS
+- **Next.js 14** (App Router, React + Node.js) — single codebase handles frontend and data-loading server components
+- **Docker + Docker Compose** — the entire app runs as one `docker compose up -d` command
+- **Caddy** as reverse proxy — automatic Let's Encrypt SSL certificate issuance and renewal
 - **GitHub** for code + content — edits to rebate/rate data live in the same repo as code
-- **GitHub Actions** for auto-deploy — push to `main` branch triggers a deploy-over-SSH step; droplet pulls and restarts the container
-- **Plausible Analytics** (self-hosted or $9/mo cloud) or **Google Analytics 4** (free) — pick one; privacy-friendly Plausible is recommended if budget allows later
+- **Static YAML/JSON data files** (`data/utilities.yaml`, `data/federal.yaml`, `data/vehicles.json`, `data/ice_vehicles.json`, `data/charging_corridors.yaml`) loaded at build time by server components
+- **Tailwind CSS** for styling, no CSS-in-JS runtime cost
+- No analytics yet (decision pending — see §13)
+
+**Deferred / not yet in the stack**
+
+- **SQLite via `better-sqlite3`** — originally planned for v1, deferred because v1 is fully static/stateless. Will revisit when we add usage counters, saved reports, or similar.
+- **Analytics** — GA4 free vs. Plausible $9/mo decision still open.
+- **UptimeRobot monitoring** — free tier, not yet configured.
 
 **Key third-party APIs**
 
 | Service | Purpose | Cost |
 |---|---|---|
 | Mapbox | Maps + geocoding + routing | Free tier: 50k map loads/mo, 100k geocodes/mo |
-| OpenChargeMap | Public charger data | Free |
-| DSIRE | Rebate database reference | Free (manual + occasional API pulls) |
+| OpenChargeMap | Public charger data (v1.1) | Free |
 | NHTSA vPIC | Vehicle spec lookup | Free, unlimited |
+| AAA Gas Prices | Quarterly baseline refresh (manual) | Free |
+| AFDC (energy.gov) | Rebate & incentive registry (manual) | Free |
 
-If Mapbox free tier is ever exceeded, fallback is Leaflet + OpenStreetMap tiles (totally free, slightly less polished).
+**What we are NOT running**
 
-**What you are NOT running**
-
-- No Postgres server
-- No Redis
-- No message queue
-- No Kubernetes
-- No separate auth service
-- No email service
+- No Postgres server, no Redis, no message queue, no Kubernetes
+- No separate auth service, no email service
+- No server-side user tracking
 
 Simplicity is a feature.
 
 ---
 
-## 6. DigitalOcean Droplet Setup
+## 6. DigitalOcean Droplet (current state)
 
-### Droplet specs
+- **Basic Droplet** — $6/month (1 GB RAM, 1 vCPU, 25 GB SSD, Ubuntu 24.04 LTS)
+- **DO weekly backups** — $1.20/mo, enabled
+- **Region:** NYC3 (low latency to WV)
+- **Droplet IP:** 174.138.53.28
+- **Security posture:** UFW (22/80/443 only), fail2ban on SSH, unattended-upgrades for security patches, SSH key-only (no passwords), non-root runtime for the app container
+- **SSL certs:** Caddy renews automatically via Let's Encrypt (keep the `caddy_data` volume intact — deleting it triggers rate limits on re-issuance)
 
-**Recommendation: Basic Droplet — $6/month**
+### Deploy workflow (current — auto via GitHub Actions)
 
-- 1 GB RAM, 1 vCPU, 25 GB SSD
-- Ubuntu 24.04 LTS (x86)
-- Region: NYC3 or TOR1 (low latency to WV)
-- Enable **Backups** ($1.20/mo) — weekly automatic snapshots
+`.github/workflows/deploy.yml` fires on every push to `main`:
 
-This is comfortably enough for Next.js + SQLite at projected traffic. If we later exceed it, resizing is a 30-second downtime event and costs an extra $6/mo.
+1. Checks out the SSH deploy key from the `DEPLOY_KEY` GitHub secret
+2. SSHes to the droplet as `root@174.138.53.28`
+3. Runs `git fetch origin && git reset --hard origin/main && docker compose up -d --build && docker compose ps`
 
-### One-time server setup (I will script this end-to-end)
+Pushes typically reach production in ~60 seconds. Manual fallback (still works
+if Actions is down):
 
-I will provide a single bootstrap script that runs on a fresh droplet and does all of the following:
+```bash
+ssh root@174.138.53.28
+cd /opt/goevwv
+git pull
+docker compose up -d --build
+```
 
-1. Creates a non-root `deploy` user with SSH key auth
-2. Disables root SSH and password SSH
-3. Enables UFW firewall (ports 22, 80, 443 only)
-4. Installs Docker + Docker Compose
-5. Installs Caddy (for SSL) or uses Caddy inside Docker Compose
-6. Installs fail2ban (brute-force protection)
-7. Configures automatic security updates (`unattended-upgrades`)
-8. Pulls the GoEV WV repo and launches it
-9. Sets up a systemd timer for nightly SQLite backups to DO Spaces (optional, $5/mo if we want offsite backup; skipped in base budget)
+### Hands-off maintenance currently in place
 
-**Your hands-on work for setup:** point your domain's DNS at the droplet IP and run one `curl | bash` bootstrap command. Total time: ~15 minutes.
-
-### Ongoing maintenance (what "hands-off" actually means)
-
-- **SSL certs:** Caddy renews automatically, forever.
 - **OS patches:** `unattended-upgrades` applies security updates nightly.
-- **App deploys:** Push a change to GitHub → deploys in 60 seconds.
-- **Backups:** DO weekly snapshots run automatically; restore is a button click.
-- **Monitoring:** Free UptimeRobot account pings the site every 5 minutes and emails you if it goes down.
+- **Backups:** DO weekly snapshots auto-run; restore is a button click.
+- **SSL certs:** Caddy renews automatically, forever.
 
-The only thing you need to do on a routine basis is edit content files when rebates or rates change (see §8).
+### Still needed
+
+- **UptimeRobot** pinging `https://goevwv.com` every 5 min → email Patrick on
+  downtime. Free tier, 10-minute setup.
 
 ---
 
@@ -272,61 +321,80 @@ The only thing you need to do on a routine basis is edit content files when reba
 
 ### Vehicle catalog
 
-A curated `vehicles.json` file in the repo. I will seed it with ~20 models that are realistic for West Virginians (Tesla Model 3/Y, Ford F-150 Lightning, Chevy Bolt / Equinox EV / Silverado EV, Hyundai Ioniq 5/6, Kia EV6, Rivian R1T, VW ID.4, Honda Prologue, Nissan Leaf, Toyota bZ4X, plus 2–3 PHEVs for range-anxious users). Each entry holds: MSRP, real-world range (EPA minus winter derating for WV), kWh/100mi, charging speeds, vehicle class.
+Curated `data/vehicles.json` — 43 models as of v1.0.6, spanning $28k Nissan Leaf
+to $127k Lucid Air Grand Touring. Each entry holds: MSRP, EPA range, curated
+winter range (28% derate), realistic highway range, city/highway efficiency,
+battery kWh, home + DCFC charging specs (peak kW, 10→80% min, connectors),
+seats, cargo, class, tax credit eligibility (historical), NHTSA AALA parts
+content, assembly location/country, and notes. PHEVs in the catalog (Toyota
+RAV4 Prime, Ford Escape PHEV, Jeep Wrangler 4xe, Toyota Prius Prime, BMW X5
+xDrive50e) model the 65/35 electric/gas utility factor from Argonne fleet data.
 
 ### Utility rates & rebates
 
-A curated `utilities.yaml` file, structured like:
+Curated `data/utilities.yaml` covers AEP (Appalachian Power), Mon Power
+(FirstEnergy), Wheeling Power, and rural cooperatives. AEP is the best-verified
+entry — rates derived directly from AEP's own bill examples (effective
+2025-12-12) plus the Off-Peak EV Charging page. Mon Power confirmed no EV
+rebate or TOU program. Wheeling Power rates remain approximate (utility site
+was unreachable on the v1.0.6 refresh; WV PSC filings are the authoritative
+fallback).
 
-```
-aep:
-  name: Appalachian Power
-  residential:
-    flat_rate_per_kwh: 0.1487
-    tou_available: false
-    ev_special_rate: null
-  rebates:
-    - name: "Level 2 Charger Rebate"
-      amount: 250
-      url: "https://..."
-      expires: "2026-12-31"
-  coverage_zips: ["24701", "25301", ...]
-```
+Editing rebates = editing one YAML file and pushing to GitHub.
 
-Editing rebates = editing one YAML file and pushing to GitHub. The site auto-deploys within a minute.
+### Federal + state constants
+
+`data/federal.yaml` holds IRS credit status (both §30D and §25E marked
+terminated with exact termination dates; §30C termination 2026-06-30 flagged),
+WV state fees ($200 BEV surcharge / $100 PHEV surcharge / $51.50 Class A base,
+all with statute citations), gas price baseline, DCFC rate ($0.48/kWh with
+source URL and retrieval date), and calculation constants (winter derate, PHEV
+split, grid CO₂ factor).
 
 ### Charger data
 
-Cached daily from OpenChargeMap API, filtered to WV bounding box. Stored in SQLite. If OpenChargeMap is unavailable at cache time, the site serves the previous day's cache.
+Deferred to v1.1. Will cache daily from OpenChargeMap API, filtered to WV
+bounding box. Stored in-memory at build time initially; may migrate to SQLite
+if the dataset warrants it.
 
 ### Dealer/installer directory
 
-Manually curated `dealers.yaml`. I will do the initial research (~30 WV dealerships + ~10 certified EVSE installers) as part of v1.1.
+Deferred to v1.1. Manually curated `dealers.yaml` — ~30 WV dealerships + ~10
+certified EVSE installers.
 
-### Content-freshness strategy
+### Transparency mechanism
+
+**`/state-of-the-data` page** (v1.0.6) is the canonical answer to "where does
+this number come from?" Every rate, fee, credit, and assumption has a row with
+source URL, retrieval date, and confidence tag. This replaces the originally
+planned "Data is X days old" footer — it's more auditable and puts Patrick's
+data-verification work in the open rather than hidden behind a timestamp.
+
+### Content-freshness schedule
 
 | Data type | How often it changes | Update mechanism |
 |---|---|---|
 | Vehicle MSRPs | 1–2x/year per model | Edit `vehicles.json`, push |
 | Utility flat rates | 1–2x/year (PSC filings) | Edit `utilities.yaml`, push |
 | Rebates | 2–4x/year | Edit `utilities.yaml`, push |
-| Chargers | Continuous | Auto via OpenChargeMap |
-| Federal tax credits | 1x/year (or legislation) | Edit `federal.yaml`, push |
-
-I will build a **"Data is X days old"** footer on each page so visitors (and you) can see freshness at a glance.
+| Gas price baseline | Quarterly (AAA) | Edit `federal.yaml`, push |
+| DCFC rate | Semi-annual | Edit `federal.yaml`, push |
+| Chargers | Continuous (v1.1) | Auto via OpenChargeMap |
+| Federal tax credits | Legislation-driven | Edit `federal.yaml`, push |
 
 ---
 
-## 8. How You Update Data (Low-Skill Workflow)
-
-You don't need to SSH in or run any commands to update data. The workflow is:
+## 8. How Patrick Updates Data (Low-Skill Workflow)
 
 1. Open the GitHub repo in your browser
-2. Click the file you want to edit (e.g., `utilities.yaml`)
+2. Click the file you want to edit (e.g., `data/utilities.yaml`)
 3. Click the pencil icon → edit → commit
-4. Within ~60 seconds, the live site reflects your change
+4. Once GitHub Actions auto-deploy is set up (v1.1 infra goal), the live site
+   will reflect the change in ~60 seconds. Until then, the change takes effect
+   on the next manual SSH → `git pull && docker compose up -d --build`.
 
-If you'd prefer a web form instead of editing YAML directly, **v1.2 can add a free Decap CMS admin page** at `yourdomain.com/admin` that gives you a point-and-click editor. This is a well-supported option and adds no ongoing cost.
+If editing YAML directly becomes a burden, **v1.2 can add a Decap CMS admin
+page** at `/admin` for point-and-click editing.
 
 ---
 
@@ -340,81 +408,119 @@ If you'd prefer a web form instead of editing YAML directly, **v1.2 can add a fr
 | Mapbox (free tier) | $0.00 |
 | OpenChargeMap | $0.00 |
 | GitHub (public repo) | $0.00 |
-| UptimeRobot (free tier) | $0.00 |
-| Google Analytics 4 | $0.00 |
-| **Total** | **~$8.20/mo** |
+| UptimeRobot (free tier, when enabled) | $0.00 |
+| Analytics (not yet chosen) | $0.00–$9.00 |
+| **Total** | **~$8.20–$17.20/mo** |
 
-Headroom within your $15/mo budget covers: a future email service ($0–10/mo if you add rebate alerts), Plausible Analytics upgrade ($9/mo), or droplet resize.
+Running well under the $15 target if we choose GA4 (free); Plausible ($9/mo)
+would push above but still affordable.
 
 ---
 
-## 10. Timeline
+## 10. Milestone Status
 
-Assumes ~part-time effort on my side and occasional review from you.
-
-| Week | Deliverable |
+| Milestone | Status |
 |---|---|
-| 0 | Droplet provisioned, domain pointed, bootstrap script run, "Hello WV" placeholder live |
-| 1 | v1.0 scaffolding: route geocoding, vehicle selector UI, basic calc engine |
-| 2 | v1.0 utility rate logic, result card, shareable URLs |
-| 3 | v1.0 polish, mobile QA, analytics, **public launch** |
-| 4–5 | v1.1: charger map + dealer directory |
-| 6–7 | v1.2: rebate explainer + TOU calculator + optional Decap CMS admin |
-| 8–10 | v2.0: business mode toggle + fleet TCO |
-| 11 | Post-launch polish, content audit, first quarterly data refresh |
-
-**Public launch target: end of week 3.** Everything after is iterative improvement on a live site.
+| Droplet provisioned, domain pointed, Coming Soon live | Done |
+| v1.0 core calculator | Done |
+| v1.0.5 "I live here" enhancements | Done |
+| v1.0.6 data accuracy pass + DCFC split + long-range catalog | Done (April 19, 2026) |
+| GitHub Actions auto-deploy (`.github/workflows/deploy.yml`) | Done |
+| Next.js 14 security patch (CVE from Dec 2025 advisory) | Open |
+| UptimeRobot monitoring | Open |
+| Analytics decision (GA4 vs. Plausible) | Open |
+| v1.1 charger map + dealer directory | Not started |
+| v1.2 rebate explainer + §30C countdown + used-EV page | Not started |
+| v2.0 business mode + fleet TCO | Not started |
 
 ---
 
 ## 11. Risks & Mitigations
 
-**Stale rate/rebate data.** Utilities and legislatures change things on their own schedule. Mitigation: visible "data last updated" footer on every affected page, plus a quarterly calendar reminder I'll set up for you.
+**Stale rate/rebate data.** Utilities and legislatures change things on their
+own schedule. Mitigation: `/state-of-the-data` page with per-row retrieval
+dates; quarterly refresh cadence tracked in Patrick's calendar.
 
-**Financial-advice liability.** This is a planning tool, not professional advice. Mitigation: clear disclaimer on every results page, plain language framing ("estimate," "approximate"), and an "assumptions" expandable on every calculation.
+**Federal credit landscape shifts.** OBBB (2025) terminated §30D and §25E; a
+future administration or Congress may reinstate them. Mitigation: the
+`active` flag on each credit in `federal.yaml` is a one-line toggle — if
+credits return, flipping that flag updates the calculator immediately.
 
-**API quota blow-out.** If the site unexpectedly goes viral, Mapbox free tier could be exceeded mid-month. Mitigation: server-side caching of geocoding, daily budget alerts, auto-fallback to Leaflet+OSM tiles if quota hits 80%.
+**Financial-advice liability.** This is a planning tool, not professional
+advice. Mitigation: clear disclaimer on every results page, plain language
+framing ("estimate," "approximate"), assumptions expandable on every
+calculation, per-source audit trail at `/state-of-the-data`.
 
-**Droplet compromise.** Any internet-facing server is a target. Mitigation: UFW firewall, SSH key-only auth, fail2ban, automatic security updates, weekly backups, minimal attack surface (one app, no admin panel exposed to public internet).
+**API quota blow-out.** If the site unexpectedly goes viral, Mapbox free tier
+could be exceeded mid-month. Mitigation (v1.1): server-side caching of
+geocoding, auto-fallback to Leaflet+OSM tiles if quota hits 80%.
 
-**Data accuracy for rural coops.** Coop rates vary and are less public. Mitigation: v1.0 covers AEP, MonPower, Wheeling Power in depth; coops get a "contact your coop" helper card until we can curate their rates in v1.2+.
+**Droplet compromise.** Any internet-facing server is a target. Mitigation:
+UFW firewall, SSH key-only auth, fail2ban, automatic security updates, weekly
+backups, minimal attack surface (one app, no admin panel exposed).
 
-**You lose interest or get busy.** Mitigation: the site is designed to run for months with zero intervention. If nothing is updated for a year, it still works — it just shows older data with its "X days old" badge.
+**Next.js security advisory (14.2.15).** npm flags a known vulnerability (Dec
+2025 advisory). Mitigation: version bump + smoke test is the next tactical
+chore; tracked in §10.
 
----
+**Data accuracy for rural coops.** Coop rates vary and are less public.
+Mitigation: calculator shows "contact your coop" helper instead of falsely
+precise numbers; `/state-of-the-data` marks all three coop rates as
+Approximate.
 
-## 12. What I Need From You
-
-To start week 0, I need:
-
-1. **Droplet access**: add my SSH public key (I will provide one) to the droplet's root authorized_keys, OR run the bootstrap script yourself and give me `deploy` user access
-2. **Domain access**: the domain is `goevwv.com` — confirmation that you have access to its DNS settings at whatever registrar you used (I'll walk you through the A-record setup)
-3. **GitHub account**: you'll own the repo; I'll have collaborator access. If you don't have one, it's a 2-minute signup
-4. **Confirmation of site name/branding**: GoEV WV? WV EV Advisor? Something else?
-5. **An email address for UptimeRobot alerts** (can be your personal email)
-
-That's it to get started.
-
----
-
-## 13. Open Questions / Decisions to Revisit
-
-These do not block v1 but we should decide before v1.2:
-
-- Do you want a comments/feedback mechanism (e.g., a "report incorrect data" button emailing you)?
-- Preferred analytics: free GA4 vs. paid privacy-friendly Plausible ($9/mo)?
-- Public vs. private GitHub repo? (Public unlocks free GitHub Actions minutes, but config data will be visible — none of it is sensitive.)
-- Do you want to include PHEVs and hybrids in comparisons, or BEV-only?
-- Should the site have an "about / who made this" page, and what should it say?
+**Patrick gets busy.** Mitigation: the site runs for months with zero
+intervention. If nothing is updated for a year, it still works — with all
+source retrieval dates visible, users can see exactly how stale the data is.
 
 ---
 
-## 14. Next Steps
+## 12. Historical — Pre-launch Requirements (archived)
 
-If this plan looks right:
+*This section listed the 5 items needed to start week 0: droplet access, domain
+access, GitHub account, branding confirmation, UptimeRobot email. All resolved
+pre-launch. Retained here as project history.*
 
-1. Reply "approved" (or with edits) and I'll produce a written week-0 runbook
-2. Provide the 5 items in §12
-3. We'll schedule a ~30-minute setup session where I walk you through pointing the domain and running the bootstrap
+---
 
-If this plan is too much or too little, let me know which parts to cut or expand.
+## 13. Open Questions
+
+Carried forward from the original plan; remaining live items:
+
+- **Analytics choice.** GA4 (free) vs. Plausible ($9/mo, privacy-friendly,
+  self-hostable). Leaning GA4 for cost; Plausible if privacy-as-a-feature
+  matters for positioning. Not yet installed.
+- **Comments / "report incorrect data" mechanism.** A mailto link is the
+  zero-infra option. An embedded form would need an email service (~$5–10/mo)
+  or a forms-as-a-service provider.
+
+Previously open, now resolved:
+- PHEVs vs BEV-only → PHEVs included
+- Public vs private GitHub repo → public
+- About page existence and tone → built and expanded into Why EVs Matter essay
+
+---
+
+## 14. Next Immediate Steps
+
+In rough priority order:
+
+1. **Patch Next.js 14.2.15** — bump to the latest patched 14.x, run typecheck +
+   build + a calculator smoke test, push (auto-deploys). Small blast radius,
+   high security-hygiene value.
+2. **UptimeRobot** — 5-min ping on `https://goevwv.com`, email alert to
+   `pbrennan10@gmail.com`. Free tier, 10 minutes of setup.
+3. **Analytics decision** (GA4 vs Plausible) — blocks being able to measure
+   the marketing push.
+4. **Marketing awareness round** — per Patrick's plan, partnerships with Solar
+   Holler, Generation WV, WV Sierra Club + targeted Reddit posts in
+   WV-specific subs + local press pitch. Do this once the Next.js patch ships,
+   since each external link landing on goevwv.com is a one-shot first
+   impression.
+5. **v1.1 charger map** — OpenChargeMap integration with WV bounding box, Mapbox
+   render, filters by connector/speed.
+6. **`whyweare50th.com` DNS cleanup** — retire the old domain's A record still
+   pointing at the droplet (tracked in CLAUDE.md).
+7. **Clean up `VERIFY_BEFORE_LAUNCH` markers in data files** — *Done 2026-04-19.*
+   All markers removed; `/state-of-the-data` is now the per-field confidence
+   source of truth. `verify_before_display` field dropped from `UtilityRebate`
+   type; `vehicles.json` `_meta` carries `confidence: "approximate"` instead.
