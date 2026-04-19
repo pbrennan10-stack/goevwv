@@ -191,7 +191,7 @@ export default function ReportPage({ searchParams }: { searchParams: SearchParam
             Winter derate: {winter ? "ON (+12% annual kWh, reflects 4 cold months of ~28% range loss)" : "OFF"}.
           </li>
           <li>
-            WV state EV fee: $200/yr BEV, $100/yr PHEV — included in annual total.
+            WV state EV fee: $250/yr BEV, $100/yr PHEV — included in annual total.
           </li>
           <li>
             Federal IRA EV tax credit repealed in 2025 — not included.

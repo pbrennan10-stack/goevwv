@@ -484,53 +484,68 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
           </span>
         </div>
 
-        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-          {vehicles.map((v) => {
-            const on = selectedIds.includes(v.id);
-            const full = selectedIds.length >= 3 && !on;
-            return (
-              <button
-                key={v.id}
-                type="button"
-                onClick={() => toggleVehicle(v.id)}
-                disabled={full}
-                className={[
-                  "text-left rounded-xl border p-3 transition",
-                  on
-                    ? "border-brand bg-brand-bg"
-                    : "border-slate-200 bg-white hover:border-slate-300",
-                  full ? "opacity-40 cursor-not-allowed" : "cursor-pointer",
-                ].join(" ")}
-              >
-                <div className="flex items-start gap-3">
-                  <div className="shrink-0 mt-1 h-4 w-4 rounded border border-slate-300 flex items-center justify-center">
-                    {on && (
-                      <div className="h-2.5 w-2.5 rounded-sm bg-brand" />
-                    )}
-                  </div>
-                  <div className="min-w-0">
-                    <div className="font-medium text-ink text-sm leading-snug">
-                      {v.year} {v.make} {v.model}
-                    </div>
-                    <div className="text-xs text-ink-soft leading-snug">
-                      {v.trim} · {powertrainLabel(v.powertrain)} ·{" "}
-                      {fmtUSD(v.msrp_usd)}
-                    </div>
-                    {rangeLabel(v) && (
-                      <div className="text-xs text-ink leading-snug mt-0.5 font-medium">
-                        {rangeLabel(v)}
-                      </div>
-                    )}
-                    {v.assembly_location && (
-                      <div className="text-xs text-ink-soft leading-snug mt-0.5">
-                        {assemblyBadge(v.assembly_country, v.us_canadian_parts_pct)}
-                      </div>
-                    )}
-                  </div>
+        <div className="space-y-3">
+          {groupedByClass(vehicles).map(({ cls, list }) => (
+            <details key={cls} open className="rounded-xl ring-1 ring-slate-200 overflow-hidden">
+              <summary className="list-none cursor-pointer select-none flex items-center justify-between gap-2 px-4 py-3 bg-slate-50 hover:bg-slate-100 transition">
+                <div className="flex items-baseline gap-2">
+                  <span className="font-semibold text-ink text-sm">
+                    {classLabel(cls)}
+                  </span>
+                  <span className="text-xs text-ink-soft">({list.length})</span>
                 </div>
-              </button>
-            );
-          })}
+                <span className="text-xs text-ink-soft font-mono">▾ click to collapse</span>
+              </summary>
+              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3 p-3">
+                {list.map((v) => {
+                  const on = selectedIds.includes(v.id);
+                  const full = selectedIds.length >= 3 && !on;
+                  return (
+                    <button
+                      key={v.id}
+                      type="button"
+                      onClick={() => toggleVehicle(v.id)}
+                      disabled={full}
+                      className={[
+                        "text-left rounded-xl border p-3 transition",
+                        on
+                          ? "border-brand bg-brand-bg"
+                          : "border-slate-200 bg-white hover:border-slate-300",
+                        full ? "opacity-40 cursor-not-allowed" : "cursor-pointer",
+                      ].join(" ")}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="shrink-0 mt-1 h-4 w-4 rounded border border-slate-300 flex items-center justify-center">
+                          {on && (
+                            <div className="h-2.5 w-2.5 rounded-sm bg-brand" />
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="font-medium text-ink text-sm leading-snug">
+                            {v.year} {v.make} {v.model}
+                          </div>
+                          <div className="text-xs text-ink-soft leading-snug">
+                            {v.trim} · {powertrainLabel(v.powertrain)} ·{" "}
+                            {fmtUSD(v.msrp_usd)}
+                          </div>
+                          {rangeLabel(v) && (
+                            <div className="text-xs text-ink leading-snug mt-0.5 font-medium">
+                              {rangeLabel(v)}
+                            </div>
+                          )}
+                          {v.assembly_location && (
+                            <div className="text-xs text-ink-soft leading-snug mt-0.5">
+                              {assemblyBadge(v.assembly_country, v.us_canadian_parts_pct)}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </details>
+          ))}
         </div>
       </section>
 
@@ -1280,6 +1295,37 @@ function powertrainLabel(p: string): string {
     case "hybrid": return "Hybrid";
     default:       return p.toUpperCase();
   }
+}
+
+const CLASS_ORDER: Vehicle["class"][] = ["truck", "suv", "sedan", "hatchback", "minivan", "other"];
+const CLASS_LABELS: Record<Vehicle["class"], string> = {
+  truck: "Trucks",
+  suv: "SUVs",
+  sedan: "Sedans",
+  hatchback: "Hatchbacks",
+  minivan: "Minivans",
+  other: "Other",
+};
+
+function classLabel(c: Vehicle["class"]): string {
+  return CLASS_LABELS[c] ?? c;
+}
+
+function groupedByClass(vehicles: Vehicle[]): Array<{ cls: Vehicle["class"]; list: Vehicle[] }> {
+  const buckets = new Map<Vehicle["class"], Vehicle[]>();
+  for (const v of vehicles) {
+    if (!buckets.has(v.class)) buckets.set(v.class, []);
+    buckets.get(v.class)!.push(v);
+  }
+  for (const list of buckets.values()) {
+    list.sort(
+      (a, b) =>
+        a.make.localeCompare(b.make) ||
+        a.model.localeCompare(b.model) ||
+        a.year - b.year,
+    );
+  }
+  return CLASS_ORDER.filter((c) => buckets.has(c)).map((c) => ({ cls: c, list: buckets.get(c)! }));
 }
 
 function rangeLabel(v: Vehicle): string {

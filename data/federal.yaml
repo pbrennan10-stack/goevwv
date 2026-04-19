@@ -68,14 +68,14 @@ federal_ev_tax_credits:
 
 wv_state_fees:
   bev_annual_fee:
-    amount_usd: 200
+    amount_usd: 250
     description: >
-      Battery-electric vehicles pay an annual fee of $200 in addition to
+      Battery-electric vehicles pay an annual fee of $250 in addition to
       standard registration fees. Passed to offset lost gasoline tax revenue.
     statute: "WV Code §17A-10-3c"
     important_note: >
       This fee materially changes the TCO calculation. A WV EV owner driving
-      10,000 miles/year effectively pays 2¢/mile in state road tax vs. a
+      10,000 miles/year effectively pays 2.5¢/mile in state road tax vs. a
       gasoline vehicle paying ~1.4¢/mile at 25 mpg at the state gas tax rate.
 
   phev_annual_fee:
@@ -92,7 +92,7 @@ wv_state_incentives:
   notes: >
     West Virginia does not currently offer state-level tax credits, rebates,
     or purchase incentives for new or used EVs. The only WV-level financial
-    levers are: (1) utility rebates (see utilities.yaml), (2) the $200/$100
+    levers are: (1) utility rebates (see utilities.yaml), (2) the $250/$100
     annual EV/PHEV fee (negative), and (3) any local initiatives from
     municipalities or economic development programs.
 

@@ -7,7 +7,7 @@
 
 ## What this project is
 
-A West Virginia-specific EV advisor. Users enter commute + utility + current vehicle and see honest TCO numbers for 1–3 EVs/PHEVs, factoring in WV utility rates, cold-winter range derating, the WV $200 annual EV fee, TOU rates where available, and federal IRA credits. No user accounts, no tracking beyond basic analytics; all calculations are client-side.
+A West Virginia-specific EV advisor. Users enter commute + utility + current vehicle and see honest TCO numbers for 1–3 EVs/PHEVs, factoring in WV utility rates, cold-winter range derating, the WV $250 annual EV fee, TOU rates where available, and federal IRA credits. No user accounts, no tracking beyond basic analytics; all calculations are client-side.
 
 Audience is both residential drivers and (by v2) WV small-business fleets.
 
@@ -80,7 +80,7 @@ docker compose logs app --tail 50 -f
 - **PHEV split:** 65% electric miles / 35% gas miles (Argonne/INL fleet data).
 - **WV grid CO₂ factor:** 0.67 kg/kWh (EIA state profile; WV is heavily coal-fired).
 - **Federal $7,500 IRA credit:** applied when `vehicle.tax_credit_eligible = true` AND MSRP ≤ $55k (cars) / $80k (SUVs/trucks). Assumes point-of-sale claim.
-- **WV annual fee:** $200 BEV / $100 PHEV added to annual operating cost.
+- **WV annual fee:** $250 BEV / $100 PHEV added to annual operating cost.
 
 These constants live in `lib/calc.ts`. If you adjust any, also update the "Assumptions" section in `components/Calculator.tsx` so users see what changed.
 

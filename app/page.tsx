@@ -22,7 +22,7 @@ export default function HomePage() {
               Calculator
             </a>
             <span className="text-slate-300">·</span>
-            <Link href="/about" className="font-medium text-ink hover:text-brand transition px-2 py-2">
+            <Link href="/about" className="hover:text-ink transition px-2 py-2">
               Why EVs Matter
             </Link>
           </nav>
