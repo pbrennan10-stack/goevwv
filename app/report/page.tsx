@@ -45,7 +45,7 @@ export default function ReportPage({ searchParams }: { searchParams: SearchParam
   const useTOU = bool(p, "tou", false);
   const winter = bool(p, "w", true);
   const mpg = num(p, "mpg", 25);
-  const gasPrice = num(p, "gas", 3.15);
+  const gasPrice = num(p, "gas", 3.90);
   const longTrips = num(p, "lt", 4);
   const longTripMi = num(p, "ltm", 200);
   const vidsRaw = str(p, "v", "");
@@ -65,7 +65,7 @@ export default function ReportPage({ searchParams }: { searchParams: SearchParam
           This report page needs a set of vehicles to compare. Head back to the calculator, pick 1–3 EVs, then
           print from there.
         </p>
-        <Link href="/" className="text-brand font-medium hover:underline">← Back to the calculator</Link>
+        <Link href="/calculator" className="text-brand font-medium hover:underline">← Back to the calculator</Link>
       </main>
     );
   }
@@ -191,7 +191,7 @@ export default function ReportPage({ searchParams }: { searchParams: SearchParam
             Winter derate: {winter ? "ON (+12% annual kWh, reflects 4 cold months of ~28% range loss)" : "OFF"}.
           </li>
           <li>
-            WV state EV fee: $250/yr BEV, $100/yr PHEV — included in annual total.
+            WV state EV fee: $200/yr BEV, $100/yr PHEV — included in annual total.
           </li>
           <li>
             Federal IRA EV tax credit repealed in 2025 — not included.

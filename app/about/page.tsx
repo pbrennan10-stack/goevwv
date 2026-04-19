@@ -18,11 +18,19 @@ export default function AboutPage() {
           </Link>
           <nav className="text-sm text-ink-soft flex items-center">
             <Link href="/" className="hover:text-ink transition px-2 py-2">
+              Home
+            </Link>
+            <span className="text-slate-300">·</span>
+            <Link href="/calculator" className="hover:text-ink transition px-2 py-2">
               Calculator
             </Link>
             <span className="text-slate-300">·</span>
             <Link href="/about" className="text-brand font-semibold transition px-2 py-2">
               Why EVs Matter
+            </Link>
+            <span className="text-slate-300">·</span>
+            <Link href="/state-of-the-data" className="hover:text-ink transition px-2 py-2">
+              State of the Data
             </Link>
           </nav>
         </div>
@@ -199,7 +207,7 @@ export default function AboutPage() {
       <footer className="mt-16 pb-8 border-t border-slate-200 pt-6 text-sm text-ink-soft">
         <p>
           GoEV WV is an independent, non-commercial project.{" "}
-          <Link href="/" className="underline hover:text-ink">
+          <Link href="/calculator" className="underline hover:text-ink">
             Back to the calculator →
           </Link>
         </p>

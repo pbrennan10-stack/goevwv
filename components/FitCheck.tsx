@@ -1,6 +1,15 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
+
+// Maps FitCheck miles answer to a sensible prefill value for the calculator's
+// daily round-trip input. Middle-of-range picks, not averages.
+const MILES_PREFILL: Record<MilesAnswer, number> = {
+  under40: 20,
+  "40-80": 60,
+  over80: 100,
+};
 
 export type FitCheckResult = {
   charging: "yes" | "no" | "unsure";
@@ -275,7 +284,21 @@ export function FitCheck() {
           <div className="mb-4">
             <VerdictDetail verdict={verdict} charging={charging} />
           </div>
-          <div className="text-xs text-ink-soft border-t border-slate-200 pt-3 mt-2">
+
+          <div className="flex flex-col sm:flex-row gap-3 sm:items-center mt-4">
+            <Link
+              href={`/calculator?mi=${MILES_PREFILL[miles]}`}
+              className="inline-flex items-center justify-center rounded-xl bg-brand hover:bg-brand-dark text-white font-semibold px-5 py-2.5 text-sm transition shadow-sm"
+            >
+              See the full numbers →
+            </Link>
+            <span className="text-xs text-ink-soft">
+              This is a quick filter — the calculator has exact cost, savings,
+              and 5-year TCO.
+            </span>
+          </div>
+
+          <div className="text-xs text-ink-soft border-t border-slate-200 pt-3 mt-4">
             <span className="font-medium">Your answers:</span> Home charging:{" "}
             <strong>{charging}</strong> · Daily miles: <strong>{miles}</strong> · Long trips:{" "}
             <strong>{trips}</strong>
@@ -287,10 +310,6 @@ export function FitCheck() {
               Start over
             </button>
           </div>
-          <p className="mt-3 text-xs text-ink-soft">
-            This is a quick filter, not the full picture. Use the calculator below for exact numbers
-            on your commute, utility, and the vehicles you&rsquo;re considering.
-          </p>
         </div>
       )}
     </section>

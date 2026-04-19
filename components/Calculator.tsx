@@ -36,7 +36,7 @@ const DEFAULT_INPUT: Omit<CalcInput, "vehicle_ids"> = {
   use_tou: false,
   current: {
     mpg: 25,
-    gas_price_per_gal: 3.15,
+    gas_price_per_gal: 3.90,
   },
   apply_winter_derate: true,
   long_trips_per_year: 4,
@@ -415,7 +415,7 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
               max={10}
               step={0.05}
               decimals={2}
-              hint="WV average ~$3.15 (AAA)."
+              hint="WV average ~$3.90 (AAA, April 2026)."
             />
             <SelectField
               label="If you switch to an EV, what happens to this vehicle?"

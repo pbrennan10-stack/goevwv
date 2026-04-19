@@ -21,7 +21,7 @@ export function ChargingStatus({ data }: { data: ChargingInfraData }) {
         <summary className="cursor-pointer list-none flex items-center justify-between gap-3 flex-wrap">
           <div>
             <h2 className="text-lg font-semibold text-ink inline">
-              WV Charging Infrastructure — Honest Status
+              WV Charging Infrastructure — Impartial Status
             </h2>
             <span className="text-xs text-ink-soft ml-2">as of {statewide_summary.as_of}</span>
           </div>

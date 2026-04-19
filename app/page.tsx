@@ -1,29 +1,30 @@
 import Link from "next/link";
-import { Calculator } from "@/components/Calculator";
-import { ChargingStatus } from "@/components/ChargingStatus";
 import { FitCheck } from "@/components/FitCheck";
 import { Logo } from "@/components/Logo";
-import { getChargingInfra, getFederalData, getIceVehicles, getUtilities, getVehicles } from "@/lib/data";
 
 export default function HomePage() {
-  const vehicles = getVehicles();
-  const iceVehicles = getIceVehicles();
-  const utilities = getUtilities();
-  const federal = getFederalData();
-  const chargingInfra = getChargingInfra();
-
   return (
     <main className="mx-auto max-w-content px-4 sm:px-6 py-8 sm:py-12">
       <header className="mb-10">
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <Logo className="text-2xl" />
           <nav className="text-sm text-ink-soft flex items-center">
-            <a href="#calculator" className="hover:text-ink transition px-2 py-2">
+            <Link
+              href="/calculator"
+              className="hover:text-ink transition px-2 py-2"
+            >
               Calculator
-            </a>
+            </Link>
             <span className="text-slate-300">·</span>
             <Link href="/about" className="hover:text-ink transition px-2 py-2">
               Why EVs Matter
+            </Link>
+            <span className="text-slate-300">·</span>
+            <Link
+              href="/state-of-the-data"
+              className="hover:text-ink transition px-2 py-2"
+            >
+              State of the Data
             </Link>
           </nav>
         </div>
@@ -41,38 +42,42 @@ export default function HomePage() {
           fast-charge stop vs. ones that don&rsquo;t — so you can decide with
           open eyes.
         </p>
+
+        <div className="mt-6 flex flex-col sm:flex-row gap-3 sm:items-center">
+          <Link
+            href="/calculator"
+            className="inline-flex items-center justify-center rounded-xl bg-brand hover:bg-brand-dark text-white font-semibold px-5 py-3 text-sm sm:text-base transition shadow-sm"
+          >
+            Get your numbers →
+          </Link>
+          <span className="text-sm text-ink-soft sm:ml-2">
+            Or start with a 3-question fit check below.
+          </span>
+        </div>
+
         <p className="mt-4 text-sm text-ink-soft max-w-prose">
           Why I built this:{" "}
           <Link
             href="/about"
             className="font-medium text-brand hover:underline"
           >
-            an honest case for EV adoption in WV →
+            the case for EV adoption in the USA →
           </Link>
         </p>
       </section>
 
       <FitCheck />
 
-      <div id="calculator">
-        <Calculator
-          vehicles={vehicles}
-          iceVehicles={iceVehicles}
-          utilities={utilities}
-          federal={federal}
-          mapboxToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
-        />
-      </div>
-
-      <div className="mt-8">
-        <ChargingStatus data={chargingInfra} />
-      </div>
-
       <footer className="mt-16 pb-8 border-t border-slate-200 pt-6 text-sm text-ink-soft">
         <p>
           GoEV WV is an independent, non-commercial project. Numbers are
           estimates based on publicly filed utility rates, EPA vehicle data,
-          and IRS rules; not financial advice. Data reviewed quarterly.
+          and IRS rules; not financial advice. Data reviewed quarterly — see
+          the{" "}
+          <Link href="/state-of-the-data" className="text-brand hover:underline">
+            State of the Data
+          </Link>{" "}
+          page for every source and retrieval date.
         </p>
       </footer>
     </main>

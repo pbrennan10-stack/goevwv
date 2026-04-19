@@ -1,14 +1,16 @@
 # Federal tax credits and WV state fees relevant to EV ownership
-# Updated: 2026-04-18
-# VERIFY_BEFORE_LAUNCH - tax credit rules shift with legislation; confirm with IRS guidance
+# Updated: 2026-04-18 (verified against IRS, WV Code, AAA)
 
 federal_ev_tax_credits:
   new_ev_credit:
     active: false
     status_note: >
-      The IRC 30D clean vehicle credit was repealed in 2025 as part of federal
-      budget reconciliation. It is no longer available to new-vehicle buyers.
-      Update this flag to true if Congress reinstates it.
+      The IRC 30D clean vehicle credit was terminated by Public Law 119-21
+      (the "One Big Beautiful Bill Act", enacted July 4, 2025). Not allowed
+      for any vehicle acquired after September 30, 2025. Update active to true
+      only if Congress reinstates it.
+    termination_date: "2025-09-30"
+    termination_statute: "P.L. 119-21 (OBBB)"
     code_section: "IRC 30D"
     max_amount_usd: 7500
     breakdown:
@@ -34,8 +36,10 @@ federal_ev_tax_credits:
   used_ev_credit:
     active: false
     status_note: >
-      The IRC 25E used clean vehicle credit was repealed alongside 30D in 2025.
-      No longer available. Update active to true if reinstated.
+      The IRC 25E used clean vehicle credit was terminated alongside 30D by
+      P.L. 119-21. Not allowed for any vehicle acquired after September 30, 2025.
+    termination_date: "2025-09-30"
+    termination_statute: "P.L. 119-21 (OBBB)"
     code_section: "IRC 25E"
     max_amount_usd: 4000
     structure: "30% of sale price, capped at $4,000"
@@ -52,6 +56,13 @@ federal_ev_tax_credits:
 
   refueling_property_credit:
     code_section: "IRC 30C"
+    termination_date: "2026-06-30"
+    termination_statute: "P.L. 119-21 (OBBB)"
+    termination_notes: >
+      Per IRS FAQ on P.L. 119-21, the 30C credit is not allowed for any
+      property placed in service after June 30, 2026 — this applies to BOTH
+      residential and commercial installations. Users installing a home
+      charger should aim to complete installation before that date.
     residential:
       max_amount_usd: 1000
       structure: "30% of cost, up to $1,000, for home EV charging equipment"
@@ -59,42 +70,58 @@ federal_ev_tax_credits:
     commercial:
       max_amount_per_port_usd: 100000
       structure: "30% of cost per port, up to $100,000/port"
-      expiration: "2026-06-30"
-      expiration_notes: >
-        Commercial 30C credit for charging infrastructure is scheduled to expire
-        June 30, 2026 absent Congressional extension. URGENT FLAG for business-mode
-        users in v2.
-    url: "https://www.irs.gov/credits-deductions/alternative-fuel-vehicle-refueling-property-credit"
+    url: "https://www.irs.gov/newsroom/faqs-for-modification-of-sections-25c-25d-25e-30c-30d-45l-45w-and-179d-under-public-law-119-21-139-stat-72-july-4-2025-commonly-known-as-the-one-big-beautiful-bill-obbb"
 
 wv_state_fees:
+  # How these stack up per WV Code §17A-10-3c:
+  #   ICE car:  $51.50 Class A base
+  #   PHEV:     $51.50 base + $100 surcharge = $151.50 total
+  #   BEV:      $51.50 base + $200 surcharge = $251.50 total
+  # The calculator uses the SURCHARGE values (200 / 100) as the EV/PHEV-specific
+  # addition to annual operating cost. The $51.50 base is paid by every Class A
+  # vehicle regardless of powertrain, so it cancels out of EV-vs-gas comparisons
+  # and is not added on either side. The ~$250 figure seen in casual sources is
+  # total BEV registration, not the surcharge — do not substitute it here.
   bev_annual_fee:
-    amount_usd: 250
+    amount_usd: 200
     description: >
-      Battery-electric vehicles pay an annual fee of $250 in addition to
-      standard registration fees. Passed to offset lost gasoline tax revenue.
+      Battery-electric vehicles pay a $200 annual surcharge on top of the
+      $51.50 Class A base registration, for a total of $251.50. The $200
+      surcharge is the EV-specific addition.
     statute: "WV Code §17A-10-3c"
+    statute_url: "https://code.wvlegislature.gov/17A-10-3c/"
+    afdc_confirmation: "https://afdc.energy.gov/laws/all?state=WV"
     important_note: >
-      This fee materially changes the TCO calculation. A WV EV owner driving
-      10,000 miles/year effectively pays 2.5¢/mile in state road tax vs. a
-      gasoline vehicle paying ~1.4¢/mile at 25 mpg at the state gas tax rate.
+      This surcharge materially changes the TCO calculation. A WV EV owner
+      driving 10,000 miles/year effectively pays 2.0¢/mile in state road tax
+      vs. a gasoline vehicle paying ~1.4¢/mile at 25 mpg at the state gas
+      tax rate.
 
   phev_annual_fee:
     amount_usd: 100
-    description: "Plug-in hybrid EVs pay an annual $100 fee."
+    description: >
+      Plug-in hybrids pay a $100 annual surcharge on top of the $51.50 Class A
+      base registration, for a total of $151.50. The $100 surcharge is the
+      PHEV-specific addition used in TCO math.
     statute: "WV Code §17A-10-3c"
+    statute_url: "https://code.wvlegislature.gov/17A-10-3c/"
+    afdc_confirmation: "https://afdc.energy.gov/laws/all?state=WV"
 
   standard_registration_fee:
-    amount_usd: 51.50  # VERIFY
-    description: "Standard WV passenger vehicle registration (separate from EV fee)"
+    amount_usd: 51.50
+    description: "Standard WV Class A passenger vehicle registration (separate from EV fee)"
+    source_url: "https://feecalculator.us/west-virginia-vehicle-registration-fee-calculator/"
+    notes: "Includes $1.00 litter fee and $0.50 insurance fee"
 
 wv_state_incentives:
   status: "NONE"
   notes: >
     West Virginia does not currently offer state-level tax credits, rebates,
     or purchase incentives for new or used EVs. The only WV-level financial
-    levers are: (1) utility rebates (see utilities.yaml), (2) the $250/$100
+    levers are: (1) utility rebates (see utilities.yaml), (2) the $200/$100
     annual EV/PHEV fee (negative), and (3) any local initiatives from
     municipalities or economic development programs.
+  source: "https://afdc.energy.gov/laws/all?state=WV"
 
 calculation_notes:
   winter_range_derating:
@@ -106,5 +133,12 @@ calculation_notes:
       range alongside.
 
   gas_price_baseline_per_gal:
-    current: 3.15  # VERIFY - WV AAA average, update quarterly
+    current: 3.90
     source: "AAA West Virginia average"
+    source_url: "https://gasprices.aaa.com/?state=WV"
+    retrieved: "2026-04-18"
+    notes: >
+      AAA WV average as of retrieval date. Pump prices vary meaningfully
+      across the state — Parkersburg was ~22¢ below the northern WV average
+      at this snapshot. Users can override this in the calculator. Refresh
+      quarterly.

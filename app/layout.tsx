@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     template: "%s | GoEV WV",
   },
   description:
-    "Honest, West Virginia-specific guidance on electric vehicles. Compare EVs by your commute, your utility, and your wallet — tailored to AEP, Mon Power, Wheeling Power, and WV's EV fees.",
+    "Impartial, West Virginia-specific guidance on electric vehicles. Compare EVs by your commute, your utility, and your wallet — tailored to AEP, Mon Power, Wheeling Power, and WV's EV fees.",
   applicationName: "GoEV WV",
   keywords: [
     "West Virginia EV",
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "GoEV WV",
     description:
-      "Honest, WV-specific EV guidance: commute, utility, and rebate calculator.",
+      "Impartial, WV-specific EV guidance: commute, utility, and rebate calculator.",
     url: "https://goevwv.com",
     siteName: "GoEV WV",
     type: "website",
