@@ -82,6 +82,72 @@ export default async function ChargersPage() {
         )}
       </section>
 
+      {/* Honest disclaimer: point users at the tools that actually handle the
+          operational/trip-planning questions better than we can. */}
+      <section className="mb-6 rounded-xl bg-surface-raised ring-1 ring-slate-200 p-4 sm:p-5 text-sm text-ink-muted leading-relaxed">
+        <p className="font-semibold text-ink mb-2">
+          There are better tools than this map.
+        </p>
+        <p className="mb-3">
+          This page shows you what exists in WV, but for the questions where
+          accuracy matters — <em>is this charger working right now?</em> or{" "}
+          <em>can my car actually make the drive?</em> — reach for the right
+          tool:
+        </p>
+        <ul className="list-disc pl-5 space-y-1.5">
+          <li>
+            <a
+              href="https://www.plugshare.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-brand hover:underline font-semibold"
+            >
+              PlugShare
+            </a>{" "}
+            — real-time availability, user check-ins, photos, reviews. The
+            community-maintained standard for &ldquo;is this charger actually
+            working?&rdquo;
+          </li>
+          <li>
+            <a
+              href="https://abetterrouteplanner.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-brand hover:underline font-semibold"
+            >
+              A Better Route Planner (ABRP)
+            </a>{" "}
+            — trip planning with battery simulation, weather, elevation, and
+            charging-stop optimization. The gold standard for &ldquo;can I
+            actually make this drive?&rdquo;
+          </li>
+          <li>
+            <a
+              href="https://chargehub.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-brand hover:underline font-semibold"
+            >
+              ChargeHub
+            </a>{" "}
+            — North American alternative to PlugShare with strong Canadian
+            coverage for border trips.
+          </li>
+          <li>
+            <strong>Your car&rsquo;s built-in navigation</strong> (Tesla,
+            Ford, GM, Hyundai/Kia) and the{" "}
+            <strong>charging network&rsquo;s own app</strong> (Tesla,
+            Electrify America, EVgo, ChargePoint, Blink) show authoritative
+            real-time status for their own stations — usually the fastest way
+            to verify a specific charger before you pull up.
+          </li>
+        </ul>
+        <p className="mt-3 text-ink-soft">
+          This map is a starting point for getting oriented to what&rsquo;s in
+          WV. Use those for anything operational.
+        </p>
+      </section>
+
       {error ? (
         <div className="rounded-xl bg-amber-50 ring-1 ring-amber-200 p-5 mb-6">
           <p className="text-sm font-semibold text-amber-900 mb-1">
@@ -127,9 +193,9 @@ export default async function ChargersPage() {
             are widely available).
           </li>
           <li>
-            This map is for planning only. Always verify a charger is operational
-            before routing to it — apps like PlugShare and the station&rsquo;s own
-            app show real-time availability and user reports.
+            Real-time availability and user reviews aren&rsquo;t in our
+            data — see the tools called out above (PlugShare, ABRP,
+            network apps) before routing to any specific station.
           </li>
         </ul>
       </section>
