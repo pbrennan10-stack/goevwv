@@ -58,6 +58,11 @@ function buildPopupHtml(c: Charger): string {
     })
     .join("");
 
+  // Google Maps navigation URL that works on web, iOS, and Android — OS opens
+  // the right maps app. Using coordinates is more reliable than the address
+  // string (OCM addresses are sometimes incomplete).
+  const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${c.lat},${c.lng}`;
+
   return `
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; min-width: 220px;">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
@@ -67,10 +72,16 @@ function buildPopupHtml(c: Charger): string {
       <div style="font-size:12px;color:#475569;margin-bottom:6px;">${escapeHtml(operator)} · ${power}</div>
       ${addr ? `<div style="font-size:12px;color:#64748b;margin-bottom:8px;">${escapeHtml(addr)}</div>` : ""}
       ${connectorList ? `<ul style="margin:4px 0 8px 18px;padding:0;font-size:12px;color:#334155;">${connectorList}</ul>` : ""}
-      <a href="${c.ocm_url}" target="_blank" rel="noopener noreferrer"
-         style="font-size:12px;color:#059669;text-decoration:underline;">
-         View on OpenChargeMap →
-      </a>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;font-size:12px;">
+        <a href="${directionsUrl}" target="_blank" rel="noopener noreferrer"
+           style="color:#059669;font-weight:600;text-decoration:underline;">
+           Directions →
+        </a>
+        <a href="${c.ocm_url}" target="_blank" rel="noopener noreferrer"
+           style="color:#475569;text-decoration:underline;">
+           OpenChargeMap
+        </a>
+      </div>
     </div>
   `;
 }

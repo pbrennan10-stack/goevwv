@@ -142,7 +142,14 @@ function transformPoi(poi: OcmPoi): Charger | null {
     max_power_kw,
     is_dcfc,
     connector_types,
-    ocm_url: `https://map.openchargemap.io/?id=${poi.ID}#/details/${poi.ID}`,
+    // OpenChargeMap's main site (openchargemap.org/site/poi/...) now gates POI
+    // detail pages behind login, and their SPA's hash-based deep-linking on
+    // map.openchargemap.io doesn't reliably populate a station view. The
+    // coordinate-based URL *does* reliably center their map on the station
+    // — OCM's own pin shows up at the center at zoom 17 and the user can
+    // click it in OCM's UI for full details. id is passed too, in case
+    // their router ever starts honouring it.
+    ocm_url: `https://map.openchargemap.io/?latitude=${addr.Latitude}&longitude=${addr.Longitude}&zoom=17&id=${poi.ID}`,
   };
 }
 
