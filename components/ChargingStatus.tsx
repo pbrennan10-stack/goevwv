@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { ChargingInfraData } from "@/lib/types";
 
 const COVERAGE_BADGE: Record<string, { label: string; color: string }> = {
@@ -39,6 +40,14 @@ export function ChargingStatus({ data }: { data: ChargingInfraData }) {
             supposed to materially expand this network{" "}
             <strong>has not issued an RFP as of April 2026</strong> — earliest new stations:{" "}
             <strong>{nevi_status.estimated_stations_open}</strong>.
+          </p>
+          <p className="mt-2">
+            <Link
+              href="/chargers"
+              className="font-semibold text-amber-950 underline hover:text-amber-900"
+            >
+              See every WV public charger on the map →
+            </Link>
           </p>
         </div>
 

@@ -18,6 +18,9 @@ COPY . .
 # NEXT_PUBLIC_* vars are embedded at build time by Next.js, not runtime.
 ARG NEXT_PUBLIC_MAPBOX_TOKEN
 ENV NEXT_PUBLIC_MAPBOX_TOKEN=$NEXT_PUBLIC_MAPBOX_TOKEN
+# Server-side env used during static generation of /chargers (OpenChargeMap fetch).
+ARG OPENCHARGEMAP_API_KEY
+ENV OPENCHARGEMAP_API_KEY=$OPENCHARGEMAP_API_KEY
 RUN npm run build
 
 # -------- Stage 3: runtime --------

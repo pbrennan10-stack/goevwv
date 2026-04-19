@@ -22,6 +22,13 @@ Audience is both residential drivers and (by v2) WV small-business fleets.
 
 Intentional non-choices: no Postgres, Redis, auth, email, or background workers. Keep the infra boring.
 
+## Required env vars (build-time)
+
+- **`NEXT_PUBLIC_MAPBOX_TOKEN`** — Mapbox token for RouteHelper (geocoding/directions) and ChargerMap rendering. Embedded in the client bundle at build.
+- **`OPENCHARGEMAP_API_KEY`** — Free key from openchargemap.org. Used server-side at build time to fetch the WV charger list for `/chargers`. Without it, the page shows a graceful "temporarily unavailable" fallback instead of the map.
+
+Locally these live in `.env.local` (gitignored). On the droplet they live in `/opt/goevwv/.env`, read by `docker compose` and forwarded as build-args per `docker-compose.yml`.
+
 ## Repo layout
 
 ```

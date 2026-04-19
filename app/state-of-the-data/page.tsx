@@ -148,6 +148,10 @@ export default function StateOfTheDataPage() {
               Calculator
             </Link>
             <span className="text-slate-300">·</span>
+            <Link href="/chargers" className="hover:text-ink transition px-2 py-2">
+              Charger Map
+            </Link>
+            <span className="text-slate-300">·</span>
             <Link
               href="/about"
               className="hover:text-ink transition px-2 py-2"
@@ -668,8 +672,39 @@ export default function StateOfTheDataPage() {
           </Section>
 
           <Section
+            title="Public charger data (/chargers map)"
+            summary="How the WV charger map gets its data and how fresh it is."
+          >
+            <SourceRow
+              label="Station locations, connectors, power ratings"
+              value="OpenChargeMap community registry"
+              source="openchargemap.org API v3 (keyless public endpoint)"
+              sourceUrl="https://openchargemap.org"
+              retrieved="Refreshed on every site build/deploy"
+              confidence="approximate"
+              notes="OpenChargeMap is maintained by volunteers and operators submitting updates. Coverage is generally good for major networks (Electrify America, Tesla, EVgo, ChargePoint) and weaker for small municipal or independent stations. Real-time availability and reliability reports are NOT in our data — use PlugShare or the charging network's own app before routing to a station."
+            />
+            <SourceRow
+              label="Bounding box used for WV fetch"
+              value="(37.0, -82.9) to (40.9, -77.5)"
+              source="GoEV WV curated — covers WV + a small buffer into VA/KY/OH/MD/PA"
+              retrieved="Methodology set 2026-04-19"
+              confidence="verified"
+              notes="The buffer captures border-area stations a WV driver might realistically use — e.g., a charger 5 miles across the Kentucky line on US-23."
+            />
+            <SourceRow
+              label="Connector-type normalization"
+              value="CCS · NACS · Tesla (legacy) · CHAdeMO · J1772 · Other"
+              source="GoEV WV mapping of OpenChargeMap's ~50 specific connector records"
+              retrieved="Methodology set 2026-04-19"
+              confidence="verified"
+              notes="OpenChargeMap catalogs many specific connector variants (e.g., 'CCS (Type 1)', 'CCS (Type 2)', 'SAE J1772 CCS'); we collapse these into the handful of categories a driver actually cares about. 'Tesla' here means the legacy proprietary port — new vehicles with NACS show under NACS."
+            />
+          </Section>
+
+          <Section
             title="Vehicle data methodology"
-            summary="How we source MSRPs, EPA ranges, and efficiency for the ~20 EVs and PHEVs in the picker."
+            summary="How we source MSRPs, EPA ranges, and efficiency for the 43 EVs and PHEVs in the picker."
           >
             <div className="text-sm text-ink-muted leading-relaxed space-y-3">
               <p>

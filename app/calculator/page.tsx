@@ -43,6 +43,10 @@ export default function CalculatorPage() {
               Calculator
             </Link>
             <span className="text-slate-300">·</span>
+            <Link href="/chargers" className="hover:text-ink transition px-2 py-2">
+              Charger Map
+            </Link>
+            <span className="text-slate-300">·</span>
             <Link href="/about" className="hover:text-ink transition px-2 py-2">
               Why EVs Matter
             </Link>
