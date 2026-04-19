@@ -133,14 +133,19 @@ function kwhPerYear(
 }
 
 // EV insurance estimates (WV full coverage, 35-45 yo clean record).
-// EVs cost ~15-25% more to insure than equivalent ICE due to higher repair/parts costs.
+// BEVs cost ~15-25% more to insure than equivalent ICE due to higher repair/parts costs.
+// PHEVs run ~10% cheaper than pure BEVs — smaller battery, established gas-drivetrain
+// repair network, and the 2nd powertrain reduces severity of electric-system claims.
 function evInsuranceEstimate(vehicle: Vehicle): number {
+  let base: number;
   switch (vehicle.class) {
-    case "truck":   return 2100;
-    case "suv":     return 1750;
-    case "minivan": return 1600;
-    default:        return 1600; // sedan / hatchback
+    case "truck":   base = 2100; break;
+    case "suv":     base = 1750; break;
+    case "minivan": base = 1600; break;
+    default:        base = 1600; break; // sedan / hatchback
   }
+  if (vehicle.powertrain === "phev") return Math.round(base * 0.90);
+  return base;
 }
 
 // Extra kWh per year from climbing hills.

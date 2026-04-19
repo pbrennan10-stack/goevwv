@@ -266,7 +266,7 @@ function AddressField({
               <button
                 type="button"
                 onMouseDown={() => onSelect(s)}
-                className="w-full px-3 py-3 text-left text-sm text-ink hover:bg-sky-50 truncate"
+                className="w-full px-3 py-3 text-left text-sm text-ink hover:bg-sky-50 focus:bg-sky-100 focus:outline-none truncate"
               >
                 {s.place_name}
               </button>

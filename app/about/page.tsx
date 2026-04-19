@@ -3,9 +3,9 @@ import Link from "next/link";
 import { Logo } from "@/components/Logo";
 
 export const metadata: Metadata = {
-  title: "Why EVs Are an Important Decision",
+  title: "Why EVs Matter",
   description:
-    "Patrick Brennan on why EV adoption matters beyond fuel savings — manufacturing sovereignty, energy flexibility, and why legislation alone can't get us there.",
+    "Patrick Brennan on why EV adoption matters beyond fuel savings — manufacturing sovereignty, energy independence, cost and simplicity, and why legislation alone can't get us there.",
 };
 
 export default function AboutPage() {
@@ -30,8 +30,7 @@ export default function AboutPage() {
 
       <article className="max-w-3xl mx-auto">
         <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-ink leading-tight mb-2">
-          Why EVs Are an{" "}
-          <span className="text-brand">Important Decision</span>
+          Why EVs <span className="text-brand">Matter</span>
         </h1>
         <p className="text-ink-soft text-sm mb-10">By Patrick Brennan</p>
 

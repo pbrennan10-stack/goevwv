@@ -94,6 +94,28 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
     if (iv) setIceVehicleId(iv);
     const op = p.get("op");
     if (op === "keep") setOwnershipPlan("keep");
+
+    // Route rehydration — reconstruct RouteData from hf/hs/el URL params.
+    // Summary text is regenerated since original address strings aren't persisted.
+    const hfStr = p.get("hf");
+    if (hfStr != null) {
+      const hf = Number(hfStr);
+      const hs = num("hs", 55);
+      const el = num("el", 0);
+      const roundTripMi = num("mi", DEFAULT_INPUT.daily_round_trip_mi);
+      if (Number.isFinite(hf)) {
+        const elFt = Math.round(el * 3.281);
+        const elStr = elFt >= 20 ? ` · ${elFt} ft elevation` : "";
+        const speedStr = hf > 0.15 && hs > 62 ? ` · avg ${Math.round(hs)} mph hwy` : "";
+        setRoute({
+          distance_mi: roundTripMi / 2,
+          highway_fraction: hf,
+          highway_avg_speed_mph: hs,
+          elevation_gain_m: el,
+          summary: `${roundTripMi.toFixed(1)} mi round-trip · ${Math.round(hf * 100)}% highway${speedStr}${elStr}`,
+        });
+      }
+    }
   }, []);
 
   // Default selected vehicles (picked to be interesting for WV).
@@ -201,9 +223,14 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
     if (longTripMi !== (DEFAULT_INPUT.long_trip_one_way_mi ?? 200)) p.set("ltm", String(longTripMi));
     if (iceVehicleId) p.set("iv", iceVehicleId);
     if (ownershipPlan !== "replace") p.set("op", ownershipPlan);
+    if (route) {
+      p.set("hf", route.highway_fraction.toFixed(3));
+      p.set("hs", String(Math.round(route.highway_avg_speed_mph)));
+      p.set("el", String(Math.round(route.elevation_gain_m)));
+    }
     const newUrl = `${window.location.pathname}?${p.toString()}`;
     window.history.replaceState({}, "", newUrl);
-  }, [daily, days, utilityId, useTOU, winter, mpg, gasPrice, selectedIds, longTrips, longTripMi, iceVehicleId, ownershipPlan]);
+  }, [daily, days, utilityId, useTOU, winter, mpg, gasPrice, selectedIds, longTrips, longTripMi, iceVehicleId, ownershipPlan, route]);
 
   const toggleVehicle = useCallback((id: string) => {
     setSelectedIds((prev) => {
@@ -262,7 +289,7 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
             min={0}
             max={52}
             step={1}
-            hint="e.g., WV → Pittsburgh, DC, Charlotte, Columbus. Used for DCFC stop estimates."
+            hint="e.g., WV → Pittsburgh, DC, Charlotte, Columbus. Used to estimate DC fast charger (DCFC) stops."
           />
           <NumField
             label="Typical one-way distance (mi)"
@@ -291,7 +318,7 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
                 className="h-4 w-4 rounded accent-brand disabled:opacity-50 shrink-0"
               />
               <span>
-                Use time-of-use (off-peak) EV rate
+                Use time-of-use (TOU) off-peak EV rate
                 {!utility.residential.tou_available && (
                   <span className="text-ink-soft"> — not offered by {utility.name}</span>
                 )}
@@ -524,7 +551,7 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
                           <div className="font-medium text-ink text-sm leading-snug">
                             {v.year} {v.make} {v.model}
                           </div>
-                          <div className="text-xs text-ink-soft leading-snug">
+                          <div className="text-xs text-ink-muted leading-snug">
                             {v.trim} · {powertrainLabel(v.powertrain)} ·{" "}
                             {fmtUSD(v.msrp_usd)}
                           </div>
@@ -534,7 +561,7 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
                             </div>
                           )}
                           {v.assembly_location && (
-                            <div className="text-xs text-ink-soft leading-snug mt-0.5">
+                            <div className="text-xs text-ink-muted leading-snug mt-0.5">
                               {assemblyBadge(v.assembly_country, v.us_canadian_parts_pct)}
                             </div>
                           )}
@@ -682,6 +709,11 @@ function BaselineCard({
         <div className="text-xs opacity-75">
           {fmtUSD(annualTotal * 5)} over 5 yr
         </div>
+        {!hasIce && (
+          <div className="text-xs opacity-75 mt-1 italic">
+            Registration fee not included — pick your vehicle above to add it.
+          </div>
+        )}
       </div>
 
       <dl className="grid grid-cols-2 gap-x-3 gap-y-2 text-sm">
@@ -817,8 +849,8 @@ function ResultCard({ r, showMaintenance, iceVehicle, currentAnnualCo2Kg }: { r:
         </div>
       )}
 
-      <div className="text-xs text-ink-soft bg-slate-50 rounded-md p-2 leading-snug">
-        Resale: EVs typically depreciate 50–65% over 5 years nationally. WV has ~1,900 registered EVs — a thin local resale market may mean steeper depreciation. Factor into any long-term financial plan.
+      <div className="text-xs text-amber-900 bg-amber-50 ring-1 ring-amber-200 rounded-md p-2 leading-snug">
+        <strong>Resale:</strong> EVs typically depreciate 50–65% over 5 years nationally. WV has ~1,900 registered EVs — a thin local resale market may mean steeper depreciation. Factor into any long-term financial plan.
       </div>
     </article>
   );
@@ -846,9 +878,10 @@ function FuelingTimePanel({
       <p className="text-xs text-ink-soft mb-4">
         Based on {out.long_trips_per_year} long road trip{out.long_trips_per_year !== 1 ? "s" : ""}/yr at ~{out.long_trip_one_way_mi} mi one-way.
         Uses each EV&rsquo;s <strong>realistic sustained highway range</strong> (not EPA) — Tesla&rsquo;s EPA
-        numbers in particular overstate real-world WV highway range considerably. DCFC stops top up to
-        ~80% (past that the taper is painfully slow), so each stop adds less range than a full home
-        charge. Home charging is passive; DCFC stops and PHEV gas fill-ups are active waiting time.
+        numbers in particular overstate real-world WV highway range considerably.{" "}
+        <strong>DC fast charger (DCFC)</strong> stops top up to ~80% (past that the taper is painfully
+        slow), so each stop adds less range than a full home charge. Home charging is passive; DCFC
+        stops and PHEV gas fill-ups are active waiting time.
       </p>
 
       {/* ICE baseline */}
@@ -904,7 +937,7 @@ function ChargingCard({ r, iceHrs }: { r: VehicleResult; iceHrs: number }) {
           <div className="text-sm font-semibold text-ink">
             {r.annual_home_charge_sessions} sessions/yr
           </div>
-          <div className="text-xs text-ink-soft">
+          <div className="text-xs text-ink-muted">
             ~{fmtNum(r.annual_home_charge_min, 0)} min total · plug in &amp; walk away
           </div>
         </div>
@@ -1176,6 +1209,13 @@ function Assumptions({
               As the grid adds renewables, EV emissions fall automatically —
               a gas car&rsquo;s emissions never change.
             </strong>
+          </li>
+          <li>
+            Five-year totals are in <strong>constant 2026 dollars</strong> — we
+            don&rsquo;t apply inflation. Gas and electric rates historically move
+            together, so the relative comparison stays roughly stable. Battery
+            degradation is minor in the first 5 years (most manufacturer warranties
+            guarantee 70%+ capacity at 8 years / 100k mi).
           </li>
           <li>
             These are honest estimates, not professional financial advice.

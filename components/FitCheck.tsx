@@ -73,7 +73,7 @@ function VerdictDetail({
       <p className="text-sm text-ink-muted">
         Home charging handles your daily driving. Long trips to the same handful of places — a
         cabin, family visits, a regular work destination — become routine once you scope out the
-        charging stops the first time (5 minutes on PlugShare or your in-car route planner before
+        charging stops the first time (5 minutes on PlugShare — a free app that maps every public charger — or your car&rsquo;s built-in navigation before
         you leave). WV winters cut range ~28% on the coldest days, so check each vehicle&rsquo;s
         winter range in the calculator. A PHEV works well here too if you&rsquo;d rather skip
         long-trip planning entirely.
@@ -86,7 +86,7 @@ function VerdictDetail({
         You drive a lot and your long trips go to <em>varied</em> destinations — each new route
         means reviewing charger locations ahead of time. A PHEV likely fits better: it runs on
         electric daily and switches to gas for unfamiliar highway runs, so you don&rsquo;t think
-        about charging mid-trip. A BEV still works, but expect to spend ~5 minutes on PlugShare
+        about charging mid-trip. A BEV still works, but expect to spend ~5 minutes on PlugShare (the free EV-charger app)
         or your in-car route planner before each first visit to a new place. Trips you repeat
         settle into routine after the first run — the friction is mostly first-time routes.
       </p>
