@@ -37,11 +37,35 @@ export interface Charger {
 // Format: (SW lat,lng),(NE lat,lng)
 const WV_BBOX = "(37.0,-82.9),(40.9,-77.5)";
 
+// We deliberately DON'T set compact=true: that flag strips the nested
+// ConnectionType.Title and OperatorInfo.Title objects, leaving only numeric
+// IDs. We need the titles both for connector-type normalization and for the
+// popup UI. Response size at WV scale is ~3-5 MB, fetched once per build —
+// fine.
 function ocmUrl(): string {
-  const base = `https://api.openchargemap.io/v3/poi?output=json&countrycode=US&boundingbox=${WV_BBOX}&maxresults=2000&compact=true&verbose=false`;
+  const base = `https://api.openchargemap.io/v3/poi?output=json&countrycode=US&boundingbox=${WV_BBOX}&maxresults=2000&verbose=false`;
   const key = process.env.OPENCHARGEMAP_API_KEY;
   return key ? `${base}&key=${encodeURIComponent(key)}` : base;
 }
+
+// OCM ConnectionTypeID → our categories. Defensive fallback for when Title
+// isn't present. OCM's reference IDs have been reshuffled over time; values
+// below reflect the April 2026 reference data
+// (api.openchargemap.io/v3/referencedata/). Title-based matching in
+// normalizeConnector is the primary path — this fallback only fires when
+// the Title is missing or unfamiliar.
+const CONNECTOR_TYPE_ID: Record<number, NormalizedConnectorType> = {
+  1: "J1772",       // Type 1 (J1772)
+  2: "CHAdeMO",
+  7: "Tesla",       // Tesla (Roadster — US pre-NACS)
+  8: "Tesla",       // Tesla (Model S/X — legacy US pre-NACS)
+  25: "J1772",      // Type 2 (Mennekes) — treated as L2 here
+  27: "NACS",       // NACS / Tesla Supercharger (current OCM mapping)
+  30: "Tesla",      // Tesla Supercharger (older OCM naming)
+  32: "CCS",        // CCS (Type 1 / SAE Combo)
+  33: "CCS",        // CCS (Type 2 / European Combo)
+  50: "NACS",       // NACS (alternate OCM mapping)
+};
 
 interface OcmConnection {
   ConnectionTypeID?: number;
@@ -65,14 +89,23 @@ interface OcmPoi {
   Connections?: OcmConnection[];
 }
 
-function normalizeConnector(title: string | undefined): NormalizedConnectorType {
-  if (!title) return "Other";
-  const t = title.toLowerCase();
-  if (t.includes("ccs")) return "CCS";
-  if (t.includes("nacs") || t.includes("north american charging")) return "NACS";
-  if (t.includes("chademo")) return "CHAdeMO";
-  if (t.includes("tesla")) return "Tesla";
-  if (t.includes("j1772") || t.includes("type 1")) return "J1772";
+function normalizeConnector(
+  title: string | undefined,
+  typeId: number | undefined,
+): NormalizedConnectorType {
+  if (title) {
+    const t = title.toLowerCase();
+    // Check NACS before CCS — "NACS" doesn't contain "ccs" but Tesla's unified
+    // naming "NACS / Tesla" shouldn't be mistaken for CCS either.
+    if (t.includes("nacs") || t.includes("north american charging")) return "NACS";
+    if (t.includes("ccs")) return "CCS";
+    if (t.includes("chademo")) return "CHAdeMO";
+    if (t.includes("tesla")) return "Tesla";
+    if (t.includes("j1772") || t.includes("type 1")) return "J1772";
+    if (t.includes("type 2") || t.includes("mennekes")) return "J1772";
+  }
+  // Fallback to ID mapping if title is missing or unrecognized
+  if (typeId != null && CONNECTOR_TYPE_ID[typeId]) return CONNECTOR_TYPE_ID[typeId];
   return "Other";
 }
 
@@ -81,7 +114,7 @@ function transformPoi(poi: OcmPoi): Charger | null {
   if (!addr || addr.Latitude == null || addr.Longitude == null) return null;
 
   const connectors: ChargerConnector[] = (poi.Connections ?? []).map((c) => ({
-    type: normalizeConnector(c.ConnectionType?.Title),
+    type: normalizeConnector(c.ConnectionType?.Title, c.ConnectionTypeID),
     power_kw: c.PowerKW ?? null,
     is_dcfc: c.Level?.IsFastChargeCapable === true || (c.PowerKW ?? 0) > 22,
     quantity: c.Quantity ?? 1,
@@ -109,7 +142,7 @@ function transformPoi(poi: OcmPoi): Charger | null {
     max_power_kw,
     is_dcfc,
     connector_types,
-    ocm_url: `https://openchargemap.org/site/poi/details/${poi.ID}`,
+    ocm_url: `https://map.openchargemap.io/?id=${poi.ID}#/details/${poi.ID}`,
   };
 }
 
