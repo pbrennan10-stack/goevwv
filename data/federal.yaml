@@ -142,3 +142,21 @@ calculation_notes:
       across the state — Parkersburg was ~22¢ below the northern WV average
       at this snapshot. Users can override this in the calculator. Refresh
       quarterly.
+
+  # Public DC fast charging rate applied to long-trip stops. Home charging
+  # stays at the user's utility rate; this only applies to road-trip kWh.
+  # $0.48/kWh matches Electrify America's Pass (non-member) rate, which is
+  # the dominant public network on WV's I-64/I-79/I-79 corridor. Members
+  # of EA Pass+ ($4/mo) pay ~$0.38; Tesla Supercharger walk-up for non-Tesla
+  # is ~$0.45; EVgo walk-up is $0.38–0.52. $0.48 is a conservative default
+  # for the typical non-enrolled user.
+  dcfc_rate_per_kwh:
+    current: 0.48
+    source: "Electrify America Pass (non-member) rate"
+    source_url: "https://www.electrifyamerica.com/pricing/"
+    retrieved: "2026-04-18"
+    notes: >
+      Applied to kWh charged during long-trip DCFC stops. Network rates
+      range $0.35–$0.60/kWh depending on network and membership; $0.48 is
+      chosen as a conservative walk-up default. Users who sign up for
+      network memberships (EA Pass+, EVgo+) will pay meaningfully less.

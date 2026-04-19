@@ -153,7 +153,10 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
     setRoute(r);
   }, []);
 
-  const annual_miles = daily * days * 52;
+  // Annual miles = commute (daily × days × 52) + long trips (trips × one-way × 2).
+  // Must match the formula in calc.ts so maintenance amortization and the
+  // "mi/yr" display are consistent across UI and calculations.
+  const annual_miles = daily * days * 52 + longTrips * longTripMi * 2;
   const iceMaint: MaintenanceCosts | null = useMemo(
     () => selectedIceVehicle ? annualIceMaintenance(selectedIceVehicle, annual_miles) : null,
     [selectedIceVehicle, annual_miles],
@@ -783,6 +786,13 @@ function ResultCard({ r, showMaintenance, iceVehicle, currentAnnualCo2Kg }: { r:
 
       <dl className="grid grid-cols-2 gap-x-3 gap-y-2 text-sm">
         <Row label="Annual fuel/energy" value={fmtUSD(r.annual_energy_cost_usd)} />
+        {r.annual_dcfc_energy_cost_usd > 0 ? (
+          <Row
+            label={`↳ DCFC (${fmtNum(r.annual_dcfc_kwh, 0)} kWh × $${fmtNum(r.annual_dcfc_energy_cost_usd / Math.max(r.annual_dcfc_kwh, 1), 2)})`}
+            value={fmtUSD(r.annual_dcfc_energy_cost_usd)}
+            muted
+          />
+        ) : null}
         <Row
           label="WV annual fee"
           value={r.annual_state_fee_usd > 0 ? fmtUSD(r.annual_state_fee_usd) : "—"}
@@ -880,8 +890,11 @@ function FuelingTimePanel({
         Uses each EV&rsquo;s <strong>realistic sustained highway range</strong> (not EPA) — Tesla&rsquo;s EPA
         numbers in particular overstate real-world WV highway range considerably.{" "}
         <strong>DC fast charger (DCFC)</strong> stops top up to ~80% (past that the taper is painfully
-        slow), so each stop adds less range than a full home charge. Home charging is passive; DCFC
-        stops and PHEV gas fill-ups are active waiting time.
+        slow), so each stop adds less range than a full home charge. Each DCFC
+        stop time includes ~4 min of plug-in, authentication, and unplug overhead;
+        winter charging is ~8% slower on average across 4 cold months. Home
+        charging is passive; DCFC stops and PHEV gas fill-ups are active
+        waiting time.
       </p>
 
       {/* ICE baseline */}
@@ -1164,7 +1177,20 @@ function Assumptions({
           <li>
             Winter derate: <strong>{winter ? "on" : "off"}</strong>. When on we
             add ~12% to annual kWh to reflect 4 cold-weather months with ~28%
-            range loss from heaters and battery chemistry.
+            range loss from heaters and battery chemistry. Winter also slows
+            DCFC by ~25% when the battery is cold; we bake in an 8% annualized
+            charge-time uplift when this toggle is on.
+          </li>
+          <li>
+            <strong>DCFC (public fast charging) rate:</strong>{" "}
+            <strong>${fed.calculation_notes.dcfc_rate_per_kwh?.current.toFixed(2) ?? "0.48"}/kWh</strong>{" "}
+            for long-trip kWh. Matches Electrify America&rsquo;s Pass (non-member)
+            rate, the dominant public network on WV&rsquo;s interstates.
+            Home-charged kWh stay at your utility rate. Each DCFC stop tops the
+            battery from ~10% to ~80% SoC (70% of capacity), and each stop
+            includes ~4 min of plug-in, authentication, and unplug time beyond
+            the raw charging window. Members of EA Pass+ or EVgo+ pay
+            meaningfully less; this is the walk-up default.
           </li>
           <li>
             WV EV road fee:{" "}

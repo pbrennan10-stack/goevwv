@@ -15,6 +15,9 @@ coverage/
 next-env.d.ts
 .vercel
 
+# TypeScript incremental build cache
+*.tsbuildinfo
+
 # SQLite runtime data (future use, created on server)
 /data/runtime/
 *.db

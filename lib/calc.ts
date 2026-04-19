@@ -45,7 +45,27 @@ const ICE_TANK_GAL = 14;           // US average passenger car tank
 const ICE_FILLUP_MIN = 5;          // drive in, pump, pay, drive out
 const EV_HOME_PLUG_MIN = 1.5;      // plug in + unplug (at home, passive)
 const LONG_TRIP_ONE_WAY_MI = 200;  // WV → Pittsburgh / DC / Charlotte typical
-const DCFC_DEFAULT_MIN = 30;       // 10→80% on a 50–150 kW charger
+const DCFC_DEFAULT_MIN = 30;       // 10→80% on a 50–150 kW charger (warm, unobstructed)
+
+// Every DCFC stop has non-charging overhead the base "10→80%" spec ignores:
+// walk to charger, plug in, authenticate, wait for session init, unplug, drive out.
+// 4 min is conservative; real-world can be 5–8 min on older networks.
+const DCFC_PER_STOP_OVERHEAD_MIN = 4;
+
+// Cold-weather DCFC is slower because battery thermal management throttles the
+// charge curve when the pack is below operating temp. Typically 20–40% slower
+// across 4 cold WV months. Annualized: (4/12) × ~25% = ~8% longer on average.
+// Only applied when winter derate toggle is ON (user controls this).
+const DCFC_WINTER_TIME_MULTIPLIER = 1.08;
+
+// DCFC stops charge 10%→80% SoC (past 80% the taper slows to a crawl), so each
+// stop adds 70% of battery capacity. Fallback for vehicles missing battery_kwh.
+const DCFC_STOP_SOC_FRACTION = 0.70;
+const DCFC_FALLBACK_BATTERY_KWH = 60;
+
+// Fallback DCFC rate if federal.yaml doesn't carry one. Matches Electrify
+// America Pass (non-member) as of 2026-04-18.
+const DCFC_FALLBACK_RATE_PER_KWH = 0.48;
 
 function homeChargeSessions(daily_mi: number, days_per_week: number, range_mi: number): number {
   // Charge when battery drops below ~20% capacity (usable = 80% of rated range).
@@ -251,19 +271,27 @@ export interface CalcReturn {
 }
 
 export function calculate(input: CalcInput, ctx: CalcContext): CalcReturn {
-  const miles = annualMiles(input.daily_round_trip_mi, input.days_per_week);
+  const commuteMi = annualMiles(input.daily_round_trip_mi, input.days_per_week);
+  const oneWayLongTripMi = input.long_trip_one_way_mi ?? LONG_TRIP_ONE_WAY_MI;
+  const longTripMi = input.long_trips_per_year * oneWayLongTripMi * 2;
+  // Total annual miles includes both commute and long trips — this is what the
+  // user actually drives in a year and what every fuel/energy figure scales on.
+  const miles = commuteMi + longTripMi;
   const trips_per_year = input.days_per_week * 52;
   const highway_fraction = input.route?.highway_fraction ?? DEFAULT_HIGHWAY_FRACTION;
   const highway_avg_speed_mph = input.route?.highway_avg_speed_mph ?? 55;
   const elevation_gain_m = input.route?.elevation_gain_m ?? 0;
   const { rate, mode } = effectiveRatePerKwh(ctx.utility, input.use_tou);
+  const dcfcRate =
+    ctx.fed.calculation_notes.dcfc_rate_per_kwh?.current ?? DCFC_FALLBACK_RATE_PER_KWH;
 
-  // Current ICE fueling time — use vehicle's actual tank size if known
+  // Current ICE fueling time — use vehicle's actual tank size if known.
+  // Fuel consumption is across all miles (commute + long trips).
   const currentTankGal = input.current.ice_vehicle?.tank_gallons ?? ICE_TANK_GAL;
   const currentFillups = miles / (Math.max(input.current.mpg, 1) * currentTankGal);
   const currentFuelingMin = currentFillups * ICE_FILLUP_MIN;
 
-  // Current-car baseline
+  // Current-car baseline — gas and CO₂ covers all annual miles
   const currentGallons = miles / Math.max(input.current.mpg, 1);
   const currentGasCost = currentGallons * input.current.gas_price_per_gal;
   const currentCo2 = currentGallons * CO2_KG_PER_GAL_GASOLINE;
@@ -283,10 +311,52 @@ export function calculate(input: CalcInput, ctx: CalcContext): CalcReturn {
   const results: VehicleResult[] = ctx.vehicles.map((v) => {
     const kwh = kwhPerYear(v, miles, input.apply_winter_derate, highway_fraction, highway_avg_speed_mph)
               + elevationExtraKwhPerYear(v, elevation_gain_m, trips_per_year);
-    const energyCost = kwh * rate;
+
+    // Charging / fueling time + energy-split breakdown
+    let homeChargeSess = 0;
+    let dcfcStops = 0;
+    let dcfcMin = 0;
+    let dcfcKwh = 0;
+    let dcfcCost = 0;
+    let gasFillupsEv = 0;
+    let gasFuelingMinEv = 0;
     const phevGas = gallonsPerYear(v, miles);
     const phevGasCost = phevGas * input.current.gas_price_per_gal;
-    const totalEnergyCost = energyCost + phevGasCost;
+
+    if (v.powertrain === "bev") {
+      const dailyRange = v.epa_range_mi ?? 200;
+      // DCFC math uses a curated realistic highway range. Fall back to
+      // 80% of EPA for any BEV that hasn't been curated yet.
+      const hwyRange = v.highway_range_mi ?? Math.round(dailyRange * 0.80);
+      homeChargeSess = homeChargeSessions(input.daily_round_trip_mi, input.days_per_week, dailyRange);
+      dcfcStops = dcfcStopsPerRoundTrip(hwyRange, oneWayLongTripMi) * input.long_trips_per_year;
+
+      // Per-stop time: base 10→80% charge + fixed overhead (plug-in, auth,
+      // unplug). Cold-weather bump applied when winter derate is on.
+      const baseChargeMin = v.charging.dcfc_10_to_80_min ?? DCFC_DEFAULT_MIN;
+      const winterMult = input.apply_winter_derate ? DCFC_WINTER_TIME_MULTIPLIER : 1.0;
+      const perStopMin = baseChargeMin * winterMult + DCFC_PER_STOP_OVERHEAD_MIN;
+      dcfcMin = dcfcStops * perStopMin;
+
+      // DCFC energy: each stop replenishes ~70% of battery capacity (10→80% SoC).
+      // Clamp to total annual kWh so DCFC never exceeds what the vehicle uses.
+      const battery = v.battery_kwh ?? DCFC_FALLBACK_BATTERY_KWH;
+      dcfcKwh = Math.min(kwh, dcfcStops * battery * DCFC_STOP_SOC_FRACTION);
+      dcfcCost = dcfcKwh * dcfcRate;
+    } else if (v.powertrain === "phev") {
+      const eRange = v.epa_range_mi_electric ?? 40;
+      homeChargeSess = homeChargeSessions(input.daily_round_trip_mi, input.days_per_week, eRange);
+      // PHEVs use gas on long trips — no DCFC stops, but gas fill-ups from annual gas consumption
+      gasFillupsEv = phevGas / ICE_TANK_GAL;
+      gasFuelingMinEv = gasFillupsEv * ICE_FILLUP_MIN;
+    }
+    const homeChargeMin = homeChargeSess * EV_HOME_PLUG_MIN;
+
+    // Energy cost split: home-rate kWh (everything that didn't go through DCFC)
+    // plus DCFC-rate kWh for long-trip fast-charging stops.
+    const homeKwh = Math.max(0, kwh - dcfcKwh);
+    const homeEnergyCost = homeKwh * rate;
+    const totalEnergyCost = homeEnergyCost + dcfcCost + phevGasCost;
 
     const fee = stateAnnualFee(v, ctx.fed);
     // Include EV maintenance + insurance only when ICE vehicle is selected (apples-to-apples)
@@ -304,30 +374,6 @@ export function calculate(input: CalcInput, ctx: CalcContext): CalcReturn {
     const co2 =
       kwh * CO2_KG_PER_KWH_WV_GRID + phevGas * CO2_KG_PER_GAL_GASOLINE;
     const co2Saved = currentCo2 - co2;
-
-    // Charging / fueling time breakdown
-    let homeChargeSess = 0;
-    let dcfcStops = 0;
-    let dcfcMin = 0;
-    let gasFillupsEv = 0;
-    let gasFuelingMinEv = 0;
-    if (v.powertrain === "bev") {
-      const dailyRange = v.epa_range_mi ?? 200;
-      // DCFC math uses a curated realistic highway range. Fall back to
-      // 80% of EPA for any BEV that hasn't been curated yet.
-      const hwyRange = v.highway_range_mi ?? Math.round(dailyRange * 0.80);
-      const oneWayMi = input.long_trip_one_way_mi ?? LONG_TRIP_ONE_WAY_MI;
-      homeChargeSess = homeChargeSessions(input.daily_round_trip_mi, input.days_per_week, dailyRange);
-      dcfcStops = dcfcStopsPerRoundTrip(hwyRange, oneWayMi) * input.long_trips_per_year;
-      dcfcMin = dcfcStops * (v.charging.dcfc_10_to_80_min ?? DCFC_DEFAULT_MIN);
-    } else if (v.powertrain === "phev") {
-      const eRange = v.epa_range_mi_electric ?? 40;
-      homeChargeSess = homeChargeSessions(input.daily_round_trip_mi, input.days_per_week, eRange);
-      // PHEVs use gas on long trips — no DCFC stops, but gas fill-ups from annual gas consumption
-      gasFillupsEv = phevGas / ICE_TANK_GAL;
-      gasFuelingMinEv = gasFillupsEv * ICE_FILLUP_MIN;
-    }
-    const homeChargeMin = homeChargeSess * EV_HOME_PLUG_MIN;
 
     const warnings: string[] = [];
     if (v.epa_range_mi && input.daily_round_trip_mi > v.epa_range_mi) {
@@ -378,6 +424,10 @@ export function calculate(input: CalcInput, ctx: CalcContext): CalcReturn {
       annual_dcfc_min: dcfcMin,
       annual_gas_fillups: gasFillupsEv,
       annual_gas_fueling_min: gasFuelingMinEv,
+      annual_home_energy_cost_usd: homeEnergyCost,
+      annual_dcfc_energy_cost_usd: dcfcCost,
+      annual_phev_gas_cost_usd: phevGasCost,
+      annual_dcfc_kwh: dcfcKwh,
     };
   });
 

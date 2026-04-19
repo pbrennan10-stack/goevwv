@@ -125,6 +125,7 @@ export interface FederalData {
   calculation_notes: {
     winter_range_derating: { default_percent: number };
     gas_price_baseline_per_gal: { current: number; source: string };
+    dcfc_rate_per_kwh?: { current: number; source: string; retrieved?: string; notes?: string };
   };
 }
 
@@ -150,9 +151,14 @@ export interface VehicleResult {
   annual_home_charge_sessions: number;
   annual_home_charge_min: number;   // passive: plug in/out at home while parked
   annual_dcfc_stops: number;        // active: sitting at a public fast charger
-  annual_dcfc_min: number;
+  annual_dcfc_min: number;          // includes per-stop overhead + winter penalty
   annual_gas_fillups: number;       // 0 for BEV; gas portion fill-ups for PHEV
   annual_gas_fueling_min: number;   // 0 for BEV; gas portion station time for PHEV
+  // Cost breakdown — separate so the UI can show DCFC as its own line
+  annual_home_energy_cost_usd: number;   // commute + long-trip home charging
+  annual_dcfc_energy_cost_usd: number;   // BEV long-trip fast charging
+  annual_phev_gas_cost_usd: number;      // PHEV gas portion (commute + long-trip)
+  annual_dcfc_kwh: number;               // for display / transparency
 }
 
 export interface IceVehicleMaintenance {

@@ -569,6 +569,65 @@ export default function StateOfTheDataPage() {
           </Section>
 
           <Section
+            title="DC fast charging (DCFC) assumptions"
+            summary="Rate and time math used for long-trip public fast-charging stops."
+          >
+            <div className="bg-surface-raised border border-slate-200 rounded p-4 mb-4 text-sm text-ink-muted leading-relaxed">
+              <p className="font-semibold text-ink mb-1">Why DCFC deserves its own line</p>
+              <p>
+                Public fast charging typically costs <strong>~3× more per kWh</strong>{" "}
+                than charging at home. For a driver who takes 10+ road trips a
+                year, quietly pricing every kWh at the home utility rate
+                overstates EV savings by hundreds of dollars. The calculator now
+                splits BEV energy into home-rate kWh (commute + long-trip
+                &ldquo;first tank&rdquo; before departure) and DCFC-rate kWh
+                (mid-route charging stops).
+              </p>
+            </div>
+            <SourceRow
+              label="DCFC rate (long-trip kWh)"
+              value={`$${federal.calculation_notes.dcfc_rate_per_kwh?.current.toFixed(2) ?? "0.48"}/kWh`}
+              source="Electrify America Pass (non-member) rate"
+              sourceUrl="https://www.electrifyamerica.com/pricing/"
+              retrieved="2026-04-18"
+              confidence="verified"
+              notes="Chosen as a conservative walk-up default matching the dominant public network on WV's I-64 / I-77 / I-79 corridors. Actual network rates in April 2026: Electrify America Pass $0.43–$0.60, Pass+ ~$0.38 ($4/mo); Tesla Supercharger (non-Tesla) $0.35–$0.50, with a subscription dropping ~$0.10/kWh; EVgo walk-up $0.38–$0.52. Members of any network will pay meaningfully less — this is the no-subscription case."
+            />
+            <SourceRow
+              label="kWh delivered per DCFC stop"
+              value="70% of battery capacity"
+              source="Industry convention (10% → 80% SoC before taper)"
+              retrieved="Calculation methodology set 2026-04-18"
+              confidence="verified"
+              notes="Charging past ~80% slows dramatically as the charge curve tapers to protect the battery. Most road-trip stops end at 80%. We compute DCFC kWh as (stops × battery_kwh × 0.7), clamped to the vehicle's total annual kWh so it never exceeds total consumption."
+            />
+            <SourceRow
+              label="Per-stop time overhead"
+              value="+4 minutes beyond raw 10→80% charge time"
+              source="Industry-typical (plug-in, authentication, session init, unplug)"
+              retrieved="Calculation methodology set 2026-04-18"
+              confidence="verified"
+              notes="Each stop's displayed time = (vehicle's spec 10→80% charge minutes) + 4 min of fixed overhead. Real-world networks vary 3–8 min for authentication and session handling; 4 min is a conservative mid-point. Over 24 stops/yr that's an extra 1.6 hours that would be invisible without this adjustment."
+            />
+            <SourceRow
+              label="Winter DCFC slowdown"
+              value="+8% annualized charge time (when winter toggle is on)"
+              source="Battery thermal management research (AAA, Recurrent, manufacturer curves)"
+              retrieved="Calculation methodology set 2026-04-18"
+              confidence="approximate"
+              notes="Cold batteries throttle DCFC power by 20–40% until preconditioned. Averaged across 4 cold WV months, this works out to ~8% longer DCFC time annually. Only applied when the user's Winter derate toggle is on — the same toggle that adds 12% to annual kWh. A cold-climate driver who regularly preconditions the battery via navigation will see less of this penalty."
+            />
+            <SourceRow
+              label="Home-charged &ldquo;first tank&rdquo; of a long trip"
+              value="85% of usable highway range, no DCFC cost"
+              source="Standard BEV road-trip planning"
+              retrieved="Calculation methodology set 2026-04-18"
+              confidence="verified"
+              notes="The first leg of any long trip starts from home on a full battery — those kWh are charged overnight at the home rate, not at DCFC. Only miles beyond the first tank hit DCFC. Similarly the destination is assumed to have overnight L2 (hotel, family garage, Supercharger near hotel) so return-leg kWh may or may not hit DCFC depending on range."
+            />
+          </Section>
+
+          <Section
             title="Calculation assumptions"
             summary="Physics and fleet-behavior constants used in the TCO math."
           >
