@@ -121,8 +121,8 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
   // Default selected vehicles (picked to be interesting for WV).
   const [selectedIds, setSelectedIds] = useState<string[]>([
     "chevy-equinox-ev-2025",
-    "toyota-rav4-prime-2025",
-    "ford-f150-lightning-2025",
+    "tesla-model-y-2025",
+    "chevy-silverado-ev-2025",
   ]);
 
   const utility = useMemo(
