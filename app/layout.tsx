@@ -36,11 +36,6 @@ export const metadata: Metadata = {
       "Impartial, WV-specific EV guidance. Your utility, our winters, realistic highway range, daily-life math.",
     // twitter:image is auto-populated from app/twitter-image.tsx
   },
-  appleWebApp: {
-    capable: true,
-    title: "GoEV WV",
-    statusBarStyle: "black-translucent",
-  },
 };
 
 export const viewport: Viewport = {
