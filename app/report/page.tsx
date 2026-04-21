@@ -258,7 +258,10 @@ function ReportCard({ r, hasIce }: { r: VehicleResult; hasIce: boolean }) {
           {r.vehicle.year} {r.vehicle.make}
         </div>
         <div className="font-bold text-ink text-base leading-tight">{r.vehicle.model}</div>
-        <div className="text-xs text-ink-soft">{r.vehicle.trim} · {powertrainLabel(r.vehicle.powertrain)}</div>
+        <div className="text-xs text-ink-soft">
+          {r.vehicle.trim} · {powertrainLabel(r.vehicle.powertrain)}
+          {r.vehicle.zero_to_sixty_s != null && ` · ${r.vehicle.zero_to_sixty_s}s`}
+        </div>
       </header>
 
       <div className={["rounded-lg p-2.5 text-sm", positive ? "bg-brand-bg text-brand-dark" : "bg-amber-50 text-amber-900"].join(" ")}>

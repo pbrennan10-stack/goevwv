@@ -783,6 +783,326 @@
         "brake_life_miles": 75000,
         "misc_annual_usd": 170
       }
+    },
+    {
+      "id": "kia-seltos-2024",
+      "year": 2024,
+      "make": "Kia",
+      "model": "Seltos",
+      "trim": "LX AWD 2.0L",
+      "class": "suv",
+      "mpg_combined": 27,
+      "tank_gallons": 13.2,
+      "annual_insurance_usd": 1480,
+      "maintenance": {
+        "oil_change_usd": 70,
+        "oil_changes_per_year": 2,
+        "tire_set_usd": 600,
+        "tire_life_miles": 55000,
+        "brake_service_usd": 450,
+        "brake_life_miles": 75000,
+        "misc_annual_usd": 180
+      }
+    },
+    {
+      "id": "bmw-m2-2024",
+      "year": 2024,
+      "make": "BMW",
+      "model": "M2",
+      "trim": "Coupe 3.0L Twin-Turbo I6",
+      "class": "sedan",
+      "mpg_combined": 19,
+      "tank_gallons": 13.7,
+      "annual_insurance_usd": 2200,
+      "maintenance": {
+        "oil_change_usd": 120,
+        "oil_changes_per_year": 1,
+        "tire_set_usd": 1100,
+        "tire_life_miles": 30000,
+        "brake_service_usd": 700,
+        "brake_life_miles": 60000,
+        "misc_annual_usd": 350
+      }
+    },
+    {
+      "id": "bmw-330i-2024",
+      "year": 2024,
+      "make": "BMW",
+      "model": "330i",
+      "trim": "xDrive Sedan 2.0L Turbo",
+      "class": "sedan",
+      "mpg_combined": 28,
+      "tank_gallons": 15.6,
+      "annual_insurance_usd": 1850,
+      "maintenance": {
+        "oil_change_usd": 120,
+        "oil_changes_per_year": 1,
+        "tire_set_usd": 900,
+        "tire_life_miles": 35000,
+        "brake_service_usd": 650,
+        "brake_life_miles": 55000,
+        "misc_annual_usd": 320
+      }
+    },
+    {
+      "id": "mazda-cx5-2024",
+      "year": 2024,
+      "make": "Mazda",
+      "model": "CX-5",
+      "trim": "S Select AWD 2.5L",
+      "class": "suv",
+      "mpg_combined": 26,
+      "tank_gallons": 15.3,
+      "annual_insurance_usd": 1520,
+      "maintenance": {
+        "oil_change_usd": 75,
+        "oil_changes_per_year": 2,
+        "tire_set_usd": 680,
+        "tire_life_miles": 55000,
+        "brake_service_usd": 480,
+        "brake_life_miles": 75000,
+        "misc_annual_usd": 190
+      }
+    },
+    {
+      "id": "subaru-crosstrek-2024",
+      "year": 2024,
+      "make": "Subaru",
+      "model": "Crosstrek",
+      "trim": "Premium AWD 2.0L",
+      "class": "suv",
+      "mpg_combined": 29,
+      "tank_gallons": 16.6,
+      "annual_insurance_usd": 1470,
+      "maintenance": {
+        "oil_change_usd": 75,
+        "oil_changes_per_year": 2,
+        "tire_set_usd": 620,
+        "tire_life_miles": 55000,
+        "brake_service_usd": 460,
+        "brake_life_miles": 75000,
+        "misc_annual_usd": 180
+      }
+    },
+    {
+      "id": "hyundai-tucson-2024",
+      "year": 2024,
+      "make": "Hyundai",
+      "model": "Tucson",
+      "trim": "SEL AWD 2.5L",
+      "class": "suv",
+      "mpg_combined": 26,
+      "tank_gallons": 14.3,
+      "annual_insurance_usd": 1540,
+      "maintenance": {
+        "oil_change_usd": 70,
+        "oil_changes_per_year": 2,
+        "tire_set_usd": 660,
+        "tire_life_miles": 55000,
+        "brake_service_usd": 460,
+        "brake_life_miles": 75000,
+        "misc_annual_usd": 180
+      }
+    },
+    {
+      "id": "lexus-rx350-2024",
+      "year": 2024,
+      "make": "Lexus",
+      "model": "RX 350",
+      "trim": "Premium AWD 2.4L Turbo",
+      "class": "suv",
+      "mpg_combined": 25,
+      "tank_gallons": 17.2,
+      "annual_insurance_usd": 1720,
+      "maintenance": {
+        "oil_change_usd": 110,
+        "oil_changes_per_year": 2,
+        "tire_set_usd": 900,
+        "tire_life_miles": 55000,
+        "brake_service_usd": 580,
+        "brake_life_miles": 80000,
+        "misc_annual_usd": 250
+      }
+    },
+    {
+      "id": "vw-tiguan-2024",
+      "year": 2024,
+      "make": "Volkswagen",
+      "model": "Tiguan",
+      "trim": "SE 4Motion 2.0L Turbo",
+      "class": "suv",
+      "mpg_combined": 25,
+      "tank_gallons": 15.3,
+      "annual_insurance_usd": 1550,
+      "maintenance": {
+        "oil_change_usd": 95,
+        "oil_changes_per_year": 2,
+        "tire_set_usd": 720,
+        "tire_life_miles": 50000,
+        "brake_service_usd": 500,
+        "brake_life_miles": 70000,
+        "misc_annual_usd": 220
+      }
+    },
+    {
+      "id": "ford-bronco-sport-2024",
+      "year": 2024,
+      "make": "Ford",
+      "model": "Bronco Sport",
+      "trim": "Big Bend 4x4 1.5L EcoBoost",
+      "class": "suv",
+      "mpg_combined": 26,
+      "tank_gallons": 13.7,
+      "annual_insurance_usd": 1600,
+      "maintenance": {
+        "oil_change_usd": 85,
+        "oil_changes_per_year": 2,
+        "tire_set_usd": 720,
+        "tire_life_miles": 50000,
+        "brake_service_usd": 500,
+        "brake_life_miles": 70000,
+        "misc_annual_usd": 210
+      }
+    },
+    {
+      "id": "ford-edge-2024",
+      "year": 2024,
+      "make": "Ford",
+      "model": "Edge",
+      "trim": "SE AWD 2.0L EcoBoost",
+      "class": "suv",
+      "mpg_combined": 23,
+      "tank_gallons": 18.5,
+      "annual_insurance_usd": 1600,
+      "maintenance": {
+        "oil_change_usd": 85,
+        "oil_changes_per_year": 2,
+        "tire_set_usd": 780,
+        "tire_life_miles": 55000,
+        "brake_service_usd": 520,
+        "brake_life_miles": 70000,
+        "misc_annual_usd": 220
+      }
+    },
+    {
+      "id": "chevy-traverse-2024",
+      "year": 2024,
+      "make": "Chevrolet",
+      "model": "Traverse",
+      "trim": "LT AWD 2.5L Turbo",
+      "class": "suv",
+      "mpg_combined": 23,
+      "tank_gallons": 22.4,
+      "annual_insurance_usd": 1650,
+      "maintenance": {
+        "oil_change_usd": 80,
+        "oil_changes_per_year": 2,
+        "tire_set_usd": 780,
+        "tire_life_miles": 55000,
+        "brake_service_usd": 540,
+        "brake_life_miles": 70000,
+        "misc_annual_usd": 230
+      }
+    },
+    {
+      "id": "nissan-murano-2024",
+      "year": 2024,
+      "make": "Nissan",
+      "model": "Murano",
+      "trim": "SV AWD 3.5L V6",
+      "class": "suv",
+      "mpg_combined": 23,
+      "tank_gallons": 19.5,
+      "annual_insurance_usd": 1620,
+      "maintenance": {
+        "oil_change_usd": 80,
+        "oil_changes_per_year": 2,
+        "tire_set_usd": 720,
+        "tire_life_miles": 55000,
+        "brake_service_usd": 520,
+        "brake_life_miles": 70000,
+        "misc_annual_usd": 210
+      }
+    },
+    {
+      "id": "honda-civic-hatchback-2024",
+      "year": 2024,
+      "make": "Honda",
+      "model": "Civic",
+      "trim": "Sport Hatchback 1.5L Turbo",
+      "class": "hatchback",
+      "mpg_combined": 33,
+      "tank_gallons": 12.4,
+      "annual_insurance_usd": 1450,
+      "maintenance": {
+        "oil_change_usd": 65,
+        "oil_changes_per_year": 2,
+        "tire_set_usd": 580,
+        "tire_life_miles": 55000,
+        "brake_service_usd": 430,
+        "brake_life_miles": 75000,
+        "misc_annual_usd": 175
+      }
+    },
+    {
+      "id": "mazda-3-hatchback-2024",
+      "year": 2024,
+      "make": "Mazda",
+      "model": "Mazda3",
+      "trim": "2.5 S Hatchback 2.5L",
+      "class": "hatchback",
+      "mpg_combined": 33,
+      "tank_gallons": 13.2,
+      "annual_insurance_usd": 1450,
+      "maintenance": {
+        "oil_change_usd": 70,
+        "oil_changes_per_year": 2,
+        "tire_set_usd": 600,
+        "tire_life_miles": 55000,
+        "brake_service_usd": 450,
+        "brake_life_miles": 75000,
+        "misc_annual_usd": 180
+      }
+    },
+    {
+      "id": "hyundai-elantra-2024",
+      "year": 2024,
+      "make": "Hyundai",
+      "model": "Elantra",
+      "trim": "SEL Sedan 2.0L",
+      "class": "sedan",
+      "mpg_combined": 37,
+      "tank_gallons": 12.4,
+      "annual_insurance_usd": 1400,
+      "maintenance": {
+        "oil_change_usd": 65,
+        "oil_changes_per_year": 2,
+        "tire_set_usd": 560,
+        "tire_life_miles": 55000,
+        "brake_service_usd": 420,
+        "brake_life_miles": 75000,
+        "misc_annual_usd": 170
+      }
+    },
+    {
+      "id": "ford-mustang-gt-2024",
+      "year": 2024,
+      "make": "Ford",
+      "model": "Mustang GT",
+      "trim": "Fastback 5.0L V8",
+      "class": "sedan",
+      "mpg_combined": 18,
+      "tank_gallons": 16,
+      "annual_insurance_usd": 1950,
+      "maintenance": {
+        "oil_change_usd": 90,
+        "oil_changes_per_year": 2,
+        "tire_set_usd": 950,
+        "tire_life_miles": 35000,
+        "brake_service_usd": 600,
+        "brake_life_miles": 60000,
+        "misc_annual_usd": 300
+      }
     }
   ]
 }

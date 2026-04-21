@@ -14,10 +14,43 @@ export const metadata: Metadata = {
 // Locally a fresh fetch happens on every build.
 export const revalidate = 86400;
 
-export default async function ChargersPage() {
+type SearchParams = Record<string, string | string[] | undefined>;
+
+function str(p: SearchParams, k: string): string | null {
+  const v = p[k];
+  if (Array.isArray(v)) return v[0] ?? null;
+  return v ?? null;
+}
+
+function parseCoords(raw: string | null): [number, number] | null {
+  if (!raw) return null;
+  const parts = raw.split(",").map(Number);
+  if (parts.length !== 2 || !parts.every(Number.isFinite)) return null;
+  return [parts[0], parts[1]];
+}
+
+export default async function ChargersPage({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}) {
   const { chargers, retrieved_at, error } = await getChargers();
   const dcfcCount = chargers.filter((c) => c.is_dcfc).length;
   const l2Count = chargers.length - dcfcCount;
+
+  // Optional URL state:
+  //   o / d — "lng,lat" origin + destination (shown as a drawn route)
+  //   br    — buffer radius in miles (5..25, default 10)
+  //   return — encoded URL to send the user back to (e.g. their calc state)
+  const origin = parseCoords(str(searchParams, "o"));
+  const destination = parseCoords(str(searchParams, "d"));
+  const brRaw = str(searchParams, "br");
+  const br = brRaw ? Number(brRaw) : NaN;
+  const bufferMi = Number.isFinite(br) && br >= 1 && br <= 25 ? br : 10;
+  // Only accept absolute-path returns (starts with "/"). Anything else is
+  // refused to prevent an open-redirect via a malicious URL.
+  const rawReturn = str(searchParams, "return");
+  const returnUrl = rawReturn && rawReturn.startsWith("/") ? rawReturn : null;
 
   return (
     <main className="mx-auto max-w-content px-4 sm:px-6 py-8 sm:py-12">
@@ -61,7 +94,7 @@ export default async function ChargersPage() {
           WV <span className="text-brand">Charger Map</span>
         </h1>
         <p className="mt-2 text-sm sm:text-base text-ink-muted max-w-prose">
-          Every public EV charging station in West Virginia (and a buffer around the
+          A public inventory of West Virginia EV charging stations (and a buffer around the
           border). Data comes from{" "}
           <a
             href="https://openchargemap.org"
@@ -72,7 +105,19 @@ export default async function ChargersPage() {
             OpenChargeMap
           </a>
           , a community-maintained registry. Filter by speed or connector type;
-          click a pin for station details and connector counts.
+          click a pin for station details and connector counts.{" "}
+          <strong>Not exhaustive —</strong>{" "}
+          <a
+            href="https://www.plugshare.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-brand hover:underline"
+          >
+            PlugShare
+          </a>{" "}
+          and similar crowd-sourced tools may include chargers this map doesn&rsquo;t
+          (newly commissioned stations, residential hosts, private fleet chargers
+          opened to the public). For anything trip-critical, cross-check before you go.
         </p>
         {!error && chargers.length > 0 && (
           <p className="mt-2 text-xs text-ink-soft">
@@ -171,6 +216,10 @@ export default async function ChargersPage() {
         <ChargerMap
           chargers={chargers}
           mapboxToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN ?? ""}
+          initialOrigin={origin}
+          initialDestination={destination}
+          initialBufferMi={bufferMi}
+          returnUrl={returnUrl}
         />
       )}
 

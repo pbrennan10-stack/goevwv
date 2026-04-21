@@ -1,6 +1,10 @@
 import { ImageResponse } from "next/og";
 
-// Renders at build time into a static PNG; deterministic so caching is safe.
+// Use edge runtime — the Node runtime path inside @vercel/og calls
+// fileURLToPath on an invalid URL during Windows builds. Edge runtime
+// doesn't take that code path and works on both local (Windows) and
+// production (Linux) builds.
+export const runtime = "edge";
 export const alt = "GoEV WV — Is an EV right for you in West Virginia?";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";

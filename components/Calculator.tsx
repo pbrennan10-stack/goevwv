@@ -53,10 +53,45 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
   const [gasPrice, setGasPrice] = useState(DEFAULT_INPUT.current.gas_price_per_gal);
   const [iceVehicleId, setIceVehicleId] = useState("");
   const [route, setRoute] = useState<RouteData | null>(null);
+  // Resolved origin/destination coords from RouteHelper. Kept separate from
+  // RouteData (which only carries derived metrics) so we can deep-link to
+  // /chargers with real coordinates after the user has their results.
+  const [routeCoords, setRouteCoords] = useState<{
+    origin: [number, number];
+    destination: [number, number];
+  } | null>(null);
   const [longTrips, setLongTrips] = useState(DEFAULT_INPUT.long_trips_per_year);
   const [longTripMi, setLongTripMi] = useState(DEFAULT_INPUT.long_trip_one_way_mi ?? 200);
   const [gasSensitivityPrice, setGasSensitivityPrice] = useState(DEFAULT_INPUT.current.gas_price_per_gal);
   const [ownershipPlan, setOwnershipPlan] = useState<"replace" | "keep">("replace");
+
+  // True once the one-time URL-hydration useEffect has run. Gates the URL-sync
+  // useEffect so it can't write default state back to the URL before
+  // hydration's setState calls have actually landed. Without this, navigating
+  // to /calculator with route params causes a brief race where URL sync fires
+  // with default closure values and clobbers the incoming params.
+  const [hasHydrated, setHasHydrated] = useState(false);
+
+  // Per-card trim preference, keyed by base-trim id → chosen variant id. Lets
+  // a single picker card (Tesla Model Y, etc.) display either the Standard or
+  // Performance trim without doubling the card count. When the chosen trim
+  // changes, we also swap the id in selectedIds so the comparison updates.
+  const [trimChoices, setTrimChoices] = useState<Record<string, string>>({});
+
+  // One-stop handler for a trim toggle click. Used by both the picker chip
+  // and the in-card chip on the Results row. Updates trim display preference
+  // AND swaps the id in selectedIds if any variant in the group was already
+  // picked for comparison, so the Results section follows the user's trim choice.
+  const swapTrim = useCallback(
+    (primaryId: string, groupIds: string[], newActiveId: string) => {
+      setTrimChoices((prev) => ({ ...prev, [primaryId]: newActiveId }));
+      setSelectedIds((prev) => {
+        if (!prev.some((id) => groupIds.includes(id))) return prev;
+        return prev.map((id) => (groupIds.includes(id) ? newActiveId : id));
+      });
+    },
+    [],
+  );
 
   // Keep sensitivity slider in sync when user updates the main gas price input.
   useEffect(() => { setGasSensitivityPrice(gasPrice); }, [gasPrice]);
@@ -89,6 +124,19 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
     if (vids) {
       const ids = vids.split(",").filter(Boolean).slice(0, 3);
       setSelectedIds(ids);
+      // If any selected id is a non-primary variant of a group, remember
+      // that choice so the picker card displays the correct variant on load.
+      const choices: Record<string, string> = {};
+      for (const id of ids) {
+        const v = vehicles.find((x) => x.id === id);
+        if (v?.variant_group && !v.variant_primary) {
+          const primary = vehicles.find(
+            (x) => x.variant_group === v.variant_group && x.variant_primary,
+          );
+          if (primary) choices[primary.id] = id;
+        }
+      }
+      if (Object.keys(choices).length > 0) setTrimChoices(choices);
     }
     const iv = p.get("iv");
     if (iv) setIceVehicleId(iv);
@@ -116,6 +164,27 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
         });
       }
     }
+
+    // Origin/destination coordinates — stored as four separate numbers
+    // (ox/oy = origin lng/lat, dx/dy = destination lng/lat) so we can deep-link
+    // to the charger map even after a URL round-trip.
+    const oxStr = p.get("ox");
+    const oyStr = p.get("oy");
+    const dxStr = p.get("dx");
+    const dyStr = p.get("dy");
+    if (oxStr && oyStr && dxStr && dyStr) {
+      const ox = Number(oxStr);
+      const oy = Number(oyStr);
+      const dx = Number(dxStr);
+      const dy = Number(dyStr);
+      if ([ox, oy, dx, dy].every(Number.isFinite)) {
+        setRouteCoords({ origin: [ox, oy], destination: [dx, dy] });
+      }
+    }
+
+    // Must be last so the URL-sync useEffect doesn't fire with stale closure
+    // state and overwrite the URL we just read from.
+    setHasHydrated(true);
   }, []);
 
   // Default selected vehicles (picked to be interesting for WV).
@@ -148,10 +217,17 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
     }
   }, [iceVehicles]);
 
-  const onRouteFill = useCallback((r: RouteData) => {
-    setDaily(Math.round(r.distance_mi * 2)); // one-way → round trip
-    setRoute(r);
-  }, []);
+  const onRouteFill = useCallback(
+    (
+      r: RouteData,
+      coords: { origin: [number, number]; destination: [number, number] },
+    ) => {
+      setDaily(Math.round(r.distance_mi * 2)); // one-way → round trip
+      setRoute(r);
+      setRouteCoords(coords);
+    },
+    [],
+  );
 
   // Annual miles = commute (daily × days × 52) + long trips (trips × one-way × 2).
   // Must match the formula in calc.ts so maintenance amortization and the
@@ -213,6 +289,9 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
   // Sync state to URL so results are shareable.
   useEffect(() => {
     if (typeof window === "undefined") return;
+    // Don't write until we've finished reading URL params on mount, or we'd
+    // overwrite the incoming URL with default state before hydration lands.
+    if (!hasHydrated) return;
     const p = new URLSearchParams();
     p.set("mi", String(daily));
     p.set("d", String(days));
@@ -231,9 +310,15 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
       p.set("hs", String(Math.round(route.highway_avg_speed_mph)));
       p.set("el", String(Math.round(route.elevation_gain_m)));
     }
+    if (routeCoords) {
+      p.set("ox", routeCoords.origin[0].toFixed(5));
+      p.set("oy", routeCoords.origin[1].toFixed(5));
+      p.set("dx", routeCoords.destination[0].toFixed(5));
+      p.set("dy", routeCoords.destination[1].toFixed(5));
+    }
     const newUrl = `${window.location.pathname}?${p.toString()}`;
     window.history.replaceState({}, "", newUrl);
-  }, [daily, days, utilityId, useTOU, winter, mpg, gasPrice, selectedIds, longTrips, longTripMi, iceVehicleId, ownershipPlan, route]);
+  }, [hasHydrated, daily, days, utilityId, useTOU, winter, mpg, gasPrice, selectedIds, longTrips, longTripMi, iceVehicleId, ownershipPlan, route, routeCoords]);
 
   const toggleVehicle = useCallback((id: string) => {
     setSelectedIds((prev) => {
@@ -366,7 +451,7 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
                     )
                     .map((v) => ({
                       value: v.id,
-                      label: `${v.make} ${v.model} — ${v.year} · ${v.mpg_combined} mpg`,
+                      label: `${v.make} ${v.model} ${v.trim} — ${v.mpg_combined} mpg`,
                     })),
                 ]}
               />
@@ -515,7 +600,14 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
         </div>
 
         <div className="space-y-3">
-          {groupedByClass(vehicles).map(({ cls, list }) => (
+          {groupedByClass(
+            // The picker shows one card per vehicle OR per variant-group
+            // (represented by its primary trim). Non-primary members of a
+            // group are filtered out and reached via the chip toggle.
+            vehicles.filter(
+              (v) => !v.variant_group || v.variant_primary,
+            ),
+          ).map(({ cls, list }) => (
             <details key={cls} open className="rounded-xl ring-1 ring-slate-200 overflow-hidden">
               <summary className="list-none cursor-pointer select-none flex items-center justify-between gap-2 px-4 py-3 bg-slate-50 hover:bg-slate-100 transition">
                 <div className="flex items-baseline gap-2">
@@ -527,50 +619,77 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
                 <span className="text-xs text-ink-soft font-mono">▾ click to collapse</span>
               </summary>
               <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3 p-3">
-                {list.map((v) => {
-                  const on = selectedIds.includes(v.id);
+                {list.map((primary) => {
+                  // Resolve the group (if any) and the vehicle currently displayed.
+                  const variants = primary.variant_group
+                    ? vehicles.filter((x) => x.variant_group === primary.variant_group)
+                    : [];
+                  const activeId = trimChoices[primary.id] ?? primary.id;
+                  const active =
+                    variants.find((v) => v.id === activeId) ?? primary;
+                  const on = selectedIds.includes(active.id);
                   const full = selectedIds.length >= 3 && !on;
                   return (
-                    <button
-                      key={v.id}
-                      type="button"
-                      onClick={() => toggleVehicle(v.id)}
-                      disabled={full}
+                    <div
+                      key={primary.id}
                       className={[
-                        "text-left rounded-xl border p-3 transition",
+                        "rounded-xl border transition",
                         on
                           ? "border-brand bg-brand-bg"
                           : "border-slate-200 bg-white hover:border-slate-300",
-                        full ? "opacity-40 cursor-not-allowed" : "cursor-pointer",
                       ].join(" ")}
                     >
-                      <div className="flex items-start gap-3">
-                        <div className="shrink-0 mt-1 h-4 w-4 rounded border border-slate-300 flex items-center justify-center">
-                          {on && (
-                            <div className="h-2.5 w-2.5 rounded-sm bg-brand" />
-                          )}
-                        </div>
-                        <div className="min-w-0">
-                          <div className="font-medium text-ink text-sm leading-snug">
-                            {v.year} {v.make} {v.model}
+                      <button
+                        type="button"
+                        onClick={() => toggleVehicle(active.id)}
+                        disabled={full}
+                        className={[
+                          "w-full text-left p-3 rounded-xl",
+                          full ? "opacity-40 cursor-not-allowed" : "cursor-pointer",
+                        ].join(" ")}
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className="shrink-0 mt-1 h-4 w-4 rounded border border-slate-300 flex items-center justify-center">
+                            {on && (
+                              <div className="h-2.5 w-2.5 rounded-sm bg-brand" />
+                            )}
                           </div>
-                          <div className="text-xs text-ink-muted leading-snug">
-                            {v.trim} · {powertrainLabel(v.powertrain)} ·{" "}
-                            {fmtUSD(v.msrp_usd)}
+                          <div className="min-w-0">
+                            <div className="font-medium text-ink text-sm leading-snug">
+                              {active.year} {active.make} {active.model}
+                            </div>
+                            <div className="text-xs text-ink-muted leading-snug">
+                              {active.trim} · {powertrainLabel(active.powertrain)} ·{" "}
+                              {fmtUSD(active.msrp_usd)}
+                              {active.zero_to_sixty_s != null && ` · ${active.zero_to_sixty_s}s`}
+                            </div>
+                            {rangeLabel(active) && (
+                              <div className="text-xs text-ink leading-snug mt-0.5 font-medium">
+                                {rangeLabel(active)}
+                              </div>
+                            )}
+                            {active.assembly_location && (
+                              <div className="text-xs text-ink-muted leading-snug mt-0.5">
+                                {assemblyBadge(active.assembly_country, active.us_canadian_parts_pct)}
+                              </div>
+                            )}
                           </div>
-                          {rangeLabel(v) && (
-                            <div className="text-xs text-ink leading-snug mt-0.5 font-medium">
-                              {rangeLabel(v)}
-                            </div>
-                          )}
-                          {v.assembly_location && (
-                            <div className="text-xs text-ink-muted leading-snug mt-0.5">
-                              {assemblyBadge(v.assembly_country, v.us_canadian_parts_pct)}
-                            </div>
-                          )}
                         </div>
-                      </div>
-                    </button>
+                      </button>
+                      {variants.length > 1 && (
+                        <TrimChips
+                          variants={variants}
+                          activeId={activeId}
+                          onChange={(newId) =>
+                            swapTrim(
+                              primary.id,
+                              variants.map((v) => v.id),
+                              newId,
+                            )
+                          }
+                        />
+                      )}
+                    </div>
                   );
                 })}
               </div>
@@ -590,6 +709,9 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
           gasSensitivityPrice={gasSensitivityPrice}
           onSensitivityChange={setGasSensitivityPrice}
           outSensitivity={outSensitivity}
+          routeCoords={routeCoords}
+          vehicles={vehicles}
+          onTrimChange={swapTrim}
         />
       )}
 
@@ -616,6 +738,9 @@ function Results({
   gasSensitivityPrice,
   onSensitivityChange,
   outSensitivity,
+  routeCoords,
+  vehicles,
+  onTrimChange,
 }: {
   out: CalcReturn;
   utility: Utility;
@@ -626,6 +751,9 @@ function Results({
   gasSensitivityPrice: number;
   onSensitivityChange: (p: number) => void;
   outSensitivity: CalcReturn;
+  routeCoords: { origin: [number, number]; destination: [number, number] } | null;
+  vehicles: Vehicle[];
+  onTrimChange: (primaryId: string, groupIds: string[], newActiveId: string) => void;
 }) {
   return (
     <section className="space-y-4">
@@ -650,9 +778,34 @@ function Results({
           iceVehicle={selectedIceVehicle}
           mpg={mpg}
         />
-        {out.results.map((r) => (
-          <ResultCard key={r.vehicle.id} r={r} showMaintenance={!!iceMaint} iceVehicle={selectedIceVehicle} currentAnnualCo2Kg={out.current_annual_co2_kg} />
-        ))}
+        {out.results.map((r) => {
+          // Resolve this vehicle's group (if any) so the card can show a
+          // trim-swap toggle and stay in sync with the picker.
+          const variants = r.vehicle.variant_group
+            ? vehicles.filter((x) => x.variant_group === r.vehicle.variant_group)
+            : [];
+          const primary = variants.find((v) => v.variant_primary) ?? variants[0];
+          return (
+            <ResultCard
+              key={r.vehicle.id}
+              r={r}
+              showMaintenance={!!iceMaint}
+              iceVehicle={selectedIceVehicle}
+              currentAnnualCo2Kg={out.current_annual_co2_kg}
+              variants={variants}
+              onTrimChange={
+                primary
+                  ? (newActiveId) =>
+                      onTrimChange(
+                        primary.id,
+                        variants.map((v) => v.id),
+                        newActiveId,
+                      )
+                  : undefined
+              }
+            />
+          );
+        })}
       </div>
 
       <FuelingTimePanel out={out} mpg={mpg} selectedIceVehicle={selectedIceVehicle} />
@@ -663,7 +816,56 @@ function Results({
         out={out}
         outSensitivity={outSensitivity}
       />
+      {routeCoords && <ChargerMapCrossLink routeCoords={routeCoords} />}
     </section>
+  );
+}
+
+// Shown only after the user has both (a) finished the calc (so we're inside
+// the Results section) and (b) entered a route via RouteHelper. Sends them to
+// the charger map with their drive drawn and an obvious way back to the calc.
+function ChargerMapCrossLink({
+  routeCoords,
+}: {
+  routeCoords: { origin: [number, number]; destination: [number, number] };
+}) {
+  const onClick = () => {
+    if (typeof window === "undefined") return;
+    const { origin, destination } = routeCoords;
+    const params = new URLSearchParams();
+    params.set("o", `${origin[0].toFixed(5)},${origin[1].toFixed(5)}`);
+    params.set("d", `${destination[0].toFixed(5)},${destination[1].toFixed(5)}`);
+    params.set("br", "10");
+    // Pass the current calculator URL so /chargers can offer a one-click
+    // "back to your calculation" that restores every input.
+    params.set(
+      "return",
+      window.location.pathname + window.location.search,
+    );
+    window.location.href = `/chargers?${params.toString()}`;
+  };
+  return (
+    <div className="rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 p-5 sm:p-7">
+      <div className="flex items-start gap-4 flex-wrap">
+        <div className="flex-1 min-w-[220px]">
+          <h3 className="text-base font-semibold text-ink mb-1">
+            Curious where the chargers are on this route?
+          </h3>
+          <p className="text-sm text-ink-muted">
+            See every WV public charger along your drive — the map highlights
+            the ones within a few miles of your path. Your calculation is
+            preserved; one click brings you back.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={onClick}
+          className="rounded-lg bg-brand text-white px-4 py-2 text-sm font-medium hover:opacity-90 transition whitespace-nowrap"
+        >
+          Open route on the charger map →
+        </button>
+      </div>
+    </div>
   );
 }
 
@@ -749,7 +951,21 @@ function BaselineCard({
   );
 }
 
-function ResultCard({ r, showMaintenance, iceVehicle, currentAnnualCo2Kg }: { r: VehicleResult; showMaintenance: boolean; iceVehicle?: IceVehicle | null; currentAnnualCo2Kg: number }) {
+function ResultCard({
+  r,
+  showMaintenance,
+  iceVehicle,
+  currentAnnualCo2Kg,
+  variants = [],
+  onTrimChange,
+}: {
+  r: VehicleResult;
+  showMaintenance: boolean;
+  iceVehicle?: IceVehicle | null;
+  currentAnnualCo2Kg: number;
+  variants?: Vehicle[];
+  onTrimChange?: (newActiveId: string) => void;
+}) {
   const savings = r.annual_savings_vs_current_usd;
   const positive = savings >= 0;
   return (
@@ -763,7 +979,17 @@ function ResultCard({ r, showMaintenance, iceVehicle, currentAnnualCo2Kg }: { r:
         </div>
         <div className="text-sm text-ink-soft">
           {r.vehicle.trim} · {powertrainLabel(r.vehicle.powertrain)}
+          {r.vehicle.zero_to_sixty_s != null && ` · ${r.vehicle.zero_to_sixty_s}s`}
         </div>
+        {variants.length > 1 && onTrimChange && (
+          <div className="mt-2 -mx-1">
+            <TrimChips
+              variants={variants}
+              activeId={r.vehicle.id}
+              onChange={onTrimChange}
+            />
+          </div>
+        )}
       </header>
 
       <div
@@ -1392,6 +1618,47 @@ function groupedByClass(vehicles: Vehicle[]): Array<{ cls: Vehicle["class"]; lis
     );
   }
   return CLASS_ORDER.filter((c) => buckets.has(c)).map((c) => ({ cls: c, list: buckets.get(c)! }));
+}
+
+// Pill-style toggle for swapping between trims within a variant group
+// (Standard / Long Range / Performance / Large Pack, etc.). Kept visually
+// subtle — a row of compact chips below the main card content.
+function TrimChips({
+  variants,
+  activeId,
+  onChange,
+}: {
+  variants: Vehicle[];
+  activeId: string;
+  onChange: (newActiveId: string) => void;
+}) {
+  return (
+    <div className="px-3 pb-2 pt-1.5 border-t border-slate-200/70 flex items-center gap-1 flex-wrap">
+      {variants.map((v) => {
+        const isActive = activeId === v.id;
+        const label = v.variant_label ?? v.trim;
+        return (
+          <button
+            key={v.id}
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              if (!isActive) onChange(v.id);
+            }}
+            className={[
+              "rounded px-2 py-0.5 text-[11px] leading-tight transition",
+              isActive
+                ? "bg-brand text-white font-semibold"
+                : "text-ink-soft hover:text-ink hover:bg-slate-100",
+            ].join(" ")}
+            aria-pressed={isActive}
+          >
+            {label}
+          </button>
+        );
+      })}
+    </div>
+  );
 }
 
 function rangeLabel(v: Vehicle): string {

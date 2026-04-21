@@ -45,6 +45,19 @@ export interface Vehicle {
   cargo_cu_ft?: number;
   payload_lbs?: number;
   towing_lbs?: number;
+  // Manufacturer-claimed 0-60 mph time in seconds. Independent testing
+  // typically lands within ±0.3s. Shown inline on cards for quick scan.
+  zero_to_sixty_s?: number;
+  // Variant grouping — lets a single picker card represent multiple trims of
+  // the same vehicle (Standard / Long Range / Performance, etc.) via a chip
+  // toggle, instead of rendering every trim as its own card.
+  //   variant_group   — shared identifier linking related trims
+  //   variant_label   — short chip label ("Long Range", "⚡ Performance", etc.)
+  //   variant_primary — true on the default trim shown in the picker; others
+  //                     are reached via the chip toggle.
+  variant_group?: string;
+  variant_label?: string;
+  variant_primary?: boolean;
   tax_credit_eligible: boolean;
   // NHTSA American Automobile Labeling Act (AALA) data
   us_canadian_parts_pct?: number | null; // null = AALA-exempt (GVWR > 8,500 lbs)
