@@ -72,9 +72,14 @@ npm run typecheck      # tsc --noEmit
 npm run build          # production build
 npm run lint
 
-# Deploy to droplet (ssh root@174.138.53.28 first)
+# Deploy: pushing to `main` triggers `.github/workflows/deploy.yml`, which
+# SSHes into the droplet and runs the sequence below. No manual step needed.
+# Runs take ~60s; watch them at https://github.com/pbrennan10-stack/goevwv/actions.
+
+# Manual fallback (if Actions is down or you need to debug on the droplet):
+ssh root@174.138.53.28
 cd /opt/goevwv
-git pull
+git fetch origin && git reset --hard origin/main
 docker compose up -d --build
 docker compose ps
 docker compose logs app --tail 50 -f
@@ -100,11 +105,11 @@ These constants live in `lib/calc.ts`. If you adjust any, also update the "Assum
 
 ## Deployment workflow
 
-Current (manual): edit files → commit → push → SSH into droplet → `git pull && docker compose up -d --build`.
+Auto-deploy via GitHub Actions: every push to `main` triggers `.github/workflows/deploy.yml`, which SSHes into the droplet, runs `git fetch origin && git reset --hard origin/main`, and rebuilds the containers. Typical cycle is ~60 seconds from push to live. The workflow uses the `DEPLOY_KEY` GitHub secret (SSH private key) for droplet access.
 
-**TODO:** Set up GitHub Actions to auto-deploy on push to `main`. This is tracked in Open TODOs below. Until then, pushing does NOT deploy automatically.
+Manual fallback — use when Actions is down, the workflow errors, or you're debugging on the droplet directly: `ssh root@174.138.53.28 && cd /opt/goevwv && git fetch origin && git reset --hard origin/main && docker compose up -d --build`.
 
-The first-time droplet setup is in `docs/REBUILD_RUNBOOK.md` (parent folder in Cowork workspace, also should be copied into `docs/` here). The bootstrap script `scripts/bootstrap.sh` is idempotent and can be re-run safely.
+The first-time droplet setup is in `docs/REBUILD_RUNBOOK.md`. The bootstrap script `scripts/bootstrap.sh` is idempotent and can be re-run safely.
 
 ## Operational notes
 
@@ -113,20 +118,17 @@ The first-time droplet setup is in `docs/REBUILD_RUNBOOK.md` (parent folder in C
 - The droplet has UFW (22/80/443 only), fail2ban on SSH, and unattended-upgrades for security patches. SSH is key-only, no passwords.
 - DO weekly backups are enabled (~$1.20/mo).
 
-## Current status (as of 2026-04-18)
+## Current status (as of 2026-04-21)
 
 - ✅ Domain registered (GoDaddy), DNS pointing at droplet
 - ✅ Droplet provisioned (Ubuntu 24.04, Docker, Caddy, firewall, fail2ban)
-- ✅ Coming Soon page deployed (static, served by Caddy)
-- ✅ MVP code complete locally (this commit if you're reading it post-push)
-- 🟡 **MVP not yet deployed to the droplet** — needs `git pull && docker compose up -d --build` on droplet after push
+- ✅ Site live at https://goevwv.com (v1.0 + v1.0.5 + v1.0.6 shipped)
+- ✅ GitHub Actions auto-deploy on push to `main` is active
 
 ## Open TODOs
 
-- [ ] **Push MVP to GitHub + `git pull + docker compose up -d --build` on droplet**
 - [ ] Clean up whyweare50th.com DNS (retiring domain; A record still points here)
 - [ ] Set up UptimeRobot (free, 5-min ping to https://goevwv.com)
-- [ ] Add GitHub Actions auto-deploy on push to main (webhook to droplet, or polling)
 - [ ] v1.1: charger map using OpenChargeMap API (free, no key) — map UI + cache layer
 - [ ] v1.1: dealer/installer directory — curated YAML + map overlay
 - [ ] v1.2: rebate & TOU explainer page — dedicated route per utility
