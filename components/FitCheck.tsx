@@ -26,9 +26,17 @@ type Verdict = "fit" | "likely" | "maybe" | "notyet";
 
 function computeVerdict(charging: ChargingAnswer, miles: MilesAnswer, trips: TripsAnswer): Verdict {
   if (charging === "yes") {
-    if (miles !== "over80") return "fit";
-    // Same-place repeat trips become routine once scoped; varied destinations
-    // keep adding planning overhead each time.
+    if (miles === "under40") return "fit";
+    if (miles === "40-80") {
+      // Moderate daily commute: rarely/routine long trips are a clean BEV fit.
+      // Varied novel destinations add per-trip planning overhead — downgrade to
+      // "likely" and surface the PHEV alternative (daily electric, gas for
+      // unfamiliar highway runs).
+      if (trips === "varied") return "likely";
+      return "fit";
+    }
+    // over80 — heavy daily driver. Same-place repeat trips become routine once
+    // scoped; varied destinations keep adding planning overhead each time.
     if (trips === "varied") return "maybe";
     return "likely";
   }
@@ -117,9 +125,11 @@ function LowMileageNote() {
 function VerdictDetail({
   verdict,
   charging,
+  trips,
 }: {
   verdict: Verdict;
   charging: ChargingAnswer;
+  trips: TripsAnswer;
 }) {
   if (verdict === "fit") {
     return (
@@ -132,6 +142,20 @@ function VerdictDetail({
     );
   }
   if (verdict === "likely") {
+    if (trips === "varied") {
+      return (
+        <p className="text-sm text-ink-muted">
+          Home charging handles your daily driving easily at this mileage. Long
+          trips to varied destinations mean ~5 minutes on PlugShare (a free EV-charger
+          app) or your car&rsquo;s built-in nav before each new route — trips you
+          repeat settle into routine after the first run. WV winters cut range
+          ~28% on the coldest days, so check winter range in the calculator. A
+          PHEV is a strong alternative if you&rsquo;d rather skip long-trip
+          planning entirely — it runs on electric daily and switches to gas for
+          unfamiliar highway trips.
+        </p>
+      );
+    }
     return (
       <p className="text-sm text-ink-muted">
         Home charging handles your daily driving. Long trips to the same handful of places — a
@@ -337,11 +361,11 @@ export function FitCheck() {
             <span className="font-semibold text-ink text-base">{ui.heading}</span>
           </div>
           <div className="mb-4 space-y-3">
-            <VerdictDetail verdict={verdict} charging={charging} />
+            <VerdictDetail verdict={verdict} charging={charging} trips={trips} />
             {miles === "under40" && verdict !== "notyet" && <LowMileageNote />}
-            {miles === "under40" &&
-              (trips === "routine" || trips === "varied") &&
-              verdict !== "notyet" && <PhevSuggestionNote />}
+            {verdict !== "notyet" &&
+              ((miles === "under40" && (trips === "routine" || trips === "varied")) ||
+                (miles === "40-80" && trips === "varied")) && <PhevSuggestionNote />}
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3 sm:items-center mt-4">
