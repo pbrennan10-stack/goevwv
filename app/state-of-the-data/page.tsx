@@ -599,19 +599,19 @@ export default function StateOfTheDataPage() {
             />
             <SourceRow
               label="kWh delivered per DCFC stop"
-              value="70% of battery capacity"
-              source="Industry convention (10% → 80% SoC before taper)"
-              retrieved="Calculation methodology set 2026-04-18"
+              value="Only what the trip actually needs (capped at 70% of battery per stop)"
+              source="Scaled to real driver behavior — top off to reach next checkpoint, not full 10→80%"
+              retrieved="Revised 2026-04-21"
               confidence="verified"
-              notes="Charging past ~80% slows dramatically as the charge curve tapers to protect the battery. Most road-trip stops end at 80%. We compute DCFC kWh as (stops × battery_kwh × 0.7), clamped to the vehicle's total annual kWh so it never exceeds total consumption."
+              notes="Charging past ~80% slows dramatically as the charge curve tapers. The 10→80% window (70% of battery kWh) is the upper bound per stop, but most stops on a borderline trip deliver much less — only the overshoot beyond the home-charged first leg. Computed as (extra miles beyond first-leg window) × highway efficiency, clamped to annual kWh."
             />
             <SourceRow
               label="Per-stop time overhead"
-              value="+4 minutes beyond raw 10→80% charge time"
+              value="+4 minutes of plug-in / auth / unplug per stop"
               source="Industry-typical (plug-in, authentication, session init, unplug)"
               retrieved="Calculation methodology set 2026-04-18"
               confidence="verified"
-              notes="Each stop's displayed time = (vehicle's spec 10→80% charge minutes) + 4 min of fixed overhead. Real-world networks vary 3–8 min for authentication and session handling; 4 min is a conservative mid-point. Over 24 stops/yr that's an extra 1.6 hours that would be invisible without this adjustment."
+              notes="Each stop's displayed time = (charging minutes scaled to actual kWh delivered, using the vehicle's spec 10→80% rate as the reference) + 4 min of fixed overhead. Real-world networks vary 3–8 min for authentication and session handling; 4 min is a conservative mid-point. A short top-up on a borderline trip might only add 5 min of charging, not the full 10→80% window."
             />
             <SourceRow
               label="Winter DCFC slowdown"

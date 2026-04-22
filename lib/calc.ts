@@ -74,10 +74,18 @@ function homeChargeSessions(daily_mi: number, days_per_week: number, range_mi: n
   return Math.ceil((days_per_week * 52) / daysPerCharge);
 }
 
-function dcfcStopsPerRoundTrip(highwayRangeMi: number, oneWayMi: number): number {
+function dcfcStopsPerRoundTrip(
+  highwayRangeMi: number,
+  oneWayMi: number,
+): { stops: number; extraMiRoundTrip: number } {
   // Counts *mid-route* DCFC stops needed to complete one leg, then × 2 for the
   // round trip (assumes destination has overnight charging — hotel L2, family
-  // garage, Supercharger near hotel, etc.).
+  // garage, Supercharger near hotel, etc.). Also returns the total miles that
+  // must be DCFC-powered, so downstream time/cost scales to the actual energy
+  // needed instead of assuming every stop is a full 10→80% fill. A real driver
+  // tops off only enough to reach the next checkpoint plus buffer; modeling
+  // every stop as 70% of battery capacity overstates both time and cost by
+  // ~5× on borderline trips.
   //
   // Asymmetric usable windows matter:
   //   - First tank (home → first stop): 100% SOC → ~10% buffer = 90% usable
@@ -88,13 +96,14 @@ function dcfcStopsPerRoundTrip(highwayRangeMi: number, oneWayMi: number): number
   // (not EPA combined). This reflects aero drag at highway speeds, HVAC, WV
   // elevation, and — for Tesla specifically — empirical reports that EPA is
   // overstated more than for other brands.
-  if (!highwayRangeMi || highwayRangeMi <= 0) return 0;
-  if (!oneWayMi || oneWayMi <= 0) return 0;
+  if (!highwayRangeMi || highwayRangeMi <= 0) return { stops: 0, extraMiRoundTrip: 0 };
+  if (!oneWayMi || oneWayMi <= 0) return { stops: 0, extraMiRoundTrip: 0 };
   const firstSegMi = highwayRangeMi * 0.90;
-  if (oneWayMi <= firstSegMi) return 0;
+  if (oneWayMi <= firstSegMi) return { stops: 0, extraMiRoundTrip: 0 };
   const perStopMi = highwayRangeMi * 0.70;
   const stopsOneWay = Math.ceil((oneWayMi - firstSegMi) / perStopMi);
-  return stopsOneWay * 2;
+  const extraMiOneWay = oneWayMi - firstSegMi;
+  return { stops: stopsOneWay * 2, extraMiRoundTrip: extraMiOneWay * 2 };
 }
 
 function annualMiles(daily: number, daysPerWeek: number): number {
@@ -329,20 +338,31 @@ export function calculate(input: CalcInput, ctx: CalcContext): CalcReturn {
       // 80% of EPA for any BEV that hasn't been curated yet.
       const hwyRange = v.highway_range_mi ?? Math.round(dailyRange * 0.80);
       homeChargeSess = homeChargeSessions(input.daily_round_trip_mi, input.days_per_week, dailyRange);
-      dcfcStops = dcfcStopsPerRoundTrip(hwyRange, oneWayLongTripMi) * input.long_trips_per_year;
 
-      // Per-stop time: base 10→80% charge + fixed overhead (plug-in, auth,
-      // unplug). Cold-weather bump applied when winter derate is on.
-      const baseChargeMin = v.charging.dcfc_10_to_80_min ?? DCFC_DEFAULT_MIN;
-      const winterMult = input.apply_winter_derate ? DCFC_WINTER_TIME_MULTIPLIER : 1.0;
-      const perStopMin = baseChargeMin * winterMult + DCFC_PER_STOP_OVERHEAD_MIN;
-      dcfcMin = dcfcStops * perStopMin;
+      const dcfcTrip = dcfcStopsPerRoundTrip(hwyRange, oneWayLongTripMi);
+      dcfcStops = dcfcTrip.stops * input.long_trips_per_year;
 
-      // DCFC energy: each stop replenishes ~70% of battery capacity (10→80% SoC).
-      // Clamp to total annual kWh so DCFC never exceeds what the vehicle uses.
+      // DCFC energy scales to the miles that actually need DCFC power — the
+      // overshoot beyond the first-leg-from-home window, both directions.
+      // A driver who needs 15 mi of extra range tops off ~5 kWh, not a full
+      // 10→80% fill. Clamp to total annual kWh so DCFC never exceeds total use.
       const battery = v.battery_kwh ?? DCFC_FALLBACK_BATTERY_KWH;
-      dcfcKwh = Math.min(kwh, dcfcStops * battery * DCFC_STOP_SOC_FRACTION);
+      const effKwhPerMi =
+        (v.efficiency_kwh_per_100mi_highway ?? v.efficiency_kwh_per_100mi) / 100;
+      const dcfcKwhPerRoundTrip = dcfcTrip.extraMiRoundTrip * effKwhPerMi;
+      dcfcKwh = Math.min(kwh, dcfcKwhPerRoundTrip * input.long_trips_per_year);
       dcfcCost = dcfcKwh * dcfcRate;
+
+      // Per-stop time: charging minutes scale with actual kWh delivered
+      // (proportional to the published 10→80% window), plus fixed overhead per
+      // stop. Cold-weather multiplier applies only to charging time, not the
+      // human overhead of plugging in and authenticating.
+      const baseChargeMin = v.charging.dcfc_10_to_80_min ?? DCFC_DEFAULT_MIN;
+      const minPerKwh = baseChargeMin / (battery * DCFC_STOP_SOC_FRACTION);
+      const winterMult = input.apply_winter_derate ? DCFC_WINTER_TIME_MULTIPLIER : 1.0;
+      const chargingMin = dcfcKwh * minPerKwh * winterMult;
+      const overheadMin = dcfcStops * DCFC_PER_STOP_OVERHEAD_MIN;
+      dcfcMin = chargingMin + overheadMin;
     } else if (v.powertrain === "phev") {
       const eRange = v.epa_range_mi_electric ?? 40;
       homeChargeSess = homeChargeSessions(input.daily_round_trip_mi, input.days_per_week, eRange);

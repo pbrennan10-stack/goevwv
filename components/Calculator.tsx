@@ -1129,12 +1129,12 @@ function FuelingTimePanel({
         Based on {out.long_trips_per_year} long road trip{out.long_trips_per_year !== 1 ? "s" : ""}/yr at ~{out.long_trip_one_way_mi} mi one-way.
         Uses each EV&rsquo;s <strong>realistic sustained highway range</strong> (not EPA) — Tesla&rsquo;s EPA
         numbers in particular overstate real-world WV highway range considerably.{" "}
-        <strong>DC fast charger (DCFC)</strong> stops top up to ~80% (past that the taper is painfully
-        slow), so each stop adds less range than a full home charge. Each DCFC
-        stop time includes ~4 min of plug-in, authentication, and unplug overhead;
-        winter charging is ~8% slower on average across 4 cold months. Home
-        charging is passive; DCFC stops and PHEV gas fill-ups are active
-        waiting time.
+        <strong>DC fast charger (DCFC)</strong> stops cap at ~80% SoC (past that the taper is
+        painfully slow), but the model only charges the kWh your specific trip actually needs —
+        a short top-up isn&rsquo;t modeled as a full 10→80% fill. Each DCFC stop time includes
+        ~4 min of plug-in, authentication, and unplug overhead; winter charging is ~8% slower
+        on average across 4 cold months. Home charging is passive; DCFC stops and PHEV gas
+        fill-ups are active waiting time.
       </p>
 
       {/* ICE baseline */}
@@ -1470,11 +1470,11 @@ function Assumptions({
             <strong>${fed.calculation_notes.dcfc_rate_per_kwh?.current.toFixed(2) ?? "0.48"}/kWh</strong>{" "}
             for long-trip kWh. Matches Electrify America&rsquo;s Pass (non-member)
             rate, the dominant public network on WV&rsquo;s interstates.
-            Home-charged kWh stay at your utility rate. Each DCFC stop tops the
-            battery from ~10% to ~80% SoC (70% of capacity), and each stop
-            includes ~4 min of plug-in, authentication, and unplug time beyond
-            the raw charging window. Members of EA Pass+ or EVgo+ pay
-            meaningfully less; this is the walk-up default.
+            Home-charged kWh stay at your utility rate. DCFC energy and time scale
+            to what the trip actually needs — a short top-up to reach your destination
+            isn&rsquo;t modeled as a full 10→80% charge. Each stop adds ~4 min of
+            plug-in, authentication, and unplug overhead beyond the charging window.
+            Members of EA Pass+ or EVgo+ pay meaningfully less; this is the walk-up default.
           </li>
           <li>
             WV EV road fee:{" "}
