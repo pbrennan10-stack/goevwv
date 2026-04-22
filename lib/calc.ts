@@ -80,9 +80,9 @@ function dcfcStopsPerRoundTrip(highwayRangeMi: number, oneWayMi: number): number
   // garage, Supercharger near hotel, etc.).
   //
   // Asymmetric usable windows matter:
-  //   - First tank (home → first stop): 100% SOC → ~15% buffer = 85% usable
+  //   - First tank (home → first stop): 100% SOC → ~10% buffer = 90% usable
   //   - Subsequent DCFC stops top to 80% only (past 80% the taper is painful)
-  //     → 80% → 15% buffer = 65% usable
+  //     → 80% → 10% buffer = 70% usable
   //
   // highwayRangeMi is the curated realistic sustained highway range at ~70 mph
   // (not EPA combined). This reflects aero drag at highway speeds, HVAC, WV
@@ -90,9 +90,9 @@ function dcfcStopsPerRoundTrip(highwayRangeMi: number, oneWayMi: number): number
   // overstated more than for other brands.
   if (!highwayRangeMi || highwayRangeMi <= 0) return 0;
   if (!oneWayMi || oneWayMi <= 0) return 0;
-  const firstSegMi = highwayRangeMi * 0.85;
+  const firstSegMi = highwayRangeMi * 0.90;
   if (oneWayMi <= firstSegMi) return 0;
-  const perStopMi = highwayRangeMi * 0.65;
+  const perStopMi = highwayRangeMi * 0.70;
   const stopsOneWay = Math.ceil((oneWayMi - firstSegMi) / perStopMi);
   return stopsOneWay * 2;
 }

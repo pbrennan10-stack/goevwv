@@ -623,7 +623,7 @@ export default function StateOfTheDataPage() {
             />
             <SourceRow
               label="Home-charged &ldquo;first tank&rdquo; of a long trip"
-              value="85% of usable highway range, no DCFC cost"
+              value="90% of usable highway range, no DCFC cost"
               source="Standard BEV road-trip planning"
               retrieved="Calculation methodology set 2026-04-18"
               confidence="verified"

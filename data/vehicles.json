@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "updated": "2026-04-19",
+    "updated": "2026-04-21",
     "schema_version": 1,
     "confidence": "approximate",
     "source_notes": "MSRPs reflect MY2025 base trims approximated from manufacturer sites and automotive press as of late 2025 / early 2026. Ranges are EPA-certified combined unless noted; winter_range_mi is our derated WV estimate (~28% haircut); highway_range_mi is curated for realistic sustained 70-mph driving. City/highway efficiency from EPA fueleconomy.gov. Per-field confidence and methodology are documented at /state-of-the-data — refresh MSRPs quarterly.",
@@ -89,9 +89,9 @@
       "epa_range_mi": 319,
       "winter_range_mi": 230,
       "highway_range_mi": 255,
-      "efficiency_kwh_per_100mi": 27,
-      "efficiency_kwh_per_100mi_city": 24,
-      "efficiency_kwh_per_100mi_highway": 30,
+      "efficiency_kwh_per_100mi": 33,
+      "efficiency_kwh_per_100mi_city": 30,
+      "efficiency_kwh_per_100mi_highway": 37,
       "battery_kwh": 85,
       "charging": {
         "home_max_kw": 11.5,
@@ -691,7 +691,7 @@
     {
       "id": "toyota-rav4-prime-2025",
       "make": "Toyota",
-      "model": "RAV4 Prime",
+      "model": "RAV4 Plug-in Hybrid",
       "trim": "SE",
       "year": 2025,
       "class": "suv",
@@ -723,8 +723,8 @@
     {
       "id": "ford-escape-phev-2025",
       "make": "Ford",
-      "model": "Escape PHEV",
-      "trim": "ST-Line Select",
+      "model": "Escape Plug-in Hybrid",
+      "trim": "Plug-in Hybrid",
       "year": 2025,
       "class": "suv",
       "powertrain": "phev",
@@ -883,7 +883,7 @@
       "id": "kia-ev9-2025",
       "make": "Kia",
       "model": "EV9",
-      "trim": "Wind RWD",
+      "trim": "Light Long Range RWD",
       "year": 2025,
       "class": "suv",
       "powertrain": "bev",
@@ -946,8 +946,8 @@
     {
       "id": "toyota-prius-prime-2025",
       "make": "Toyota",
-      "model": "Prius Prime",
-      "trim": "SE PHEV",
+      "model": "Prius Plug-in Hybrid",
+      "trim": "SE",
       "year": 2025,
       "class": "sedan",
       "powertrain": "phev",
@@ -1506,13 +1506,13 @@
       "class": "truck",
       "powertrain": "bev",
       "msrp_usd": 86700,
-      "epa_range_mi": 270,
-      "winter_range_mi": 194,
-      "highway_range_mi": 195,
-      "efficiency_kwh_per_100mi": 50,
-      "efficiency_kwh_per_100mi_city": 44,
-      "efficiency_kwh_per_100mi_highway": 58,
-      "battery_kwh": 92,
+      "epa_range_mi": 352,
+      "winter_range_mi": 253,
+      "highway_range_mi": 265,
+      "efficiency_kwh_per_100mi": 47,
+      "efficiency_kwh_per_100mi_city": 41,
+      "efficiency_kwh_per_100mi_highway": 54,
+      "battery_kwh": 135,
       "charging": {
         "home_max_kw": 11.5,
         "dcfc_peak_kw": 220,
@@ -1530,7 +1530,7 @@
       "us_canadian_parts_pct": null,
       "assembly_location": "Normal, IL",
       "assembly_country": "US",
-      "notes": "R1T Dual Motor Performance — 665 hp, 3.5s 0-60, same tow/payload as Standard. AALA-exempt; over $80k truck IRA cap before options."
+      "notes": "R1T Dual Motor Performance — 665 hp, 3.5s 0-60, same tow/payload as Standard. Ships with the Large pack (135 kWh / 352 mi EPA) as standard; Max pack (149 kWh / ~410 mi) available as an upgrade. AALA-exempt; over $80k truck IRA cap before options."
     },
     {
       "id": "rivian-r1s-performance-2025",
@@ -1541,13 +1541,13 @@
       "class": "suv",
       "powertrain": "bev",
       "msrp_usd": 92700,
-      "epa_range_mi": 270,
-      "winter_range_mi": 194,
-      "highway_range_mi": 195,
-      "efficiency_kwh_per_100mi": 53,
-      "efficiency_kwh_per_100mi_city": 47,
-      "efficiency_kwh_per_100mi_highway": 60,
-      "battery_kwh": 92,
+      "epa_range_mi": 352,
+      "winter_range_mi": 253,
+      "highway_range_mi": 265,
+      "efficiency_kwh_per_100mi": 51,
+      "efficiency_kwh_per_100mi_city": 45,
+      "efficiency_kwh_per_100mi_highway": 59,
+      "battery_kwh": 135,
       "charging": {
         "home_max_kw": 11.5,
         "dcfc_peak_kw": 220,
@@ -1564,7 +1564,7 @@
       "us_canadian_parts_pct": null,
       "assembly_location": "Normal, IL",
       "assembly_country": "US",
-      "notes": "R1S Dual Motor Performance — 665 hp, 3.5s 0-60 for a 3-row full-size SUV. AALA-exempt; over $80k SUV IRA cap."
+      "notes": "R1S Dual Motor Performance — 665 hp, 3.5s 0-60 for a 3-row full-size SUV. Ships with the Large pack (135 kWh / 352 mi EPA) as standard; Max pack (149 kWh / ~410 mi) available as an upgrade. AALA-exempt; over $80k SUV IRA cap."
     },
     {
       "id": "cadillac-escalade-iq-2025",

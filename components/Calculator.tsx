@@ -410,6 +410,20 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
                 {!utility.residential.tou_available && (
                   <span className="text-ink-soft"> — not offered by {utility.name}</span>
                 )}
+                {utility.residential.tou_available && utility.residential.tou_url && (
+                  <>
+                    {" "}
+                    <a
+                      href={utility.residential.tou_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="text-ink-soft underline decoration-dotted underline-offset-2 hover:text-brand"
+                    >
+                      program details ↗
+                    </a>
+                  </>
+                )}
               </span>
             </label>
             <label className="flex items-center gap-2 text-sm text-ink py-1.5 cursor-pointer">
@@ -1334,6 +1348,50 @@ function Row({
   );
 }
 
+// Contextual pointer to the selected utility's active EV programs — rebates and
+// TOU tariff. Lives inside the collapsed Assumptions accordion so it never
+// pulls focus from the calculator; shown only when the utility actually has
+// something to link to, so it silently no-ops for Mon Power and coops.
+function UtilityProgramsNote({ utility }: { utility: Utility }) {
+  const rebates = utility.rebates ?? [];
+  const touUrl = utility.residential.tou_url;
+  const touName = utility.residential.tou_program_name;
+  if (rebates.length === 0 && !touUrl) return null;
+  return (
+    <li>
+      <strong>{utility.name} EV programs</strong> (not included in the savings
+      math — apply separately):
+      <ul className="mt-1 ml-5 list-disc space-y-1">
+        {rebates.map((r) => (
+          <li key={r.id}>
+            <a
+              href={r.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline decoration-dotted underline-offset-2 hover:text-brand"
+            >
+              {r.name}
+              {r.amount_usd != null && <> — up to ${r.amount_usd}</>} ↗
+            </a>
+          </li>
+        ))}
+        {touUrl && (
+          <li>
+            <a
+              href={touUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline decoration-dotted underline-offset-2 hover:text-brand"
+            >
+              {touName ?? "Off-peak EV rate"} — program details ↗
+            </a>
+          </li>
+        )}
+      </ul>
+    </li>
+  );
+}
+
 function Assumptions({
   utility,
   winter,
@@ -1427,6 +1485,7 @@ function Assumptions({
             Federal EV tax credit (IRC 30D): <strong>repealed in 2025</strong>{" "}
             and not included in these estimates.
           </li>
+          <UtilityProgramsNote utility={utility} />
           {hasIceVehicle && (
             <li>
               Maintenance comparison: ICE costs use vehicle-specific data (oil
