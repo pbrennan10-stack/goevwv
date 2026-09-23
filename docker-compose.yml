@@ -18,6 +18,9 @@ services:
       NODE_ENV: production
       PORT: "3000"
       HOSTNAME: "0.0.0.0"
+      # Also needed at runtime: /chargers refreshes its OpenChargeMap data daily
+      # in the background, and OpenChargeMap rejects requests without a key.
+      OPENCHARGEMAP_API_KEY: ${OPENCHARGEMAP_API_KEY}
     # No ports exposed to the host; only Caddy talks to it over the internal network.
     networks:
       - goevwv_net

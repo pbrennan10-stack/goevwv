@@ -1,7 +1,7 @@
 {
   "_meta": {
-    "updated": "2026-04-21",
-    "note": "Maintenance: WV-area averages (RepairPal + AAA Your Driving Costs 2024, +5% for mountain road conditions). Insurance: estimated full-coverage annual premium for a 35-45 year old with clean record in WV — actual rates vary widely by driver history, coverage level, and ZIP code. tank_gallons: usable tank capacity for refueling-time calculation."
+    "updated": "2026-09-23",
+    "note": "Maintenance: WV-area averages originally from RepairPal + AAA Your Driving Costs 2024 (+5% for mountain road conditions), inflated 2026-09-23 for repair-cost growth (BLS CPI motor vehicle maintenance & repair +14% over two years): oil, brakes, misc ×1.15; tires ×1.05 (tire CPI ~flat). Insurance: estimated full-coverage annual premium for a 35-45 year old with a clean record in WV, scaled 2026-09-23 against 2026 WV averages (NerdWallet $2,144, Bankrate $2,162, ValuePenguin $2,148, Insurify $1,862): sedans ×1.15, SUVs/minivans ×1.25, pickups and Jeep Wrangler ×1.08. Actual rates vary widely by driver history, coverage level, and ZIP code. tank_gallons: usable tank capacity for refueling-time calculation."
   },
   "ice_vehicles": [
     {
@@ -13,15 +13,15 @@
       "class": "truck",
       "mpg_combined": 22,
       "tank_gallons": 23,
-      "annual_insurance_usd": 1850,
+      "annual_insurance_usd": 2000,
       "maintenance": {
-        "oil_change_usd": 85,
+        "oil_change_usd": 100,
         "oil_changes_per_year": 4,
-        "tire_set_usd": 950,
+        "tire_set_usd": 1000,
         "tire_life_miles": 50000,
-        "brake_service_usd": 650,
+        "brake_service_usd": 750,
         "brake_life_miles": 55000,
-        "misc_annual_usd": 300
+        "misc_annual_usd": 350
       }
     },
     {
@@ -33,15 +33,15 @@
       "class": "truck",
       "mpg_combined": 17,
       "tank_gallons": 24,
-      "annual_insurance_usd": 1800,
+      "annual_insurance_usd": 1940,
       "maintenance": {
-        "oil_change_usd": 80,
+        "oil_change_usd": 90,
         "oil_changes_per_year": 3,
-        "tire_set_usd": 900,
+        "tire_set_usd": 950,
         "tire_life_miles": 50000,
-        "brake_service_usd": 680,
+        "brake_service_usd": 780,
         "brake_life_miles": 55000,
-        "misc_annual_usd": 280
+        "misc_annual_usd": 320
       }
     },
     {
@@ -53,15 +53,15 @@
       "class": "truck",
       "mpg_combined": 17,
       "tank_gallons": 26,
-      "annual_insurance_usd": 1850,
+      "annual_insurance_usd": 2000,
       "maintenance": {
-        "oil_change_usd": 85,
+        "oil_change_usd": 100,
         "oil_changes_per_year": 3,
-        "tire_set_usd": 880,
+        "tire_set_usd": 920,
         "tire_life_miles": 50000,
-        "brake_service_usd": 720,
+        "brake_service_usd": 830,
         "brake_life_miles": 50000,
-        "misc_annual_usd": 280
+        "misc_annual_usd": 320
       }
     },
     {
@@ -73,15 +73,15 @@
       "class": "truck",
       "mpg_combined": 17,
       "tank_gallons": 24,
-      "annual_insurance_usd": 1800,
+      "annual_insurance_usd": 1940,
       "maintenance": {
-        "oil_change_usd": 80,
+        "oil_change_usd": 90,
         "oil_changes_per_year": 3,
-        "tire_set_usd": 900,
+        "tire_set_usd": 950,
         "tire_life_miles": 50000,
-        "brake_service_usd": 680,
+        "brake_service_usd": 780,
         "brake_life_miles": 55000,
-        "misc_annual_usd": 280
+        "misc_annual_usd": 320
       }
     },
     {
@@ -93,15 +93,15 @@
       "class": "truck",
       "mpg_combined": 23,
       "tank_gallons": 21,
-      "annual_insurance_usd": 1700,
+      "annual_insurance_usd": 1840,
       "maintenance": {
-        "oil_change_usd": 75,
+        "oil_change_usd": 85,
         "oil_changes_per_year": 3,
-        "tire_set_usd": 800,
+        "tire_set_usd": 840,
         "tire_life_miles": 50000,
-        "brake_service_usd": 550,
+        "brake_service_usd": 630,
         "brake_life_miles": 55000,
-        "misc_annual_usd": 250
+        "misc_annual_usd": 290
       }
     },
     {
@@ -113,15 +113,15 @@
       "class": "truck",
       "mpg_combined": 14,
       "tank_gallons": 26,
-      "annual_insurance_usd": 1950,
+      "annual_insurance_usd": 2110,
       "maintenance": {
-        "oil_change_usd": 110,
+        "oil_change_usd": 125,
         "oil_changes_per_year": 4,
-        "tire_set_usd": 1200,
+        "tire_set_usd": 1260,
         "tire_life_miles": 45000,
-        "brake_service_usd": 900,
+        "brake_service_usd": 1040,
         "brake_life_miles": 45000,
-        "misc_annual_usd": 380
+        "misc_annual_usd": 440
       }
     },
     {
@@ -133,15 +133,15 @@
       "class": "suv",
       "mpg_combined": 20,
       "tank_gallons": 21,
-      "annual_insurance_usd": 1850,
+      "annual_insurance_usd": 2000,
       "maintenance": {
-        "oil_change_usd": 80,
+        "oil_change_usd": 90,
         "oil_changes_per_year": 3,
-        "tire_set_usd": 900,
+        "tire_set_usd": 950,
         "tire_life_miles": 45000,
-        "brake_service_usd": 600,
+        "brake_service_usd": 690,
         "brake_life_miles": 50000,
-        "misc_annual_usd": 300
+        "misc_annual_usd": 350
       }
     },
     {
@@ -153,15 +153,15 @@
       "class": "suv",
       "mpg_combined": 17,
       "tank_gallons": 23,
-      "annual_insurance_usd": 1750,
+      "annual_insurance_usd": 2190,
       "maintenance": {
-        "oil_change_usd": 80,
+        "oil_change_usd": 90,
         "oil_changes_per_year": 2,
-        "tire_set_usd": 800,
+        "tire_set_usd": 840,
         "tire_life_miles": 55000,
-        "brake_service_usd": 550,
+        "brake_service_usd": 630,
         "brake_life_miles": 65000,
-        "misc_annual_usd": 250
+        "misc_annual_usd": 290
       }
     },
     {
@@ -173,15 +173,15 @@
       "class": "suv",
       "mpg_combined": 22,
       "tank_gallons": 24,
-      "annual_insurance_usd": 1700,
+      "annual_insurance_usd": 2130,
       "maintenance": {
-        "oil_change_usd": 80,
+        "oil_change_usd": 90,
         "oil_changes_per_year": 3,
-        "tire_set_usd": 820,
+        "tire_set_usd": 860,
         "tire_life_miles": 50000,
-        "brake_service_usd": 600,
+        "brake_service_usd": 690,
         "brake_life_miles": 55000,
-        "misc_annual_usd": 270
+        "misc_annual_usd": 310
       }
     },
     {
@@ -193,15 +193,15 @@
       "class": "suv",
       "mpg_combined": 22,
       "tank_gallons": 24,
-      "annual_insurance_usd": 1750,
+      "annual_insurance_usd": 2190,
       "maintenance": {
-        "oil_change_usd": 80,
+        "oil_change_usd": 90,
         "oil_changes_per_year": 3,
-        "tire_set_usd": 800,
+        "tire_set_usd": 840,
         "tire_life_miles": 50000,
-        "brake_service_usd": 580,
+        "brake_service_usd": 670,
         "brake_life_miles": 55000,
-        "misc_annual_usd": 280
+        "misc_annual_usd": 320
       }
     },
     {
@@ -213,15 +213,15 @@
       "class": "suv",
       "mpg_combined": 23,
       "tank_gallons": 18,
-      "annual_insurance_usd": 1650,
+      "annual_insurance_usd": 2060,
       "maintenance": {
-        "oil_change_usd": 75,
+        "oil_change_usd": 85,
         "oil_changes_per_year": 3,
-        "tire_set_usd": 780,
+        "tire_set_usd": 820,
         "tire_life_miles": 55000,
-        "brake_service_usd": 540,
+        "brake_service_usd": 620,
         "brake_life_miles": 60000,
-        "misc_annual_usd": 250
+        "misc_annual_usd": 290
       }
     },
     {
@@ -233,15 +233,15 @@
       "class": "suv",
       "mpg_combined": 17,
       "tank_gallons": 24,
-      "annual_insurance_usd": 1900,
+      "annual_insurance_usd": 2380,
       "maintenance": {
-        "oil_change_usd": 90,
+        "oil_change_usd": 105,
         "oil_changes_per_year": 3,
-        "tire_set_usd": 1000,
+        "tire_set_usd": 1050,
         "tire_life_miles": 50000,
-        "brake_service_usd": 750,
+        "brake_service_usd": 860,
         "brake_life_miles": 55000,
-        "misc_annual_usd": 320
+        "misc_annual_usd": 370
       }
     },
     {
@@ -253,15 +253,15 @@
       "class": "suv",
       "mpg_combined": 23,
       "tank_gallons": 19,
-      "annual_insurance_usd": 1600,
+      "annual_insurance_usd": 2000,
       "maintenance": {
-        "oil_change_usd": 80,
+        "oil_change_usd": 90,
         "oil_changes_per_year": 2,
-        "tire_set_usd": 760,
+        "tire_set_usd": 800,
         "tire_life_miles": 55000,
-        "brake_service_usd": 520,
+        "brake_service_usd": 600,
         "brake_life_miles": 62000,
-        "misc_annual_usd": 230
+        "misc_annual_usd": 260
       }
     },
     {
@@ -273,15 +273,15 @@
       "class": "suv",
       "mpg_combined": 23,
       "tank_gallons": 18,
-      "annual_insurance_usd": 1650,
+      "annual_insurance_usd": 2060,
       "maintenance": {
-        "oil_change_usd": 80,
+        "oil_change_usd": 90,
         "oil_changes_per_year": 2,
-        "tire_set_usd": 780,
+        "tire_set_usd": 820,
         "tire_life_miles": 55000,
-        "brake_service_usd": 540,
+        "brake_service_usd": 620,
         "brake_life_miles": 62000,
-        "misc_annual_usd": 230
+        "misc_annual_usd": 260
       }
     },
     {
@@ -293,15 +293,15 @@
       "class": "suv",
       "mpg_combined": 30,
       "tank_gallons": 15,
-      "annual_insurance_usd": 1550,
+      "annual_insurance_usd": 1940,
       "maintenance": {
-        "oil_change_usd": 65,
+        "oil_change_usd": 75,
         "oil_changes_per_year": 2,
-        "tire_set_usd": 700,
+        "tire_set_usd": 740,
         "tire_life_miles": 55000,
-        "brake_service_usd": 480,
+        "brake_service_usd": 550,
         "brake_life_miles": 65000,
-        "misc_annual_usd": 200
+        "misc_annual_usd": 230
       }
     },
     {
@@ -313,15 +313,15 @@
       "class": "suv",
       "mpg_combined": 30,
       "tank_gallons": 14,
-      "annual_insurance_usd": 1500,
+      "annual_insurance_usd": 1880,
       "maintenance": {
-        "oil_change_usd": 65,
+        "oil_change_usd": 75,
         "oil_changes_per_year": 2,
-        "tire_set_usd": 700,
+        "tire_set_usd": 740,
         "tire_life_miles": 60000,
-        "brake_service_usd": 460,
+        "brake_service_usd": 530,
         "brake_life_miles": 70000,
-        "misc_annual_usd": 180
+        "misc_annual_usd": 210
       }
     },
     {
@@ -333,15 +333,15 @@
       "class": "suv",
       "mpg_combined": 28,
       "tank_gallons": 15,
-      "annual_insurance_usd": 1500,
+      "annual_insurance_usd": 1880,
       "maintenance": {
-        "oil_change_usd": 65,
+        "oil_change_usd": 75,
         "oil_changes_per_year": 2,
-        "tire_set_usd": 650,
+        "tire_set_usd": 680,
         "tire_life_miles": 55000,
-        "brake_service_usd": 450,
+        "brake_service_usd": 520,
         "brake_life_miles": 65000,
-        "misc_annual_usd": 200
+        "misc_annual_usd": 230
       }
     },
     {
@@ -353,15 +353,15 @@
       "class": "suv",
       "mpg_combined": 26,
       "tank_gallons": 15,
-      "annual_insurance_usd": 1450,
+      "annual_insurance_usd": 1810,
       "maintenance": {
-        "oil_change_usd": 70,
+        "oil_change_usd": 80,
         "oil_changes_per_year": 3,
-        "tire_set_usd": 680,
+        "tire_set_usd": 710,
         "tire_life_miles": 55000,
-        "brake_service_usd": 480,
+        "brake_service_usd": 550,
         "brake_life_miles": 60000,
-        "misc_annual_usd": 200
+        "misc_annual_usd": 230
       }
     },
     {
@@ -373,15 +373,15 @@
       "class": "suv",
       "mpg_combined": 29,
       "tank_gallons": 19,
-      "annual_insurance_usd": 1400,
+      "annual_insurance_usd": 1750,
       "maintenance": {
-        "oil_change_usd": 65,
+        "oil_change_usd": 75,
         "oil_changes_per_year": 2,
-        "tire_set_usd": 680,
+        "tire_set_usd": 710,
         "tire_life_miles": 60000,
-        "brake_service_usd": 450,
+        "brake_service_usd": 520,
         "brake_life_miles": 68000,
-        "misc_annual_usd": 180
+        "misc_annual_usd": 210
       }
     },
     {
@@ -393,15 +393,15 @@
       "class": "suv",
       "mpg_combined": 33,
       "tank_gallons": 15,
-      "annual_insurance_usd": 1450,
+      "annual_insurance_usd": 1810,
       "maintenance": {
-        "oil_change_usd": 65,
+        "oil_change_usd": 75,
         "oil_changes_per_year": 2,
-        "tire_set_usd": 660,
+        "tire_set_usd": 690,
         "tire_life_miles": 55000,
-        "brake_service_usd": 440,
+        "brake_service_usd": 510,
         "brake_life_miles": 65000,
-        "misc_annual_usd": 180
+        "misc_annual_usd": 210
       }
     },
     {
@@ -413,15 +413,15 @@
       "class": "sedan",
       "mpg_combined": 32,
       "tank_gallons": 14,
-      "annual_insurance_usd": 1450,
+      "annual_insurance_usd": 1670,
       "maintenance": {
-        "oil_change_usd": 60,
+        "oil_change_usd": 70,
         "oil_changes_per_year": 2,
-        "tire_set_usd": 580,
+        "tire_set_usd": 610,
         "tire_life_miles": 60000,
-        "brake_service_usd": 400,
+        "brake_service_usd": 460,
         "brake_life_miles": 70000,
-        "misc_annual_usd": 150
+        "misc_annual_usd": 170
       }
     },
     {
@@ -433,15 +433,15 @@
       "class": "sedan",
       "mpg_combined": 32,
       "tank_gallons": 14,
-      "annual_insurance_usd": 1500,
+      "annual_insurance_usd": 1720,
       "maintenance": {
-        "oil_change_usd": 65,
+        "oil_change_usd": 75,
         "oil_changes_per_year": 2,
-        "tire_set_usd": 620,
+        "tire_set_usd": 650,
         "tire_life_miles": 60000,
-        "brake_service_usd": 420,
+        "brake_service_usd": 480,
         "brake_life_miles": 70000,
-        "misc_annual_usd": 160
+        "misc_annual_usd": 180
       }
     },
     {
@@ -453,15 +453,15 @@
       "class": "sedan",
       "mpg_combined": 32,
       "tank_gallons": 15,
-      "annual_insurance_usd": 1450,
+      "annual_insurance_usd": 1670,
       "maintenance": {
-        "oil_change_usd": 60,
+        "oil_change_usd": 70,
         "oil_changes_per_year": 2,
-        "tire_set_usd": 600,
+        "tire_set_usd": 630,
         "tire_life_miles": 60000,
-        "brake_service_usd": 400,
+        "brake_service_usd": 460,
         "brake_life_miles": 70000,
-        "misc_annual_usd": 150
+        "misc_annual_usd": 170
       }
     },
     {
@@ -473,15 +473,15 @@
       "class": "sedan",
       "mpg_combined": 32,
       "tank_gallons": 16,
-      "annual_insurance_usd": 1400,
+      "annual_insurance_usd": 1610,
       "maintenance": {
-        "oil_change_usd": 60,
+        "oil_change_usd": 70,
         "oil_changes_per_year": 2,
-        "tire_set_usd": 580,
+        "tire_set_usd": 610,
         "tire_life_miles": 60000,
-        "brake_service_usd": 400,
+        "brake_service_usd": 460,
         "brake_life_miles": 70000,
-        "misc_annual_usd": 150
+        "misc_annual_usd": 170
       }
     },
     {
@@ -493,15 +493,15 @@
       "class": "sedan",
       "mpg_combined": 34,
       "tank_gallons": 13,
-      "annual_insurance_usd": 1300,
+      "annual_insurance_usd": 1490,
       "maintenance": {
-        "oil_change_usd": 55,
+        "oil_change_usd": 65,
         "oil_changes_per_year": 2,
-        "tire_set_usd": 520,
+        "tire_set_usd": 550,
         "tire_life_miles": 65000,
-        "brake_service_usd": 350,
+        "brake_service_usd": 400,
         "brake_life_miles": 75000,
-        "misc_annual_usd": 130
+        "misc_annual_usd": 150
       }
     },
     {
@@ -513,15 +513,15 @@
       "class": "sedan",
       "mpg_combined": 30,
       "tank_gallons": 15,
-      "annual_insurance_usd": 1350,
+      "annual_insurance_usd": 1550,
       "maintenance": {
-        "oil_change_usd": 60,
+        "oil_change_usd": 70,
         "oil_changes_per_year": 2,
-        "tire_set_usd": 560,
+        "tire_set_usd": 590,
         "tire_life_miles": 60000,
-        "brake_service_usd": 380,
+        "brake_service_usd": 440,
         "brake_life_miles": 70000,
-        "misc_annual_usd": 160
+        "misc_annual_usd": 180
       }
     },
     {
@@ -533,15 +533,15 @@
       "class": "minivan",
       "mpg_combined": 22,
       "tank_gallons": 19,
-      "annual_insurance_usd": 1550,
+      "annual_insurance_usd": 1940,
       "maintenance": {
-        "oil_change_usd": 80,
+        "oil_change_usd": 90,
         "oil_changes_per_year": 2,
-        "tire_set_usd": 720,
+        "tire_set_usd": 760,
         "tire_life_miles": 55000,
-        "brake_service_usd": 500,
+        "brake_service_usd": 580,
         "brake_life_miles": 62000,
-        "misc_annual_usd": 220
+        "misc_annual_usd": 250
       }
     },
     {
@@ -553,15 +553,15 @@
       "class": "truck",
       "mpg_combined": 22,
       "tank_gallons": 18,
-      "annual_insurance_usd": 1680,
+      "annual_insurance_usd": 1810,
       "maintenance": {
-        "oil_change_usd": 85,
+        "oil_change_usd": 100,
         "oil_changes_per_year": 2,
-        "tire_set_usd": 780,
+        "tire_set_usd": 820,
         "tire_life_miles": 50000,
-        "brake_service_usd": 540,
+        "brake_service_usd": 620,
         "brake_life_miles": 60000,
-        "misc_annual_usd": 240
+        "misc_annual_usd": 280
       }
     },
     {
@@ -573,15 +573,15 @@
       "class": "truck",
       "mpg_combined": 19,
       "tank_gallons": 21,
-      "annual_insurance_usd": 1700,
+      "annual_insurance_usd": 1840,
       "maintenance": {
-        "oil_change_usd": 80,
+        "oil_change_usd": 90,
         "oil_changes_per_year": 2,
-        "tire_set_usd": 780,
+        "tire_set_usd": 820,
         "tire_life_miles": 50000,
-        "brake_service_usd": 540,
+        "brake_service_usd": 620,
         "brake_life_miles": 60000,
-        "misc_annual_usd": 240
+        "misc_annual_usd": 280
       }
     },
     {
@@ -593,15 +593,15 @@
       "class": "truck",
       "mpg_combined": 37,
       "tank_gallons": 13.8,
-      "annual_insurance_usd": 1450,
+      "annual_insurance_usd": 1570,
       "maintenance": {
-        "oil_change_usd": 70,
+        "oil_change_usd": 80,
         "oil_changes_per_year": 2,
-        "tire_set_usd": 620,
+        "tire_set_usd": 650,
         "tire_life_miles": 50000,
-        "brake_service_usd": 420,
+        "brake_service_usd": 480,
         "brake_life_miles": 85000,
-        "misc_annual_usd": 180
+        "misc_annual_usd": 210
       }
     },
     {
@@ -613,15 +613,15 @@
       "class": "truck",
       "mpg_combined": 20,
       "tank_gallons": 21,
-      "annual_insurance_usd": 1650,
+      "annual_insurance_usd": 1780,
       "maintenance": {
-        "oil_change_usd": 75,
+        "oil_change_usd": 85,
         "oil_changes_per_year": 2,
-        "tire_set_usd": 720,
+        "tire_set_usd": 760,
         "tire_life_miles": 50000,
-        "brake_service_usd": 520,
+        "brake_service_usd": 600,
         "brake_life_miles": 60000,
-        "misc_annual_usd": 230
+        "misc_annual_usd": 260
       }
     },
     {
@@ -633,15 +633,15 @@
       "class": "truck",
       "mpg_combined": 19,
       "tank_gallons": 23,
-      "annual_insurance_usd": 1850,
+      "annual_insurance_usd": 2000,
       "maintenance": {
-        "oil_change_usd": 80,
+        "oil_change_usd": 90,
         "oil_changes_per_year": 2,
-        "tire_set_usd": 880,
+        "tire_set_usd": 920,
         "tire_life_miles": 55000,
-        "brake_service_usd": 600,
+        "brake_service_usd": 690,
         "brake_life_miles": 62000,
-        "misc_annual_usd": 260
+        "misc_annual_usd": 300
       }
     },
     {
@@ -653,15 +653,15 @@
       "class": "suv",
       "mpg_combined": 24,
       "tank_gallons": 17.1,
-      "annual_insurance_usd": 1620,
+      "annual_insurance_usd": 2030,
       "maintenance": {
-        "oil_change_usd": 75,
+        "oil_change_usd": 85,
         "oil_changes_per_year": 2,
-        "tire_set_usd": 720,
+        "tire_set_usd": 760,
         "tire_life_miles": 55000,
-        "brake_service_usd": 500,
+        "brake_service_usd": 580,
         "brake_life_miles": 70000,
-        "misc_annual_usd": 210
+        "misc_annual_usd": 240
       }
     },
     {
@@ -673,15 +673,15 @@
       "class": "suv",
       "mpg_combined": 26,
       "tank_gallons": 18.8,
-      "annual_insurance_usd": 1580,
+      "annual_insurance_usd": 1980,
       "maintenance": {
-        "oil_change_usd": 75,
+        "oil_change_usd": 85,
         "oil_changes_per_year": 2,
-        "tire_set_usd": 680,
+        "tire_set_usd": 710,
         "tire_life_miles": 55000,
-        "brake_service_usd": 480,
+        "brake_service_usd": 550,
         "brake_life_miles": 70000,
-        "misc_annual_usd": 200
+        "misc_annual_usd": 230
       }
     },
     {
@@ -693,15 +693,15 @@
       "class": "suv",
       "mpg_combined": 23,
       "tank_gallons": 18.8,
-      "annual_insurance_usd": 1600,
+      "annual_insurance_usd": 2000,
       "maintenance": {
-        "oil_change_usd": 75,
+        "oil_change_usd": 85,
         "oil_changes_per_year": 2,
-        "tire_set_usd": 680,
+        "tire_set_usd": 710,
         "tire_life_miles": 55000,
-        "brake_service_usd": 480,
+        "brake_service_usd": 550,
         "brake_life_miles": 70000,
-        "misc_annual_usd": 200
+        "misc_annual_usd": 230
       }
     },
     {
@@ -713,15 +713,15 @@
       "class": "suv",
       "mpg_combined": 17,
       "tank_gallons": 28,
-      "annual_insurance_usd": 1880,
+      "annual_insurance_usd": 2350,
       "maintenance": {
-        "oil_change_usd": 85,
+        "oil_change_usd": 100,
         "oil_changes_per_year": 2,
-        "tire_set_usd": 880,
+        "tire_set_usd": 920,
         "tire_life_miles": 55000,
-        "brake_service_usd": 620,
+        "brake_service_usd": 710,
         "brake_life_miles": 62000,
-        "misc_annual_usd": 260
+        "misc_annual_usd": 300
       }
     },
     {
@@ -733,15 +733,15 @@
       "class": "suv",
       "mpg_combined": 29,
       "tank_gallons": 16.6,
-      "annual_insurance_usd": 1500,
+      "annual_insurance_usd": 1880,
       "maintenance": {
-        "oil_change_usd": 75,
+        "oil_change_usd": 85,
         "oil_changes_per_year": 2,
-        "tire_set_usd": 620,
+        "tire_set_usd": 650,
         "tire_life_miles": 55000,
-        "brake_service_usd": 460,
+        "brake_service_usd": 530,
         "brake_life_miles": 75000,
-        "misc_annual_usd": 190
+        "misc_annual_usd": 220
       }
     },
     {
@@ -753,15 +753,15 @@
       "class": "minivan",
       "mpg_combined": 35,
       "tank_gallons": 18,
-      "annual_insurance_usd": 1620,
+      "annual_insurance_usd": 2030,
       "maintenance": {
-        "oil_change_usd": 80,
+        "oil_change_usd": 90,
         "oil_changes_per_year": 2,
-        "tire_set_usd": 720,
+        "tire_set_usd": 760,
         "tire_life_miles": 55000,
-        "brake_service_usd": 500,
+        "brake_service_usd": 580,
         "brake_life_miles": 90000,
-        "misc_annual_usd": 210
+        "misc_annual_usd": 240
       }
     },
     {
@@ -773,15 +773,15 @@
       "class": "sedan",
       "mpg_combined": 36,
       "tank_gallons": 12.4,
-      "annual_insurance_usd": 1470,
+      "annual_insurance_usd": 1690,
       "maintenance": {
-        "oil_change_usd": 65,
+        "oil_change_usd": 75,
         "oil_changes_per_year": 2,
-        "tire_set_usd": 560,
+        "tire_set_usd": 590,
         "tire_life_miles": 55000,
-        "brake_service_usd": 420,
+        "brake_service_usd": 480,
         "brake_life_miles": 75000,
-        "misc_annual_usd": 170
+        "misc_annual_usd": 200
       }
     },
     {
@@ -793,15 +793,15 @@
       "class": "suv",
       "mpg_combined": 27,
       "tank_gallons": 13.2,
-      "annual_insurance_usd": 1480,
+      "annual_insurance_usd": 1850,
       "maintenance": {
-        "oil_change_usd": 70,
+        "oil_change_usd": 80,
         "oil_changes_per_year": 2,
-        "tire_set_usd": 600,
+        "tire_set_usd": 630,
         "tire_life_miles": 55000,
-        "brake_service_usd": 450,
+        "brake_service_usd": 520,
         "brake_life_miles": 75000,
-        "misc_annual_usd": 180
+        "misc_annual_usd": 210
       }
     },
     {
@@ -813,15 +813,15 @@
       "class": "sedan",
       "mpg_combined": 19,
       "tank_gallons": 13.7,
-      "annual_insurance_usd": 2200,
+      "annual_insurance_usd": 2530,
       "maintenance": {
-        "oil_change_usd": 120,
+        "oil_change_usd": 140,
         "oil_changes_per_year": 1,
-        "tire_set_usd": 1100,
+        "tire_set_usd": 1160,
         "tire_life_miles": 30000,
-        "brake_service_usd": 700,
+        "brake_service_usd": 800,
         "brake_life_miles": 60000,
-        "misc_annual_usd": 350
+        "misc_annual_usd": 400
       }
     },
     {
@@ -833,15 +833,15 @@
       "class": "sedan",
       "mpg_combined": 28,
       "tank_gallons": 15.6,
-      "annual_insurance_usd": 1850,
+      "annual_insurance_usd": 2130,
       "maintenance": {
-        "oil_change_usd": 120,
+        "oil_change_usd": 140,
         "oil_changes_per_year": 1,
-        "tire_set_usd": 900,
+        "tire_set_usd": 950,
         "tire_life_miles": 35000,
-        "brake_service_usd": 650,
+        "brake_service_usd": 750,
         "brake_life_miles": 55000,
-        "misc_annual_usd": 320
+        "misc_annual_usd": 370
       }
     },
     {
@@ -853,15 +853,15 @@
       "class": "suv",
       "mpg_combined": 26,
       "tank_gallons": 15.3,
-      "annual_insurance_usd": 1520,
+      "annual_insurance_usd": 1900,
       "maintenance": {
-        "oil_change_usd": 75,
+        "oil_change_usd": 85,
         "oil_changes_per_year": 2,
-        "tire_set_usd": 680,
+        "tire_set_usd": 710,
         "tire_life_miles": 55000,
-        "brake_service_usd": 480,
+        "brake_service_usd": 550,
         "brake_life_miles": 75000,
-        "misc_annual_usd": 190
+        "misc_annual_usd": 220
       }
     },
     {
@@ -873,15 +873,15 @@
       "class": "suv",
       "mpg_combined": 29,
       "tank_gallons": 16.6,
-      "annual_insurance_usd": 1470,
+      "annual_insurance_usd": 1840,
       "maintenance": {
-        "oil_change_usd": 75,
+        "oil_change_usd": 85,
         "oil_changes_per_year": 2,
-        "tire_set_usd": 620,
+        "tire_set_usd": 650,
         "tire_life_miles": 55000,
-        "brake_service_usd": 460,
+        "brake_service_usd": 530,
         "brake_life_miles": 75000,
-        "misc_annual_usd": 180
+        "misc_annual_usd": 210
       }
     },
     {
@@ -893,15 +893,15 @@
       "class": "suv",
       "mpg_combined": 26,
       "tank_gallons": 14.3,
-      "annual_insurance_usd": 1540,
+      "annual_insurance_usd": 1930,
       "maintenance": {
-        "oil_change_usd": 70,
+        "oil_change_usd": 80,
         "oil_changes_per_year": 2,
-        "tire_set_usd": 660,
+        "tire_set_usd": 690,
         "tire_life_miles": 55000,
-        "brake_service_usd": 460,
+        "brake_service_usd": 530,
         "brake_life_miles": 75000,
-        "misc_annual_usd": 180
+        "misc_annual_usd": 210
       }
     },
     {
@@ -913,15 +913,15 @@
       "class": "suv",
       "mpg_combined": 25,
       "tank_gallons": 17.2,
-      "annual_insurance_usd": 1720,
+      "annual_insurance_usd": 2150,
       "maintenance": {
-        "oil_change_usd": 110,
+        "oil_change_usd": 125,
         "oil_changes_per_year": 2,
-        "tire_set_usd": 900,
+        "tire_set_usd": 950,
         "tire_life_miles": 55000,
-        "brake_service_usd": 580,
+        "brake_service_usd": 670,
         "brake_life_miles": 80000,
-        "misc_annual_usd": 250
+        "misc_annual_usd": 290
       }
     },
     {
@@ -933,15 +933,15 @@
       "class": "suv",
       "mpg_combined": 25,
       "tank_gallons": 15.3,
-      "annual_insurance_usd": 1550,
+      "annual_insurance_usd": 1940,
       "maintenance": {
-        "oil_change_usd": 95,
+        "oil_change_usd": 110,
         "oil_changes_per_year": 2,
-        "tire_set_usd": 720,
+        "tire_set_usd": 760,
         "tire_life_miles": 50000,
-        "brake_service_usd": 500,
+        "brake_service_usd": 580,
         "brake_life_miles": 70000,
-        "misc_annual_usd": 220
+        "misc_annual_usd": 250
       }
     },
     {
@@ -953,15 +953,15 @@
       "class": "suv",
       "mpg_combined": 26,
       "tank_gallons": 13.7,
-      "annual_insurance_usd": 1600,
+      "annual_insurance_usd": 2000,
       "maintenance": {
-        "oil_change_usd": 85,
+        "oil_change_usd": 100,
         "oil_changes_per_year": 2,
-        "tire_set_usd": 720,
+        "tire_set_usd": 760,
         "tire_life_miles": 50000,
-        "brake_service_usd": 500,
+        "brake_service_usd": 580,
         "brake_life_miles": 70000,
-        "misc_annual_usd": 210
+        "misc_annual_usd": 240
       }
     },
     {
@@ -973,15 +973,15 @@
       "class": "suv",
       "mpg_combined": 23,
       "tank_gallons": 18.5,
-      "annual_insurance_usd": 1600,
+      "annual_insurance_usd": 2000,
       "maintenance": {
-        "oil_change_usd": 85,
+        "oil_change_usd": 100,
         "oil_changes_per_year": 2,
-        "tire_set_usd": 780,
+        "tire_set_usd": 820,
         "tire_life_miles": 55000,
-        "brake_service_usd": 520,
+        "brake_service_usd": 600,
         "brake_life_miles": 70000,
-        "misc_annual_usd": 220
+        "misc_annual_usd": 250
       }
     },
     {
@@ -993,15 +993,15 @@
       "class": "suv",
       "mpg_combined": 23,
       "tank_gallons": 22.4,
-      "annual_insurance_usd": 1650,
+      "annual_insurance_usd": 2060,
       "maintenance": {
-        "oil_change_usd": 80,
+        "oil_change_usd": 90,
         "oil_changes_per_year": 2,
-        "tire_set_usd": 780,
+        "tire_set_usd": 820,
         "tire_life_miles": 55000,
-        "brake_service_usd": 540,
+        "brake_service_usd": 620,
         "brake_life_miles": 70000,
-        "misc_annual_usd": 230
+        "misc_annual_usd": 260
       }
     },
     {
@@ -1013,15 +1013,15 @@
       "class": "suv",
       "mpg_combined": 23,
       "tank_gallons": 19.5,
-      "annual_insurance_usd": 1620,
+      "annual_insurance_usd": 2030,
       "maintenance": {
-        "oil_change_usd": 80,
+        "oil_change_usd": 90,
         "oil_changes_per_year": 2,
-        "tire_set_usd": 720,
+        "tire_set_usd": 760,
         "tire_life_miles": 55000,
-        "brake_service_usd": 520,
+        "brake_service_usd": 600,
         "brake_life_miles": 70000,
-        "misc_annual_usd": 210
+        "misc_annual_usd": 240
       }
     },
     {
@@ -1033,15 +1033,15 @@
       "class": "hatchback",
       "mpg_combined": 33,
       "tank_gallons": 12.4,
-      "annual_insurance_usd": 1450,
+      "annual_insurance_usd": 1670,
       "maintenance": {
-        "oil_change_usd": 65,
+        "oil_change_usd": 75,
         "oil_changes_per_year": 2,
-        "tire_set_usd": 580,
+        "tire_set_usd": 610,
         "tire_life_miles": 55000,
-        "brake_service_usd": 430,
+        "brake_service_usd": 490,
         "brake_life_miles": 75000,
-        "misc_annual_usd": 175
+        "misc_annual_usd": 200
       }
     },
     {
@@ -1053,15 +1053,15 @@
       "class": "hatchback",
       "mpg_combined": 33,
       "tank_gallons": 13.2,
-      "annual_insurance_usd": 1450,
+      "annual_insurance_usd": 1670,
       "maintenance": {
-        "oil_change_usd": 70,
+        "oil_change_usd": 80,
         "oil_changes_per_year": 2,
-        "tire_set_usd": 600,
+        "tire_set_usd": 630,
         "tire_life_miles": 55000,
-        "brake_service_usd": 450,
+        "brake_service_usd": 520,
         "brake_life_miles": 75000,
-        "misc_annual_usd": 180
+        "misc_annual_usd": 210
       }
     },
     {
@@ -1073,15 +1073,15 @@
       "class": "sedan",
       "mpg_combined": 37,
       "tank_gallons": 12.4,
-      "annual_insurance_usd": 1400,
+      "annual_insurance_usd": 1610,
       "maintenance": {
-        "oil_change_usd": 65,
+        "oil_change_usd": 75,
         "oil_changes_per_year": 2,
-        "tire_set_usd": 560,
+        "tire_set_usd": 590,
         "tire_life_miles": 55000,
-        "brake_service_usd": 420,
+        "brake_service_usd": 480,
         "brake_life_miles": 75000,
-        "misc_annual_usd": 170
+        "misc_annual_usd": 200
       }
     },
     {
@@ -1093,15 +1093,15 @@
       "class": "sedan",
       "mpg_combined": 18,
       "tank_gallons": 16,
-      "annual_insurance_usd": 1950,
+      "annual_insurance_usd": 2240,
       "maintenance": {
-        "oil_change_usd": 90,
+        "oil_change_usd": 105,
         "oil_changes_per_year": 2,
-        "tire_set_usd": 950,
+        "tire_set_usd": 1000,
         "tire_life_miles": 35000,
-        "brake_service_usd": 600,
+        "brake_service_usd": 690,
         "brake_life_miles": 60000,
-        "misc_annual_usd": 300
+        "misc_annual_usd": 350
       }
     },
     {
@@ -1113,15 +1113,15 @@
       "class": "truck",
       "mpg_combined": 19,
       "tank_gallons": 22,
-      "annual_insurance_usd": 1850,
+      "annual_insurance_usd": 2000,
       "maintenance": {
-        "oil_change_usd": 85,
+        "oil_change_usd": 100,
         "oil_changes_per_year": 3,
-        "tire_set_usd": 900,
+        "tire_set_usd": 950,
         "tire_life_miles": 45000,
-        "brake_service_usd": 620,
+        "brake_service_usd": 710,
         "brake_life_miles": 50000,
-        "misc_annual_usd": 300
+        "misc_annual_usd": 350
       }
     },
     {
@@ -1133,15 +1133,15 @@
       "class": "suv",
       "mpg_combined": 21,
       "tank_gallons": 20.8,
-      "annual_insurance_usd": 1800,
+      "annual_insurance_usd": 2250,
       "maintenance": {
-        "oil_change_usd": 85,
+        "oil_change_usd": 100,
         "oil_changes_per_year": 3,
-        "tire_set_usd": 900,
+        "tire_set_usd": 950,
         "tire_life_miles": 45000,
-        "brake_service_usd": 600,
+        "brake_service_usd": 690,
         "brake_life_miles": 55000,
-        "misc_annual_usd": 280
+        "misc_annual_usd": 320
       }
     },
     {
@@ -1153,15 +1153,15 @@
       "class": "truck",
       "mpg_combined": 13,
       "tank_gallons": 31,
-      "annual_insurance_usd": 2000,
+      "annual_insurance_usd": 2160,
       "maintenance": {
-        "oil_change_usd": 115,
+        "oil_change_usd": 130,
         "oil_changes_per_year": 4,
-        "tire_set_usd": 1250,
+        "tire_set_usd": 1310,
         "tire_life_miles": 45000,
-        "brake_service_usd": 920,
+        "brake_service_usd": 1060,
         "brake_life_miles": 45000,
-        "misc_annual_usd": 400
+        "misc_annual_usd": 460
       }
     },
     {
@@ -1173,15 +1173,15 @@
       "class": "minivan",
       "mpg_combined": 22,
       "tank_gallons": 19,
-      "annual_insurance_usd": 1550,
+      "annual_insurance_usd": 1940,
       "maintenance": {
-        "oil_change_usd": 80,
+        "oil_change_usd": 90,
         "oil_changes_per_year": 2,
-        "tire_set_usd": 720,
+        "tire_set_usd": 760,
         "tire_life_miles": 55000,
-        "brake_service_usd": 520,
+        "brake_service_usd": 600,
         "brake_life_miles": 60000,
-        "misc_annual_usd": 230
+        "misc_annual_usd": 260
       }
     },
     {
@@ -1193,15 +1193,15 @@
       "class": "minivan",
       "mpg_combined": 22,
       "tank_gallons": 19,
-      "annual_insurance_usd": 1530,
+      "annual_insurance_usd": 1910,
       "maintenance": {
-        "oil_change_usd": 75,
+        "oil_change_usd": 85,
         "oil_changes_per_year": 2,
-        "tire_set_usd": 700,
+        "tire_set_usd": 740,
         "tire_life_miles": 55000,
-        "brake_service_usd": 500,
+        "brake_service_usd": 580,
         "brake_life_miles": 65000,
-        "misc_annual_usd": 210
+        "misc_annual_usd": 240
       }
     },
     {
@@ -1213,15 +1213,15 @@
       "class": "truck",
       "mpg_combined": 21,
       "tank_gallons": 19.5,
-      "annual_insurance_usd": 1700,
+      "annual_insurance_usd": 1840,
       "maintenance": {
-        "oil_change_usd": 80,
+        "oil_change_usd": 90,
         "oil_changes_per_year": 2,
-        "tire_set_usd": 760,
+        "tire_set_usd": 800,
         "tire_life_miles": 55000,
-        "brake_service_usd": 540,
+        "brake_service_usd": 620,
         "brake_life_miles": 65000,
-        "misc_annual_usd": 230
+        "misc_annual_usd": 260
       }
     },
     {
@@ -1233,15 +1233,15 @@
       "class": "hatchback",
       "mpg_combined": 57,
       "tank_gallons": 10.6,
-      "annual_insurance_usd": 1500,
+      "annual_insurance_usd": 1720,
       "maintenance": {
-        "oil_change_usd": 65,
+        "oil_change_usd": 75,
         "oil_changes_per_year": 2,
-        "tire_set_usd": 600,
+        "tire_set_usd": 630,
         "tire_life_miles": 55000,
-        "brake_service_usd": 420,
+        "brake_service_usd": 480,
         "brake_life_miles": 90000,
-        "misc_annual_usd": 170
+        "misc_annual_usd": 200
       }
     },
     {
@@ -1253,15 +1253,15 @@
       "class": "suv",
       "mpg_combined": 23,
       "tank_gallons": 19.3,
-      "annual_insurance_usd": 1620,
+      "annual_insurance_usd": 2030,
       "maintenance": {
-        "oil_change_usd": 80,
+        "oil_change_usd": 90,
         "oil_changes_per_year": 2,
-        "tire_set_usd": 780,
+        "tire_set_usd": 820,
         "tire_life_miles": 55000,
-        "brake_service_usd": 520,
+        "brake_service_usd": 600,
         "brake_life_miles": 70000,
-        "misc_annual_usd": 220
+        "misc_annual_usd": 250
       }
     },
     {
@@ -1273,15 +1273,15 @@
       "class": "suv",
       "mpg_combined": 21,
       "tank_gallons": 18.8,
-      "annual_insurance_usd": 1650,
+      "annual_insurance_usd": 2060,
       "maintenance": {
-        "oil_change_usd": 80,
+        "oil_change_usd": 90,
         "oil_changes_per_year": 2,
-        "tire_set_usd": 780,
+        "tire_set_usd": 820,
         "tire_life_miles": 55000,
-        "brake_service_usd": 540,
+        "brake_service_usd": 620,
         "brake_life_miles": 70000,
-        "misc_annual_usd": 230
+        "misc_annual_usd": 260
       }
     },
     {
@@ -1293,15 +1293,15 @@
       "class": "suv",
       "mpg_combined": 18,
       "tank_gallons": 23.5,
-      "annual_insurance_usd": 1880,
+      "annual_insurance_usd": 2350,
       "maintenance": {
-        "oil_change_usd": 90,
+        "oil_change_usd": 105,
         "oil_changes_per_year": 3,
-        "tire_set_usd": 1000,
+        "tire_set_usd": 1050,
         "tire_life_miles": 50000,
-        "brake_service_usd": 740,
+        "brake_service_usd": 850,
         "brake_life_miles": 55000,
-        "misc_annual_usd": 320
+        "misc_annual_usd": 370
       }
     },
     {
@@ -1313,15 +1313,15 @@
       "class": "suv",
       "mpg_combined": 17,
       "tank_gallons": 24,
-      "annual_insurance_usd": 1880,
+      "annual_insurance_usd": 2350,
       "maintenance": {
-        "oil_change_usd": 90,
+        "oil_change_usd": 105,
         "oil_changes_per_year": 3,
-        "tire_set_usd": 1000,
+        "tire_set_usd": 1050,
         "tire_life_miles": 50000,
-        "brake_service_usd": 740,
+        "brake_service_usd": 850,
         "brake_life_miles": 55000,
-        "misc_annual_usd": 310
+        "misc_annual_usd": 360
       }
     },
     {
@@ -1333,15 +1333,15 @@
       "class": "suv",
       "mpg_combined": 21,
       "tank_gallons": 19.5,
-      "annual_insurance_usd": 1650,
+      "annual_insurance_usd": 2060,
       "maintenance": {
-        "oil_change_usd": 80,
+        "oil_change_usd": 90,
         "oil_changes_per_year": 2,
-        "tire_set_usd": 780,
+        "tire_set_usd": 820,
         "tire_life_miles": 55000,
-        "brake_service_usd": 540,
+        "brake_service_usd": 620,
         "brake_life_miles": 65000,
-        "misc_annual_usd": 230
+        "misc_annual_usd": 260
       }
     },
     {
@@ -1353,15 +1353,15 @@
       "class": "suv",
       "mpg_combined": 25,
       "tank_gallons": 19.5,
-      "annual_insurance_usd": 1650,
+      "annual_insurance_usd": 2060,
       "maintenance": {
-        "oil_change_usd": 85,
+        "oil_change_usd": 100,
         "oil_changes_per_year": 2,
-        "tire_set_usd": 820,
+        "tire_set_usd": 860,
         "tire_life_miles": 55000,
-        "brake_service_usd": 540,
+        "brake_service_usd": 620,
         "brake_life_miles": 70000,
-        "misc_annual_usd": 230
+        "misc_annual_usd": 260
       }
     },
     {
@@ -1373,15 +1373,15 @@
       "class": "suv",
       "mpg_combined": 22,
       "tank_gallons": 18.6,
-      "annual_insurance_usd": 1620,
+      "annual_insurance_usd": 2030,
       "maintenance": {
-        "oil_change_usd": 95,
+        "oil_change_usd": 110,
         "oil_changes_per_year": 2,
-        "tire_set_usd": 780,
+        "tire_set_usd": 820,
         "tire_life_miles": 50000,
-        "brake_service_usd": 560,
+        "brake_service_usd": 640,
         "brake_life_miles": 65000,
-        "misc_annual_usd": 240
+        "misc_annual_usd": 280
       }
     },
     {
@@ -1393,15 +1393,15 @@
       "class": "suv",
       "mpg_combined": 15,
       "tank_gallons": 24,
-      "annual_insurance_usd": 2100,
+      "annual_insurance_usd": 2630,
       "maintenance": {
-        "oil_change_usd": 115,
+        "oil_change_usd": 130,
         "oil_changes_per_year": 3,
-        "tire_set_usd": 1300,
+        "tire_set_usd": 1370,
         "tire_life_miles": 45000,
-        "brake_service_usd": 880,
+        "brake_service_usd": 1010,
         "brake_life_miles": 55000,
-        "misc_annual_usd": 380
+        "misc_annual_usd": 440
       }
     },
     {
@@ -1413,15 +1413,15 @@
       "class": "suv",
       "mpg_combined": 25,
       "tank_gallons": 14.5,
-      "annual_insurance_usd": 1680,
+      "annual_insurance_usd": 2100,
       "maintenance": {
-        "oil_change_usd": 100,
+        "oil_change_usd": 115,
         "oil_changes_per_year": 2,
-        "tire_set_usd": 820,
+        "tire_set_usd": 860,
         "tire_life_miles": 55000,
-        "brake_service_usd": 560,
+        "brake_service_usd": 640,
         "brake_life_miles": 80000,
-        "misc_annual_usd": 240
+        "misc_annual_usd": 280
       }
     },
     {
@@ -1433,15 +1433,15 @@
       "class": "suv",
       "mpg_combined": 25,
       "tank_gallons": 18.5,
-      "annual_insurance_usd": 1780,
+      "annual_insurance_usd": 2230,
       "maintenance": {
-        "oil_change_usd": 125,
+        "oil_change_usd": 145,
         "oil_changes_per_year": 1,
-        "tire_set_usd": 960,
+        "tire_set_usd": 1010,
         "tire_life_miles": 40000,
-        "brake_service_usd": 700,
+        "brake_service_usd": 800,
         "brake_life_miles": 60000,
-        "misc_annual_usd": 340
+        "misc_annual_usd": 390
       }
     },
     {
@@ -1453,15 +1453,15 @@
       "class": "suv",
       "mpg_combined": 21,
       "tank_gallons": 19.5,
-      "annual_insurance_usd": 1780,
+      "annual_insurance_usd": 2230,
       "maintenance": {
-        "oil_change_usd": 100,
+        "oil_change_usd": 115,
         "oil_changes_per_year": 2,
-        "tire_set_usd": 880,
+        "tire_set_usd": 920,
         "tire_life_miles": 55000,
-        "brake_service_usd": 580,
+        "brake_service_usd": 670,
         "brake_life_miles": 70000,
-        "misc_annual_usd": 260
+        "misc_annual_usd": 300
       }
     },
     {
@@ -1473,15 +1473,15 @@
       "class": "suv",
       "mpg_combined": 20,
       "tank_gallons": 21,
-      "annual_insurance_usd": 1640,
+      "annual_insurance_usd": 2050,
       "maintenance": {
-        "oil_change_usd": 85,
+        "oil_change_usd": 100,
         "oil_changes_per_year": 2,
-        "tire_set_usd": 820,
+        "tire_set_usd": 860,
         "tire_life_miles": 55000,
-        "brake_service_usd": 560,
+        "brake_service_usd": 640,
         "brake_life_miles": 65000,
-        "misc_annual_usd": 250
+        "misc_annual_usd": 290
       }
     },
     {
@@ -1493,15 +1493,15 @@
       "class": "suv",
       "mpg_combined": 26,
       "tank_gallons": 14.8,
-      "annual_insurance_usd": 1520,
+      "annual_insurance_usd": 1900,
       "maintenance": {
-        "oil_change_usd": 70,
+        "oil_change_usd": 80,
         "oil_changes_per_year": 2,
-        "tire_set_usd": 680,
+        "tire_set_usd": 710,
         "tire_life_miles": 55000,
-        "brake_service_usd": 460,
+        "brake_service_usd": 530,
         "brake_life_miles": 70000,
-        "misc_annual_usd": 200
+        "misc_annual_usd": 230
       }
     }
   ]

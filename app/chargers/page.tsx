@@ -30,10 +30,11 @@ function parseCoords(raw: string | null): [number, number] | null {
 }
 
 export default async function ChargersPage({
-  searchParams,
+  searchParams: searchParamsPromise,
 }: {
-  searchParams: SearchParams;
+  searchParams: Promise<SearchParams>;
 }) {
+  const searchParams = await searchParamsPromise;
   const { chargers, retrieved_at, error } = await getChargers();
   const dcfcCount = chargers.filter((c) => c.is_dcfc).length;
   const l2Count = chargers.length - dcfcCount;

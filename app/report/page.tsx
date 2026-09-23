@@ -4,7 +4,7 @@ import { Logo } from "@/components/Logo";
 import { CopyLinkButton, PrintButton } from "@/components/PrintButton";
 import { annualIceMaintenance, calculate, fmtNum, fmtUSD, fmtUSDsigned } from "@/lib/calc";
 import { getFederalData, getIceVehicles, getUtilities, getVehicles } from "@/lib/data";
-import type { Vehicle, VehicleResult } from "@/lib/types";
+import type { RouteData, Vehicle, VehicleResult } from "@/lib/types";
 
 export const metadata: Metadata = {
   title: "Your WV EV analysis — GoEV WV",
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-// Next.js 14 App Router: searchParams is a plain record
+// Next.js 15 App Router: searchParams arrives as a Promise of a plain record
 type SearchParams = Record<string, string | string[] | undefined>;
 
 function str(p: SearchParams, k: string, fallback: string): string {
@@ -31,8 +31,12 @@ function bool(p: SearchParams, k: string, fallback: boolean): boolean {
   return raw === "1" || raw === "true";
 }
 
-export default function ReportPage({ searchParams }: { searchParams: SearchParams }) {
-  const p = searchParams;
+export default async function ReportPage({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>;
+}) {
+  const p = await searchParams;
 
   const vehicles = getVehicles();
   const iceVehicles = getIceVehicles();
@@ -45,12 +49,28 @@ export default function ReportPage({ searchParams }: { searchParams: SearchParam
   const useTOU = bool(p, "tou", false);
   const winter = bool(p, "w", true);
   const mpg = num(p, "mpg", 25);
-  const gasPrice = num(p, "gas", 3.90);
+  const gasPrice = num(p, "gas", federal.calculation_notes.gas_price_baseline_per_gal.current);
   const longTrips = num(p, "lt", 4);
   const longTripMi = num(p, "ltm", 200);
   const vidsRaw = str(p, "v", "");
   const selectedIds = vidsRaw.split(",").filter(Boolean).slice(0, 3);
   const iceVehicleId = str(p, "iv", "");
+  const ownershipPlan = str(p, "op", "replace") === "keep" ? "keep" : "replace";
+
+  // Commute-route details (highway share, speed, elevation) — same URL params
+  // the calculator writes, so the printed numbers match the screen.
+  const hfRaw = str(p, "hf", "");
+  const hf = Number(hfRaw);
+  const route: RouteData | undefined =
+    hfRaw !== "" && Number.isFinite(hf)
+      ? {
+          distance_mi: daily / 2,
+          highway_fraction: hf,
+          highway_avg_speed_mph: num(p, "hs", 55),
+          elevation_gain_m: num(p, "el", 0),
+          summary: "",
+        }
+      : undefined;
 
   const utility = utilities.find((u) => u.id === utilityId) ?? utilities[0];
   const selectedVehicles = vehicles.filter((v) => selectedIds.includes(v.id));
@@ -85,6 +105,8 @@ export default function ReportPage({ searchParams }: { searchParams: SearchParam
       vehicle_ids: selectedIds,
       long_trips_per_year: longTrips,
       long_trip_one_way_mi: longTripMi,
+      route,
+      ownership_plan: ownershipPlan,
     },
     { vehicles: selectedVehicles, utility, fed: federal },
   );
@@ -97,7 +119,7 @@ export default function ReportPage({ searchParams }: { searchParams: SearchParam
     <main className="mx-auto max-w-content px-4 sm:px-6 py-8 print:py-4 print:max-w-full">
       {/* Actions — hidden when printing */}
       <div className="no-print flex items-center justify-between gap-3 flex-wrap mb-8">
-        <Link href={`/?${editInputsQuery(p)}`} className="text-sm text-ink-soft hover:text-ink">
+        <Link href={`/calculator?${editInputsQuery(p)}`} className="text-sm text-ink-soft hover:text-ink">
           ← Edit inputs
         </Link>
         <div className="flex gap-2">
@@ -142,6 +164,14 @@ export default function ReportPage({ searchParams }: { searchParams: SearchParam
           <InputRow label="Gas price" value={`$${gasPrice.toFixed(2)}/gal`} />
           <InputRow label="Long road trips/yr" value={`${longTrips}`} />
           <InputRow label="Long-trip one-way" value={`${longTripMi} mi`} />
+          {route && (
+            <InputRow
+              label="Commute route"
+              value={`${Math.round(route.highway_fraction * 100)}% highway${
+                route.elevation_gain_m >= 6 ? ` · ${Math.round(route.elevation_gain_m * 3.281)} ft elevation` : ""
+              }`}
+            />
+          )}
         </dl>
       </section>
 
@@ -191,21 +221,24 @@ export default function ReportPage({ searchParams }: { searchParams: SearchParam
             Winter derate: {winter ? "ON (+12% annual kWh, reflects 4 cold months of ~28% range loss)" : "OFF"}.
           </li>
           <li>
-            WV state EV fee: $200/yr BEV, $100/yr PHEV — included in annual total.
+            WV state EV fee: ${federal.wv_state_fees.bev_annual_fee.amount_usd}/yr BEV, ${federal.wv_state_fees.phev_annual_fee.amount_usd}/yr PHEV — included in annual total.
           </li>
           <li>
-            Federal IRA EV tax credit repealed in 2025 — not included.
+            Federal EV tax credits ended for purchases after Sept 30, 2025, and the home-charger credit
+            ended June 30, 2026 — neither is included.
           </li>
           <li>
-            PHEVs modeled at 65% electric / 35% gas miles (INL/Argonne fleet data).
+            Plug-in hybrids assume nightly charging: electric until the battery range is used each day,
+            then gas.
           </li>
           <li>
-            WV grid CO₂ factor: 0.67 kg/kWh (EIA state profile). WV is part of PJM, so as the grid adds
-            renewables, EV emissions fall automatically — a gas car&rsquo;s emissions never change.
+            Grid CO₂ factor: 0.44 kg/kWh (EPA eGRID, RFCW/PJM region incl. grid losses). As the grid adds
+            cleaner generation, EV emissions fall automatically — a gas car&rsquo;s emissions never change.
           </li>
           <li>
-            Resale: EVs typically depreciate 50–65% over 5 years nationally. WV has ~1,900 registered EVs —
-            a thin local resale market may mean steeper depreciation.
+            Resale: EVs lost ~57% of their value over 5 years in 2026 data (iSeeCars) vs ~42% for all
+            vehicles. WV has only ~5,000 registered EVs — a thin local resale market may mean steeper
+            depreciation.
           </li>
           <li>
             Estimates, not professional financial advice. Rate and rebate data reviewed quarterly.
@@ -273,7 +306,7 @@ function ReportCard({ r, hasIce }: { r: VehicleResult; hasIce: boolean }) {
           <span className="text-[10px] font-normal opacity-70"> /yr</span>
         </div>
         <div className="text-[10px] opacity-75">
-          {fmtUSD(Math.abs(r.five_year_savings_vs_current_usd))} {positive ? "saved" : "more"} over 5 yr
+          {fmtUSD(Math.abs(r.five_year_savings_vs_current_usd))} {positive ? "saved" : "more"} in running costs over 5 yr
         </div>
       </div>
 

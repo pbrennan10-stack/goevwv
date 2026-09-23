@@ -14,7 +14,7 @@ import {
 export const metadata: Metadata = {
   title: "EV Cost Calculator",
   description:
-    "Enter your commute, pick up to three EVs or PHEVs, and see WV-specific numbers on charging cost, annual savings, winter range, and 5-year total cost of ownership.",
+    "Enter your commute, pick up to three EVs or PHEVs, and see WV-specific numbers on charging cost, annual savings, winter range, and 5-year running costs.",
 };
 
 export default function CalculatorPage() {
@@ -67,8 +67,8 @@ export default function CalculatorPage() {
         </h1>
         <p className="mt-2 text-sm sm:text-base text-ink-muted max-w-prose">
           Enter your commute and utility, pick up to three vehicles, and see
-          charging cost, annual savings, and 5-year total cost of ownership —
-          with winter range and the WV EV fee factored in.
+          charging cost, annual savings, and 5-year running costs — with
+          winter range and the WV EV fee factored in.
         </p>
       </section>
 

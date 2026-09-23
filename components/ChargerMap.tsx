@@ -141,8 +141,8 @@ export function ChargerMap({
   const [routeError, setRouteError] = useState<string | null>(null);
   const [bufferMi, setBufferMi] = useState(initialBufferMi);
 
-  const originTimer = useRef<ReturnType<typeof setTimeout>>();
-  const destTimer = useRef<ReturnType<typeof setTimeout>>();
+  const originTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const destTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const autoLoadedRef = useRef(false);
 
   // Pre-compute distance-to-route for every charger when the route changes.

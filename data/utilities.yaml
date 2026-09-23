@@ -1,6 +1,8 @@
 # WV utility data for GoEV WV
-# Updated: 2026-04-18 (verified against utility sites, AFDC, AEP Off-Peak page)
+# Updated: 2026-09-23 (verified against utility tariff sheets filed with the WV PSC)
 # Rates should be refreshed quarterly against utility tariff sheets or WV PSC filings.
+# All per-kWh figures are MARGINAL rates (energy charge + all per-kWh riders) and
+# exclude municipal B&O / utility taxes, which vary by town.
 
 # ---------------------------------------------------------------
 # APPALACHIAN POWER (AEP) - serves southern & central WV
@@ -13,75 +15,81 @@ aep:
   customer_service_phone: "1-800-956-4237"
 
   residential:
-    # Source: AEP WV bill examples page (effective Dec 12, 2025) and AEP off-peak EV page.
-    # Bill examples: 1,000 kWh = $176.43; 2,000 kWh = $332.13.
-    # Deriving: fixed charges = $20.73/mo; marginal variable rate = $0.1557/kWh.
-    # The marginal rate is what EV charging actually costs (each additional kWh).
-    # The all-in average at 1,000 kWh is ~$0.176/kWh (matches AEP's "17.6 cents" quote).
-    flat_rate_per_kwh: 0.156  # marginal rate — correct for EV cost calculations
-    all_in_rate_per_kwh_at_1000kwh: 0.176  # displayed average; higher because it spreads fixed charges
-    monthly_customer_charge: 20.73  # all fixed charges combined (base + all riders, Dec 2025)
+    # Source: AEP WV rates page bill examples + joint APCo/Wheeling tariff
+    # (PSC W.Va. Nos. 16 & 21), bills rendered on/after Sept 1, 2026.
+    # Bill examples: 1,000 kWh = $183.07; 2,000 kWh = $344.53.
+    # Tariff Sheet 38: "All over 500 kWh" = $0.161465/kWh all-in:
+    #   base 9.584¢ + ENEC 5.857¢ (incl. 0.290¢ securitization/CRRC)
+    #   + ECS 0.309¢ + EE/DR 0.1826¢ + RET 0.21386¢
+    # The first 500 kWh/month are billed ~1.5¢ higher; EV charging sits on top
+    # of household load, so the "over 500 kWh" rate is the right marginal rate.
+    flat_rate_per_kwh: 0.1615
+    all_in_rate_per_kwh_at_1000kwh: 0.183
+    monthly_customer_charge: 14.02  # Tariff Sheet 5-1, effective July 1, 2026
+    winter_block_rate_per_kwh: 0.1271  # usage above 1,350 kWh in Dec–Feb (Sheets 5-1, 38)
+    rate_source: "https://www.appalachianpower.com/company/about/rates/wv"
+    rate_tariff_url: "https://www.appalachianpower.com/lib/docs/ratesandtariffs/WestVirginia/ENEC_Tariff_Sheets_Eff_9-1-26.pdf"
+    rate_retrieved: "2026-09-23"
     rate_notes: >
-      AEP WV residential rates effective December 12, 2025. Bill examples: 1,000 kWh = $176.43;
-      2,000 kWh = $332.13. This implies ~$20.73/month in fixed charges and a marginal
-      variable rate of ~$0.156/kWh. The calculator uses the marginal rate because that
-      is the actual cost of each additional kWh from EV charging — using the all-in
-      average would overstate EV charging costs by ~13%. AEP rates have risen sharply
-      since 2019 (+33%) and a further rate case was filed in 2025.
+      AEP WV residential rates for bills rendered on/after September 1, 2026.
+      Two increases since our April 2026 refresh: a +4% inflation adjustment to
+      residential base rates effective July 1, 2026 (NOIR APCO and Wheeling 26A,
+      order June 18, 2026), and an ENEC fuel-clause increase effective
+      September 1, 2026 (Case 26-0469-E-ENEC). Marginal rate is 16.15¢/kWh.
+      APCo agreed not to file another base rate case before June 1, 2027, but
+      ENEC and riders can still move. Usage above 1,350 kWh in Dec–Feb is billed
+      at a lower winter block (12.71¢), which modestly helps winter EV charging
+      in electrically heated homes; the calculator does not model this.
 
     tou_available: true
-    tou_program_name: "WV Off-Peak EV Charging"
+    tou_program_name: "WV Off-Peak EV Charging (Schedule PEV)"
     tou_url: "https://www.appalachianpower.com/clean-energy/electric-cars/wv-off-peak"
     tou_schedule:
-      off_peak_hours: "8:00 PM - 6:00 AM (Mon-Fri), all day Sat, Sun, and federal holidays"
-      off_peak_rate_per_kwh: 0.129   # source: AEP off-peak page, current as of Apr 2026
-      on_peak_rate_per_kwh: 0.227    # normal rate $0.176 + on-peak surcharge $0.051
+      off_peak_hours: "8:00 PM - 6:00 AM (Mon-Fri), all day Sat, Sun, and major holidays"
+      # Tariff Sheet 22-1 (Schedule PEV): off-peak base 5.685¢ + riders.
+      # Rider set isn't specified for PEV; RS riders give 12.25¢, RS-TOD riders
+      # give 11.99¢. We use the higher (conservative) figure.
+      off_peak_rate_per_kwh: 0.1225
+      on_peak_rate_per_kwh: 0.240   # Sheet 22-1: on-peak base 17.077¢ + riders
+    tou_monthly_meter_charge: 14.02  # PEV meter carries its own basic charge (also the minimum bill)
     tou_requires_separate_meter: true
+    tou_confidence: "approximate"
+    tou_notes: >
+      AEP's program web page still shows 12.9¢ off-peak / 22.7¢ on-peak, which
+      predate the July and September 2026 increases. Figures here are computed
+      from the tariff sheet. The separate EV meter has its own $14.02/month
+      basic charge ($168/yr), so the off-peak rate only pays off for heavy
+      chargers — roughly 4,200+ kWh/yr (about 13,000–14,000 EV miles).
     tou_enrollment_notes: >
-      Requires a separate EV meter on your charging circuit. AEP provides the meter
-      hardware at no charge, but you must hire a licensed electrician to install the
-      meter base and pass an electrical inspection before AEP installs the meter.
-      No enrollment fee. Apply at appalachianpower.com or call 1-800-956-4237.
+      Requires a separate EV meter on a hard-wired charging circuit (≤240V,
+      ≤100A) and an AMI house meter. AEP provides the meter hardware at no
+      charge, but you must hire a licensed electrician to install the meter
+      base and pass an electrical inspection before AEP installs the meter.
+      Apply at appalachianpower.com or call 1-800-956-4237.
 
   rebates:
-    - id: "aep-charge-forward-l2"
-      name: "Charge Forward Level 2 Charger Rebate"
+    - id: "aep-go-electric-l2"
+      name: "Go Electric Level 2 Charger Rebate"
       type: "l2_charger"
-      amount_usd: 250
+      amount_usd: 300
       description: >
-        Rebate of up to $250 for purchase and installation of an ENERGY STAR
-        certified Level 2 EV charger.
+        $300 rebate per ENERGY STAR certified Level 2 EV charger. Replaced the
+        earlier Charge Forward program ($250 charger + $250 electrician bonus);
+        there is no longer a separate electrician bonus.
       eligibility:
-        - "Must be AEP residential customer"
+        - "Residential customer in the Appalachian Power West Virginia service territory"
         - "Charger must be ENERGY STAR certified"
-      url: "https://takechargewv.com/programs/for-your-home/chargeforward"
+      url: "https://takechargewv.com/programs/for-your-home/go-electric"
       expires: null
-      expires_notes: "Listed as active with no stated end date per AFDC WV incentive registry (retrieved 2026-04-18)"
-      stackable_with_federal: true
-      verified_source: "https://afdc.energy.gov/laws/all?state=WV"
-      verified_date: "2026-04-18"
+      expires_notes: "Active as of 2026-09-23; no end date posted."
+      stackable_with_federal: false  # federal §30C credit expired 2026-06-30
+      verified_source: "https://takechargewv.com/programs/for-your-home/go-electric"
+      verified_date: "2026-09-23"
+      confidence: "verified"
 
-    - id: "aep-charge-forward-licensed-electrician"
-      name: "Charge Forward Licensed Electrician Bonus"
-      type: "installation"
-      amount_usd: 250
-      description: >
-        Additional rebate of up to $250 if the Level 2 charger is installed by
-        a licensed electrician.
-      eligibility:
-        - "Must be AEP residential customer"
-        - "Installation by licensed electrician"
-        - "Stacks with the L2 charger rebate above"
-      url: "https://takechargewv.com/programs/for-your-home/chargeforward"
-      expires: null
-      expires_notes: "Bundled with Charge Forward L2 program; no stated end date as of 2026-04-18"
-      stackable_with_federal: true
-      verified_source: "https://afdc.energy.gov/laws/all?state=WV"
-      verified_date: "2026-04-18"
-
-  coverage_zip_prefixes: ["247", "248", "249", "253", "254", "255", "256", "257", "258", "259"]
-  # Approximate southern/central WV ZIP prefixes; user ZIP lookup on the calculator
-  # is a heuristic, not a bill-accurate service-territory map.
+  coverage_zip_prefixes: ["247", "248", "249", "253", "255", "256", "257", "258", "259"]
+  # Approximate southern/central WV ZIP prefixes; heuristic, not bill-accurate.
+  # 254xx (Martinsburg / Eastern Panhandle) is Potomac Edison, not AEP.
 
 # ---------------------------------------------------------------
 # MON POWER (FirstEnergy) - serves northern WV
@@ -90,46 +98,85 @@ mon_power:
   name: "Mon Power"
   parent_company: "FirstEnergy"
   website: "https://www.firstenergycorp.com/mon_power.html"
-  service_area: "Northern and north-central West Virginia (34 counties)"
+  service_area: "Northern and north-central West Virginia"
   customer_service_phone: "1-800-686-0022"
 
   residential:
-    flat_rate_per_kwh: 0.138
-    flat_rate_range: "0.1297 - 0.1377 by tariff zone"
-    monthly_customer_charge: 8.00
-    rate_source: "https://utility-rates.com/providers/mon-power"
-    rate_retrieved: "2026-04-18"
+    # Schedule A Sheet 7-1 + rider sheets 6-A/B/C/F, effective Aug 1, 2026:
+    #   energy 12.023¢ (fuel/ENEC is embedded) + vegetation mgmt 1.189¢
+    #   + ECC 0.269¢ + ECC-2 0.030¢ + ECC normalization 0.040¢ = 13.551¢
+    # Cross-check: reproduces the PSC-reported average bill of $141.51.
+    flat_rate_per_kwh: 0.1355
+    monthly_customer_charge: 6.00
+    rate_source: "https://www.firstenergycorp.com/content/dam/customer/Customer%20Choice/Files/west-virginia/tariffs/WVMPRetailTariff.pdf"
+    rate_retrieved: "2026-09-23"
     rate_notes: >
-      Mon Power WV residential rates averaged ~13.8¢/kWh in March 2026 per
-      tariff-verified data. Energy charge varies 12.97-13.77¢/kWh across
-      service zones. Customer charge $8.00/month. Recent rate cases have
-      approved double-digit increases; trend is upward. Authoritative source
-      is the WVMPRetailTariff PDF at firstenergycorp.com — refresh against
-      that quarterly.
+      Rates effective August 1, 2026 under Case 26-0508-E-42T (order July 31,
+      2026) — step 1 of a two-step increase. Step 2 takes effect June 1, 2027
+      (about +$4/month for an average home, roughly +0.4¢/kWh). Mon Power and
+      Potomac Edison file jointly and have identical residential rates.
+      Customer charge is $6.00/month (the previous $8.00 figure was wrong).
+      There are no rate zones in the WV tariff.
     authoritative_source: "https://www.firstenergycorp.com/content/dam/customer/Customer%20Choice/Files/west-virginia/tariffs/WVMPRetailTariff.pdf"
 
     tou_available: false
     tou_program_name: null
     tou_notes: >
-      Confirmed no residential EV TOU tariff in WV as of 2026-04-18.
-      FirstEnergy's WV EV page directs users to an external ChooseEV Mon
-      Power resource but lists no TOU rate. AFDC WV incentive registry
-      lists no Mon Power TOU program. TOU pilots exist in other FirstEnergy
-      states (PA, NJ) but not WV.
-    tou_verified_source: "https://www.firstenergycorp.com/help/saving_energy/electric-vehicles/wv-ev.html"
-    tou_verified_date: "2026-04-18"
+      No residential EV TOU tariff in WV — the Mon Power tariff contains no
+      vehicle-specific schedule (verified 2026-09-23). FirstEnergy EV TOU
+      programs exist in Maryland, Pennsylvania, and New Jersey, not WV.
+    tou_verified_source: "https://www.firstenergycorp.com/content/dam/customer/Customer%20Choice/Files/west-virginia/tariffs/WVMPRetailTariff.pdf"
+    tou_verified_date: "2026-09-23"
 
   rebates: []
   rebates_notes: >
     Mon Power / FirstEnergy offers no WV residential EV charger rebate or
-    TOU program as of 2026-04-18. AFDC WV registry lists zero FirstEnergy
-    WV EV incentives. Do not add speculative entries; verify with
-    FirstEnergy customer service if a program is launched.
+    TOU program as of 2026-09-23. Do not add speculative entries.
   rebates_verified_source: "https://afdc.energy.gov/laws/all?state=WV"
-  rebates_verified_date: "2026-04-18"
+  rebates_verified_date: "2026-09-23"
 
   coverage_zip_prefixes: ["262", "263", "264", "265", "266", "267", "268", "269"]
   # Approximate northern WV ZIP prefixes; heuristic, not bill-accurate.
+  # 267xx/268xx include areas served by Potomac Edison (not mapped ZIP-by-ZIP).
+
+# ---------------------------------------------------------------
+# POTOMAC EDISON (FirstEnergy) - serves the Eastern Panhandle
+# ---------------------------------------------------------------
+potomac_edison:
+  name: "Potomac Edison"
+  parent_company: "FirstEnergy"
+  website: "https://www.firstenergycorp.com/potomac_edison.html"
+  service_area: "Eastern Panhandle and Potomac Highlands (Berkeley, Jefferson, Morgan, Hampshire, Mineral, Grant, Hardy, Pendleton counties)"
+  customer_service_phone: "1-800-686-0011"
+
+  residential:
+    # Schedule R Sheet 8-1 + rider sheets 7-C/D/E/G, effective Aug 1, 2026:
+    #   energy 12.023¢ + vegetation 1.189¢ + ECC 0.280¢ + ECC-2 0.031¢
+    #   + normalization 0.028¢ = 13.551¢
+    flat_rate_per_kwh: 0.1355
+    monthly_customer_charge: 6.00
+    rate_source: "https://www.firstenergycorp.com/content/dam/customer/Customer%20Choice/Files/west-virginia/tariffs/WVPERetailTariff.pdf"
+    rate_retrieved: "2026-09-23"
+    rate_notes: >
+      Separate tariff document (P.S.C. W.Va. No. 3) from Mon Power, but the
+      same residential rates under the same joint rate case (26-0508-E-42T).
+      Same two-step increase: step 2 on June 1, 2027. Serves Martinsburg,
+      Charles Town, Shepherdstown, Berkeley Springs, Romney, Moorefield,
+      Petersburg and surrounding areas.
+
+    tou_available: false
+    tou_program_name: null
+    tou_notes: >
+      No EV TOU in the WV Potomac Edison tariff. Potomac Edison's EV-only TOU
+      rate is a Maryland program and does not apply to WV customers.
+    tou_verified_date: "2026-09-23"
+
+  rebates: []
+  rebates_notes: "No WV EV charger rebate as of 2026-09-23."
+
+  coverage_zip_prefixes: ["254"]
+  # 254xx = Martinsburg / Charles Town / Berkeley Springs. Parts of 267xx/268xx
+  # (Mineral, Hampshire, Hardy, Grant, Pendleton) are also Potomac Edison.
 
 # ---------------------------------------------------------------
 # WHEELING POWER - AEP subsidiary serving northern panhandle
@@ -142,79 +189,95 @@ wheeling_power:
   customer_service_phone: "1-800-982-4237"
 
   residential:
-    # Wheeling Power is a small AEP subsidiary; rates track AEP closely but
-    # have separate WV PSC tariff filings. Specific Wheeling Power residential
-    # rate schedules were not independently verified on 2026-04-18 — site was
-    # unreachable and no public rate summary was published on utility-rates
-    # aggregators. Values below assume parity with the AEP tariff structure
-    # as a best-available estimate. Refresh against WV PSC filings.
-    flat_rate_per_kwh: 0.165
-    monthly_customer_charge: 9.00
-    rate_confidence: "approximate"
+    # Wheeling Power is still a separate company (tariff No. 21) but shares
+    # the same tariff document and joint rate cases with Appalachian Power.
+    # Residential rates are identical to APCo's. Source: AEP WV bill
+    # calculator (WP-WVRate-9-1-2026.xlsx) and the joint tariff.
+    flat_rate_per_kwh: 0.1615
+    monthly_customer_charge: 14.02
+    rate_source: "https://www.appalachianpower.com/lib/docs/ratesandtariffs/WestVirginia/ENEC_Tariff_Sheets_Eff_9-1-26.pdf"
+    rate_retrieved: "2026-09-23"
     rate_notes: >
-      Wheeling Power serves ~40,000 customers in the northern panhandle and
-      files separate tariffs from AEP, though structures are similar. Ohio
-      County average residential price is ~17.56¢/kWh per findenergy.com.
-      The values here are an approximation; users in the panhandle should
-      verify with their actual bill.
-    authoritative_source: "https://www.psc.state.wv.us"
-    retrieved: "2026-04-18"
+      Identical residential rates to Appalachian Power (joint tariff, bills
+      rendered on/after September 1, 2026). ENEC is 5.857¢ with no separate
+      securitization charge, and total riders match APCo's.
 
     tou_available: true
-    tou_notes: "Same Charge Forward / Off-Peak program as AEP via TakeChargeWV"
+    tou_program_name: "Off-Peak EV Charging (Schedule PEV)"
+    tou_url: "https://www.appalachianpower.com/clean-energy/electric-cars/wv-off-peak"
+    tou_schedule:
+      off_peak_hours: "8:00 PM - 6:00 AM (Mon-Fri), all day Sat, Sun, and major holidays"
+      off_peak_rate_per_kwh: 0.1225
+      on_peak_rate_per_kwh: 0.240
+    tou_monthly_meter_charge: 14.02
+    tou_requires_separate_meter: true
+    tou_confidence: "approximate"
+    tou_notes: "Schedule PEV appears in Wheeling Power's tariff No. 21 as well (Sheet 22-1)."
 
-  rebates:
-    - id: "wheeling-power-charge-forward-l2"
-      name: "Charge Forward Level 2 Charger Rebate (Wheeling Power)"
-      type: "l2_charger"
-      amount_usd: 250
-      description: "Same program as AEP Charge Forward, administered jointly."
-      url: "https://takechargewv.com/programs/for-your-home/chargeforward"
-      expires: null
-      expires_notes: "Same as AEP Charge Forward; active with no stated end date per AFDC (2026-04-18)"
+  rebates: []
+  rebates_notes: >
+    The Go Electric $300 charger rebate names only the Appalachian Power WV
+    service territory. Wheeling Power eligibility is unconfirmed — customers
+    should ask TakeCharge WV before counting on it.
+  rebates_verified_date: "2026-09-23"
 
   coverage_zip_prefixes: ["260", "261"]
 
 # ---------------------------------------------------------------
-# RURAL ELECTRIC COOPERATIVES
+# CO-OPS & SMALL UTILITIES
 # ---------------------------------------------------------------
 rural_coops:
-  name: "Rural Electric Cooperatives"
+  name: "Co-op or small local utility"
   type: "aggregate"
-  service_area: "Various rural WV counties"
-  # Specific coop rates were not independently verified on 2026-04-18. Coop
-  # websites do not generally publish rate schedules inline; rates require
-  # tariff-document retrieval or direct contact. Per our v1 strategy we
-  # display "contact your coop" rather than calculating off these estimates
-  # for users whose ZIP resolves to a coop.
-  rate_verification_status: "unverified — coop-specific rates require direct tariff retrieval"
+  service_area: "Various rural WV areas served by co-ops, Black Diamond Power, or municipal utilities"
+  # Per-kWh rates could NOT be verified from primary sources on 2026-09-23.
+  # Tariffs are scanned images or unpublished. Figures below are aggregator
+  # average-bill rates (bill ÷ kWh, so they include fixed charges and
+  # overstate the marginal rate somewhat). Treat as rough placeholders.
+  rate_verification_status: "unverified — co-op / small-utility rates require direct tariff retrieval or a member call"
   coops:
     - id: "harrison-rural"
       name: "Harrison Rural Electrification Association"
       website: "https://www.harrisonrea.com"
-      estimated_rate_per_kwh: 0.115
-      rate_confidence: "approximate"
+      service_area: "Parts of Harrison, Doddridge, Marion, Taylor, Barbour, Upshur, Lewis counties"
+      estimated_rate_per_kwh: 0.21
+      rate_confidence: "unverified"
+      notes: "Aggregator average-bill rate (findenergy). A rate-change filing is dated 2026-02-28; the tariff PDF is a scanned image."
 
     - id: "black-diamond-power"
       name: "Black Diamond Power"
       website: "https://www.blackdiamondpower.com"
-      estimated_rate_per_kwh: 0.120
-      rate_confidence: "approximate"
+      service_area: "Parts of Clay, Raleigh, Wyoming counties (~4,900 customers)"
+      estimated_rate_per_kwh: 0.18
+      rate_confidence: "unverified"
+      notes: "Investor-owned distributor that buys from AEP. The PSC denied its rate increase and opened a general investigation (Oct 2025); outcome not found."
 
     - id: "craig-botetourt"
       name: "Craig-Botetourt Electric Cooperative"
       website: "https://www.cbec.coop"
-      estimated_rate_per_kwh: 0.140
-      rate_confidence: "approximate"
+      service_area: "Monroe County (~495 WV members)"
+      estimated_rate_per_kwh: 0.187
+      rate_confidence: "unverified"
+      notes: "WV rate increase effective 2026-05-01 raised the average bill ~6.8% (Cardinal News, 2026-03-19)."
 
-  v1_strategy: >
-    For v1, show a "Contact your coop" card instead of specific rate calculations
-    for users whose ZIP resolves to a coop service area. Display the coop name
-    and website. Collect rate data and add specific calculations in v1.2.
+    - id: "new-martinsville-muni"
+      name: "New Martinsville Municipal Electric"
+      service_area: "City of New Martinsville (Wetzel County)"
+      estimated_rate_per_kwh: null
+      rate_confidence: "unverified"
+
+    - id: "philippi-muni"
+      name: "Philippi Municipal Electric"
+      service_area: "City of Philippi (Barbour County)"
+      estimated_rate_per_kwh: null
+      rate_confidence: "unverified"
 
   generic_fallback:
-    flat_rate_per_kwh: 0.120  # WV coop average approximation
-    disclaimer: "Coop rates vary. Contact your specific cooperative for accurate pricing."
+    flat_rate_per_kwh: 0.17  # rough midpoint of available aggregator figures
+    disclaimer: >
+      Rate is a rough placeholder (~17¢/kWh) — co-op and small-utility rates
+      could not be verified. Check the per-kWh charge on your bill and enter
+      it for an accurate estimate.
 
 # ---------------------------------------------------------------
 # WV PUBLIC SERVICE COMMISSION
@@ -223,4 +286,4 @@ wvpsc:
   name: "West Virginia Public Service Commission"
   website: "https://www.psc.state.wv.us"
   role: "Approves utility rates and riders for investor-owned utilities"
-  note: "Tariff sheets for AEP, Mon Power, Wheeling Power are filed here."
+  note: "Tariff sheets for AEP, Wheeling Power, Mon Power, and Potomac Edison are filed here."

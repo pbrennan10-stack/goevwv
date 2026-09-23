@@ -247,6 +247,10 @@ export async function getChargers(): Promise<{
 
   // All live attempts failed — try the committed snapshot. Users see real
   // charger data (slightly stale) instead of a blank map + error banner.
+  // /chargers renders per request (it reads searchParams), so this path runs
+  // at request time too — which is why the running container needs
+  // OPENCHARGEMAP_API_KEY (see docker-compose.yml). Successful fetches are
+  // cached for a day via next.revalidate above.
   const snapshot = await loadSnapshot();
   if (snapshot?.pois) {
     const chargers = snapshot.pois

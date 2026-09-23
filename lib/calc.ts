@@ -31,9 +31,13 @@ function vehicleMassKg(v: Vehicle): number {
 
 // EPA constants
 const CO2_KG_PER_GAL_GASOLINE = 8.887; // EPA direct tailpipe CO2
-// WV electric grid emissions factor — WV is ~90% coal-fired.
-// Source: EIA State Electricity Profile for WV. This is rough and will update.
-const CO2_KG_PER_KWH_WV_GRID = 0.67;
+// Grid emissions factor for EV charging in WV. WV sits in the PJM grid and
+// exports much of its coal power, so we use EPA eGRID's RFCW subregion rate
+// (the grid WV homes actually draw from), consistent with EPA/DOE practice:
+// eGRID2023 rev2 RFCW total output 926.6 lb CO2e/MWh + 4.2% grid losses
+// = 0.439 kg/kWh. (EIA's WV in-state generation rate is 0.867 kg/kWh — a
+// coal-only worst case.) Refreshed 2026-09-23.
+const CO2_KG_PER_KWH_WV_GRID = 0.44;
 
 // Winter in WV effectively adds ~12% to annual kWh consumption for BEVs
 // if we assume ~4 cold months with ~28% range loss on those months only.
@@ -63,9 +67,9 @@ const DCFC_WINTER_TIME_MULTIPLIER = 1.08;
 const DCFC_STOP_SOC_FRACTION = 0.70;
 const DCFC_FALLBACK_BATTERY_KWH = 60;
 
-// Fallback DCFC rate if federal.yaml doesn't carry one. Matches Electrify
-// America Pass (non-member) as of 2026-04-18.
-const DCFC_FALLBACK_RATE_PER_KWH = 0.48;
+// Fallback DCFC rate if federal.yaml doesn't carry one. WV-area walk-up
+// average as of 2026-09-23.
+const DCFC_FALLBACK_RATE_PER_KWH = 0.55;
 
 function homeChargeSessions(daily_mi: number, days_per_week: number, range_mi: number): number {
   // Charge when battery drops below ~20% capacity (usable = 80% of rated range).
@@ -113,13 +117,15 @@ function annualMiles(daily: number, daysPerWeek: number): number {
 function effectiveRatePerKwh(
   utility: Utility,
   useTOU: boolean,
-): { rate: number; mode: "flat" | "tou" } {
+): { rate: number; mode: "flat" | "tou"; meterAnnualUsd: number } {
   const r = utility.residential;
   if (useTOU && r.tou_available && r.tou_schedule) {
     // Users who opt into TOU charge overnight (off-peak) by design — use 100% off-peak rate.
-    return { rate: r.tou_schedule.off_peak_rate_per_kwh, mode: "tou" };
+    // A separately metered EV circuit carries its own monthly basic charge.
+    const meterAnnualUsd = (r.tou_monthly_meter_charge ?? 0) * 12;
+    return { rate: r.tou_schedule.off_peak_rate_per_kwh, mode: "tou", meterAnnualUsd };
   }
-  return { rate: r.flat_rate_per_kwh, mode: "flat" };
+  return { rate: r.flat_rate_per_kwh, mode: "flat", meterAnnualUsd: 0 };
 }
 
 // At highway speeds above the EPA test (~55 mph), aerodynamic drag raises EV energy use.
@@ -145,36 +151,60 @@ function blendedKwhPer100mi(
   return (1 - highway_fraction) * city + highway_fraction * hwy;
 }
 
+// Electric miles per year for a PHEV, assuming it's plugged in every night.
+// Each commute day runs on electricity until the battery is empty, then on gas;
+// each long road trip gets one battery's worth of electric miles (charged at
+// home before leaving — PHEV owners rarely charge on the road). Winter derate
+// shrinks usable electric range by the same factor it raises kWh per mile.
+function phevElectricMiles(
+  vehicle: Vehicle,
+  daily_round_trip_mi: number,
+  commute_days_per_year: number,
+  long_trips_per_year: number,
+  long_trip_one_way_mi: number,
+  derate: boolean,
+): number {
+  if (vehicle.powertrain !== "phev") return 0;
+  const annualMult = derate ? ANNUAL_WINTER_KWH_MULTIPLIER : 1.0;
+  const eRange = (vehicle.epa_range_mi_electric ?? 0) / annualMult;
+  const commuteElectric = Math.min(daily_round_trip_mi, eRange) * commute_days_per_year;
+  const tripElectric = Math.min(long_trip_one_way_mi * 2, eRange) * long_trips_per_year;
+  return commuteElectric + tripElectric;
+}
+
 function kwhPerYear(
   vehicle: Vehicle,
-  miles: number,
+  miles: number, // for PHEVs, pass electric miles only
   derate: boolean,
   highway_fraction: number,
   highway_avg_speed_mph = 55,
 ): number {
   const basePerMile = blendedKwhPer100mi(vehicle, highway_fraction, highway_avg_speed_mph) / 100;
   const annualMult = derate ? ANNUAL_WINTER_KWH_MULTIPLIER : 1.0;
-  if (vehicle.powertrain === "phev") {
-    const electricShare = 0.65;
-    return miles * electricShare * basePerMile * annualMult;
-  }
   return miles * basePerMile * annualMult;
 }
 
-// EV insurance estimates (WV full coverage, 35-45 yo clean record).
-// BEVs cost ~15-25% more to insure than equivalent ICE due to higher repair/parts costs.
-// PHEVs run ~10% cheaper than pure BEVs — smaller battery, established gas-drivetrain
-// repair network, and the 2nd powertrain reduces severity of electric-system claims.
+// EV/PHEV insurance estimate (WV full coverage, 35-45 yo clean record).
+// Roughly 40% of a full-coverage premium (liability) doesn't depend on the car;
+// the other 60% (collision/comprehensive) scales with its value. Class bases are
+// a typical WV premium at a reference price. Tesla, Rivian, Lucid and Polestar
+// run ~25% higher (repair-network costs). 2026 sources: Insurify (new EVs in WV
+// ~4% cheaper than new gas cars), ValuePenguin (legacy-brand EVs ≈ gas; Tesla/
+// Rivian +48%), MoneyGeek WV (Model Y $2,747). Set 2026-09-23.
+const INSURANCE_CLASS_BASE: Record<string, { usd: number; ref_msrp: number }> = {
+  sedan:     { usd: 1650, ref_msrp: 30000 },
+  hatchback: { usd: 1650, ref_msrp: 30000 },
+  suv:       { usd: 1900, ref_msrp: 36000 },
+  minivan:   { usd: 1800, ref_msrp: 42000 },
+  truck:     { usd: 2000, ref_msrp: 52000 },
+};
+const INSURANCE_PREMIUM_BRANDS = new Set(["Tesla", "Rivian", "Lucid", "Polestar"]);
+
 function evInsuranceEstimate(vehicle: Vehicle): number {
-  let base: number;
-  switch (vehicle.class) {
-    case "truck":   base = 2100; break;
-    case "suv":     base = 1750; break;
-    case "minivan": base = 1600; break;
-    default:        base = 1600; break; // sedan / hatchback
-  }
-  if (vehicle.powertrain === "phev") return Math.round(base * 0.90);
-  return base;
+  const base = INSURANCE_CLASS_BASE[vehicle.class] ?? INSURANCE_CLASS_BASE.sedan;
+  const priceFactor = Math.min(1.8, Math.max(0.85, 0.40 + 0.60 * (vehicle.msrp_usd / base.ref_msrp)));
+  const brandFactor = INSURANCE_PREMIUM_BRANDS.has(vehicle.make) ? 1.25 : 1.0;
+  return Math.round((base.usd * priceFactor * brandFactor) / 10) * 10;
 }
 
 // Extra kWh per year from climbing hills.
@@ -193,12 +223,11 @@ function elevationExtraKwhPerYear(
   return (roundTripNet / 3_600_000) * trips_per_year;
 }
 
-function gallonsPerYear(vehicle: Vehicle, miles: number): number {
-  // Only PHEVs burn gas in our catalog on days the battery is empty (35% of miles).
+function gallonsPerYear(vehicle: Vehicle, gasMiles: number): number {
+  // Only PHEVs burn gas in our catalog — the miles beyond each charge.
   if (vehicle.powertrain !== "phev") return 0;
-  const gasShare = 0.35;
   const mpg = vehicle.efficiency_mpg_hybrid ?? 35;
-  return (miles * gasShare) / mpg;
+  return gasMiles / mpg;
 }
 
 function stateAnnualFee(
@@ -245,11 +274,12 @@ export function annualEvMaintenance(vehicle: Vehicle, annual_miles: number): Mai
   // No oil changes. Misc = cabin air filter + wiper fluid only.
   const isTruck = vehicle.class === "truck";
   const isSuv = vehicle.class === "suv" || vehicle.class === "minivan";
-  const tireSet = isTruck ? 950 : isSuv ? 750 : 620;
+  // Refreshed 2026-09-23: EV-rated tire prices, +15% repair inflation (BLS CPI).
+  const tireSet = isTruck ? 1250 : isSuv ? 950 : 750;
   const tireMi = 48000;
-  const brakeSvc = isTruck ? 280 : isSuv ? 200 : 160;
+  const brakeSvc = isTruck ? 320 : isSuv ? 230 : 185;
   const brakeMi = 100000;
-  const misc = 100;
+  const misc = 115;
   const tires = (tireSet / tireMi) * annual_miles;
   const brakes = (brakeSvc / brakeMi) * annual_miles;
   return { oil_usd: 0, tires_usd: tires, brakes_usd: brakes, misc_usd: misc, total_usd: tires + brakes + misc };
@@ -290,7 +320,7 @@ export function calculate(input: CalcInput, ctx: CalcContext): CalcReturn {
   const highway_fraction = input.route?.highway_fraction ?? DEFAULT_HIGHWAY_FRACTION;
   const highway_avg_speed_mph = input.route?.highway_avg_speed_mph ?? 55;
   const elevation_gain_m = input.route?.elevation_gain_m ?? 0;
-  const { rate, mode } = effectiveRatePerKwh(ctx.utility, input.use_tou);
+  const { rate, mode, meterAnnualUsd } = effectiveRatePerKwh(ctx.utility, input.use_tou);
   const dcfcRate =
     ctx.fed.calculation_notes.dcfc_rate_per_kwh?.current ?? DCFC_FALLBACK_RATE_PER_KWH;
 
@@ -318,7 +348,12 @@ export function calculate(input: CalcInput, ctx: CalcContext): CalcReturn {
   const currentTotalUsd = currentGasCost + currentMaintUsd + currentInsuranceUsd + currentRegUsd;
 
   const results: VehicleResult[] = ctx.vehicles.map((v) => {
-    const kwh = kwhPerYear(v, miles, input.apply_winter_derate, highway_fraction, highway_avg_speed_mph)
+    const phevElecMi = phevElectricMiles(
+      v, input.daily_round_trip_mi, trips_per_year, input.long_trips_per_year, oneWayLongTripMi,
+      input.apply_winter_derate,
+    );
+    const electricMiles = v.powertrain === "phev" ? phevElecMi : miles;
+    const kwh = kwhPerYear(v, electricMiles, input.apply_winter_derate, highway_fraction, highway_avg_speed_mph)
               + elevationExtraKwhPerYear(v, elevation_gain_m, trips_per_year);
 
     // Charging / fueling time + energy-split breakdown
@@ -329,7 +364,7 @@ export function calculate(input: CalcInput, ctx: CalcContext): CalcReturn {
     let dcfcCost = 0;
     let gasFillupsEv = 0;
     let gasFuelingMinEv = 0;
-    const phevGas = gallonsPerYear(v, miles);
+    const phevGas = gallonsPerYear(v, Math.max(0, miles - phevElecMi));
     const phevGasCost = phevGas * input.current.gas_price_per_gal;
 
     if (v.powertrain === "bev") {
@@ -375,7 +410,7 @@ export function calculate(input: CalcInput, ctx: CalcContext): CalcReturn {
     // Energy cost split: home-rate kWh (everything that didn't go through DCFC)
     // plus DCFC-rate kWh for long-trip fast-charging stops.
     const homeKwh = Math.max(0, kwh - dcfcKwh);
-    const homeEnergyCost = homeKwh * rate;
+    const homeEnergyCost = homeKwh * rate + meterAnnualUsd;
     const totalEnergyCost = homeEnergyCost + dcfcCost + phevGasCost;
 
     const fee = stateAnnualFee(v, ctx.fed);
@@ -415,9 +450,16 @@ export function calculate(input: CalcInput, ctx: CalcContext): CalcReturn {
         `Estimated WV winter range (${v.winter_range_mi} mi) is less than your daily round trip. Plan for mid-day charging in January/February.`,
       );
     }
+    if (v.powertrain === "phev" && v.epa_range_mi_electric && input.daily_round_trip_mi > v.epa_range_mi_electric) {
+      warnings.push(
+        `Your ${input.daily_round_trip_mi}-mi round trip is longer than this plug-in hybrid's ${v.epa_range_mi_electric}-mi electric range, so part of every commute runs on gas (about ${Math.round((miles > 0 ? electricMiles / miles : 0) * 100)}% of your miles on electricity).`,
+      );
+    }
     if (mode === "tou" && ctx.utility.residential.tou_requires_separate_meter) {
       warnings.push(
-        "This utility's EV TOU rate requires a separate meter install; factor in one-time cost.",
+        meterAnnualUsd > 0
+          ? `This utility's EV TOU rate requires a separate meter (one-time electrician cost) with its own ${fmtUSD(meterAnnualUsd / 12)}/month basic charge — included above. It only pays off if you charge a lot.`
+          : "This utility's EV TOU rate requires a separate meter install; factor in one-time cost.",
       );
     }
 
@@ -447,6 +489,7 @@ export function calculate(input: CalcInput, ctx: CalcContext): CalcReturn {
       annual_home_energy_cost_usd: homeEnergyCost,
       annual_dcfc_energy_cost_usd: dcfcCost,
       annual_phev_gas_cost_usd: phevGasCost,
+      electric_share: miles > 0 ? electricMiles / miles : 0,
       annual_dcfc_kwh: dcfcKwh,
     };
   });

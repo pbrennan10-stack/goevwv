@@ -1,5 +1,5 @@
 # Federal tax credits and WV state fees relevant to EV ownership
-# Updated: 2026-04-18 (verified against IRS, WV Code, AAA)
+# Updated: 2026-09-23 (verified against IRS, WV Code, AAA, congress.gov)
 
 federal_ev_tax_credits:
   new_ev_credit:
@@ -35,6 +35,9 @@ federal_ev_tax_credits:
 
   used_ev_credit:
     active: false
+    pending_legislation_note: >
+      A July 2026 Senate draft (Cortez Masto) would restore 25E through 2031.
+      Not enacted as of 2026-09-23.
     status_note: >
       The IRC 25E used clean vehicle credit was terminated alongside 30D by
       P.L. 119-21. Not allowed for any vehicle acquired after September 30, 2025.
@@ -54,15 +57,26 @@ federal_ev_tax_credits:
       joint: 150000
     url: "https://www.irs.gov/credits-deductions/used-clean-vehicle-credit"
 
+  commercial_clean_vehicle_credit:
+    active: false
+    code_section: "IRC 45W"
+    termination_date: "2025-09-30"
+    termination_statute: "P.L. 119-21 (OBBB)"
+    status_note: "Terminated for vehicles acquired after 2025-09-30. Relevant to future fleet mode."
+    url: "https://www.irs.gov/credits-deductions/commercial-clean-vehicle-credit"
+
   refueling_property_credit:
     code_section: "IRC 30C"
+    active: false
     termination_date: "2026-06-30"
     termination_statute: "P.L. 119-21 (OBBB)"
     termination_notes: >
-      Per IRS FAQ on P.L. 119-21, the 30C credit is not allowed for any
-      property placed in service after June 30, 2026 — this applies to BOTH
-      residential and commercial installations. Users installing a home
-      charger should aim to complete installation before that date.
+      EXPIRED. Per IRS guidance on P.L. 119-21, the 30C credit is not allowed
+      for any property placed in service after June 30, 2026 — BOTH
+      residential and commercial installations. No home-charger tax credit is
+      available for installs after that date.
+    verified_source: "https://www.irs.gov/credits-deductions/alternative-fuel-vehicle-refueling-property-credit"
+    verified_date: "2026-09-23"
     residential:
       max_amount_usd: 1000
       structure: "30% of cost, up to $1,000, for home EV charging equipment"
@@ -113,6 +127,26 @@ wv_state_fees:
     source_url: "https://feecalculator.us/west-virginia-vehicle-registration-fee-calculator/"
     notes: "Includes $1.00 litter fee and $0.50 insurance fee"
 
+  pending_legislation:
+    wv_hb_4838_2026: >
+      2026 regular-session bill to raise the BEV fee to $400 and the
+      PHEV/hybrid fee to $200. Introduced 2026-01-27; died in House Finance.
+      No change to current fees.
+    federal_ev_registration_fee: >
+      H.R. 8870 (BUILD America 250 Act) proposes a federal annual fee of
+      $130 BEV / $35 PHEV, rising $5 every two years from 2029 (caps $150 /
+      $50). Passed House T&I Committee 62-2 on 2026-05-22; no floor vote as
+      of 2026-09-23. Current highway law extended to 2026-12-11. NOT LAW —
+      not included in the calculator.
+    federal_fee_source: "https://www.congress.gov/bill/119th-congress/house-bill/8870"
+    verified_date: "2026-09-23"
+  hybrid_fee_note: >
+    A 2019 news report (WTOV9) found the WV DMV charging the $100 surcharge
+    to a conventional (non-plug) hybrid coded "Hybrid (fuel/electric)", even
+    though AFDC describes it as PHEV-only. Current DMV practice not confirmed.
+    Not relevant to the current calculator (no HEV comparison).
+  fees_verified_date: "2026-09-23"
+
 wv_state_incentives:
   status: "NONE"
   notes: >
@@ -122,6 +156,7 @@ wv_state_incentives:
     annual EV/PHEV fee (negative), and (3) any local initiatives from
     municipalities or economic development programs.
   source: "https://afdc.energy.gov/laws/all?state=WV"
+  verified_date: "2026-09-23"
 
 calculation_notes:
   winter_range_derating:
@@ -130,33 +165,38 @@ calculation_notes:
       WV winters reach sub-freezing regularly. Industry research (AAA, Recurrent,
       Geotab) shows 20-40% range loss at cold temps depending on model and HVAC
       use. We default to 28% for conservative estimates and show the un-derated
-      range alongside.
+      range alongside. Recurrent (Nov 2025, 30,000+ vehicles) found ~22% loss
+      at 32°F and ~30% at 20°F; WV winter days cluster around freezing, so
+      28% remains slightly conservative. Re-checked 2026-09-23.
 
   gas_price_baseline_per_gal:
-    current: 3.90
+    current: 4.37
     source: "AAA West Virginia average"
     source_url: "https://gasprices.aaa.com/?state=WV"
-    retrieved: "2026-04-18"
+    retrieved: "2026-09-23"
+    retrieved_label: "Sept 2026"
     notes: >
-      AAA WV average as of retrieval date. Pump prices vary meaningfully
-      across the state — Parkersburg was ~22¢ below the northern WV average
-      at this snapshot. Users can override this in the calculator. Refresh
+      AAA WV average regular on 2026-09-23 was $4.373 (week ago $4.137, month
+      ago $3.957, year ago $2.971; US average $4.474). Prices were rising
+      fast at this snapshot, so this default sits near a local peak and
+      flatters EV savings versus a typical year — the gas-price slider in the
+      calculator lets users test lower prices. Metro spread $4.27–$4.40
+      (AAA showed an apparent outlier for Morgantown, excluded). Refresh
       quarterly.
 
   # Public DC fast charging rate applied to long-trip stops. Home charging
   # stays at the user's utility rate; this only applies to road-trip kWh.
-  # $0.48/kWh matches Electrify America's Pass (non-member) rate, which is
-  # the dominant public network on WV's I-64/I-79/I-79 corridor. Members
-  # of EA Pass+ ($4/mo) pay ~$0.38; Tesla Supercharger walk-up for non-Tesla
-  # is ~$0.45; EVgo walk-up is $0.38–0.52. $0.48 is a conservative default
-  # for the typical non-enrolled user.
   dcfc_rate_per_kwh:
-    current: 0.48
-    source: "Electrify America Pass (non-member) rate"
-    source_url: "https://www.electrifyamerica.com/pricing/"
-    retrieved: "2026-04-18"
+    current: 0.55
+    member_rate: 0.43
+    source: "WV and neighboring-state walk-up DCFC prices (dcfctracker.com, network apps)"
+    source_url: "https://dcfctracker.com/states/wv"
+    retrieved: "2026-09-23"
     notes: >
-      Applied to kWh charged during long-trip DCFC stops. Network rates
-      range $0.35–$0.60/kWh depending on network and membership; $0.48 is
-      chosen as a conservative walk-up default. Users who sign up for
-      network memberships (EA Pass+, EVgo+) will pay meaningfully less.
+      Walk-up (no membership) default. September 2026 snapshot: WV average
+      across networks ~$0.52/kWh (56 sites); US non-member average ~$0.553;
+      Tesla Supercharger non-Tesla walk-up ~$0.62 in WV ($0.44 with a ~$13/mo
+      membership); Electrify America guest $0.54–$0.63 in PA/OH/VA/MD/KY.
+      Ionna caps at $0.39 but has no WV sites. Tesla members and EA Pass+
+      members pay ~$0.43. Electrify America no longer lists rates on its
+      website — its app is authoritative.
