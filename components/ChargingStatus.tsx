@@ -33,13 +33,13 @@ export function ChargingStatus({ data }: { data: ChargingInfraData }) {
         <div className="mt-4 rounded-xl bg-amber-50 ring-1 ring-amber-200 p-4 text-sm text-amber-900">
           <p className="font-semibold mb-1">State of the network</p>
           <p>
-            ~{statewide_summary.dcfc_approx} DC fast chargers and ~
-            {statewide_summary.public_ports_approx} total public ports statewide.{" "}
-            {statewide_summary.bev_registrations.toLocaleString()} registered EVs (
-            {statewide_summary.bev_pct_of_vehicles}% of vehicles). The NEVI program that was
-            supposed to materially expand this network{" "}
-            <strong>has not issued an RFP as of April 2026</strong> — earliest new stations:{" "}
-            <strong>{nevi_status.estimated_stations_open}</strong>.
+            ~{statewide_summary.dcfc_sites_approx} DC fast-charging sites (~
+            {statewide_summary.dcfc_ports_approx} fast-charging ports) and ~
+            {statewide_summary.public_ports_approx} total public ports statewide. ~
+            {statewide_summary.bev_registrations.toLocaleString()} registered battery EVs (
+            {statewide_summary.bev_pct_of_vehicles}% of vehicles). Federal NEVI funding
+            will add fast chargers along WV&rsquo;s interstates; the first stations are
+            estimated for <strong>{nevi_status.estimated_stations_open}</strong>.
           </p>
           <p className="mt-2">
             <Link
@@ -121,12 +121,13 @@ export function ChargingStatus({ data }: { data: ChargingInfraData }) {
             <span>
               Stations planned: <strong className="text-ink">{nevi_status.stations_planned}</strong>
             </span>
+            {nevi_status.current_phase && (
+              <span>
+                Current phase: <strong className="text-ink">{nevi_status.current_phase}</strong>
+              </span>
+            )}
             <span>
-              RFP expected:{" "}
-              <strong className="text-ink">{nevi_status.rfp_expected ?? "TBD"}</strong>
-            </span>
-            <span>
-              Earliest open:{" "}
+              First stations:{" "}
               <strong className="text-ink">{nevi_status.estimated_stations_open}</strong>
             </span>
           </div>

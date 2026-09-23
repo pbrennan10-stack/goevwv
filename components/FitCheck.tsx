@@ -112,7 +112,7 @@ function VerdictDetail({
         <p>
           <strong>Check what outlets you already have before ruling it out.</strong> If you have
           a 240V outlet at home (dryer, welder, RV hookup, garage 50-amp), a portable Level 2
-          charger is $200–$500 and works the day it arrives — no electrician needed. That adds
+          charger is ~$250–$350 and works the day it arrives — no electrician needed. That adds
           ~20 miles of range per hour and changes the picture significantly. Even a standard
           120V outlet adds 3–5 mi/hr overnight and is enough for a short daily drive.
         </p>
@@ -123,15 +123,14 @@ function VerdictDetail({
   return (
     <div className="text-sm text-ink-muted space-y-2">
       <p>
-        WV has about 55 DC fast chargers statewide — most clustered along I-64, I-79, and in
-        Morgantown, Charleston, Huntington, Parkersburg, and Wheeling. Without home charging,
+        WV has only about 56 DC fast-charging sites statewide — most clustered along I-64, I-79,
+        and in Morgantown, Charleston, Huntington, Parkersburg, and Wheeling. Without home charging,
         you&rsquo;d rely on public chargers that are 30–60 miles apart in rural areas.
       </p>
       <p>
-        The federal NEVI program allocated $45.7M to WV for 15 new charging stations — but as of
-        April 2026, no RFP has been issued.{" "}
-        <strong>Earliest new stations: 2027 at best.</strong> This may change — check back as
-        infrastructure improves.
+        The federal NEVI program allocated $45.7M to WV for new highway fast-charging stations,
+        with the first estimated for 2027–2028. Until then, plan around today&rsquo;s network —
+        check back as infrastructure improves.
       </p>
       <div className="space-y-1">
         <p className="font-medium text-ink">Three home-charging tiers, cheapest first:</p>
@@ -139,13 +138,15 @@ function VerdictDetail({
           <li>
             <strong>Already have a 240V outlet?</strong> (dryer, welder, RV hookup, or a
             50-amp circuit in the garage) — a <strong>portable Level 2 charger is
-            $200–$500</strong> and works the day it arrives. No electrician. Adds ~20 mi of
+            ~$250–$350</strong> and works the day it arrives. No electrician. Adds ~20 mi of
             range per hour. This is the option most people overlook.
           </li>
           <li>
-            <strong>Wall-mounted Level 2 install:</strong> $800–$3,200 for hardware plus a
-            licensed electrician. <strong>AEP customers can get $500 back.</strong> Fastest
-            (up to 48 amps) and cleanest install.
+            <strong>Wall-mounted Level 2 install:</strong> typically ~$1,700 installed
+            ($750–$2,500; add $1,500–$3,000 if your electrical panel needs an upgrade).{" "}
+            <strong>Appalachian Power customers can get a $300 rebate.</strong> The federal
+            home-charger tax credit ended June 30, 2026. Fastest (up to 48 amps) and cleanest
+            install.
           </li>
           <li>
             <strong>Standard 120V outlet:</strong> slow — 3–5 mi/hr overnight — but works
@@ -293,8 +294,8 @@ export function FitCheck() {
               See the full numbers →
             </Link>
             <span className="text-xs text-ink-soft">
-              This is a quick filter — the calculator has exact cost, savings,
-              and 5-year TCO.
+              This is a quick filter — the calculator has detailed charging cost,
+              savings, and 5-year running costs.
             </span>
           </div>
 

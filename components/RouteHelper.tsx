@@ -50,8 +50,8 @@ export function RouteHelper({ token, onFill }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const homeTimer = useRef<ReturnType<typeof setTimeout>>();
-  const workTimer = useRef<ReturnType<typeof setTimeout>>();
+  const homeTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const workTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const geocode = useCallback(
     async (q: string): Promise<Suggestion[]> => {

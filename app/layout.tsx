@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     template: "%s | GoEV WV",
   },
   description:
-    "Impartial, West Virginia-specific guidance on electric vehicles. Compare EVs by your commute, your utility, and your wallet — tailored to AEP, Mon Power, Wheeling Power, and WV's EV fees.",
+    "Impartial, West Virginia-specific guidance on electric vehicles. Compare EVs by your commute, your utility, and your wallet — tailored to AEP, Mon Power, Potomac Edison, Wheeling Power, and WV's EV fees.",
   applicationName: "GoEV WV",
   keywords: [
     "West Virginia EV",

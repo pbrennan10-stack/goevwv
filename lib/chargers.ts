@@ -153,11 +153,27 @@ function transformPoi(poi: OcmPoi): Charger | null {
   };
 }
 
-export async function getChargers(): Promise<{
+type ChargerResult = {
   chargers: Charger[];
   retrieved_at: string;
   error: string | null;
-}> {
+};
+
+// During `next build` a failed fetch returns an error result so the build still
+// succeeds (the page shows a "temporarily unavailable" notice). At runtime —
+// the daily background refresh — a failure throws instead, so Next keeps
+// serving the last good version of the page rather than replacing it with the
+// error notice.
+export async function getChargers(): Promise<ChargerResult> {
+  const result = await fetchChargers();
+  const isBuild = process.env.NEXT_PHASE === "phase-production-build";
+  if (!isBuild && (result.error || result.chargers.length === 0)) {
+    throw new Error(`Charger refresh failed: ${result.error ?? "no stations returned"}`);
+  }
+  return result;
+}
+
+async function fetchChargers(): Promise<ChargerResult> {
   const retrieved_at = new Date().toISOString().slice(0, 10);
   const hasKey = !!process.env.OPENCHARGEMAP_API_KEY;
   try {

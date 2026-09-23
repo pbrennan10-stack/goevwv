@@ -36,7 +36,7 @@ const DEFAULT_INPUT: Omit<CalcInput, "vehicle_ids"> = {
   use_tou: false,
   current: {
     mpg: 25,
-    gas_price_per_gal: 3.90,
+    gas_price_per_gal: 0, // replaced at runtime by the AAA baseline in federal.yaml
   },
   apply_winter_derate: true,
   long_trips_per_year: 4,
@@ -44,18 +44,19 @@ const DEFAULT_INPUT: Omit<CalcInput, "vehicle_ids"> = {
 };
 
 export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxToken }: Props) {
+  const baselineGas = federal.calculation_notes.gas_price_baseline_per_gal;
   const [daily, setDaily] = useState(DEFAULT_INPUT.daily_round_trip_mi);
   const [days, setDays] = useState(DEFAULT_INPUT.days_per_week);
   const [utilityId, setUtilityId] = useState(DEFAULT_INPUT.utility_id);
   const [useTOU, setUseTOU] = useState(DEFAULT_INPUT.use_tou);
   const [winter, setWinter] = useState(DEFAULT_INPUT.apply_winter_derate);
   const [mpg, setMpg] = useState(DEFAULT_INPUT.current.mpg);
-  const [gasPrice, setGasPrice] = useState(DEFAULT_INPUT.current.gas_price_per_gal);
+  const [gasPrice, setGasPrice] = useState(baselineGas.current);
   const [iceVehicleId, setIceVehicleId] = useState("");
   const [route, setRoute] = useState<RouteData | null>(null);
   const [longTrips, setLongTrips] = useState(DEFAULT_INPUT.long_trips_per_year);
   const [longTripMi, setLongTripMi] = useState(DEFAULT_INPUT.long_trip_one_way_mi ?? 200);
-  const [gasSensitivityPrice, setGasSensitivityPrice] = useState(DEFAULT_INPUT.current.gas_price_per_gal);
+  const [gasSensitivityPrice, setGasSensitivityPrice] = useState(baselineGas.current);
   const [ownershipPlan, setOwnershipPlan] = useState<"replace" | "keep">("replace");
 
   // Keep sensitivity slider in sync when user updates the main gas price input.
@@ -82,7 +83,7 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
     setUseTOU(bool("tou", DEFAULT_INPUT.use_tou));
     setWinter(bool("w", DEFAULT_INPUT.apply_winter_derate));
     setMpg(num("mpg", DEFAULT_INPUT.current.mpg));
-    setGasPrice(num("gas", DEFAULT_INPUT.current.gas_price_per_gal));
+    setGasPrice(num("gas", baselineGas.current));
     setLongTrips(num("lt", DEFAULT_INPUT.long_trips_per_year));
     setLongTripMi(num("ltm", DEFAULT_INPUT.long_trip_one_way_mi ?? 200));
     const vids = p.get("v");
@@ -116,13 +117,15 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
         });
       }
     }
+    // Runs once on mount to hydrate from the URL; baselineGas comes from static data.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Default selected vehicles (picked to be interesting for WV).
   const [selectedIds, setSelectedIds] = useState<string[]>([
     "chevy-equinox-ev-2025",
     "toyota-rav4-prime-2025",
-    "ford-f150-lightning-2025",
+    "chevy-silverado-ev-wt-2027",
   ]);
 
   const utility = useMemo(
@@ -418,7 +421,7 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
               max={10}
               step={0.05}
               decimals={2}
-              hint="WV average ~$3.90 (AAA, April 2026)."
+              hint={`WV average ~$${baselineGas.current.toFixed(2)} (AAA, ${baselineGas.retrieved_label ?? baselineGas.retrieved ?? "latest"}). Gas prices are volatile — try the slider below.`}
             />
             <SelectField
               label="If you switch to an EV, what happens to this vehicle?"
@@ -568,6 +571,11 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
                               {assemblyBadge(v.assembly_country, v.us_canadian_parts_pct)}
                             </div>
                           )}
+                          {statusLabel(v) && (
+                            <div className="text-xs text-amber-800 leading-snug mt-0.5 font-medium">
+                              {statusLabel(v)}
+                            </div>
+                          )}
                         </div>
                       </div>
                     </button>
@@ -641,6 +649,11 @@ function Results({
           <ReportLink />
         </div>
       </div>
+      <p className="text-xs text-ink-soft -mt-2">
+        These compare <strong>running costs</strong> — fuel or charging, the WV fee, and (when you
+        pick your current vehicle) maintenance and insurance. They don&rsquo;t include what you pay
+        for the vehicle or what it&rsquo;s worth when you sell it.
+      </p>
 
       {/* Cards grid: baseline (current vehicle) + each EV, side-by-side for comparison */}
       <div className={["grid gap-4 md:grid-cols-2", gridColsFor(out.results.length + 1)].join(" ")}>
@@ -710,7 +723,7 @@ function BaselineCard({
           <span className="text-xs font-normal opacity-70"> /year</span>
         </div>
         <div className="text-xs opacity-75">
-          {fmtUSD(annualTotal * 5)} over 5 yr
+          {fmtUSD(annualTotal * 5)} running costs over 5 yr
         </div>
         {!hasIce && (
           <div className="text-xs opacity-75 mt-1 italic">
@@ -764,6 +777,11 @@ function ResultCard({ r, showMaintenance, iceVehicle, currentAnnualCo2Kg }: { r:
         <div className="text-sm text-ink-soft">
           {r.vehicle.trim} · {powertrainLabel(r.vehicle.powertrain)}
         </div>
+        {r.vehicle.status_note && statusLabel(r.vehicle) && (
+          <div className="mt-1 text-xs text-amber-800">
+            <strong>{statusLabel(r.vehicle)}:</strong> {r.vehicle.status_note}
+          </div>
+        )}
       </header>
 
       <div
@@ -780,7 +798,7 @@ function ResultCard({ r, showMaintenance, iceVehicle, currentAnnualCo2Kg }: { r:
           <span className="text-xs font-normal opacity-70"> /year</span>
         </div>
         <div className="text-xs opacity-75">
-          {fmtUSD(Math.abs(r.five_year_savings_vs_current_usd))} {positive ? "saved" : "more"} over 5 yr
+          {fmtUSD(Math.abs(r.five_year_savings_vs_current_usd))} {positive ? "saved" : "more"} in running costs over 5 yr
         </div>
       </div>
 
@@ -814,7 +832,7 @@ function ResultCard({ r, showMaintenance, iceVehicle, currentAnnualCo2Kg }: { r:
           value={`${fmtNum(r.co2_kg_per_year / 1000, 2)} t${currentAnnualCo2Kg > 0 ? ` (−${fmtNum((currentAnnualCo2Kg - r.co2_kg_per_year) / 1000, 2)} vs baseline)` : ""}`}
         />
         <Row
-          label="MSRP"
+          label={r.vehicle.status === "discontinued" ? "Last MSRP" : "MSRP"}
           value={fmtUSD(r.vehicle.msrp_usd)}
         />
         <Row
@@ -860,7 +878,7 @@ function ResultCard({ r, showMaintenance, iceVehicle, currentAnnualCo2Kg }: { r:
       )}
 
       <div className="text-xs text-amber-900 bg-amber-50 ring-1 ring-amber-200 rounded-md p-2 leading-snug">
-        <strong>Resale:</strong> EVs typically depreciate 50–65% over 5 years nationally. WV has ~1,900 registered EVs — a thin local resale market may mean steeper depreciation. Factor into any long-term financial plan.
+        <strong>Resale:</strong> EVs lost ~57% of their value over 5 years in 2026 data (iSeeCars), vs ~42% for all vehicles and ~34% for trucks. WV has only ~5,000 registered EVs — a thin local resale market may mean steeper depreciation. Factor into any long-term financial plan.
       </div>
     </article>
   );
@@ -982,7 +1000,7 @@ function ChargingCard({ r, iceHrs }: { r: VehicleResult; iceHrs: number }) {
       {isPhev && (
         <div className="rounded-lg bg-slate-50 ring-1 ring-slate-200 p-3">
           <div className="text-xs text-ink-soft font-medium mb-0.5">
-            Gas fill-ups (35% gas miles) — active
+            Gas fill-ups ({fmtNum((1 - r.electric_share) * 100, 0)}% gas miles) — active
           </div>
           <div className="text-sm font-semibold text-ink">
             {fmtNum(r.annual_gas_fillups, 1)} fill-ups/yr
@@ -1139,9 +1157,21 @@ function Assumptions({
                 ? `TOU off-peak rate: ${fmtNum(
                     (utility.residential.tou_schedule?.off_peak_rate_per_kwh ?? 0) * 100,
                     1,
-                  )}¢/kWh (100% off-peak charging assumed)`
+                  )}¢/kWh (100% off-peak charging assumed)${
+                    utility.residential.tou_monthly_meter_charge
+                      ? ` plus the EV meter's ${fmtUSD(utility.residential.tou_monthly_meter_charge)}/month basic charge`
+                      : ""
+                  }`
                 : `flat ${fmtNum(utility.residential.flat_rate_per_kwh * 100, 1)}¢/kWh`}
             </strong>
+            . This is the marginal rate (energy charge plus per-kWh riders) —
+            what each extra kWh of charging actually costs, not your bill&rsquo;s
+            average, which spreads fixed charges over every kWh.
+            {utility.id === "rural_coops" && (
+              <> Co-op and small-utility rates couldn&rsquo;t be verified; this
+              ~17¢ figure is a rough placeholder. Check the per-kWh charge on
+              your bill.</>
+            )}
           </li>
           <li>
             {route ? (
@@ -1183,14 +1213,15 @@ function Assumptions({
           </li>
           <li>
             <strong>DCFC (public fast charging) rate:</strong>{" "}
-            <strong>${fed.calculation_notes.dcfc_rate_per_kwh?.current.toFixed(2) ?? "0.48"}/kWh</strong>{" "}
-            for long-trip kWh. Matches Electrify America&rsquo;s Pass (non-member)
-            rate, the dominant public network on WV&rsquo;s interstates.
+            <strong>${fed.calculation_notes.dcfc_rate_per_kwh?.current.toFixed(2) ?? "0.55"}/kWh</strong>{" "}
+            for long-trip kWh — the typical walk-up (no membership) price at
+            fast chargers in and around WV (Tesla Superchargers open to all
+            EVs, Electrify America, ChargePoint, and others).
             Home-charged kWh stay at your utility rate. Each DCFC stop tops the
             battery from ~10% to ~80% SoC (70% of capacity), and each stop
             includes ~4 min of plug-in, authentication, and unplug time beyond
-            the raw charging window. Members of EA Pass+ or EVgo+ pay
-            meaningfully less; this is the walk-up default.
+            the raw charging window. Tesla or Electrify America Pass+ members
+            pay closer to ${fed.calculation_notes.dcfc_rate_per_kwh?.member_rate?.toFixed(2) ?? "0.43"}/kWh.
           </li>
           <li>
             WV EV road fee:{" "}
@@ -1213,24 +1244,30 @@ function Assumptions({
           {hasIceVehicle && (
             <li>
               Insurance: ICE estimate is from vehicle data (full coverage, 35–45 year old WV driver with a clean record).
-              EV insurance is estimated by vehicle class at 15–25% above comparable ICE due to higher parts and repair costs.
+              EV and plug-in hybrid insurance is estimated from vehicle class and price: about 40% of a
+              full-coverage premium doesn&rsquo;t depend on the car, and the rest scales with its value.
+              Tesla, Rivian, and Lucid are estimated ~25% higher for repair costs. 2026 data shows new EVs
+              in WV cost about the same to insure as new gas cars.
               Your actual rate will vary based on driving history, coverage level, and ZIP code — get a real quote before deciding.
             </li>
           )}
           <li>
-            PHEVs: assumed 65% of miles on electric, 35% on gas (industry
-            average from INL/Argonne fleet data).
+            Plug-in hybrids: assumes you plug in every night. Each commute runs on
+            electricity until the battery&rsquo;s range is used up (range reduced in
+            winter when the derate is on), then on gas; each long road trip gets one
+            battery&rsquo;s worth of electric miles. Drivers who don&rsquo;t charge
+            nightly will use more gas — national fleet studies (INL/Argonne) average
+            about 65% electric.
           </li>
           <li>
-            WV grid CO₂ factor: 0.67 kg/kWh (EIA state profile). WV is part of
-            the <strong>PJM Interconnection</strong> — the grid serving 13 states
-            plus DC. PJM&rsquo;s actual fuel mix is more diverse than WV&rsquo;s
-            in-state generation: roughly 40% gas, 22% nuclear, 18% coal, and
-            17%+ wind/solar/hydro from neighboring states. When PJM dispatches
-            gas or nuclear instead of coal, your EV&rsquo;s real-time emissions
-            drop. The 0.67 kg/kWh figure reflects WV&rsquo;s heavy coal exports
-            and is the conservative assumption; the actual PJM marginal factor
-            at night (when most EVs charge) is typically lower.{" "}
+            Grid CO₂ factor: 0.44 kg/kWh — EPA eGRID&rsquo;s rate for the RFCW
+            region West Virginia belongs to, including grid losses. WV is part
+            of the <strong>PJM Interconnection</strong>, the grid serving 13
+            states plus DC, and exports much of the coal power it generates, so
+            the regional mix — not WV&rsquo;s in-state plants — is what your
+            charger actually draws from. EPA and DOE use the same approach. As
+            a coal-only worst case, WV&rsquo;s in-state generation averages
+            ~0.87 kg/kWh (EIA).{" "}
             <strong>
               As the grid adds renewables, EV emissions fall automatically —
               a gas car&rsquo;s emissions never change.
@@ -1386,12 +1423,17 @@ function groupedByClass(vehicles: Vehicle[]): Array<{ cls: Vehicle["class"]; lis
   for (const list of buckets.values()) {
     list.sort(
       (a, b) =>
+        statusRank(a) - statusRank(b) ||
         a.make.localeCompare(b.make) ||
         a.model.localeCompare(b.model) ||
         a.year - b.year,
     );
   }
   return CLASS_ORDER.filter((c) => buckets.has(c)).map((c) => ({ cls: c, list: buckets.get(c)! }));
+}
+
+function statusRank(v: Vehicle): number {
+  return v.status === "discontinued" ? 2 : v.status === "final_year" ? 1 : 0;
 }
 
 function rangeLabel(v: Vehicle): string {
@@ -1407,6 +1449,12 @@ function rangeLabel(v: Vehicle): string {
     }
     return `${v.epa_range_mi} mi EPA`;
   }
+  return "";
+}
+
+function statusLabel(v: Vehicle): string {
+  if (v.status === "final_year") return "Final model year — dealer inventory only";
+  if (v.status === "discontinued") return "No longer sold new — used market";
   return "";
 }
 

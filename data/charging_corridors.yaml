@@ -1,28 +1,41 @@
 # WV EV Charging Infrastructure — curated quarterly alongside vehicle MSRPs
-# Last updated: 2026-04-18
-# Sources: Tesla.com/findus, PlugShare, ChargePoint, WVDOT NEVI plan documents
+# Last updated: 2026-09-23 (NEVI status + statewide counts refreshed; corridor
+#   station lists below were NOT re-verified this cycle — last curated 2026-04-18)
+# Sources: AFDC station + registration data, dcfctracker.com, WVDOT NEVI pages,
+#   EV States Clearinghouse awards dashboard, Tesla.com/findus, PlugShare
 # Coverage rating: good = no gaps >50 mi, moderate = some gaps 50-80 mi, thin = gaps >80 mi
 
 nevi_status:
   allocation_usd: 45700000
   allocation_note: "Allocated over 5 years under IIJA/BIL"
   rfp_issued: false
-  rfp_expected: "Q2–Q3 2026"
-  stations_planned: 15
-  estimated_stations_open: "2027–2028"
+  current_phase: "Program planning and management (Phase 1)"
+  stations_planned: 15  # from earlier WVDOT plan; not re-confirmed on current WVDOT pages
+  estimated_stations_open: "2027–2028 (estimated)"
+  as_of: "September 2026"
+  source_url: "https://transportation.wv.gov/nevi-home"
+  # Keep this note factual and neutral — describe status, don't characterize pace.
   note: >
-    WV has not issued an RFP as of April 2026 — nearly two years behind schedule.
-    The federal NEVI program was frozen in February 2025 and partially restored in
-    August 2025, but WV did not join the states' lawsuit and faces additional
-    uncertainty. Planned stations follow I-64, I-77, I-79, I-81, and I-70 corridors.
-    Do not count on these stations existing until 2027 at the earliest.
+    The federal NEVI program funds new DC fast-charging stations along West
+    Virginia's interstate corridors (I-64, I-77, I-79, I-81, and I-70).
+    WVDOT updated its NEVI deployment plan in September 2025 and began Phase 1
+    program management in 2026. NEVI-funded stations are not yet open; the
+    first are estimated for 2027–2028. See WVDOT's NEVI page for the latest
+    status, and plan trips around today's network in the meantime.
 
 statewide_summary:
-  public_ports_approx: 550
-  dcfc_approx: 55
-  as_of: "late 2025"
-  bev_registrations: 1870
-  bev_pct_of_vehicles: 0.13
+  public_ports_approx: 543      # AFDC: 324 L2 + 217 DCFC + 2 L1 ports
+  l2_ports_approx: 324
+  dcfc_ports_approx: 217
+  dcfc_sites_approx: 56         # dcfctracker.com (AFDC doesn't split DCFC locations)
+  as_of: "September 2026"
+  bev_registrations: 5000       # AFDC 2025 registration data (rounded), published June 2026
+  phev_registrations: 2700
+  bev_pct_of_vehicles: 0.38     # of ~1,323,000 light-duty vehicles
+  sources:
+    - "https://afdc.energy.gov/stations/states"
+    - "https://afdc.energy.gov/vehicle-registration"
+    - "https://dcfctracker.com/states/wv"
 
 corridors:
   - id: i64
@@ -87,7 +100,7 @@ corridors:
     gaps:
       - description: "Clarksburg to Charleston — ~100 miles; limited DCFC mid-route"
         severity: high
-        note: "Weston and Sutton are NEVI planned stops (2027+). Current gap is real."
+        note: "Weston and Sutton are planned NEVI stops. Plan charging stops ahead on this stretch."
 
   - id: i77
     name: "I-77 — WV Turnpike (North-South)"
@@ -103,7 +116,7 @@ corridors:
         network: Planned NEVI
         stalls: 0
         kw: 0
-        note: "NEVI planned stop; not built as of 2026"
+        note: "Planned NEVI stop (not yet open)"
       - city: Parkersburg
         network: Tesla Supercharger
         stalls: 6
@@ -111,7 +124,7 @@ corridors:
     gaps:
       - description: "Beckley to Ripley to Parkersburg — sparse non-Tesla DCFC across ~130 miles"
         severity: high
-        note: "Ripley NEVI station is planned but not yet built. Use PlugShare to check current status."
+        note: "Ripley is a planned NEVI stop (not yet open). Use PlugShare to check current options."
 
   - id: i81
     name: "I-81 — Eastern Panhandle"

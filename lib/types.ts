@@ -50,6 +50,10 @@ export interface Vehicle {
   us_canadian_parts_pct?: number | null; // null = AALA-exempt (GVWR > 8,500 lbs)
   assembly_location?: string;            // e.g. "Dearborn, MI" or "Cuautitlán, Mexico"
   assembly_country?: string;             // e.g. "US", "Canada", "Mexico", "South Korea"
+  // current = sold new; final_year = last model year / production ended, new
+  // inventory remains; discontinued = used market only (msrp_usd is last new price).
+  status?: "current" | "final_year" | "discontinued";
+  status_note?: string;
   notes: string;
 }
 
@@ -78,6 +82,7 @@ export interface UtilityResidential {
     on_peak_rate_per_kwh: number;
   };
   tou_requires_separate_meter?: boolean;
+  tou_monthly_meter_charge?: number; // basic charge on the separate EV meter, $/month
   tou_enrollment_notes?: string;
   tou_notes?: string;
 }
@@ -123,8 +128,19 @@ export interface FederalData {
   };
   calculation_notes: {
     winter_range_derating: { default_percent: number };
-    gas_price_baseline_per_gal: { current: number; source: string };
-    dcfc_rate_per_kwh?: { current: number; source: string; retrieved?: string; notes?: string };
+    gas_price_baseline_per_gal: {
+      current: number;
+      source: string;
+      retrieved?: string;
+      retrieved_label?: string;
+    };
+    dcfc_rate_per_kwh?: {
+      current: number;
+      member_rate?: number;
+      source: string;
+      retrieved?: string;
+      notes?: string;
+    };
   };
 }
 
@@ -158,6 +174,7 @@ export interface VehicleResult {
   annual_dcfc_energy_cost_usd: number;   // BEV long-trip fast charging
   annual_phev_gas_cost_usd: number;      // PHEV gas portion (commute + long-trip)
   annual_dcfc_kwh: number;               // for display / transparency
+  electric_share: number;                // 1 for BEVs; PHEV share of miles on electricity
 }
 
 export interface IceVehicleMaintenance {
@@ -234,17 +251,24 @@ export interface NeviStatus {
   allocation_note?: string;
   rfp_issued: boolean;
   rfp_expected?: string;
+  current_phase?: string;
   stations_planned: number;
   estimated_stations_open: string;
+  as_of?: string;
+  source_url?: string;
   note: string;
 }
 
 export interface StatewideSummary {
   public_ports_approx: number;
-  dcfc_approx: number;
+  l2_ports_approx?: number;
+  dcfc_ports_approx: number;
+  dcfc_sites_approx: number;
   as_of: string;
   bev_registrations: number;
+  phev_registrations?: number;
   bev_pct_of_vehicles: number;
+  sources?: string[];
 }
 
 export interface ChargingInfraData {

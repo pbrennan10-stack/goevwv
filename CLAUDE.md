@@ -13,7 +13,7 @@ Audience is both residential drivers and (by v2) WV small-business fleets.
 
 ## Stack
 
-- **Next.js 14** App Router + TypeScript + Tailwind
+- **Next.js 15** App Router + React 19 + TypeScript + Tailwind
 - **Node.js 20** (Alpine in Docker)
 - **Data files** under `data/` — curated JSON/YAML, edited via git commits (no CMS yet)
 - **Docker + Caddy** — Caddy handles TLS via Let's Encrypt automatically
@@ -25,7 +25,7 @@ Intentional non-choices: no Postgres, Redis, auth, email, or background workers.
 ## Required env vars (build-time)
 
 - **`NEXT_PUBLIC_MAPBOX_TOKEN`** — Mapbox token for RouteHelper (geocoding/directions) and ChargerMap rendering. Embedded in the client bundle at build.
-- **`OPENCHARGEMAP_API_KEY`** — Free key from openchargemap.org. Used server-side at build time to fetch the WV charger list for `/chargers`. Without it, the page shows a graceful "temporarily unavailable" fallback instead of the map.
+- **`OPENCHARGEMAP_API_KEY`** — Free key from openchargemap.org. Used server-side to fetch the WV charger list for `/chargers`, both at build time and by the daily background refresh (so docker-compose passes it to the running container too). Without it at build, the page shows a graceful "temporarily unavailable" fallback; a failed daily refresh keeps the last good page.
 
 Locally these live in `.env.local` (gitignored). On the droplet they live in `/opt/goevwv/.env`, read by `docker compose` and forwarded as build-args per `docker-compose.yml`.
 
@@ -83,11 +83,13 @@ docker compose logs app --tail 50 -f
 ## Calculation methodology (important — document in UI if you change)
 
 - **Winter derate:** +12% annual kWh (4 cold months × ~28% range loss, averaged). Toggleable in UI; default ON.
-- **TOU rate:** 100% off-peak rate assumed — users who opt into TOU are committed to overnight charging.
-- **PHEV split:** 65% electric miles / 35% gas miles (Argonne/INL fleet data).
-- **WV grid CO₂ factor:** 0.67 kg/kWh (EIA state profile; WV is heavily coal-fired).
-- **Federal $7,500 IRA credit:** applied when `vehicle.tax_credit_eligible = true` AND MSRP ≤ $55k (cars) / $80k (SUVs/trucks). Assumes point-of-sale claim.
+- **TOU rate:** 100% off-peak rate assumed — users who opt into TOU are committed to overnight charging. The separate EV meter's monthly basic charge (`tou_monthly_meter_charge`, $14.02 for AEP/Wheeling Schedule PEV) is added to annual energy cost.
+- **PHEV split:** commute-aware, assuming nightly charging — each commute day uses min(round trip, electric range) electric miles, each long trip gets one battery's worth; winter derate shrinks electric range by the same 1.12 factor. (Replaced a fixed 65/35 split in Sept 2026.)
+- **Grid CO₂ factor:** 0.44 kg/kWh — EPA eGRID RFCW subregion incl. grid losses (WV is in PJM). EIA's WV in-state rate (0.87) is shown as a coal-only worst case.
+- **EV insurance:** class base × (0.40 + 0.60 × MSRP / class reference MSRP), clamped 0.85–1.8, × 1.25 for Tesla/Rivian/Lucid/Polestar. Gas-vehicle insurance is per-model in `ice_vehicles.json`.
+- **Federal credits:** IRC 30D/25E ended for vehicles acquired after 2025-09-30 and 30C (home charger) after 2026-06-30 (P.L. 119-21). `federalCredit()` returns 0 while `new_ev_credit.active: false`.
 - **WV annual fee:** $200 BEV / $100 PHEV added to annual operating cost (per WV Code §17A-10-3c).
+- **Results are running costs**, not full ownership cost — purchase price, financing, and resale are not included (the UI says so).
 
 These constants live in `lib/calc.ts`. If you adjust any, also update the "Assumptions" section in `components/Calculator.tsx` so users see what changed.
 
@@ -96,13 +98,14 @@ These constants live in `lib/calc.ts`. If you adjust any, also update the "Assum
 - Per-field confidence (Verified / Approximate / Pending) and source provenance is documented at `/state-of-the-data`. That page is the source of truth for "where does this number come from?" — keep it updated when data files change.
 - Vehicle MSRPs are MY2025 base-trim approximations. Refresh quarterly.
 - Rebate `expires` dates change on utility schedules; verify against the utility's own program page, not aggregators.
+- Vehicle `id`s are stable keys used in shareable URLs — never rename one, even when the model year changes. Use `status` (`current` / `final_year` / `discontinued`) instead of deleting a model.
+- When editing vehicle `notes`, append to the existing commentary rather than replacing it.
+- The gas-price default lives in `federal.yaml` (`gas_price_baseline_per_gal`); the calculator and report read it from there.
 - When adding a new rebate that isn't fully confirmed, mark it with `confidence: "approximate"` in the YAML (free-form; not yet schema-enforced) and document the verification gap on `/state-of-the-data` — don't ship it silently.
 
 ## Deployment workflow
 
-Current (manual): edit files → commit → push → SSH into droplet → `git pull && docker compose up -d --build`.
-
-**TODO:** Set up GitHub Actions to auto-deploy on push to `main`. This is tracked in Open TODOs below. Until then, pushing does NOT deploy automatically.
+Pushing to `main` deploys automatically: `.github/workflows/deploy.yml` SSHes into the droplet and runs `git fetch && git reset --hard origin/main && docker compose up -d --build`. It can also be triggered manually from the GitHub Actions tab. If the build fails, the previous container keeps running.
 
 The first-time droplet setup is in `docs/REBUILD_RUNBOOK.md` (parent folder in Cowork workspace, also should be copied into `docs/` here). The bootstrap script `scripts/bootstrap.sh` is idempotent and can be re-run safely.
 
@@ -113,21 +116,22 @@ The first-time droplet setup is in `docs/REBUILD_RUNBOOK.md` (parent folder in C
 - The droplet has UFW (22/80/443 only), fail2ban on SSH, and unattended-upgrades for security patches. SSH is key-only, no passwords.
 - DO weekly backups are enabled (~$1.20/mo).
 
-## Current status (as of 2026-04-18)
+## Current status (as of 2026-09-23)
 
-- ✅ Domain registered (GoDaddy), DNS pointing at droplet
-- ✅ Droplet provisioned (Ubuntu 24.04, Docker, Caddy, firewall, fail2ban)
-- ✅ Coming Soon page deployed (static, served by Caddy)
-- ✅ MVP code complete locally (this commit if you're reading it post-push)
-- 🟡 **MVP not yet deployed to the droplet** — needs `git pull && docker compose up -d --build` on droplet after push
+- ✅ Live on goevwv.com: calculator, charger map (v1.1), About, State of the Data, printable report
+- ✅ Auto-deploy on push to `main`
+- ✅ September 2026 data refresh (utilities, fees, gas, DCFC, 58-vehicle catalog, insurance/maintenance) and Next.js 15 security upgrade
 
 ## Open TODOs
 
-- [ ] **Push MVP to GitHub + `git pull + docker compose up -d --build` on droplet**
+- [x] Push MVP + deploy to droplet
 - [ ] Clean up whyweare50th.com DNS (retiring domain; A record still points here)
 - [ ] Set up UptimeRobot (free, 5-min ping to https://goevwv.com)
-- [ ] Add GitHub Actions auto-deploy on push to main (webhook to droplet, or polling)
-- [ ] v1.1: charger map using OpenChargeMap API (free, no key) — map UI + cache layer
+- [x] GitHub Actions auto-deploy on push to main
+- [x] v1.1: charger map using OpenChargeMap API (free key required)
+- [ ] Two-car household mode: "keep as second vehicle" option — model an EV for commuting alongside a kept gas vehicle (UI option exists; math is future build-out)
+- [ ] Full ownership cost: purchase price, financing, and resale value alongside running costs
+- [ ] Road trips modeled separately at interstate speed; utility lookup by address; contact/feedback link
 - [ ] v1.1: dealer/installer directory — curated YAML + map overlay
 - [ ] v1.2: rebate & TOU explainer page — dedicated route per utility
 - [ ] v1.2: optional Decap CMS admin at /admin for YAML-averse editing
