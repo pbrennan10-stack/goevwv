@@ -32,7 +32,14 @@ interface Suggestion {
 
 interface Props {
   token: string;
-  onFill: (r: RouteData) => void;
+  // Receives the computed RouteData PLUS the resolved origin/destination
+  // coordinates. Coords are needed by callers that want to deep-link to other
+  // pages (e.g. /chargers?o=lng,lat&d=lng,lat) — RouteData itself only carries
+  // derived metrics, not the geographic endpoints.
+  onFill: (
+    r: RouteData,
+    coords: { origin: [number, number]; destination: [number, number] },
+  ) => void;
 }
 
 export function RouteHelper({ token, onFill }: Props) {
@@ -163,7 +170,7 @@ export function RouteHelper({ token, onFill }: Props) {
 
       const r: RouteData = { distance_mi, highway_fraction, highway_avg_speed_mph, elevation_gain_m, summary };
       setResult(r);
-      onFill(r);
+      onFill(r, { origin: homeCoords, destination: workCoords });
     } catch (e) {
       setError(e instanceof Error ? e.message : "Route lookup failed.");
     } finally {

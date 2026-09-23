@@ -85,6 +85,9 @@ export default function HomePage() {
           </Link>{" "}
           page for every source and retrieval date.
         </p>
+        <p className="mt-3 text-xs">
+          &copy; {new Date().getFullYear()} GoEV WV. Built by Patrick Brennan in West Virginia.
+        </p>
       </footer>
     </main>
   );

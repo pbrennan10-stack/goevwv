@@ -106,8 +106,8 @@ pump vs. passive home charging vs. active DCFC time on long trips.
 **Realistic highway range** — DCFC stop calculator uses a curated
 `highway_range_mi` per vehicle (not EPA combined). Tesla gets ~35% off EPA; other
 BEVs derate ~15–20%. Math models asymmetric usable windows: first tank from home
-uses 85% (100% → 15% SOC); subsequent DCFC stops use 65% (80% fast-charge cap →
-15% SOC).
+uses 90% (100% → 10% SOC); subsequent DCFC stops use 70% (80% fast-charge cap →
+10% SOC).
 
 **Route-specific long-trip distance** — user enters actual one-way distance
 (default 200 mi, range 50–600).
@@ -197,6 +197,14 @@ preserved where rhetorically load-bearing.
 - Curated dealer/installer directory as map overlay + list
 - "Distance from your route" filter
 - Mapbox is already wired and credentialed; OpenChargeMap is free and keyless
+- **Investigate NREL Alternative Fuels Data Center station API**
+  (developer.nrel.gov/docs/transportation/alt-fuel-stations-v1/) as either a
+  replacement for or second source alongside OpenChargeMap. NREL is
+  government-maintained (DOE), arguably more authoritative for US stations,
+  has a documented schema, and offers a free API key with generous quotas.
+  Open questions: WV coverage completeness vs. OCM, connector/power field
+  mapping, update cadence. If coverage is comparable, either swap or
+  cross-reference both and flag stations that appear in only one source.
 
 ### v1.2 — Rebates, §30C Countdown, Used-EV Angle (revised scope)
 
@@ -429,6 +437,7 @@ would push above but still affordable.
 | Next.js 14 security patch (CVE from Dec 2025 advisory) | Open |
 | UptimeRobot monitoring | Open |
 | Analytics decision (GA4 vs. Plausible) | Open |
+| Trim-package audit (especially Rivian R1T/R1S Standard/Large/Max pack sizes, and cross-check all variant-group entries for pack kWh, range, 0-60, MSRP consistency with current OEM spec sheets) | Open |
 | v1.1 charger map + dealer directory | Not started |
 | v1.2 rebate explainer + §30C countdown + used-EV page | Not started |
 | v2.0 business mode + fleet TCO | Not started |

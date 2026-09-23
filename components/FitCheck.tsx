@@ -26,9 +26,17 @@ type Verdict = "fit" | "likely" | "maybe" | "notyet";
 
 function computeVerdict(charging: ChargingAnswer, miles: MilesAnswer, trips: TripsAnswer): Verdict {
   if (charging === "yes") {
-    if (miles !== "over80") return "fit";
-    // Same-place repeat trips become routine once scoped; varied destinations
-    // keep adding planning overhead each time.
+    if (miles === "under40") return "fit";
+    if (miles === "40-80") {
+      // Moderate daily commute: rarely/routine long trips are a clean BEV fit.
+      // Varied novel destinations add per-trip planning overhead — downgrade to
+      // "likely" and surface the PHEV alternative (daily electric, gas for
+      // unfamiliar highway runs).
+      if (trips === "varied") return "likely";
+      return "fit";
+    }
+    // over80 — heavy daily driver. Same-place repeat trips become routine once
+    // scoped; varied destinations keep adding planning overhead each time.
     if (trips === "varied") return "maybe";
     return "likely";
   }
@@ -60,12 +68,68 @@ const VERDICT_UI: Record<Verdict, { icon: string; heading: string; color: string
   },
 };
 
+// Shown alongside any verdict when the user's daily round-trip is under 40 mi.
+// At that mileage fuel cost is already modest, so the dollar-savings pitch
+// for switching to an EV is weak even when everything else lines up. Rather
+// than hide that, we name it — users who choose an EV should be choosing on
+// non-fuel grounds (simpler drivetrain, less pump time, domestic energy).
+// Shown when a user's pattern is short daily commute + frequent long trips.
+// That's the textbook PHEV use case: electric for the commute, gas for the
+// road trips, no public-charging dependency, no range anxiety. Often a
+// better fit than either a pure BEV or a pure gas car at this mix.
+function PhevSuggestionNote() {
+  return (
+    <div className="rounded-lg bg-brand-bg ring-1 ring-brand/30 p-3 text-sm text-ink">
+      <p>
+        <strong className="text-brand-dark">A PHEV might be the sweet spot here:</strong>{" "}
+        short daily commute + frequent long trips is the pattern plug-in hybrids
+        were built for. A 30–45 mile electric range covers almost all your
+        day-to-day driving on cheap home electricity — then on long trips the
+        gas engine takes over. No charging stops, no range anxiety, no public-
+        charger dependency.
+      </p>
+      <p className="mt-2 text-ink-muted">
+        WV-relevant options: Toyota RAV4 Prime (42 mi electric), Toyota Prius
+        Prime (44 mi), Ford Escape PHEV (37 mi), Jeep Wrangler 4xe (22 mi).
+        Worth comparing in the calculator before committing to a pure BEV.
+      </p>
+    </div>
+  );
+}
+
+function LowMileageNote() {
+  return (
+    <div className="rounded-lg bg-amber-50 ring-1 ring-amber-200 p-3 text-sm text-amber-900">
+      <p>
+        <strong>One honest note on economics at this mileage:</strong> a short
+        commute means your gas bill is already modest — typically around
+        $1,200–$1,500/yr at WV gas prices. Going electric saves maybe $800–$1,200
+        of that per year, which is real but won&rsquo;t pay back a new-EV
+        premium quickly on fuel alone. Higher-mileage drivers see the dollar
+        case close much faster.
+      </p>
+      <p className="mt-2">
+        At low mileage, the stronger reasons to go electric tend to be the
+        non-fuel ones — simpler drivetrain and lower maintenance (no oil
+        changes, brakes last 3–5× longer), domestic energy, and the time you
+        get back not visiting gas stations. See{" "}
+        <Link href="/about" className="font-semibold underline hover:text-amber-950">
+          Why EVs Matter
+        </Link>{" "}
+        for the full case.
+      </p>
+    </div>
+  );
+}
+
 function VerdictDetail({
   verdict,
   charging,
+  trips,
 }: {
   verdict: Verdict;
   charging: ChargingAnswer;
+  trips: TripsAnswer;
 }) {
   if (verdict === "fit") {
     return (
@@ -78,6 +142,20 @@ function VerdictDetail({
     );
   }
   if (verdict === "likely") {
+    if (trips === "varied") {
+      return (
+        <p className="text-sm text-ink-muted">
+          Home charging handles your daily driving easily at this mileage. Long
+          trips to varied destinations mean ~5 minutes on PlugShare (a free EV-charger
+          app) or your car&rsquo;s built-in nav before each new route — trips you
+          repeat settle into routine after the first run. WV winters cut range
+          ~28% on the coldest days, so check winter range in the calculator. A
+          PHEV is a strong alternative if you&rsquo;d rather skip long-trip
+          planning entirely — it runs on electric daily and switches to gas for
+          unfamiliar highway trips.
+        </p>
+      );
+    }
     return (
       <p className="text-sm text-ink-muted">
         Home charging handles your daily driving. Long trips to the same handful of places — a
@@ -119,7 +197,8 @@ function VerdictDetail({
       </div>
     );
   }
-  // notyet
+  // notyet — no low-mileage note needed here: these users are blocked on charging,
+  // not on whether the fuel-cost math works.
   return (
     <div className="text-sm text-ink-muted space-y-2">
       <p>
@@ -282,8 +361,12 @@ export function FitCheck() {
             </span>
             <span className="font-semibold text-ink text-base">{ui.heading}</span>
           </div>
-          <div className="mb-4">
-            <VerdictDetail verdict={verdict} charging={charging} />
+          <div className="mb-4 space-y-3">
+            <VerdictDetail verdict={verdict} charging={charging} trips={trips} />
+            {miles === "under40" && verdict !== "notyet" && <LowMileageNote />}
+            {verdict !== "notyet" &&
+              ((miles === "under40" && (trips === "routine" || trips === "varied")) ||
+                (miles === "40-80" && trips === "varied")) && <PhevSuggestionNote />}
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3 sm:items-center mt-4">

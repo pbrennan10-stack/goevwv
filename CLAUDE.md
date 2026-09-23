@@ -72,9 +72,14 @@ npm run typecheck      # tsc --noEmit
 npm run build          # production build
 npm run lint
 
-# Deploy to droplet (ssh root@174.138.53.28 first)
+# Deploy: pushing to `main` triggers `.github/workflows/deploy.yml`, which
+# SSHes into the droplet and runs the sequence below. No manual step needed.
+# Runs take ~60s; watch them at https://github.com/pbrennan10-stack/goevwv/actions.
+
+# Manual fallback (if Actions is down or you need to debug on the droplet):
+ssh root@174.138.53.28
 cd /opt/goevwv
-git pull
+git fetch origin && git reset --hard origin/main
 docker compose up -d --build
 docker compose ps
 docker compose logs app --tail 50 -f
@@ -105,9 +110,11 @@ These constants live in `lib/calc.ts`. If you adjust any, also update the "Assum
 
 ## Deployment workflow
 
-Pushing to `main` deploys automatically: `.github/workflows/deploy.yml` SSHes into the droplet and runs `git fetch && git reset --hard origin/main && docker compose up -d --build`. It can also be triggered manually from the GitHub Actions tab. If the build fails, the previous container keeps running.
+Auto-deploy via GitHub Actions: every push to `main` triggers `.github/workflows/deploy.yml`, which SSHes into the droplet, runs `git fetch origin && git reset --hard origin/main`, and rebuilds the containers. Typical cycle is ~60 seconds from push to live. The workflow uses the `DEPLOY_KEY` GitHub secret (SSH private key) for droplet access. If the build fails, the previous container keeps running.
 
-The first-time droplet setup is in `docs/REBUILD_RUNBOOK.md` (parent folder in Cowork workspace, also should be copied into `docs/` here). The bootstrap script `scripts/bootstrap.sh` is idempotent and can be re-run safely.
+Manual fallback — use when Actions is down, the workflow errors, or you're debugging on the droplet directly: `ssh root@174.138.53.28 && cd /opt/goevwv && git fetch origin && git reset --hard origin/main && docker compose up -d --build`.
+
+The first-time droplet setup is in `docs/REBUILD_RUNBOOK.md`. The bootstrap script `scripts/bootstrap.sh` is idempotent and can be re-run safely.
 
 ## Operational notes
 
@@ -118,25 +125,26 @@ The first-time droplet setup is in `docs/REBUILD_RUNBOOK.md` (parent folder in C
 
 ## Current status (as of 2026-09-23)
 
-- ✅ Live on goevwv.com: calculator, charger map (v1.1), About, State of the Data, printable report
-- ✅ Auto-deploy on push to `main`
-- ✅ September 2026 data refresh (utilities, fees, gas, DCFC, 58-vehicle catalog, insurance/maintenance) and Next.js 15 security upgrade
+- ✅ Domain registered (GoDaddy), DNS pointing at droplet
+- ✅ Droplet provisioned (Ubuntu 24.04, Docker, Caddy, firewall, fail2ban)
+- ✅ Site live at https://goevwv.com: calculator, charger map (v1.1), About, State of the Data, printable report
+- ✅ GitHub Actions auto-deploy on push to `main` is active
+- ✅ September 2026 data refresh (utilities, fees, gas, DCFC, vehicle catalog, insurance/maintenance) and Next.js 15 security upgrade
 
 ## Open TODOs
 
-- [x] Push MVP + deploy to droplet
 - [ ] Clean up whyweare50th.com DNS (retiring domain; A record still points here)
 - [ ] Set up UptimeRobot (free, 5-min ping to https://goevwv.com)
-- [x] GitHub Actions auto-deploy on push to main
-- [x] v1.1: charger map using OpenChargeMap API (free key required)
+- [x] v1.1: charger map using OpenChargeMap API (free key required) — live fetch + committed snapshot fallback
 - [ ] Two-car household mode: "keep as second vehicle" option — model an EV for commuting alongside a kept gas vehicle (UI option exists; math is future build-out)
 - [ ] Full ownership cost: purchase price, financing, and resale value alongside running costs
 - [ ] Road trips modeled separately at interstate speed; utility lookup by address; contact/feedback link
+- [ ] Move the repo out of OneDrive (or pin it "Always keep on this device") — OneDrive turned .git files into online-only placeholders in Sept 2026 and broke commits
 - [ ] v1.1: dealer/installer directory — curated YAML + map overlay
 - [ ] v1.2: rebate & TOU explainer page — dedicated route per utility
 - [ ] v1.2: optional Decap CMS admin at /admin for YAML-averse editing
 - [ ] v2.0: business-mode toggle + fleet TCO (multi-vehicle input, depot charging, commercial tariff, Section 179/bonus depreciation)
-- [ ] Eventually: favicons, OG images, sitemap.xml, robots.txt
+- [x] Favicons, OG images, sitemap.xml, robots.txt
 - [x] `VERIFY_BEFORE_LAUNCH` markers cleaned up (v1.0.6); per-field confidence now lives on `/state-of-the-data`
 
 ## Principles

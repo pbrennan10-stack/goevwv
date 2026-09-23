@@ -153,28 +153,20 @@ function transformPoi(poi: OcmPoi): Charger | null {
   };
 }
 
-type ChargerResult = {
-  chargers: Charger[];
+// Fallback snapshot shape. Committed alongside the code at
+// data/charger-snapshot.json so a failing build still produces a working
+// charger map instead of the "data temporarily unavailable" UI. Refreshed
+// quarterly (or any time we notice the live data has drifted meaningfully).
+interface ChargerSnapshot {
   retrieved_at: string;
-  error: string | null;
-};
-
-// During `next build` a failed fetch returns an error result so the build still
-// succeeds (the page shows a "temporarily unavailable" notice). At runtime —
-// the daily background refresh — a failure throws instead, so Next keeps
-// serving the last good version of the page rather than replacing it with the
-// error notice.
-export async function getChargers(): Promise<ChargerResult> {
-  const result = await fetchChargers();
-  const isBuild = process.env.NEXT_PHASE === "phase-production-build";
-  if (!isBuild && (result.error || result.chargers.length === 0)) {
-    throw new Error(`Charger refresh failed: ${result.error ?? "no stations returned"}`);
-  }
-  return result;
+  source?: string;
+  notes?: string;
+  pois: OcmPoi[];
 }
 
-async function fetchChargers(): Promise<ChargerResult> {
-  const retrieved_at = new Date().toISOString().slice(0, 10);
+async function tryLiveFetch(): Promise<
+  { ok: true; pois: OcmPoi[] } | { ok: false; error: string; status?: number }
+> {
   const hasKey = !!process.env.OPENCHARGEMAP_API_KEY;
   try {
     const headers: Record<string, string> = {
@@ -185,7 +177,6 @@ async function fetchChargers(): Promise<ChargerResult> {
     }
     const res = await fetch(ocmUrl(), {
       headers,
-      // Revalidate once per day if the route becomes ISR later; no effect at build time.
       next: { revalidate: 86400 },
     });
     if (!res.ok) {
@@ -194,21 +185,90 @@ async function fetchChargers(): Promise<ChargerResult> {
           ? " — set OPENCHARGEMAP_API_KEY env var (free at openchargemap.org/profile/register)"
           : "";
       return {
-        chargers: [],
-        retrieved_at,
+        ok: false,
+        status: res.status,
         error: `OpenChargeMap returned ${res.status}${suffix}`,
       };
     }
     const data = (await res.json()) as OcmPoi[];
-    const chargers = data
-      .map(transformPoi)
-      .filter((c): c is Charger => c !== null);
-    return { chargers, retrieved_at, error: null };
+    return { ok: true, pois: data };
   } catch (e) {
     return {
-      chargers: [],
-      retrieved_at,
+      ok: false,
       error: e instanceof Error ? e.message : "Unknown error",
     };
   }
+}
+
+async function loadSnapshot(): Promise<ChargerSnapshot | null> {
+  // Dynamic import so this module stays edge-safe if ever used in an edge
+  // context — fs only loads on the Node server. At build time it's a regular
+  // Node process, so this is a no-op.
+  try {
+    const { readFile } = await import("node:fs/promises");
+    const { join } = await import("node:path");
+    const path = join(process.cwd(), "data", "charger-snapshot.json");
+    const text = await readFile(path, "utf8");
+    return JSON.parse(text) as ChargerSnapshot;
+  } catch {
+    return null;
+  }
+}
+
+export async function getChargers(): Promise<{
+  chargers: Charger[];
+  retrieved_at: string;
+  error: string | null;
+  is_snapshot?: boolean;
+  snapshot_date?: string;
+}> {
+  const today = new Date().toISOString().slice(0, 10);
+
+  // Retry the live fetch 2-3 times with a short backoff. OpenChargeMap's
+  // free-tier rate limits can briefly return 403/429 and then recover a
+  // second later. Without retries, any such blip would bake the fallback
+  // error into the static build for a full deploy cycle.
+  let lastError = "Unknown fetch failure";
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    const result = await tryLiveFetch();
+    if (result.ok) {
+      const chargers = result.pois
+        .map(transformPoi)
+        .filter((c): c is Charger => c !== null);
+      return { chargers, retrieved_at: today, error: null };
+    }
+    lastError = result.error;
+    if (attempt < 3) {
+      // 800 ms, then 2 s. Keeps total worst-case latency under 3 s while
+      // covering typical transient-rate-limit windows.
+      await new Promise((r) => setTimeout(r, attempt === 1 ? 800 : 2000));
+    }
+  }
+
+  // All live attempts failed — try the committed snapshot. Users see real
+  // charger data (slightly stale) instead of a blank map + error banner.
+  // /chargers renders per request (it reads searchParams), so this path runs
+  // at request time too — which is why the running container needs
+  // OPENCHARGEMAP_API_KEY (see docker-compose.yml). Successful fetches are
+  // cached for a day via next.revalidate above.
+  const snapshot = await loadSnapshot();
+  if (snapshot?.pois) {
+    const chargers = snapshot.pois
+      .map(transformPoi)
+      .filter((c): c is Charger => c !== null);
+    return {
+      chargers,
+      retrieved_at: snapshot.retrieved_at,
+      error: null,
+      is_snapshot: true,
+      snapshot_date: snapshot.retrieved_at,
+    };
+  }
+
+  // Live failed AND no snapshot available — fall back to the empty-state UI.
+  return {
+    chargers: [],
+    retrieved_at: today,
+    error: lastError,
+  };
 }
