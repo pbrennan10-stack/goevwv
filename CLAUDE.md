@@ -90,8 +90,8 @@ npm run build          # production build
 npm run lint
 
 # Deploy: pushing to `main` triggers `.github/workflows/deploy.yml`, which
-# SSHes into the droplet and runs the sequence below. No manual step needed.
-# Runs take ~60s; watch them at https://github.com/pbrennan10-stack/goevwv/actions.
+# builds the image on GitHub, ships it to the droplet, and restarts it.
+# Runs take ~3–5 min; watch them at https://github.com/pbrennan10-stack/goevwv/actions.
 
 # Manual fallback (if Actions is down or you need to debug on the droplet):
 ssh root@174.138.53.28
@@ -128,9 +128,16 @@ These constants live in `lib/calc.ts`. If you adjust any, also update the "Assum
 
 ## Deployment workflow
 
-Auto-deploy via GitHub Actions: every push to `main` triggers `.github/workflows/deploy.yml`, which SSHes into the droplet, runs `git fetch origin && git reset --hard origin/main`, and rebuilds the containers. Typical cycle is ~60 seconds from push to live. The workflow uses the `DEPLOY_KEY` GitHub secret (SSH private key) for droplet access. If the build fails, the previous container keeps running.
+Auto-deploy via GitHub Actions: every push to `main` triggers `.github/workflows/deploy.yml`, which **builds the Docker image on GitHub's runner**, streams it to the droplet over SSH (`docker save | ssh … docker load`), runs `git reset --hard origin/main` there (for Caddyfile/compose changes), and restarts with `docker compose up -d --no-build`. It then checks https://goevwv.com returns 200. Typical cycle ~3–5 min. If any step fails, the old containers keep serving.
 
-Manual fallback — use when Actions is down, the workflow errors, or you're debugging on the droplet directly: `ssh root@174.138.53.28 && cd /opt/goevwv && git fetch origin && git reset --hard origin/main && docker compose up -d --build`.
+Why: building Next.js on the droplet ran it out of memory in Sept 2026 (91 pages) — the box thrashed, SSH died with "Broken pipe", and the site went down until a power cycle. **Never build on the droplet in normal operation.**
+
+GitHub repository secrets required (Settings → Secrets and variables → Actions):
+- `DEPLOY_KEY` — SSH private key for root@174.138.53.28
+- `NEXT_PUBLIC_MAPBOX_TOKEN`, `OPENCHARGEMAP_API_KEY` — same values as `/opt/goevwv/.env` on the droplet (the deploy fails early with a clear message if missing)
+- `NEXT_PUBLIC_GOATCOUNTER_CODE` — optional
+
+Manual fallback (Actions down): build locally or on a bigger machine, or on the droplet only after confirming swap exists (`swapon --show`; add a 2 GB swapfile if empty): `ssh root@174.138.53.28 && cd /opt/goevwv && git fetch origin && git reset --hard origin/main && docker compose up -d --build`.
 
 The first-time droplet setup is in `docs/REBUILD_RUNBOOK.md`. The bootstrap script `scripts/bootstrap.sh` is idempotent and can be re-run safely.
 
