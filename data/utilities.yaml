@@ -51,18 +51,21 @@ aep:
       # give 11.99¢. We use the higher (conservative) figure.
       off_peak_rate_per_kwh: 0.1225
       on_peak_rate_per_kwh: 0.240   # Sheet 22-1: on-peak base 17.077¢ + riders
-    tou_monthly_meter_charge: 14.02  # PEV meter carries its own basic charge (also the minimum bill)
-    tou_requires_separate_meter: true
+    # Corrected 2026-09-27 per site owner (firsthand): the PEV meter is a
+    # submeter installed behind the house meter and carries NO monthly charge.
+    # (The Sept 2026 refresh had read Sheets 22-1/22-2 as a $14.02/mo basic charge.)
+    tou_monthly_meter_charge: 0
+    tou_requires_separate_meter: true  # EV submeter behind the house meter
     tou_confidence: "approximate"
     tou_notes: >
       AEP's program web page still shows 12.9¢ off-peak / 22.7¢ on-peak, which
       predate the July and September 2026 increases. Figures here are computed
-      from the tariff sheet. The separate EV meter has its own $14.02/month
-      basic charge ($168/yr), so the off-peak rate only pays off for heavy
-      chargers — roughly 4,200+ kWh/yr (about 13,000–14,000 EV miles).
+      from the tariff sheet. The EV submeter sits behind the house meter and
+      has no monthly charge, so every off-peak kWh saves ~3.9¢ versus the
+      standard rate; the only extra cost is the one-time electrician install.
     tou_enrollment_notes: >
-      Requires a separate EV meter on a hard-wired charging circuit (≤240V,
-      ≤100A) and an AMI house meter. AEP provides the meter hardware at no
+      Requires an EV submeter (installed behind the house meter) on a
+      hard-wired charging circuit (≤240V, ≤100A) and an AMI house meter. AEP provides the meter hardware at no
       charge, but you must hire a licensed electrician to install the meter
       base and pass an electrical inspection before AEP installs the meter.
       Apply at appalachianpower.com or call 1-800-956-4237.
@@ -209,10 +212,10 @@ wheeling_power:
       off_peak_hours: "8:00 PM - 6:00 AM (Mon-Fri), all day Sat, Sun, and major holidays"
       off_peak_rate_per_kwh: 0.1225
       on_peak_rate_per_kwh: 0.240
-    tou_monthly_meter_charge: 14.02
+    tou_monthly_meter_charge: 0  # same Schedule PEV as AEP: submeter, no monthly charge
     tou_requires_separate_meter: true
     tou_confidence: "approximate"
-    tou_notes: "Schedule PEV appears in Wheeling Power's tariff No. 21 as well (Sheet 22-1)."
+    tou_notes: "Schedule PEV appears in Wheeling Power's tariff No. 21 as well (Sheet 22-1). The no-monthly-charge submeter setup is confirmed for AEP and assumed identical for Wheeling (joint tariff)."
 
   rebates: []
   rebates_notes: >

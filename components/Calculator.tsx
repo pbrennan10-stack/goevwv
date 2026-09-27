@@ -788,7 +788,10 @@ function Results({
             ({out.rate_mode === "tou" ? "TOU off-peak" : "flat"}) via{" "}
             <strong>{utility.name}</strong>
           </div>
-          <ReportLink />
+          <div className="flex items-center gap-4">
+            <ShareLink />
+            <ReportLink />
+          </div>
         </div>
       </div>
       <p className="text-xs text-ink-soft -mt-2">
@@ -1657,6 +1660,44 @@ function SelectField({
         ))}
       </select>
     </label>
+  );
+}
+
+function ShareLink() {
+  // Results live in the URL, so sharing the URL shares the comparison.
+  // Phones get the native share sheet (text, Facebook, etc.); desktops copy.
+  const [copied, setCopied] = useState(false);
+  const onClick = async () => {
+    if (typeof window === "undefined") return;
+    const url = window.location.href;
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: "My EV numbers for West Virginia",
+          text: "Here's what an EV would cost me to run in WV:",
+          url,
+        });
+      } catch {
+        // User closed the share sheet — nothing to do.
+      }
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1800);
+    } catch {
+      window.prompt("Copy this link:", url);
+    }
+  };
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="text-sm font-medium text-brand hover:underline whitespace-nowrap"
+    >
+      {copied ? "Link copied ✓" : "Share results"}
+    </button>
   );
 }
 

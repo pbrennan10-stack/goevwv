@@ -1,6 +1,6 @@
 # GoEV WV
 
-**Live site:** https://goevwv.com (not yet deployed)
+**Live site:** https://goevwv.com
 **Repo:** https://github.com/pbrennan10-stack/goevwv
 
 An interactive advisor for West Virginians considering an electric vehicle. Enter your commute, pick vehicles to compare, and see honest, WV-specific numbers on cost, payback, and charging feasibility.

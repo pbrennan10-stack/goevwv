@@ -63,6 +63,8 @@ const websiteSchema = {
   },
 };
 
+const goatcounter = process.env.NEXT_PUBLIC_GOATCOUNTER_CODE;
+
 export default function RootLayout({
   children,
 }: {
@@ -89,6 +91,15 @@ export default function RootLayout({
           Skip to main content
         </a>
         <div id="main-content">{children}</div>
+        {/* Privacy-friendly page counts (no cookies, no personal data).
+            Off unless NEXT_PUBLIC_GOATCOUNTER_CODE is set at build time. */}
+        {goatcounter && (
+          <script
+            data-goatcounter={`https://${goatcounter}.goatcounter.com/count`}
+            async
+            src="https://gc.zgo.at/count.js"
+          />
+        )}
       </body>
     </html>
   );

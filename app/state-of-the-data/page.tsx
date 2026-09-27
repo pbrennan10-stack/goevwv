@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Logo } from "@/components/Logo";
+import { SiteHeader } from "@/components/SiteHeader";
 import { getFederalData, getUtilities } from "@/lib/data";
 
 export const metadata: Metadata = {
@@ -132,43 +133,7 @@ export default function StateOfTheDataPage() {
 
   return (
     <main className="mx-auto max-w-content px-4 sm:px-6 py-8 sm:py-12">
-      <header className="mb-10">
-        <div className="flex items-center justify-between gap-4 flex-wrap">
-          <Link href="/">
-            <Logo className="text-2xl" />
-          </Link>
-          <nav className="text-sm text-ink-soft flex items-center">
-            <Link href="/" className="hover:text-ink transition px-2 py-2">
-              Home
-            </Link>
-            <span className="text-slate-300">·</span>
-            <Link
-              href="/calculator"
-              className="hover:text-ink transition px-2 py-2"
-            >
-              Calculator
-            </Link>
-            <span className="text-slate-300">·</span>
-            <Link href="/chargers" className="hover:text-ink transition px-2 py-2">
-              Charger Map
-            </Link>
-            <span className="text-slate-300">·</span>
-            <Link
-              href="/about"
-              className="hover:text-ink transition px-2 py-2"
-            >
-              Why EVs Matter
-            </Link>
-            <span className="text-slate-300">·</span>
-            <Link
-              href="/state-of-the-data"
-              className="text-brand font-semibold transition px-2 py-2"
-            >
-              State of the Data
-            </Link>
-          </nav>
-        </div>
-      </header>
+      <SiteHeader active="/state-of-the-data" />
 
       <article className="max-w-3xl mx-auto">
         <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-ink leading-tight mb-3">
@@ -387,13 +352,13 @@ export default function StateOfTheDataPage() {
                   notes="On-peak base 17.077¢ plus riders. The calculator assumes TOU users charge 100% off-peak; any daytime charging hits this higher rate."
                 />
                 <SourceRow
-                  label="Off-Peak EV Charging — separate meter basic charge"
+                  label="Off-Peak EV Charging — EV submeter monthly charge"
                   value={`$${(aep.residential.tou_monthly_meter_charge ?? 0).toFixed(2)}/month`}
-                  source="AEP WV tariff, Sheets 22-1 / 22-2"
+                  source="Confirmed by a program participant (the site owner)"
                   sourceUrl="https://www.appalachianpower.com/clean-energy/electric-cars/wv-off-peak"
-                  retrieved="2026-09-23"
+                  retrieved="2026-09-27"
                   confidence="verified"
-                  notes="The EV circuit gets its own meter, which carries its own basic charge (also the minimum bill) — $168/year. New this refresh: the calculator now includes it when you pick the TOU option. At a ~4¢/kWh discount, TOU only breaks even above roughly 4,200 kWh/year of charging (about 13,000–14,000 EV miles). Also requires a licensed electrician to install the meter base (one-time cost, not modeled)."
+                  notes="The EV circuit gets a submeter installed behind the house meter, with no monthly charge. (Our September 2026 refresh wrongly added a $14.02/month basic charge; corrected September 27.) So every off-peak kWh saves about 4¢ versus the standard rate. The one-time cost is a licensed electrician installing the meter base and passing inspection, which isn't modeled."
                 />
               </>
             ) : null}
@@ -470,7 +435,7 @@ export default function StateOfTheDataPage() {
                 />
                 <SourceRow
                   label="Off-Peak EV Charging (Schedule PEV)"
-                  value="Available — same rates and meter charge as AEP"
+                  value="Available — same rates and submeter setup as AEP"
                   source="Wheeling Power tariff No. 21, Sheet 22-1"
                   sourceUrl="https://www.appalachianpower.com/clean-energy/electric-cars/wv-off-peak"
                   retrieved="2026-09-23"
