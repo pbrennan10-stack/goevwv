@@ -49,8 +49,9 @@ export default function HomePage() {
 
       <FitCheck />
 
-      <section className="mt-14 grid gap-4 sm:grid-cols-3">
+      <section className="mt-14 grid gap-4 sm:grid-cols-2">
         {[
+          { href: "/plan", title: "Plan your household", body: "Two cars, different drivers, road trips and towing — see what an EV would really cost, purchase price included." },
           { href: "/ev", title: "Browse every EV", body: "Winter range, charging cost, and yearly savings for every model sold in WV." },
           { href: "/utilities", title: "Your utility's EV rates", body: "Appalachian Power, Mon Power, Potomac Edison, Wheeling Power — rates and rebates." },
           { href: "/faq", title: "Quick answers", body: "The $200 WV fee, what happened to tax credits, chargers, hills, and cold." },

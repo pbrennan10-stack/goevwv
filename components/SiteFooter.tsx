@@ -16,6 +16,7 @@ export function SiteFooter() {
       </p>
       <AiDataNotice className="mt-3" />
       <p className="mt-3 flex flex-wrap gap-x-4 gap-y-1">
+        <Link href="/plan" className="hover:text-ink">Plan your household</Link>
         <Link href="/calculator" className="hover:text-ink">Calculator</Link>
         <Link href="/ev" className="hover:text-ink">All EVs</Link>
         <Link href="/utilities" className="hover:text-ink">WV utility EV rates</Link>

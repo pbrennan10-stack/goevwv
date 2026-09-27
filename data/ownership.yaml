@@ -1,0 +1,62 @@
+# Ownership-cost assumptions for the household planner (/plan).
+# The planner compares whole-household cost over an ownership period:
+#   purchase price + WV sales tax + title − resale value at the end
+#   + running costs (energy, maintenance, insurance, registration)
+#   + the value each vehicle you already own loses while you keep it.
+# Researched 2026-09-27 (AI-assisted; see /state-of-the-data).
+
+ownership_years_default: 5
+
+wv_purchase_tax:
+  # WV motor vehicle sales tax, collected by the DMV at titling. (The old
+  # "privilege tax", WV Code 17A-3-4, was replaced July 1, 2008.) 6% since
+  # July 1, 2017. No county or municipal add-on on vehicle sales since 2009.
+  rate: 0.06
+  trade_in_reduces_base: true   # taxed on price minus trade-in (trade-in must be titled in WV to the buyer)
+  title_fee_usd: 15
+  source: "https://code.wvlegislature.gov/11-15-3C/"
+  source2: "https://dmv.wv.gov/titles"
+  notes: >
+    Destination charges are treated as taxable (not stated explicitly in statute
+    or on the DMV page). Manufacturer rebates are not subtracted before tax per
+    third-party guides. Lien recording adds $10 if financed (not modeled).
+
+# Share of the original price a NEW vehicle keeps after 5 years, by segment.
+# iSeeCars "Cars That Hold Their Value" study, ~950,000 five-year-old vehicles
+# sold Mar 2025–Feb 2026 (published ~Mar 2026): EVs lost 57.2%, all vehicles
+# 41.8%, trucks 34.2%, hybrids 35.4%, SUVs 44.9%.
+retention_5yr:
+  bev: 0.428
+  phev: 0.582       # no published PHEV segment figure; we use the all-vehicle average
+  gas: 0.582        # all vehicles (iSeeCars doesn't publish gas-only)
+  gas_truck: 0.658
+  source: "https://www.iseecars.com/cars-that-hold-their-value-study"
+  notes: >
+    Kelley Blue Book's 2026 residual-value awards project ~45% retention after
+    5 years for an average 2026 model at wholesale (auction) prices — lower than
+    iSeeCars' retail figures. Early EVs had steep depreciation partly from price
+    cuts and lapsed tax credits; newer EVs may hold value differently.
+    2026 trend: used-EV values firmed as gas prices rose — Cox Automotive's
+    used EV average listing price was up ~8% year over year in Jul–Aug 2026,
+    and Manheim wholesale EV values ran ahead of non-EVs (+11% YoY in May,
+    narrowing to +2% by mid-September). Gains were concentrated in cheaper,
+    older EVs; used EVs over $40k still fell, and ~500k lease returns in 2026
+    add supply. Not enough to justify a new 5-year figure — the planner's
+    slider lets people apply their own view. Revisit with iSeeCars' next
+    study (~Mar 2027).
+  trend_source: "https://www.coxautoinc.com/market-insights/"
+
+# How much a vehicle you already own loses per year if you keep it:
+# midpoint of Kelley Blue Book's "8–12% each year" after the first two years.
+older_vehicle_annual_depreciation: 0.10
+older_vehicle_source: "https://www.kbb.com/car-advice/how-to-beat-car-depreciation/"
+
+# Starting guess for what a vehicle you already own is worth, when you haven't
+# entered one — the planner always asks you to replace it with a real number.
+default_owned_value_usd: 15000
+
+# For reference if financing is added later (not used yet).
+apr_reference:
+  new_60mo: 0.07     # Bankrate weekly survey, 2026-09-23
+  used: 0.106        # Edmunds, July 2026 (search excerpt)
+  source: "https://www.bankrate.com/loans/auto-loans/rates/"

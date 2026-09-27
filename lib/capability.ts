@@ -39,7 +39,10 @@ export function capabilitySpecs(c: Capability): [string, string][] {
   if (c.cargo_behind_row3_cu_ft != null) {
     rows.push(["Cargo, all seats up", `${n1(c.cargo_behind_row3_cu_ft)} cu ft`]);
   }
-  if (c.cargo_behind_row2_cu_ft != null) {
+  const sameCargo = c.cargo_behind_row2_cu_ft != null && c.cargo_behind_row2_cu_ft === c.cargo_max_cu_ft;
+  if (sameCargo) {
+    rows.push(["Cargo space", `${n1(c.cargo_behind_row2_cu_ft!)} cu ft`]);
+  } else if (c.cargo_behind_row2_cu_ft != null) {
     rows.push([
       c.cargo_behind_row3_cu_ft != null ? "Cargo behind 2nd row" : "Cargo, seats up",
       `${n1(c.cargo_behind_row2_cu_ft)} cu ft${
@@ -58,7 +61,7 @@ export function capabilitySpecs(c: Capability): [string, string][] {
   if (total != null && (c.frunk_cu_ft || extraSubtrunk(c))) {
     rows.push(["Luggage space, every seat full", `${n1(total)} cu ft total`]);
   }
-  if (c.cargo_max_cu_ft != null) {
+  if (c.cargo_max_cu_ft != null && !sameCargo) {
     rows.push(["Cargo, seats folded", `${n1(c.cargo_max_cu_ft)} cu ft`]);
   }
   if (c.towing_lbs === 0) rows.push(["Towing", "Not rated for towing"]);
@@ -72,8 +75,9 @@ export function capabilitySpecs(c: Capability): [string, string][] {
 // a vehicle carries how far on the same electricity. Pickups (bed, no
 // enclosed cargo figure) and vehicles without cargo data return null.
 export function cargoMilesPerKwh(
-  c: Capability & { efficiency_kwh_per_100mi: number },
+  c: Capability & { efficiency_kwh_per_100mi: number; class?: string },
 ): number | null {
+  if (c.class === "van") return null; // cargo vans are a different job; not scored against cars
   const cargo = cargoSeatsUp(c);
   if (cargo == null || !c.efficiency_kwh_per_100mi) return null;
   return cargo * (100 / c.efficiency_kwh_per_100mi);

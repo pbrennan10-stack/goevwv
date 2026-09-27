@@ -37,19 +37,34 @@ Locally these live in `.env.local` (gitignored). On the droplet they live in `/o
 goevwv/
 ├── app/                # Next.js App Router
 │   ├── layout.tsx      # Root layout, metadata, viewport
-│   ├── page.tsx        # Landing + calculator (server component loads data)
+│   ├── page.tsx        # Landing + fit check
+│   ├── plan/           # Household planner (whole driveway, purchase price, trips)
+│   ├── calculator/     # Single-vehicle calculator
+│   ├── ev/             # /ev index + /ev/[id] static guide page per vehicle (SEO)
+│   ├── utilities/      # /utilities index + /utilities/[id] EV rate page per utility
+│   ├── faq/            # WV EV FAQ built from data/* (FAQPage JSON-LD)
+│   ├── chargers/, about/, state-of-the-data/, report/
 │   └── globals.css     # Tailwind base
 ├── components/
-│   ├── Calculator.tsx  # Main client component: form + vehicle picker + results
-│   └── Logo.tsx
+│   ├── HouseholdPlanner.tsx # /plan client UI (4 steps; state in ?h= URL param)
+│   ├── Calculator.tsx  # Single-vehicle calculator: form + picker + results
+│   ├── SiteHeader.tsx / SiteFooter.tsx  # Shared nav + footer (add new pages here)
+│   ├── AiDataNotice.tsx # "AI-assisted data, may contain errors" notice
+│   └── Logo.tsx, FitCheck.tsx, ChargerMap.tsx, RouteHelper.tsx, …
 ├── lib/
-│   ├── types.ts        # TS types for Vehicle, Utility, FederalData, CalcInput, VehicleResult
+│   ├── types.ts        # TS types (Vehicle, Capability, Utility, FederalData, …)
 │   ├── data.ts         # Server-only: loads data/*.json and data/*.yaml
-│   └── calc.ts         # TCO math + number formatters
+│   ├── calc.ts         # Per-vehicle TCO math + formatters (shared by planner)
+│   ├── household.ts    # Household planner engine (assignment, fit, ownership cost)
+│   ├── capability.ts   # Seats/cargo/towing helpers, cargo-miles index
+│   └── scenario.ts     # "Typical WV driver" defaults for /ev, /utilities, /faq
 ├── data/
-│   ├── vehicles.json   # ~20 EV/PHEV models curated for WV
-│   ├── utilities.yaml  # AEP, Mon Power, Wheeling Power, rural coops
-│   └── federal.yaml    # IRA credits, WV state fees, gas-price baseline
+│   ├── vehicles.json   # ~70 EV/PHEV models incl. cargo vans (capability + source per vehicle)
+│   ├── ice_vehicles.json # ~75 gas vehicles people own today (mpg, insurance, maintenance, capability)
+│   ├── utilities.yaml  # AEP, Mon Power, Potomac Edison, Wheeling Power, co-ops
+│   ├── federal.yaml    # Federal credits, WV state fees, gas & DCFC price baselines
+│   ├── ownership.yaml  # WV sales tax, resale retention, depreciation (planner)
+│   └── charging_corridors.yaml, charger-snapshot.json
 ├── public/             # Static assets (old index.html is dormant — Next.js routes /)
 ├── scripts/
 │   └── bootstrap.sh    # Droplet provisioner (one-shot, runs on fresh Ubuntu)
@@ -139,8 +154,8 @@ The first-time droplet setup is in `docs/REBUILD_RUNBOOK.md`. The bootstrap scri
 - [ ] Clean up whyweare50th.com DNS (retiring domain; A record still points here)
 - [ ] Set up UptimeRobot (free, 5-min ping to https://goevwv.com)
 - [x] v1.1: charger map using OpenChargeMap API (free key required) — live fetch + committed snapshot fallback
-- [ ] Two-car household mode: "keep as second vehicle" option — model an EV for commuting alongside a kept gas vehicle (UI option exists; math is future build-out)
-- [ ] Full ownership cost: purchase price, financing, and resale value alongside running costs
+- [x] Household planner at /plan (Sept 2026): multiple vehicles/drivers/trips, auto-assignment with override, trip fit (seats, luggage, towing, charging stops), purchase price + WV sales tax + resale over an ownership period
+- [ ] Planner: compare against buying a new GAS vehicle (needs MSRPs in ice_vehicles.json); financing (APR reference in ownership.yaml); fold /calculator into /plan once it covers route/elevation inputs
 - [ ] Road trips modeled separately at interstate speed; utility lookup by address; contact/feedback link
 - [ ] Move the repo out of OneDrive (or pin it "Always keep on this device") — OneDrive turned .git files into online-only placeholders in Sept 2026 and broke commits
 - [ ] v1.1: dealer/installer directory — curated YAML + map overlay
@@ -153,6 +168,10 @@ The first-time droplet setup is in `docs/REBUILD_RUNBOOK.md`. The bootstrap scri
 ## Guide pages (SEO)
 
 `/ev/[id]`, `/utilities/[id]`, and `/faq` are statically generated from `data/*` at build time, so they refresh automatically with every data update — no copy to maintain. They show one "typical WV driver" example (`lib/scenario.ts`: 30 mi/day, 5 days/wk, 4 long trips, 25 mpg, AEP) and deep-link into the calculator with the same inputs; keep `TYPICAL` in step with `DEFAULT_INPUT` in `components/Calculator.tsx`. New vehicles and utilities get pages and sitemap entries automatically. Co-ops are excluded from `/utilities/[id]` because their rates are unverified.
+
+## Household planner (/plan)
+
+Engine in `lib/household.ts` reuses `lib/calc.ts` energy/DCFC/insurance helpers — change per-mile math there, not in the planner. Total over N years = running costs × N + lost value (new vehicle: price + WV 6% sales tax after trade-in + title − resale via `retention_5yr` or the user's slider; kept vehicles: `older_vehicle_annual_depreciation`). The sold vehicle's would-be depreciation stays in the "today" scenario, which keeps the comparison fair. Each use goes to the cheapest vehicle whose `fit()` isn't "no". `scripts/smoke-household.ts` is a quick sanity run (see its header).
 
 ## Principles
 

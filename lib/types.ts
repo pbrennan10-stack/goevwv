@@ -7,6 +7,7 @@ export type VehicleClass =
   | "truck"
   | "hatchback"
   | "minivan"
+  | "van"
   | "other";
 
 // Seating, cargo, and towing — what the household planner checks a trip
@@ -46,6 +47,10 @@ export interface Vehicle extends Capability {
   class: VehicleClass;
   powertrain: Powertrain;
   msrp_usd: number;
+  destination_usd?: number;
+  // false = no EPA label (heavy vans, Escalade IQ, not-yet-rated models);
+  // range/efficiency are the manufacturer's estimates.
+  epa_rated?: boolean; // manufacturer destination/delivery charge, when known
   // BEV specs
   epa_range_mi?: number;
   winter_range_mi?: number;
