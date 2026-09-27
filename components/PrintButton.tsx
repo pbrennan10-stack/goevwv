@@ -5,7 +5,7 @@ export function PrintButton({ className, children }: { className?: string; child
     <button
       type="button"
       onClick={() => window.print()}
-      className={className ?? "rounded-lg bg-brand text-white px-4 py-2 text-sm font-medium hover:opacity-90 transition"}
+      className={className ?? "rounded-lg bg-brand text-white px-4 py-2 text-sm font-medium hover:bg-brand-dark transition"}
     >
       {children ?? "Print this report"}
     </button>

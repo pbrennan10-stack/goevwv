@@ -132,6 +132,16 @@ export function dcfcStopsPerRoundTrip(
   return { stops: stopsOneWay * 2, extraMiRoundTrip: extraMiOneWay * 2 };
 }
 
+// Where (miles from the start, one way) each fast-charging stop falls — the
+// same rule dcfcStopsPerRoundTrip uses, so charts and math can't disagree.
+export function dcfcStopMiles(highwayRangeMi: number, oneWayMi: number): number[] {
+  if (!highwayRangeMi || highwayRangeMi <= 0 || oneWayMi <= 0) return [];
+  const out: number[] = [];
+  let at = highwayRangeMi * 0.9;
+  while (at < oneWayMi) { out.push(at); at += highwayRangeMi * 0.7; }
+  return out;
+}
+
 function annualMiles(daily: number, daysPerWeek: number): number {
   return daily * daysPerWeek * WORK_WEEKS_PER_YEAR;
 }

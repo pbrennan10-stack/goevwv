@@ -890,7 +890,7 @@ function ChargerMapCrossLink({
         <button
           type="button"
           onClick={onClick}
-          className="rounded-lg bg-brand text-white px-4 py-2 text-sm font-medium hover:opacity-90 transition whitespace-nowrap"
+          className="rounded-lg bg-brand text-white px-4 py-2 text-sm font-medium hover:bg-brand-dark transition whitespace-nowrap"
         >
           Open route on the charger map →
         </button>

@@ -6,8 +6,12 @@ const config: Config = {
     extend: {
       colors: {
         brand: {
-          DEFAULT: "#059669", // emerald-600 - our accent green
-          dark: "#047857",
+          // Text and buttons: emerald-700 passes WCAG AA (5.5:1 on white);
+          // the lighter emerald-600 ("bright") is for fills with no text
+          // (chart bars, focus rings, slider thumbs), which need only 3:1.
+          DEFAULT: "#047857",
+          dark: "#065f46",
+          bright: "#059669",
           light: "#34d399",
           bg: "#ecfdf5",
         },

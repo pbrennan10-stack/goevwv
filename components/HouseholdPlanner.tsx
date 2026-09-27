@@ -7,9 +7,13 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { CHART_COLORS, StackedBars } from "@/components/charts";
+import { ANNUAL_WINTER_KWH_MULTIPLIER, dcfcStopMiles } from "@/lib/calc";
 import { cargoSeatsUpLabel } from "@/lib/capability";
 import {
   DESTINATION_FALLBACK_USD,
+  TOW_RANGE_FACTOR,
+  batteryRangeFactor,
   fit,
   planHousehold,
   retention,
@@ -19,153 +23,27 @@ import {
   type HomeCharging,
   type HouseholdInput,
   type OdometerBand,
-  type TripInput,
   type Unit,
+  type Use,
 } from "@/lib/household";
 import type { IceVehicle, Vehicle } from "@/lib/types";
+import {
+  CHARGING_OPTIONS,
+  LUGGAGE,
+  ODOMETER_OPTIONS,
+  decodeState,
+  encodeState,
+  gasOutlook,
+  initialState,
+  sanitizeLoaded,
+  type PlanState,
+} from "@/lib/planState";
 
 interface Props {
   catalog: Catalog;
 }
 
 const usd = (n: number) => `$${Math.round(n).toLocaleString("en-US")}`;
-
-// ---------- Presets ----------
-
-const LUGGAGE = [
-  { v: 8, label: "Light — a couple of bags" },
-  { v: 20, label: "Normal — a suitcase each" },
-  { v: 28, label: "Packed — suitcases + beach/camping gear" },
-  { v: 40, label: "Loaded — gear for a week away" },
-];
-
-interface TripPreset extends TripInput { on: boolean }
-
-const TRIP_PRESETS: TripPreset[] = [
-  { id: "beach", label: "Beach vacation", oneWayMi: 400, perYear: 1, people: 4, luggageCuFt: 28, towLbs: 0, on: true },
-  { id: "family", label: "Visit family", oneWayMi: 220, perYear: 6, people: 2, luggageCuFt: 8, towLbs: 0, on: true },
-  { id: "ski", label: "Ski or lake weekend", oneWayMi: 150, perYear: 3, people: 4, luggageCuFt: 20, towLbs: 0, on: false },
-  { id: "camp", label: "Hunting or fishing camp", oneWayMi: 90, perYear: 4, people: 2, luggageCuFt: 20, towLbs: 0, on: false },
-  { id: "tow", label: "Tow a camper or boat", oneWayMi: 60, perYear: 3, people: 4, luggageCuFt: 8, towLbs: 5000, on: false },
-];
-
-interface State {
-  step: number;
-  owned: { key: string; ref: string; valueNow: number; mpgOverride?: number; odometer?: OdometerBand }[];
-  candRef: string;
-  priceOverride: number | null;
-  replaces: string | null;
-  drivers: { id: number; commuteOneWayMi: number; daysPerWeek: number }[];
-  errandsMiPerWeek: number;
-  errandsPeople: number;
-  trips: TripPreset[];
-  utilityId: string;
-  useTOU: boolean;
-  gasPrice: number;
-  years: number;
-  overrides: Record<string, string>;
-  retention5yOverride: number | null;
-  // New gas vehicle to compare against: "auto" = new version of the vehicle
-  // being replaced (when it's still sold), null = no comparison.
-  gasRef: string | null;
-  gasPriceOverride: number | null;
-  homeCharging: HomeCharging;
-}
-
-const ODOMETER_OPTIONS: { v: OdometerBand; label: string }[] = [
-  { v: "under_50k", label: "Under 50,000" },
-  { v: "50k_100k", label: "50,000–100,000" },
-  { v: "over_100k", label: "Over 100,000" },
-];
-
-const CHARGING_OPTIONS: { v: HomeCharging; label: string }[] = [
-  { v: "auto", label: "Not sure — pick for me" },
-  { v: "l1", label: "Regular wall outlet (no install)" },
-  { v: "l2", label: "Install a Level 2 charger (240V)" },
-  { v: "none", label: "I can't charge at home" },
-];
-
-function gasOutlook(cat: Catalog) {
-  const o = cat.fed.calculation_notes.gas_price_outlook_per_gal;
-  const today = cat.fed.calculation_notes.gas_price_baseline_per_gal.current;
-  return { mid: o?.mid ?? today, low: o?.low ?? today, high: o?.high ?? today, today };
-}
-
-function initialState(cat: Catalog): State {
-  return {
-    step: 0,
-    owned: [{ key: "a", ref: "ice:honda-crv-2024", valueNow: cat.own.default_owned_value_usd }],
-    candRef: "ev:chevy-equinox-ev-2025",
-    priceOverride: null,
-    replaces: "a",
-    drivers: [{ id: 1, commuteOneWayMi: 21, daysPerWeek: 5 }],
-    errandsMiPerWeek: 60,
-    errandsPeople: 3,
-    trips: TRIP_PRESETS.map((t) => ({ ...t })),
-    utilityId: "aep",
-    useTOU: false,
-    gasPrice: gasOutlook(cat).mid,
-    years: cat.own.ownership_years_default,
-    overrides: {},
-    retention5yOverride: null,
-    gasRef: "auto",
-    gasPriceOverride: null,
-    homeCharging: "auto",
-  };
-}
-
-// State lives in the URL (?h=…) so a plan can be shared or bookmarked.
-function encodeState(s: State): string {
-  const json = JSON.stringify({ ...s, step: undefined });
-  return btoa(unescape(encodeURIComponent(json))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-}
-function decodeState(q: string): Partial<State> | null {
-  try {
-    const b = q.replace(/-/g, "+").replace(/_/g, "/");
-    return JSON.parse(decodeURIComponent(escape(atob(b))));
-  } catch {
-    return null;
-  }
-}
-
-// Shared links come from anywhere — keep only well-formed fields that point at
-// vehicles we still have, so an old or mangled link can't crash the page.
-function sanitizeLoaded(raw: Partial<State> | null, cat: Catalog): Partial<State> | null {
-  if (!raw || typeof raw !== "object") return null;
-  const refOk = (r: unknown) => {
-    if (typeof r !== "string") return false;
-    const [k, id] = r.split(":");
-    return k === "ev" ? cat.evs.some((v) => v.id === id) : k === "ice" ? cat.ice.some((v) => v.id === id) : false;
-  };
-  const num = (x: unknown, lo: number, hi: number) => typeof x === "number" && Number.isFinite(x) && x >= lo && x <= hi;
-  const out: Partial<State> = {};
-  if (Array.isArray(raw.owned)) {
-    const owned = raw.owned.filter((o) => o && typeof o.key === "string" && refOk(o.ref) && num(o.valueNow, 0, 1e6)).slice(0, 3);
-    if (owned.length) out.owned = owned;
-  }
-  if (refOk(raw.candRef) && String(raw.candRef).startsWith("ev:")) out.candRef = raw.candRef;
-  if (Array.isArray(raw.drivers)) {
-    const drivers = raw.drivers.filter((d) => d && num(d.id, 0, 1e6) && num(d.commuteOneWayMi, 0, 500) && num(d.daysPerWeek, 0, 7)).slice(0, 4);
-    if (drivers.length) out.drivers = drivers;
-  }
-  if (Array.isArray(raw.trips)) {
-    const trips = raw.trips.filter((t) => t && typeof t.id === "string" && typeof t.label === "string" && num(t.oneWayMi, 0, 5000) && num(t.perYear, 0, 365) && num(t.people, 1, 9) && num(t.luggageCuFt, 0, 200) && num(t.towLbs, 0, 40000)).slice(0, 12);
-    if (trips.length) out.trips = trips;
-  }
-  for (const k of ["errandsMiPerWeek", "errandsPeople", "gasPrice", "years", "priceOverride", "gasPriceOverride", "retention5yOverride"] as const) {
-    const v = raw[k];
-    const [lo, hi] = k === "gasPrice" ? [0.5, 15] : k === "years" ? [1, 20] : k === "retention5yOverride" ? [0, 1] : k === "errandsPeople" ? [1, 9] : [0, 1e6];
-    if (v === null && (k === "priceOverride" || k === "gasPriceOverride" || k === "retention5yOverride")) (out as Record<string, unknown>)[k] = null;
-    else if (num(v, lo, hi)) (out as Record<string, unknown>)[k] = v;
-  }
-  if (typeof raw.utilityId === "string" && cat.utilities.some((u) => u.id === raw.utilityId)) out.utilityId = raw.utilityId;
-  if (typeof raw.useTOU === "boolean") out.useTOU = raw.useTOU;
-  if (raw.replaces === null || (typeof raw.replaces === "string" && (out.owned ?? []).some((o) => o.key === raw.replaces))) out.replaces = raw.replaces;
-  if (raw.gasRef === null || raw.gasRef === "auto" || refOk(raw.gasRef)) out.gasRef = raw.gasRef;
-  if (raw.homeCharging && ["auto", "l1", "l2", "none"].includes(raw.homeCharging)) out.homeCharging = raw.homeCharging;
-  if (raw.overrides && typeof raw.overrides === "object") out.overrides = Object.fromEntries(Object.entries(raw.overrides).filter(([a, b]) => typeof a === "string" && typeof b === "string"));
-  return Object.keys(out).length ? out : null;
-}
 
 // ---------- Small UI pieces ----------
 
@@ -270,10 +148,10 @@ function FitIcon({ level }: { level: "ok" | "tight" | "no" }) {
 const STEPS = ["Vehicles", "Driving", "Try an EV", "Your plan"];
 
 export function HouseholdPlanner({ catalog }: Props) {
-  const [s, setS] = useState<State>(() => initialState(catalog));
+  const [s, setS] = useState<PlanState>(() => initialState(catalog));
   const [hydrated, setHydrated] = useState(false);
   const [copied, setCopied] = useState(false);
-  const set = (patch: Partial<State>) => setS((prev) => ({ ...prev, ...patch }));
+  const set = (patch: Partial<PlanState>) => setS((prev) => ({ ...prev, ...patch }));
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -635,8 +513,8 @@ function PlanResults({
   gasVehicle: IceVehicle | undefined;
   input: HouseholdInput;
   tips: { retention5: number | null; gasPrice: number | null } | null;
-  s: State;
-  set: (p: Partial<State>) => void;
+  s: PlanState;
+  set: (p: Partial<PlanState>) => void;
   result: ReturnType<typeof planHousehold>;
   catalog: Catalog;
   price: number;
@@ -710,15 +588,21 @@ function PlanResults({
 
       <Card className="bg-brand-bg ring-emerald-200 space-y-3">
         <p className="text-sm text-ink-muted">Whole-household cost over {Y} years — buying, owning, and driving everything in your driveway.</p>
-        <div className={`grid gap-3 ${cols.length === 3 ? "grid-cols-3" : "grid-cols-2"}`}>
-          {cols.map((c) => (
-            <div key={c.label} className="min-w-0">
-              <div className="text-xs text-ink-soft">{c.label}</div>
-              <div className={`${cols.length === 3 ? "text-lg sm:text-2xl" : "text-2xl"} font-extrabold text-ink`}>{usd(c.r.totalOverPeriod)}</div>
-              <div className="text-xs text-ink-soft break-words">{c.r.units.map((u) => u.unit.short).join(" + ")}</div>
-            </div>
-          ))}
-        </div>
+        <StackedBars
+          ariaLabel={`Total over ${Y} years: ${cols.map((c) => `${c.label} ${usd(c.r.totalOverPeriod)}`).join("; ")}.`}
+          rows={cols.map((c) => ({
+            label: c.label,
+            sublabel: c.r.units.map((u) => u.unit.short).join(" + "),
+            highlight: c.r === plan,
+            segments: [
+              { key: "capital", label: "Lost value (price − resale)", value: c.r.capitalOverPeriod, color: CHART_COLORS.gas },
+              { key: "energy", label: "Gas & charging", value: sum(c.r.units.map((u) => u.energy)) * Y, color: CHART_COLORS.phev },
+              { key: "maint", label: "Maintenance", value: sum(c.r.units.map((u) => u.maintenance)) * Y, color: "#0f766e" },
+              { key: "ins", label: "Insurance", value: sum(c.r.units.map((u) => u.insurance)) * Y, color: CHART_COLORS.neutral },
+              { key: "fees", label: "WV fees", value: sum(c.r.units.map((u) => u.registration)) * Y, color: CHART_COLORS.fee },
+            ],
+          }))}
+        />
         {vsGas != null && runVsGas != null && gasVehicle && (
           <p className={`text-lg font-bold ${vsGas >= 0 ? "text-emerald-800" : "text-amber-800"}`}>
             vs. a new {gasVehicle.model}: the {cand.model}{" "}
@@ -933,16 +817,23 @@ function PlanResults({
                 const f = fit(u, use, s.years);
                 const assigned = plan.assignment[use.id] === u.key;
                 return (
-                  <div key={u.key} className="flex gap-2">
-                    <FitIcon level={f.level} />
-                    <div className="text-sm">
-                      <span className="font-medium text-ink">{u.short}</span>
-                      {assigned && <span className="text-emerald-800 font-medium"> · taking this trip</span>}
-                      <span className="block text-ink-muted">{f.text}</span>
+                  <div key={u.key} className="space-y-1">
+                    <div className="flex gap-2">
+                      <FitIcon level={f.level} />
+                      <div className="text-sm">
+                        <span className="font-medium text-ink">{u.short}</span>
+                        {assigned && <span className="text-emerald-800 font-medium"> · taking this trip</span>}
+                        <span className="block text-ink-muted">{f.text}</span>
+                      </div>
                     </div>
+                    {f.level !== "no" && <TripStrip unit={u} use={use} years={s.years} />}
                   </div>
                 );
               })}
+              <p className="text-[11px] text-ink-soft">
+                Stops are shown where the battery or tank would need one, not at specific stations — see the{" "}
+                <Link href="/chargers" className="text-brand hover:underline">charger map</Link>.
+              </p>
             </Card>
           ))}
           {cand.powertrain === "bev" && uses.some((u) => u.kind === "trip" && plan.assignment[u.id] === "new" && u.oneWayMi >= 250) && (
@@ -964,7 +855,7 @@ function PlanResults({
           <li>Insurance is an estimate for a 35–45-year-old WV driver with a clean record; your quote will differ. Financing isn&apos;t included.</li>
           <li>Comparing a new EV with keeping an older car usually favors keeping the older car — new vehicles lose value fastest. That&apos;s why we also compare against buying a <em>new gas vehicle</em>: the fairer question when it&apos;s time to replace one.</li>
         </ul>
-        <p className="mt-3">Every source is on <Link href="/state-of-the-data" className="text-brand hover:underline">State of the Data</Link>.</p>
+        <p className="mt-3">Every source is on <Link href="/state-of-the-data" className="text-brand hover:underline">PlanState of the Data</Link>.</p>
       </details>
     </section>
   );
@@ -973,6 +864,57 @@ function PlanResults({
 // Some trim names repeat the model ("Q5 Premium" on an Audi Q5).
 function trimWithoutModel(trim: string, model: string) {
   return trim.toLowerCase().startsWith(`${model.toLowerCase()} `) ? trim.slice(model.length + 1) : trim;
+}
+
+// One trip, one vehicle: a strip from home to the destination (one way) with
+// fast-charging stops (EV), the switch to gas (plug-in hybrid), or a fill-up
+// (gas). Uses the same stop rule as the cost math (dcfcStopMiles).
+function TripStrip({ unit, use, years }: { unit: Unit; use: Use; years: number }) {
+  const L = use.oneWayMi;
+  const pct = (mi: number) => `${Math.min(100, Math.max(0, (mi / L) * 100))}%`;
+  let fill: string = CHART_COLORS.gas;
+  let markers: { at: number; label: string; kind: "stop" | "gas" }[] = [];
+  let electricTo = 0;
+  if (unit.pt === "bev" && unit.ev) {
+    fill = CHART_COLORS.ev;
+    let hwy = (unit.ev.highway_range_mi ?? Math.round((unit.ev.epa_range_mi ?? 200) * 0.8)) * (unit.isNew ? batteryRangeFactor(years) : 1);
+    if (use.towLbs > 0) hwy *= TOW_RANGE_FACTOR;
+    const perStop = Math.round((unit.ev.charging.dcfc_10_to_80_min ?? 30) * 0.8 + 4);
+    markers = dcfcStopMiles(hwy, L).map((at) => ({ at, label: `~${perStop} min`, kind: "stop" as const }));
+  } else if (unit.pt === "phev" && unit.ev) {
+    electricTo = Math.min(L, (unit.ev.epa_range_mi_electric ?? 0) / ANNUAL_WINTER_KWH_MULTIPLIER);
+  } else if (unit.ice) {
+    const tankMi = (unit.ice.tank_gallons ?? 14) * unit.mpg * 0.85;
+    for (let at = tankMi; at < L; at += tankMi) markers.push({ at, label: "fill up", kind: "gas" });
+  }
+  const aria = unit.pt === "bev"
+    ? `${unit.short}: ${markers.length ? `${markers.length} charging stop${markers.length > 1 ? "s" : ""} on the way` : "no charging stops"} over ${L} miles.`
+    : unit.pt === "phev" ? `${unit.short}: electric for about ${Math.round(electricTo)} miles, then gas.`
+    : `${unit.short}: ${markers.length ? `${markers.length} gas stop${markers.length > 1 ? "s" : ""}` : "no gas stops"} over ${L} miles.`;
+  return (
+    <div className="chart ml-7" role="img" aria-label={aria}>
+      <div className="relative h-7">
+        <div className="absolute inset-x-0 top-2.5 h-2 rounded-full" style={{ background: unit.pt === "phev" ? CHART_COLORS.gas : fill, opacity: 0.85 }} />
+        {unit.pt === "phev" && electricTo > 0 && (
+          <div className="absolute left-0 top-2.5 h-2 rounded-l-full" style={{ width: pct(electricTo), background: CHART_COLORS.ev }} />
+        )}
+        {markers.map((m, i) => (
+          <div key={i} className="absolute top-0 -ml-2 flex flex-col items-center motion-safe:transition-[left] motion-safe:duration-500" style={{ left: pct(m.at) }}>
+            <span className={`h-4 w-4 rounded-full border-2 border-white shadow ${m.kind === "stop" ? "bg-amber-600" : "bg-slate-500"}`} />
+          </div>
+        ))}
+      </div>
+      <div className="flex justify-between text-[11px] text-ink-soft -mt-1">
+        <span>Home</span>
+        <span>
+          {unit.pt === "bev" && (markers.length ? `${markers.length} stop${markers.length > 1 ? "s" : ""} · ${markers[0].label} each` : "no stops")}
+          {unit.pt === "phev" && `${Math.round(electricTo)} mi electric, then gas`}
+          {unit.pt === "gas" && (markers.length ? `${markers.length} fill-up${markers.length > 1 ? "s" : ""}` : "no fill-ups")}
+        </span>
+        <span>{L} mi</span>
+      </div>
+    </div>
+  );
 }
 
 function sum(xs: number[]) {

@@ -211,7 +211,7 @@ export function buildUses(h: HouseholdInput): Use[] {
 export type FitLevel = "ok" | "tight" | "no";
 export interface Fit { level: FitLevel; text: string; dcfcStopsEachWay?: number; addedMin?: number }
 
-const TOW_RANGE_FACTOR = 0.55; // towing near capacity cuts EV range ~40–50%
+export const TOW_RANGE_FACTOR = 0.55; // towing near capacity cuts EV range ~40–50%
 
 // EV batteries lose ~2% of range a year (Geotab: 1.5%/yr home-charged, 2.3%
 // fleet average; Recurrent similar). Trip and winter fit use the AVERAGE range

@@ -529,7 +529,7 @@ export function ChargerMap({
             type="button"
             onClick={onGetRoute}
             disabled={!originCoords || !destCoords || routeLoading}
-            className="rounded-lg bg-brand text-white px-4 py-2 text-sm font-medium disabled:opacity-40 hover:opacity-90 transition"
+            className="rounded-lg bg-brand text-white px-4 py-2 text-sm font-medium disabled:opacity-40 hover:bg-brand-dark transition"
           >
             {routeLoading ? "Loading route…" : "Get route"}
           </button>
