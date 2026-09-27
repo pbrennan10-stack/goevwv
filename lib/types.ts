@@ -53,6 +53,12 @@ export interface Vehicle extends Capability {
   // Curated (not derived) because manufacturers' EPA inflation varies by brand —
   // Tesla in particular overstates more than most. WV-specific calibration.
   highway_range_mi?: number;
+  // Some makers' EPA ratings are conservative. When at least two independent
+  // tests (Edmunds, Consumer Reports, InsideEVs…) agree a model beats EPA,
+  // real_world_range_factor holds the LOWEST matching tested/EPA ratio, and
+  // winter_range_mi / efficiency figures in the data are already scaled by it.
+  real_world_range_factor?: number;
+  real_world_range_source?: string;
   efficiency_kwh_per_100mi: number;
   efficiency_kwh_per_100mi_city?: number;
   efficiency_kwh_per_100mi_highway?: number;

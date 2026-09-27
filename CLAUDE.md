@@ -90,6 +90,7 @@ docker compose logs app --tail 50 -f
 ## Calculation methodology (important — document in UI if you change)
 
 - **Winter derate:** +12% annual kWh (4 cold months × ~28% range loss, averaged). Toggleable in UI; default ON.
+- **Conservative EPA ratings:** when ≥2 independent tests agree a model beats EPA (Mercedes EQE/EQS/CLA as of Sept 2026), `real_world_range_factor` holds the lowest matching tested/EPA ratio and `winter_range_mi` + efficiency fields in `vehicles.json` are pre-scaled by it (notes record the before values). Highway range is not scaled. Don't apply without test evidence.
 - **TOU rate:** 100% off-peak rate assumed — users who opt into TOU are committed to overnight charging. Any monthly charge on the EV meter (`tou_monthly_meter_charge`) is added to annual energy cost. For AEP/Wheeling Schedule PEV it is $0 — the EV submeter sits behind the house meter with no monthly fee (owner-confirmed Sept 2026; an earlier refresh wrongly used $14.02).
 - **PHEV split:** commute-aware, assuming nightly charging — each commute day uses min(round trip, electric range) electric miles, each long trip gets one battery's worth; winter derate shrinks electric range by the same 1.12 factor. (Replaced a fixed 65/35 split in Sept 2026.)
 - **Grid CO₂ factor:** 0.44 kg/kWh — EPA eGRID RFCW subregion incl. grid losses (WV is in PJM). EIA's WV in-state rate (0.87) is shown as a coal-only worst case.

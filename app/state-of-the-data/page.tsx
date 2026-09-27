@@ -872,6 +872,20 @@ export default function StateOfTheDataPage() {
                   estimate applying a ~28% haircut to EPA combined range.
                 </li>
                 <li>
+                  <strong>Conservative EPA ratings (real_world_range_factor):</strong>{" "}
+                  automakers can choose how they certify EV range, and some
+                  (notably Mercedes-Benz) consistently beat their EPA number in
+                  independent tests up to ~75 mph, while others land at or below
+                  it. When at least two independent tests (Edmunds, Consumer
+                  Reports, InsideEVs) agree, we scale that model&rsquo;s winter
+                  range and efficiency by the <em>lowest</em> matching test
+                  result. As of September 2026 this applies to the Mercedes EQE
+                  SUV (1.12×), EQE sedan (1.16×), EQS 450+ (1.13×), and CLA 250+
+                  (1.16×). Highway range is unchanged — it was already calibrated
+                  to 70-mph tests. Untested models may also beat EPA; we
+                  don&rsquo;t assume it without evidence.
+                </li>
+                <li>
                   <strong>City/highway efficiency:</strong> EPA
                   MPGe-to-kWh/100mi conversions from fueleconomy.gov.
                 </li>

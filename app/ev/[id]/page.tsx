@@ -257,7 +257,24 @@ export default async function VehiclePage({ params }: Params) {
             <p className="mt-3 text-sm text-ink-muted">
               Why the winter number is lower: batteries lose range in the cold,
               and heating the cabin uses energy. We knock about 28% off the EPA
-              figure for a January morning in the mountains. That still leaves{" "}
+              figure for a January morning in the mountains.
+              {v.real_world_range_factor ? (
+                <>
+                  {" "}For this model we start higher than EPA: independent
+                  real-world tests show it beats its EPA rating by at least{" "}
+                  {Math.round((v.real_world_range_factor - 1) * 100)}% at normal
+                  speeds (
+                  {v.real_world_range_source ? (
+                    <a href={v.real_world_range_source} className="text-brand hover:underline" rel="noopener">
+                      source
+                    </a>
+                  ) : (
+                    "source"
+                  )}
+                  ), so our winter range and charging cost reflect that.
+                </>
+              ) : null}{" "}
+              That still leaves{" "}
               {v.winter_range_mi} miles — about{" "}
               {Math.floor(v.winter_range_mi / TYPICAL.daily_round_trip_mi)} days of a{" "}
               {TYPICAL.daily_round_trip_mi}-mile commute on one charge.
