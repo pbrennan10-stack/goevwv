@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { AiDataNotice } from "@/components/AiDataNotice";
 import Link from "next/link";
 import { Logo } from "@/components/Logo";
 import { CopyLinkButton, PrintButton } from "@/components/PrintButton";
@@ -253,6 +254,7 @@ export default async function ReportPage({
           report reflects the inputs you provided. Rerun anytime with different vehicles, commute, or
           utility.
         </p>
+        <AiDataNotice className="mt-2" />
         <p className="mt-2 no-print">
           <Link href="/about" className="text-brand hover:underline">
             Why I built this →

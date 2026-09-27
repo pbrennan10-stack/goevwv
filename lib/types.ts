@@ -9,7 +9,35 @@ export type VehicleClass =
   | "minivan"
   | "other";
 
-export interface Vehicle {
+// Seating, cargo, and towing — what the household planner checks a trip
+// against. Cargo is split because one "cargo" number hides the question
+// families actually ask ("does it fit 4 people AND the luggage?"):
+//   cargo_behind_row2_cu_ft — rear cargo with the 2nd row up (3-row vehicles:
+//                             3rd row folded). Sedans: trunk. null for pickups.
+//   cargo_behind_row3_cu_ft — 3-row vehicles only, all seats up.
+//   cargo_max_cu_ft         — all rear seats folded, excluding frunk.
+//   subtrunk_cu_ft          — under-floor bin behind row 2; 0 = none, null = unknown.
+//   row2_includes_subtrunk  — true when the row-2 figure already counts that bin
+//                             (so it isn't added twice); null = can't tell.
+//   frunk_cu_ft             — front trunk; 0 = none, null = has one, size unknown.
+// Per-vehicle provenance lives in capability_source / capability_confidence.
+export interface Capability {
+  seats: number;
+  cargo_behind_row2_cu_ft?: number | null;
+  cargo_behind_row3_cu_ft?: number | null;
+  cargo_max_cu_ft?: number | null;
+  subtrunk_cu_ft?: number | null;
+  row2_includes_subtrunk?: boolean | null;
+  frunk_cu_ft?: number | null;
+  bed_length_in?: number | null;
+  towing_lbs?: number | null;
+  payload_lbs?: number | null;
+  capability_source?: string;
+  capability_confidence?: "verified" | "approximate" | "unknown";
+  capability_note?: string;
+}
+
+export interface Vehicle extends Capability {
   id: string;
   make: string;
   model: string;
@@ -25,6 +53,12 @@ export interface Vehicle {
   // Curated (not derived) because manufacturers' EPA inflation varies by brand —
   // Tesla in particular overstates more than most. WV-specific calibration.
   highway_range_mi?: number;
+  // Some makers' EPA ratings are conservative. When at least two independent
+  // tests (Edmunds, Consumer Reports, InsideEVs…) agree a model beats EPA,
+  // real_world_range_factor holds the LOWEST matching tested/EPA ratio, and
+  // winter_range_mi / efficiency figures in the data are already scaled by it.
+  real_world_range_factor?: number;
+  real_world_range_source?: string;
   efficiency_kwh_per_100mi: number;
   efficiency_kwh_per_100mi_city?: number;
   efficiency_kwh_per_100mi_highway?: number;
@@ -41,10 +75,6 @@ export interface Vehicle {
     connector_home: string;
     connector_dcfc: string;
   };
-  seats: number;
-  cargo_cu_ft?: number;
-  payload_lbs?: number;
-  towing_lbs?: number;
   // Manufacturer-claimed 0-60 mph time in seconds. Independent testing
   // typically lands within ±0.3s. Shown inline on cards for quick scan.
   zero_to_sixty_s?: number;
@@ -200,7 +230,7 @@ export interface IceVehicleMaintenance {
   misc_annual_usd: number;
 }
 
-export interface IceVehicle {
+export interface IceVehicle extends Partial<Capability> {
   id: string;
   year: number;
   make: string;

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { AiDataNotice } from "@/components/AiDataNotice";
 import Link from "next/link";
 import { ChargerMap } from "@/components/ChargerMap";
 import { Logo } from "@/components/Logo";
@@ -236,6 +237,7 @@ export default async function ChargersPage({
           </Link>{" "}
           page.
         </p>
+        <AiDataNotice className="mt-3" />
       </footer>
     </main>
   );

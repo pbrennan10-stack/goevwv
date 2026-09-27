@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { AiDataNotice } from "@/components/AiDataNotice";
 import Link from "next/link";
 import { Calculator } from "@/components/Calculator";
 import { ChargingStatus } from "@/components/ChargingStatus";
@@ -63,6 +64,7 @@ export default function CalculatorPage() {
           </Link>{" "}
           page for every source and retrieval date.
         </p>
+        <AiDataNotice className="mt-3" />
       </footer>
     </main>
   );

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { AiDataNotice } from "@/components/AiDataNotice";
 import Link from "next/link";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Logo } from "@/components/Logo";
@@ -189,6 +190,7 @@ export default function AboutPage() {
             Back to the calculator →
           </Link>
         </p>
+        <AiDataNotice className="mt-3" />
       </footer>
     </main>
   );

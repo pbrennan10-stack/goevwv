@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AiDataNotice } from "./AiDataNotice";
 
 export function SiteFooter() {
   return (
@@ -13,6 +14,7 @@ export function SiteFooter() {
         </Link>{" "}
         page.
       </p>
+      <AiDataNotice className="mt-3" />
       <p className="mt-3 flex flex-wrap gap-x-4 gap-y-1">
         <Link href="/calculator" className="hover:text-ink">Calculator</Link>
         <Link href="/ev" className="hover:text-ink">All EVs</Link>
