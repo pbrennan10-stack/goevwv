@@ -1,15 +1,52 @@
 name: Deploy
 
+# Builds the Docker image HERE (GitHub's runner has ~7 GB RAM), ships it to
+# the droplet over SSH, and restarts the containers. The droplet never runs
+# `next build` itself — building there ran it out of memory (Sept 2026: the
+# box thrashed, SSH dropped with "Broken pipe", and the site went down).
+# If any step fails, the previously running containers keep serving.
+
 on:
   push:
     branches: [main]
   workflow_dispatch:
 
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
 jobs:
   deploy:
-    name: Deploy to droplet
+    name: Build and deploy to droplet
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      HOST: 174.138.53.28
     steps:
+      - uses: actions/checkout@v4
+
+      - name: Check build secrets
+        env:
+          MAPBOX: ${{ secrets.NEXT_PUBLIC_MAPBOX_TOKEN }}
+          OCM: ${{ secrets.OPENCHARGEMAP_API_KEY }}
+        run: |
+          if [ -z "$MAPBOX" ] || [ -z "$OCM" ]; then
+            echo "::error::Add NEXT_PUBLIC_MAPBOX_TOKEN and OPENCHARGEMAP_API_KEY as repository secrets (Settings → Secrets and variables → Actions). Copy the values from /opt/goevwv/.env on the droplet."
+            exit 1
+          fi
+
+      - name: Build image
+        env:
+          MAPBOX: ${{ secrets.NEXT_PUBLIC_MAPBOX_TOKEN }}
+          OCM: ${{ secrets.OPENCHARGEMAP_API_KEY }}
+          GOATCOUNTER: ${{ secrets.NEXT_PUBLIC_GOATCOUNTER_CODE }}
+        run: |
+          docker build -t goevwv:latest \
+            --build-arg NEXT_PUBLIC_MAPBOX_TOKEN="$MAPBOX" \
+            --build-arg OPENCHARGEMAP_API_KEY="$OCM" \
+            --build-arg NEXT_PUBLIC_GOATCOUNTER_CODE="$GOATCOUNTER" \
+            .
+
       - name: Set up SSH
         env:
           DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
@@ -17,9 +54,26 @@ jobs:
           mkdir -p ~/.ssh
           echo "$DEPLOY_KEY" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -H 174.138.53.28 >> ~/.ssh/known_hosts
+          ssh-keyscan -H "$HOST" >> ~/.ssh/known_hosts
+          # Keepalives so a quiet step doesn't drop the connection.
+          printf 'Host droplet\n  HostName %s\n  User root\n  IdentityFile ~/.ssh/deploy_key\n  ServerAliveInterval 30\n  ServerAliveCountMax 10\n' "$HOST" > ~/.ssh/config
 
-      - name: Pull & rebuild
+      - name: Ship image to droplet
+        run: docker save goevwv:latest | gzip | ssh droplet 'gunzip | docker load'
+
+      - name: Update config and restart
         run: |
-          ssh -i ~/.ssh/deploy_key root@174.138.53.28 \
-            "cd /opt/goevwv && git fetch origin && git reset --hard origin/main && docker compose up -d --build && docker compose ps"
+          ssh droplet "cd /opt/goevwv \
+            && git fetch origin && git reset --hard origin/main \
+            && docker compose up -d --no-build \
+            && docker image prune -f \
+            && docker compose ps"
+
+      - name: Check the live site
+        run: |
+          for i in $(seq 1 12); do
+            code=$(curl -s -o /dev/null -m 10 -w '%{http_code}' https://goevwv.com/ || true)
+            if [ "$code" = "200" ]; then echo "goevwv.com is up"; exit 0; fi
+            echo "Waiting for goevwv.com (got $code)…"; sleep 10
+          done
+          echo "::error::goevwv.com did not return 200 after deploy"; exit 1
