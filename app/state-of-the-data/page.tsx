@@ -782,6 +782,15 @@ export default function StateOfTheDataPage() {
               notes="Based on ~950,000 five-year-old vehicles sold Mar 2025–Feb 2026 — i.e., 2020–21 models, when EV prices and tax credits were changing fast. Used-EV values firmed in 2026 as gas prices rose (Cox Automotive: used EV listing prices up ~8% year over year in Jul–Aug 2026; Manheim wholesale EV values ahead of non-EVs, though the gap narrowed from +11% in May to +2% by mid-September). Gains were mostly in cheaper, older EVs. The planner uses the study figure by default and lets you slide your own estimate. No published plug-in hybrid figure exists; we use the all-vehicle average."
             />
             <SourceRow
+              label="New gas vehicle prices and mpg (for the new-EV-vs-new-gas comparison)"
+              value={`${gasCars.filter((v) => v.new_msrp_usd).length} of ${gasCars.length} gas models priced new`}
+              source="Manufacturer pricing where readable; otherwise Cars.com / press trim listings. MPG from the EPA fueleconomy.gov dataset."
+              sourceUrl="https://www.fueleconomy.gov/feg/download.shtml"
+              retrieved="2026-09-27"
+              confidence="approximate"
+              notes={`Current model year (2026–2027), same trim as closely as possible, MSRP plus destination. ${gasCars.filter((v) => v.price_confidence === "verified").length} prices were read directly from the manufacturer; the rest came from listings that matched the manufacturer wherever we could compare. Several models changed since 2024 — the RAV4 and Camry are hybrid-only, Silverado/Sierra now start with a 2.7L turbo, Telluride dropped its V6 — so the "new" version may differ from the one you own. Chevrolet Malibu and Ford Edge are no longer sold new.`}
+            />
+            <SourceRow
               label="What a vehicle you already own loses per year"
               value={`~${Math.round(own.older_vehicle_annual_depreciation * 100)}% a year`}
               source="Kelley Blue Book (8–12% a year after the first two years)"

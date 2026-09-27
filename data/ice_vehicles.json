@@ -29,7 +29,16 @@
         "brake_service_usd": 750,
         "brake_life_miles": 55000,
         "misc_annual_usd": 350
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2026,
+      "new_trim": "XLT SuperCrew 5.5' 4x4 2.7L EcoBoost",
+      "new_msrp_usd": 51915,
+      "new_destination_usd": 2795,
+      "new_mpg_combined": 20,
+      "price_source": "https://www.cars.com/research/ford-f_150-2026/trims/",
+      "price_confidence": "approximate",
+      "price_note": "Price from Cars.com (ford.com build pages not fetchable); destination from ford.com/auto-shipping-delivery-charges (2026 F-150 $2,795). EPA 2026 F-150 4WD 2.7L = 20 mpg."
     },
     {
       "id": "chevy-silverado-2024",
@@ -56,7 +65,16 @@
         "brake_service_usd": 780,
         "brake_life_miles": 55000,
         "misc_annual_usd": 320
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2026,
+      "new_trim": "LT Crew Cab 4WD short box (2.7L TurboMax base)",
+      "new_msrp_usd": 53700,
+      "new_destination_usd": 2795,
+      "new_mpg_combined": 19,
+      "price_source": "https://www.cars.com/research/chevrolet-silverado_1500-2026/trims/",
+      "price_confidence": "approximate",
+      "price_note": "LT now comes standard with 2.7L turbo-4; 5.3L V8 is an extra-cost option (price not verified, dealer sites say ~$1,500; EPA 5.3L 4WD = 17 mpg). Priced/rated the base 2.7T. Price from Cars.com; $2,795 destination per GM Authority/TFL reports."
     },
     {
       "id": "ram-1500-2024",
@@ -84,7 +102,16 @@
         "brake_service_usd": 830,
         "brake_life_miles": 50000,
         "misc_annual_usd": 320
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2027,
+      "new_trim": "Tradesman Crew Cab 5'7\" 4x4 (3.6L V6 eTorque base)",
+      "new_msrp_usd": 48725,
+      "new_destination_usd": 2595,
+      "new_mpg_combined": 21,
+      "price_source": "https://www.cars.com/research/ram-1500-2027/trims/",
+      "price_confidence": "approximate",
+      "price_note": "2024 Tradesman used 5.7L Hemi; 5.7L Hemi is again offered for 2026-27 as an option (EPA 4WD 17-18 mpg), not priced here. Priced base 3.6L mild-hybrid V6. Price from Cars.com; destination $2,595 per Cars.com 2026 destination-fee article."
     },
     {
       "id": "gmc-sierra-2024",
@@ -111,7 +138,16 @@
         "brake_service_usd": 780,
         "brake_life_miles": 55000,
         "misc_annual_usd": 320
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2026,
+      "new_trim": "SLE Crew Cab 4WD short box (2.7L TurboMax base)",
+      "new_msrp_usd": 54600,
+      "new_destination_usd": 2795,
+      "new_mpg_combined": 18,
+      "price_source": "https://www.cars.com/research/gmc-sierra_1500-2026/trims/",
+      "price_confidence": "approximate",
+      "price_note": "SLE now standard with 2.7L turbo-4; 5.3L V8 optional at extra cost (not priced; EPA 5.3L 4WD = 16 mpg). Price from Cars.com; $2,795 destination per press reports on GM full-size trucks."
     },
     {
       "id": "toyota-tacoma-2024",
@@ -138,7 +174,16 @@
         "brake_service_usd": 630,
         "brake_life_miles": 55000,
         "misc_annual_usd": 290
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2026,
+      "new_trim": "TRD Off-Road Double Cab 5' 4x4 2.4T automatic",
+      "new_msrp_usd": 43915,
+      "new_destination_usd": 1595,
+      "new_mpg_combined": 21,
+      "price_source": "https://www.cars.com/research/toyota-tacoma-2026/trims/",
+      "price_confidence": "approximate",
+      "price_note": "Same trim/engine. Price from Cars.com; destination $1,595 from KBB 2026 Tacoma page. EPA 2026 Tacoma 4WD auto = 21 mpg (2024 catalog value was 23)."
     },
     {
       "id": "ford-f250-2024",
@@ -165,7 +210,15 @@
         "brake_service_usd": 1040,
         "brake_life_miles": 45000,
         "misc_annual_usd": 440
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2026,
+      "new_trim": "XLT Crew Cab 6.75' 4x4 (6.8L V8 base)",
+      "new_msrp_usd": 56800,
+      "new_destination_usd": 2795,
+      "price_source": "https://www.cars.com/research/ford-f_250-2026/trims/",
+      "price_confidence": "approximate",
+      "price_note": "Base XLT price uses the standard 6.8L V8; the 7.3L V8 is an extra-cost option (not priced). Heavy-duty pickups are not EPA-rated, so mpg null. Destination from ford.com (2026 Super Duty $2,795). Price from Cars.com."
     },
     {
       "id": "jeep-wrangler-2024",
@@ -193,7 +246,16 @@
         "brake_service_usd": 690,
         "brake_life_miles": 50000,
         "misc_annual_usd": 350
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2026,
+      "new_trim": "Sport 4-door 4x4 3.6L V6 (6-speed manual base)",
+      "new_msrp_usd": 39040,
+      "new_destination_usd": 1995,
+      "new_mpg_combined": 19,
+      "price_source": "https://www.cars.com/research/jeep-wrangler-2026/trims/",
+      "price_confidence": "approximate",
+      "price_note": "Base price is V6 manual (19 mpg); 8-speed automatic is extra cost (EPA 20 mpg). Price from Cars.com; Jeep destination $1,995 per Cars.com 2026 destination-fee article. A 2027 Wrangler is also listed by EPA."
     },
     {
       "id": "toyota-4runner-2024",
@@ -221,7 +283,16 @@
         "brake_service_usd": 630,
         "brake_life_miles": 65000,
         "misc_annual_usd": 290
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2026,
+      "new_trim": "TRD Off-Road 4x4 2.4L turbo-4",
+      "new_msrp_usd": 50690,
+      "new_destination_usd": 1450,
+      "new_mpg_combined": 21,
+      "price_source": "https://www.cars.com/research/toyota-4runner-2026/trims/",
+      "price_confidence": "approximate",
+      "price_note": "4.0L V6 dropped with the 2025 redesign; 2.4L turbo-4 is the only non-hybrid engine. Price from Cars.com; $1,450 DPH from Toyota pressroom 2026 4Runner release (may have risen since)."
     },
     {
       "id": "dodge-durango-2024",
@@ -250,7 +321,15 @@
         "brake_service_usd": 690,
         "brake_life_miles": 55000,
         "misc_annual_usd": 310
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2026,
+      "new_trim": "GT AWD 3.6L V6",
+      "new_msrp_usd": 40995,
+      "new_mpg_combined": 20,
+      "price_source": "https://www.cars.com/research/dodge-durango-2026/trims/",
+      "price_confidence": "approximate",
+      "price_note": "SXT trim dropped; GT is now the base V6 trim. Price from Cars.com (dodge.com blocked); destination not found. 2027 Durango also listed (GT Plus AWD $40,995)."
     },
     {
       "id": "jeep-grand-cherokee-2024",
@@ -279,7 +358,16 @@
         "brake_service_usd": 670,
         "brake_life_miles": 55000,
         "misc_annual_usd": 320
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2027,
+      "new_trim": "Laredo 4x4 3.6L V6",
+      "new_msrp_usd": 41730,
+      "new_destination_usd": 1995,
+      "new_mpg_combined": 22,
+      "price_source": "https://www.cars.com/research/jeep-grand_cherokee-2027/trims/",
+      "price_confidence": "approximate",
+      "price_note": "Same trim/engine. Price from Cars.com; destination is the 2026 Jeep figure ($1,995) per Cars.com destination-fee article."
     },
     {
       "id": "ford-explorer-2024",
@@ -308,7 +396,16 @@
         "brake_service_usd": 620,
         "brake_life_miles": 60000,
         "misc_annual_usd": 290
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2027,
+      "new_trim": "Active 4WD (100A) 2.3L EcoBoost",
+      "new_msrp_usd": 40465,
+      "new_destination_usd": 1795,
+      "new_mpg_combined": 23,
+      "price_source": "https://www.cars.com/research/ford-explorer-2027/trims/",
+      "price_confidence": "approximate",
+      "price_note": "XLT renamed Active from 2025. Price from Cars.com; destination from ford.com (2027 Explorer $1,795)."
     },
     {
       "id": "chevy-tahoe-2024",
@@ -337,7 +434,16 @@
         "brake_service_usd": 860,
         "brake_life_miles": 55000,
         "misc_annual_usd": 370
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2027,
+      "new_trim": "LT 4WD 5.3L V8",
+      "new_msrp_usd": 67200,
+      "new_destination_usd": 2795,
+      "new_mpg_combined": 17,
+      "price_source": "https://www.cars.com/research/chevrolet-tahoe-2027/trims/",
+      "price_confidence": "approximate",
+      "price_note": "Price from Cars.com (its LT engine label shows the diesel, but dealer/Chevy sources say 5.3L V8 is standard on LT). Destination $2,795 per TFL/KBB reports on GM full-size SUVs."
     },
     {
       "id": "honda-pilot-2024",
@@ -366,7 +472,16 @@
         "brake_service_usd": 600,
         "brake_life_miles": 62000,
         "misc_annual_usd": 260
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2026,
+      "new_trim": "EX-L AWD 3.5L V6",
+      "new_msrp_usd": 46795,
+      "new_destination_usd": 1495,
+      "new_mpg_combined": 21,
+      "price_source": "https://www.cars.com/research/honda-pilot-2026/trims/",
+      "price_confidence": "approximate",
+      "price_note": "Same trim/engine. Price from Cars.com (hondanews blocked); destination from hondanews 2026 Pilot release summary."
     },
     {
       "id": "kia-telluride-2024",
@@ -395,7 +510,16 @@
         "brake_service_usd": 620,
         "brake_life_miles": 62000,
         "misc_annual_usd": 260
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2027,
+      "new_trim": "EX AWD 2.5L turbo-4",
+      "new_msrp_usd": 45790,
+      "new_destination_usd": 1545,
+      "new_mpg_combined": 20,
+      "price_source": "https://www.kiamedia.com/us/en/models/telluride/2027/pricing",
+      "price_confidence": "verified",
+      "price_note": "Redesigned 2027 Telluride replaced the 3.8L V6 with a 2.5L turbo-4 (hybrid also offered). Price and destination from Kia Media."
     },
     {
       "id": "toyota-rav4-2024",
@@ -422,7 +546,16 @@
         "brake_service_usd": 550,
         "brake_life_miles": 65000,
         "misc_annual_usd": 230
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2026,
+      "new_trim": "LE AWD Hybrid 2.5L",
+      "new_msrp_usd": 33300,
+      "new_destination_usd": 1450,
+      "new_mpg_combined": 42,
+      "price_source": "https://www.cars.com/research/toyota-rav4-2026/trims/",
+      "price_confidence": "approximate",
+      "price_note": "Redesigned 2026 RAV4 is hybrid-only; gas-only 2.5L dropped. Priced closest trim (LE AWD hybrid). Price from Cars.com (LE FWD $31,900 matches Toyota pressroom); DPH $1,450 from dealer-site summary."
     },
     {
       "id": "honda-crv-2024",
@@ -450,7 +583,16 @@
         "brake_service_usd": 530,
         "brake_life_miles": 70000,
         "misc_annual_usd": 210
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2027,
+      "new_trim": "LX AWD 1.5T",
+      "new_msrp_usd": 33020,
+      "new_destination_usd": 1450,
+      "new_mpg_combined": 29,
+      "price_source": "https://www.cars.com/research/honda-cr_v-2027/trims/",
+      "price_confidence": "approximate",
+      "price_note": "Same trim/engine. Price from Cars.com; $1,450 destination from hondanews 2027 CR-V pricing release (search snippet)."
     },
     {
       "id": "chevy-equinox-2024",
@@ -478,7 +620,16 @@
         "brake_service_usd": 520,
         "brake_life_miles": 65000,
         "misc_annual_usd": 230
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2027,
+      "new_trim": "LT FWD 1.5T",
+      "new_msrp_usd": 29000,
+      "new_destination_usd": 1995,
+      "new_mpg_combined": 27,
+      "price_source": "https://www.cars.com/research/chevrolet-equinox-2027/trims/",
+      "price_confidence": "approximate",
+      "price_note": "Same trim/engine (redesigned 2025). Price from Cars.com; destination is 2026 Equinox figure ($1,995) per GM Authority."
     },
     {
       "id": "ford-escape-2024",
@@ -506,7 +657,16 @@
         "brake_service_usd": 550,
         "brake_life_miles": 60000,
         "misc_annual_usd": 230
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2026,
+      "new_trim": "Active AWD 1.5L EcoBoost",
+      "new_msrp_usd": 31750,
+      "new_destination_usd": 1495,
+      "new_mpg_combined": 28,
+      "price_source": "https://www.cars.com/research/ford-escape-2026/trims/",
+      "price_confidence": "approximate",
+      "price_note": "2026 is the final Escape model year; production ended Dec 17, 2025, so only remaining new inventory (replacement: Ford Bronco Sport). 2.0L now only on ST-Line Select AWD and up ($33,890, 26 mpg); priced Active AWD 1.5L instead. Destination from ford.com."
     },
     {
       "id": "subaru-outback-2024",
@@ -534,7 +694,16 @@
         "brake_service_usd": 520,
         "brake_life_miles": 68000,
         "misc_annual_usd": 210
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2026,
+      "new_trim": "Premium AWD 2.5L",
+      "new_msrp_usd": 34995,
+      "new_destination_usd": 1450,
+      "new_mpg_combined": 27,
+      "price_source": "https://www.cars.com/research/subaru-outback-2026/trims/",
+      "price_confidence": "approximate",
+      "price_note": "Redesigned 2026 Outback, same trim/engine. Price from Cars.com; $1,450 destination from Subaru media center release."
     },
     {
       "id": "nissan-rogue-2024",
@@ -562,7 +731,16 @@
         "brake_service_usd": 510,
         "brake_life_miles": 65000,
         "misc_annual_usd": 210
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2026,
+      "new_trim": "SV AWD 1.5T (2026.5)",
+      "new_msrp_usd": 31890,
+      "new_destination_usd": 1575,
+      "new_mpg_combined": 31,
+      "price_source": "https://usa.nissannews.com/en-US/releases/release-2704b0eedba2fa91be91a7ae2e22fbd2",
+      "price_confidence": "verified",
+      "price_note": "Same trim/engine. Price and destination from Nissan newsroom (2026.5 Rogue)."
     },
     {
       "id": "toyota-camry-2024",
@@ -588,7 +766,16 @@
         "brake_service_usd": 460,
         "brake_life_miles": 70000,
         "misc_annual_usd": 170
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2026,
+      "new_trim": "LE FWD Hybrid 2.5L",
+      "new_msrp_usd": 29600,
+      "new_destination_usd": 1195,
+      "new_mpg_combined": 51,
+      "price_source": "https://www.cars.com/research/toyota-camry-2026/trims/",
+      "price_confidence": "approximate",
+      "price_note": "Camry is hybrid-only since 2025; gas-only 2.5L dropped. Price from Cars.com; DPH $1,195 from dealer-site summary."
     },
     {
       "id": "honda-accord-2024",
@@ -614,7 +801,16 @@
         "brake_service_usd": 480,
         "brake_life_miles": 70000,
         "misc_annual_usd": 180
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2026,
+      "new_trim": "SE 1.5T",
+      "new_msrp_usd": 30695,
+      "new_destination_usd": 1195,
+      "new_mpg_combined": 31,
+      "price_source": "https://www.cars.com/research/honda-accord-2026/trims/",
+      "price_confidence": "approximate",
+      "price_note": "EX trim dropped; SE is the upper non-hybrid 1.5T trim (LX $28,395, 32 mpg). Price from Cars.com; destination from hondanews 2026 Accord summary."
     },
     {
       "id": "hyundai-sonata-2024",
@@ -640,7 +836,16 @@
         "brake_service_usd": 460,
         "brake_life_miles": 70000,
         "misc_annual_usd": 170
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2026,
+      "new_trim": "SE FWD 2.5L",
+      "new_msrp_usd": 27450,
+      "new_destination_usd": 1245,
+      "new_mpg_combined": 32,
+      "price_source": "https://www.cars.com/research/hyundai-sonata-2026/trims/",
+      "price_confidence": "approximate",
+      "price_note": "Same trim/engine. EPA lists 29-32 mpg for FWD 2.5L depending on stop-start; 32 assumed for SE (unconfirmed). Price from Cars.com; $1,245 freight from Hyundai 2026 Sonata price sheet (Aug 2025). 2027 Sonata also EPA-listed."
     },
     {
       "id": "nissan-altima-2024",
@@ -666,7 +871,16 @@
         "brake_service_usd": 460,
         "brake_life_miles": 70000,
         "misc_annual_usd": 170
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2026,
+      "new_trim": "SV FWD 2.5L",
+      "new_msrp_usd": 27580,
+      "new_destination_usd": 1275,
+      "new_mpg_combined": 30,
+      "price_source": "https://usa.nissannews.com/en-US/releases/2026-nissan-altima-priced-from-27580",
+      "price_confidence": "verified",
+      "price_note": "Same trim/engine. Price and destination from Nissan newsroom."
     },
     {
       "id": "toyota-corolla-2024",
@@ -692,7 +906,16 @@
         "brake_service_usd": 400,
         "brake_life_miles": 75000,
         "misc_annual_usd": 150
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2027,
+      "new_trim": "LE sedan FWD 2.0L",
+      "new_msrp_usd": 23325,
+      "new_destination_usd": 1195,
+      "new_mpg_combined": 35,
+      "price_source": "https://www.cars.com/research/toyota-corolla-2027/trims/",
+      "price_confidence": "approximate",
+      "price_note": "Same trim/engine. Price from Cars.com; DPH is 2026 Toyota car figure ($1,195). MPG assumes LE uses the 1-mode CVT (35); other 2027 Corolla variants 33."
     },
     {
       "id": "chevy-malibu-2024",
@@ -718,7 +941,10 @@
         "brake_service_usd": 440,
         "brake_life_miles": 70000,
         "misc_annual_usd": 180
-      }
+      },
+      "new_status": "discontinued",
+      "price_confidence": "verified",
+      "price_note": "Malibu production ended Nov 2024 (no 2025+ model; none in EPA 2026/2027 data). Closest current replacement: Chevrolet Equinox or Trax."
     },
     {
       "id": "honda-odyssey-2024",
@@ -747,7 +973,16 @@
         "brake_service_usd": 580,
         "brake_life_miles": 62000,
         "misc_annual_usd": 250
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2027,
+      "new_trim": "EX-L 3.5L V6",
+      "new_msrp_usd": 43195,
+      "new_destination_usd": 1495,
+      "new_mpg_combined": 22,
+      "price_source": "https://www.cars.com/research/honda-odyssey-2027/trims/",
+      "price_confidence": "approximate",
+      "price_note": "EX trim dropped; EX-L is now the base trim. Price from Cars.com; destination is 2026 Odyssey figure from hondanews summary."
     },
     {
       "id": "ford-ranger-2024",
@@ -773,7 +1008,16 @@
         "brake_service_usd": 620,
         "brake_life_miles": 60000,
         "misc_annual_usd": 280
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2026,
+      "new_trim": "XLT SuperCrew 4x4 2.3L EcoBoost",
+      "new_msrp_usd": 39575,
+      "new_destination_usd": 1895,
+      "new_mpg_combined": 21,
+      "price_source": "https://www.cars.com/research/ford-ranger-2026/trims/",
+      "price_confidence": "approximate",
+      "price_note": "Same trim/engine (2.7L V6 optional, 20 mpg). Price from Cars.com; destination from ford.com (2026 Ranger $1,895)."
     },
     {
       "id": "chevy-colorado-2024",
@@ -800,7 +1044,16 @@
         "brake_service_usd": 620,
         "brake_life_miles": 60000,
         "misc_annual_usd": 280
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2026,
+      "new_trim": "LT Crew Cab 4WD 2.7L turbo-4",
+      "new_msrp_usd": 39300,
+      "new_destination_usd": 2095,
+      "new_mpg_combined": 19,
+      "price_source": "https://www.cars.com/research/chevrolet-colorado-2026/trims/",
+      "price_confidence": "approximate",
+      "price_note": "Same trim/engine. Price from Cars.com; destination $2,095 from search summary of GM sources (unconfirmed)."
     },
     {
       "id": "ford-maverick-2024",
@@ -828,7 +1081,16 @@
         "brake_service_usd": 480,
         "brake_life_miles": 85000,
         "misc_annual_usd": 210
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2026,
+      "new_trim": "XLT FWD Hybrid 2.5L",
+      "new_msrp_usd": 30645,
+      "new_destination_usd": 1845,
+      "new_mpg_combined": 38,
+      "price_source": "https://www.cars.com/research/ford-maverick-2026/trims/",
+      "price_confidence": "approximate",
+      "price_note": "Same trim/powertrain. Price from Cars.com; destination from ford.com (2026 Maverick $1,845)."
     },
     {
       "id": "nissan-frontier-2024",
@@ -856,7 +1118,16 @@
         "brake_service_usd": 600,
         "brake_life_miles": 60000,
         "misc_annual_usd": 260
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2027,
+      "new_trim": "SV Crew Cab 4x4 3.8L V6",
+      "new_msrp_usd": 39790,
+      "new_destination_usd": 1695,
+      "new_mpg_combined": 19,
+      "price_source": "https://www.cars.com/research/nissan-frontier-2027/trims/",
+      "price_confidence": "approximate",
+      "price_note": "Same trim/engine. Price from Cars.com; destination is 2026 Frontier figure from Nissan newsroom search summary."
     },
     {
       "id": "toyota-tundra-2024",
@@ -884,7 +1155,16 @@
         "brake_service_usd": 690,
         "brake_life_miles": 62000,
         "misc_annual_usd": 300
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2026,
+      "new_trim": "SR5 CrewMax 5.5' 4x4 3.4L twin-turbo V6",
+      "new_msrp_usd": 51510,
+      "new_destination_usd": 2095,
+      "new_mpg_combined": 19,
+      "price_source": "https://www.cars.com/research/toyota-tundra-2026/trims/",
+      "price_confidence": "approximate",
+      "price_note": "Same trim/engine. Cars.com listing did not label drivetrain; $51,510 assumed to be 4x4 (2WD $48,510). DPH $2,095 per TFL/dealer summaries."
     },
     {
       "id": "toyota-highlander-2024",
@@ -913,7 +1193,16 @@
         "brake_service_usd": 580,
         "brake_life_miles": 70000,
         "misc_annual_usd": 240
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2026,
+      "new_trim": "XLE AWD 2.4L turbo",
+      "new_msrp_usd": 46270,
+      "new_destination_usd": 1495,
+      "new_mpg_combined": 24,
+      "price_source": "https://www.cars.com/research/toyota-highlander-2026/trims/",
+      "price_confidence": "approximate",
+      "price_note": "Same trim/engine. Price from Cars.com; DPH $1,495 from dealer-site summary."
     },
     {
       "id": "kia-sorento-2024",
@@ -942,7 +1231,16 @@
         "brake_service_usd": 550,
         "brake_life_miles": 70000,
         "misc_annual_usd": 230
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2026,
+      "new_trim": "LX FWD 2.5L",
+      "new_msrp_usd": 32390,
+      "new_destination_usd": 1495,
+      "new_mpg_combined": 26,
+      "price_source": "https://www.kiamedia.com/us/en/models/sorento/2026/pricing",
+      "price_confidence": "verified",
+      "price_note": "Same trim/engine. Price and destination from Kia Media. A 2027 Sorento is also EPA-listed (same 26 mpg)."
     },
     {
       "id": "hyundai-santafe-2024",
@@ -971,7 +1269,16 @@
         "brake_service_usd": 550,
         "brake_life_miles": 70000,
         "misc_annual_usd": 230
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2027,
+      "new_trim": "SEL AWD 2.5L turbo",
+      "new_msrp_usd": 39640,
+      "new_destination_usd": 1600,
+      "new_mpg_combined": 23,
+      "price_source": "https://www.cars.com/research/hyundai-santa_fe-2027/trims/",
+      "price_confidence": "approximate",
+      "price_note": "Same trim/engine. Price from Cars.com; freight $1,600 is the 2026 Santa Fe price-sheet figure (2027 not confirmed)."
     },
     {
       "id": "chevy-suburban-2024",
@@ -1000,7 +1307,16 @@
         "brake_service_usd": 710,
         "brake_life_miles": 62000,
         "misc_annual_usd": 300
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2027,
+      "new_trim": "LS 4WD 5.3L V8",
+      "new_msrp_usd": 67200,
+      "new_destination_usd": 2795,
+      "new_mpg_combined": 16,
+      "price_source": "https://www.cars.com/research/chevrolet-suburban-2027/trims/",
+      "price_confidence": "approximate",
+      "price_note": "Same trim/engine. Price from Cars.com; $2,795 destination per Cars.com 2026 destination-fee article."
     },
     {
       "id": "subaru-forester-2024",
@@ -1028,7 +1344,16 @@
         "brake_service_usd": 530,
         "brake_life_miles": 75000,
         "misc_annual_usd": 220
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2026,
+      "new_trim": "Premium AWD 2.5L",
+      "new_msrp_usd": 31995,
+      "new_destination_usd": 1450,
+      "new_mpg_combined": 29,
+      "price_source": "https://www.cars.com/research/subaru-forester-2026/trims/",
+      "price_confidence": "approximate",
+      "price_note": "Same trim/engine. Price from Cars.com (Subaru revised 2026 Forester pricing mid-year); $1,450 destination from Subaru media center."
     },
     {
       "id": "toyota-sienna-2024",
@@ -1057,7 +1382,16 @@
         "brake_service_usd": 580,
         "brake_life_miles": 90000,
         "misc_annual_usd": 240
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2026,
+      "new_trim": "LE AWD 8-passenger Hybrid",
+      "new_msrp_usd": 43320,
+      "new_destination_usd": 1495,
+      "new_mpg_combined": 35,
+      "price_source": "https://www.cars.com/research/toyota-sienna-2026/trims/",
+      "price_confidence": "approximate",
+      "price_note": "Same trim/powertrain. Price from Cars.com; DPH $1,495 from dealer-site summary."
     },
     {
       "id": "honda-civic-2024",
@@ -1084,7 +1418,16 @@
         "brake_service_usd": 480,
         "brake_life_miles": 75000,
         "misc_annual_usd": 200
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2026,
+      "new_trim": "LX Sedan 2.0L CVT",
+      "new_msrp_usd": 24695,
+      "new_destination_usd": 1195,
+      "new_mpg_combined": 36,
+      "price_source": "https://www.cars.com/research/honda-civic-2026/",
+      "price_confidence": "approximate",
+      "price_note": "Price from Cars.com (June 2026: $25,890 incl. $1,195 dest); Honda pages blocked fetching. Launch MSRP was $24,595 with $1,150 dest (Cars.com)."
     },
     {
       "id": "kia-seltos-2024",
@@ -1111,7 +1454,16 @@
         "brake_service_usd": 520,
         "brake_life_miles": 75000,
         "misc_annual_usd": 210
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2027,
+      "new_trim": "LX AWD 2.0L IVT",
+      "new_msrp_usd": 26690,
+      "new_destination_usd": 1495,
+      "new_mpg_combined": 28,
+      "price_source": "https://www.kiamedia.com/us/en/models/seltos/2027/pricing",
+      "price_confidence": "verified",
+      "price_note": "Redesigned 2027 Seltos; 2026 LX AWD was $24,990 (+$1,495)."
     },
     {
       "id": "bmw-m2-2024",
@@ -1138,7 +1490,16 @@
         "brake_service_usd": 800,
         "brake_life_miles": 60000,
         "misc_annual_usd": 400
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2026,
+      "new_trim": "M2 Coupe 3.0L Twin-Turbo I6",
+      "new_msrp_usd": 68200,
+      "new_destination_usd": 1350,
+      "new_mpg_combined": 19,
+      "price_source": "https://www.bmwblog.com/2026/01/06/2026-bmw-m2-review-price-performance-changes/",
+      "price_confidence": "approximate",
+      "price_note": "Price from BMWBlog/Cars.com (bmwusa.com timed out). Same 19 mpg for 6MT and 8AT. 2027 M2 also listed by EPA."
     },
     {
       "id": "bmw-330i-2024",
@@ -1164,7 +1525,16 @@
         "brake_service_usd": 750,
         "brake_life_miles": 55000,
         "misc_annual_usd": 370
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2026,
+      "new_trim": "330i xDrive Sedan 2.0L Turbo (48V mild hybrid)",
+      "new_msrp_usd": 50000,
+      "new_destination_usd": 1350,
+      "new_mpg_combined": 29,
+      "price_source": "https://www.cars.com/research/bmw-330-2026/",
+      "price_confidence": "approximate",
+      "price_note": "Price from Cars.com/Edmunds ($51,350 incl. $1,350 dest); 2026 330i is now a mild hybrid."
     },
     {
       "id": "mazda-cx5-2024",
@@ -1192,7 +1562,16 @@
         "brake_service_usd": 550,
         "brake_life_miles": 75000,
         "misc_annual_usd": 220
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2026,
+      "new_trim": "2.5 S Select AWD",
+      "new_msrp_usd": 31990,
+      "new_destination_usd": 1595,
+      "new_mpg_combined": 26,
+      "price_source": "https://news.mazdausa.com/2026-01-13-Mazda-Announces-Pricing-and-Packaging-for-All-New-2026-Mazda-CX-5",
+      "price_confidence": "verified",
+      "price_note": "All-new 2026 CX-5; trim renamed 2.5 S Select; AWD standard."
     },
     {
       "id": "subaru-crosstrek-2024",
@@ -1219,7 +1598,16 @@
         "brake_service_usd": 530,
         "brake_life_miles": 75000,
         "misc_annual_usd": 210
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2027,
+      "new_trim": "Premium AWD 2.5L",
+      "new_msrp_usd": 27995,
+      "new_destination_usd": 1475,
+      "new_mpg_combined": 29,
+      "price_source": "https://media.subaru.com/pressrelease/2473/1/subaru-crosstrek-pricing-holds-steady-26995-msrp-2027",
+      "price_confidence": "verified",
+      "price_note": "2.0L engine dropped; all non-hybrid Crosstreks now use the 2.5L."
     },
     {
       "id": "hyundai-tucson-2024",
@@ -1247,7 +1635,16 @@
         "brake_service_usd": 530,
         "brake_life_miles": 75000,
         "misc_annual_usd": 210
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2026,
+      "new_trim": "SEL AWD 2.5L",
+      "new_msrp_usd": 32550,
+      "new_destination_usd": 1600,
+      "new_mpg_combined": 26,
+      "price_source": "https://www.cars.com/research/hyundai-tucson-2026/",
+      "price_confidence": "approximate",
+      "price_note": "Cars.com lists SEL AWD $32,550; other sources cite $32,050 (earlier pricing). Freight $1,600 per Hyundai release; Hyundai pages blocked fetching."
     },
     {
       "id": "lexus-rx350-2024",
@@ -1275,7 +1672,16 @@
         "brake_service_usd": 670,
         "brake_life_miles": 80000,
         "misc_annual_usd": 290
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2026,
+      "new_trim": "RX 350 Premium AWD 2.4L Turbo",
+      "new_msrp_usd": 55000,
+      "new_destination_usd": 1550,
+      "new_mpg_combined": 24,
+      "price_source": "https://pressroom.lexus.com/2026-lexus-rx-extending-the-range/",
+      "price_confidence": "verified",
+      "price_note": "Lexus lists $56,550 including $1,550 DPH."
     },
     {
       "id": "vw-tiguan-2024",
@@ -1303,7 +1709,16 @@
         "brake_service_usd": 580,
         "brake_life_miles": 70000,
         "misc_annual_usd": 250
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2026,
+      "new_trim": "SE 4MOTION 2.0L Turbo",
+      "new_msrp_usd": 35105,
+      "new_destination_usd": 1475,
+      "new_mpg_combined": 25,
+      "price_source": "https://media.vw.com/press-kits/2026-tiguan-press-kit",
+      "price_confidence": "approximate",
+      "price_note": "Price from the VW 2026 pricing sheet as quoted in search results (PDF blocked fetching)."
     },
     {
       "id": "ford-bronco-sport-2024",
@@ -1331,7 +1746,16 @@
         "brake_service_usd": 580,
         "brake_life_miles": 70000,
         "misc_annual_usd": 240
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2026,
+      "new_trim": "Big Bend 4x4 1.5L EcoBoost",
+      "new_msrp_usd": 31845,
+      "new_destination_usd": 1995,
+      "new_mpg_combined": 27,
+      "price_source": "https://www.ford.com/suvs/bronco-sport/models/big-bend/",
+      "price_confidence": "approximate",
+      "price_note": "Price from Ford Authority/dealer sources; Ford.com did not show price when fetched."
     },
     {
       "id": "ford-edge-2024",
@@ -1359,7 +1783,10 @@
         "brake_service_usd": 600,
         "brake_life_miles": 70000,
         "misc_annual_usd": 250
-      }
+      },
+      "new_status": "discontinued",
+      "price_confidence": "approximate",
+      "price_note": "Ford Edge ended North American production April 2024; no 2025+ US model. Closest current replacements: Ford Bronco Sport/Escape (smaller) or Ford Explorer (larger)."
     },
     {
       "id": "chevy-traverse-2024",
@@ -1388,7 +1815,16 @@
         "brake_service_usd": 620,
         "brake_life_miles": 70000,
         "misc_annual_usd": 260
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2027,
+      "new_trim": "LT AWD 2.5L Turbo",
+      "new_msrp_usd": 42800,
+      "new_destination_usd": 1995,
+      "new_mpg_combined": 21,
+      "price_source": "https://gmauthority.com/blog/2026/06/2027-chevy-traverse-pricing-uncovered/",
+      "price_confidence": "approximate",
+      "price_note": "LT $40,800 + $2,000 AWD per GM Authority/Cars.com search results; 2026 LT AWD was $44,695 incl. $1,995."
     },
     {
       "id": "nissan-murano-2024",
@@ -1415,7 +1851,16 @@
         "brake_service_usd": 600,
         "brake_life_miles": 70000,
         "misc_annual_usd": 240
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2026,
+      "new_trim": "SV AWD 2.0L Turbo",
+      "new_msrp_usd": 41670,
+      "new_destination_usd": 1545,
+      "new_mpg_combined": 23,
+      "price_source": "https://usa.nissannews.com/en-US/releases/2026-nissan-murano-priced-from-41670-adds-available-propilot-assist-21",
+      "price_confidence": "verified",
+      "price_note": "3.5L V6 replaced by 2.0L turbo I4 (redesigned 2025); AWD standard."
     },
     {
       "id": "honda-civic-hatchback-2024",
@@ -1443,7 +1888,16 @@
         "brake_service_usd": 490,
         "brake_life_miles": 75000,
         "misc_annual_usd": 200
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2026,
+      "new_trim": "Sport Hatchback 2.0L CVT",
+      "new_msrp_usd": 27895,
+      "new_destination_usd": 1195,
+      "new_mpg_combined": 34,
+      "price_source": "https://www.cars.com/research/honda-civic-2026/",
+      "price_confidence": "approximate",
+      "price_note": "1.5L turbo dropped from Sport hatchback; now 2.0L. Price from Cars.com ($29,090 incl. $1,195 dest)."
     },
     {
       "id": "mazda-3-hatchback-2024",
@@ -1470,7 +1924,16 @@
         "brake_service_usd": 520,
         "brake_life_miles": 75000,
         "misc_annual_usd": 210
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2026,
+      "new_trim": "2.5 S Hatchback FWD",
+      "new_msrp_usd": 25650,
+      "new_destination_usd": 1315,
+      "new_mpg_combined": 29,
+      "price_source": "https://news.mazdausa.com/2025-08-19-2026-Mazda3-Pricing-and-Packaging",
+      "price_confidence": "verified",
+      "price_note": "MSRP also shown on mazdausa.com."
     },
     {
       "id": "hyundai-elantra-2024",
@@ -1496,7 +1959,16 @@
         "brake_service_usd": 480,
         "brake_life_miles": 75000,
         "misc_annual_usd": 200
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2026,
+      "new_trim": "SEL Sport Sedan 2.0L IVT",
+      "new_msrp_usd": 23950,
+      "new_destination_usd": 1245,
+      "new_mpg_combined": 34,
+      "price_source": "https://www.cars.com/research/hyundai-elantra-2026/",
+      "price_confidence": "approximate",
+      "price_note": "SEL renamed SEL Sport; earlier sources list $23,750. EPA lists 34 (non-ISG) and 35 (stop-start) for the 2.0L IVT."
     },
     {
       "id": "ford-mustang-gt-2024",
@@ -1523,7 +1995,16 @@
         "brake_service_usd": 690,
         "brake_life_miles": 60000,
         "misc_annual_usd": 350
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2026,
+      "new_trim": "GT Fastback 5.0L V8",
+      "new_msrp_usd": 46560,
+      "new_destination_usd": 1995,
+      "new_mpg_combined": 18,
+      "price_source": "https://www.edmunds.com/ford/mustang/",
+      "price_confidence": "approximate",
+      "price_note": "Price from press/search results; Cars.com lists $46,800. 18 mpg with standard 6MT; 10-speed auto is 19."
     },
     {
       "id": "jeep-gladiator-2024",
@@ -1551,7 +2032,16 @@
         "brake_service_usd": 710,
         "brake_life_miles": 50000,
         "misc_annual_usd": 350
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2026,
+      "new_trim": "Sport S 4x4 3.6L V6",
+      "new_msrp_usd": 43015,
+      "new_destination_usd": 1995,
+      "new_mpg_combined": 19,
+      "price_source": "https://www.jeep.com/gladiator/specs.sport-s.html",
+      "price_confidence": "approximate",
+      "price_note": "Price from search results citing Jeep/press (jeep.com blocked fetching); Cars.com lists $44,020."
     },
     {
       "id": "ford-bronco-2024",
@@ -1579,7 +2069,16 @@
         "brake_service_usd": 690,
         "brake_life_miles": 55000,
         "misc_annual_usd": 320
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2026,
+      "new_trim": "Big Bend 4-Door 4x4 2.3L EcoBoost",
+      "new_msrp_usd": 39525,
+      "new_destination_usd": 1895,
+      "new_mpg_combined": 20,
+      "price_source": "https://www.ford.com/suvs/bronco/models/big-bend/",
+      "price_confidence": "approximate",
+      "price_note": "Sources conflict ($39,525-$41,295); Big Bend is 4-door only for 2026. 20 mpg with 10-spd auto; 7MT is 19."
     },
     {
       "id": "ram-2500-2024",
@@ -1607,7 +2106,15 @@
         "brake_service_usd": 1060,
         "brake_life_miles": 45000,
         "misc_annual_usd": 460
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2026,
+      "new_trim": "Tradesman Crew Cab 4x4 6'4\" box 6.4L HEMI V8",
+      "new_msrp_usd": 50810,
+      "new_destination_usd": 2595,
+      "price_source": "https://www.cars.com/research/ram-2500-2026/",
+      "price_confidence": "approximate",
+      "price_note": "Cars.com lists $53,405 incl. $2,595 dest. Heavy-duty pickups are not EPA-rated, so mpg is null."
     },
     {
       "id": "chrysler-pacifica-2024",
@@ -1636,7 +2143,16 @@
         "brake_service_usd": 600,
         "brake_life_miles": 60000,
         "misc_annual_usd": 260
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2026,
+      "new_trim": "Select FWD 3.6L V6",
+      "new_msrp_usd": 42450,
+      "new_destination_usd": 1995,
+      "new_mpg_combined": 22,
+      "price_source": "https://www.cars.com/research/chrysler-pacifica-2026/",
+      "price_confidence": "approximate",
+      "price_note": "Touring L trim dropped; Select is now the base gas trim. Cars.com/Edmunds list $44,445 incl. $1,995 dest."
     },
     {
       "id": "kia-carnival-2024",
@@ -1665,7 +2181,16 @@
         "brake_service_usd": 580,
         "brake_life_miles": 65000,
         "misc_annual_usd": 240
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2027,
+      "new_trim": "LX FWD 3.5L V6",
+      "new_msrp_usd": 37490,
+      "new_destination_usd": 1545,
+      "new_mpg_combined": 21,
+      "price_source": "https://www.kiamedia.com/us/en/models/carnival/2027/pricing",
+      "price_confidence": "verified",
+      "price_note": "Now badged Carnival MPV; 2026 LX was $37,390."
     },
     {
       "id": "honda-ridgeline-2024",
@@ -1693,7 +2218,16 @@
         "brake_service_usd": 620,
         "brake_life_miles": 65000,
         "misc_annual_usd": 260
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2026,
+      "new_trim": "Sport AWD 3.5L V6",
+      "new_msrp_usd": 40795,
+      "new_destination_usd": 1495,
+      "new_mpg_combined": 21,
+      "price_source": "https://www.cars.com/research/honda-ridgeline-2026/",
+      "price_confidence": "approximate",
+      "price_note": "Honda configurator/Cars.com list $40,795; Honda launch release cited $40,595. Honda pages blocked fetching."
     },
     {
       "id": "toyota-prius-2024",
@@ -1720,7 +2254,16 @@
         "brake_service_usd": 480,
         "brake_life_miles": 90000,
         "misc_annual_usd": 200
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2027,
+      "new_trim": "LE FWD 2.0L Hybrid",
+      "new_msrp_usd": 28755,
+      "new_destination_usd": 1295,
+      "new_mpg_combined": 55,
+      "price_source": "https://pressroom.toyota.com/2027-toyota-prius-designed-to-stand-out-built-on-hybrid-innovation/",
+      "price_confidence": "verified",
+      "price_note": "2026 LE FWD was $28,550 (57 mpg)."
     },
     {
       "id": "subaru-ascent-2024",
@@ -1749,7 +2292,15 @@
         "brake_service_usd": 600,
         "brake_life_miles": 70000,
         "misc_annual_usd": 250
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2027,
+      "new_trim": "Premium AWD 2.4L Turbo",
+      "new_msrp_usd": 40795,
+      "new_destination_usd": 1495,
+      "new_mpg_combined": 22,
+      "price_source": "https://media.subaru.com/pressrelease/2455/1/subaru-announces-pricing-2027-ascent-3-row-suv",
+      "price_confidence": "verified"
     },
     {
       "id": "hyundai-palisade-2024",
@@ -1778,7 +2329,16 @@
         "brake_service_usd": 620,
         "brake_life_miles": 70000,
         "misc_annual_usd": 260
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2027,
+      "new_trim": "SEL AWD 3.5L V6",
+      "new_msrp_usd": 44240,
+      "new_destination_usd": 1600,
+      "new_mpg_combined": 20,
+      "price_source": "https://www.cars.com/research/hyundai-palisade-2027/",
+      "price_confidence": "approximate",
+      "price_note": "Redesigned in 2026; 3.8L V6 replaced by 3.5L V6. Price from Cars.com ($42,240 FWD + AWD); Hyundai pages blocked fetching."
     },
     {
       "id": "ford-expedition-2024",
@@ -1807,7 +2367,16 @@
         "brake_service_usd": 850,
         "brake_life_miles": 55000,
         "misc_annual_usd": 370
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2026,
+      "new_trim": "Active 4x4 3.5L EcoBoost V6",
+      "new_msrp_usd": 65700,
+      "new_destination_usd": 2595,
+      "new_mpg_combined": 18,
+      "price_source": "https://www.cars.com/research/ford-expedition-2026/",
+      "price_confidence": "approximate",
+      "price_note": "XLT trim dropped in the 2025 redesign; Active is the closest trim. 2027 Active 4x4 is listed at $66,600."
     },
     {
       "id": "gmc-yukon-2024",
@@ -1836,7 +2405,16 @@
         "brake_service_usd": 850,
         "brake_life_miles": 55000,
         "misc_annual_usd": 360
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2026,
+      "new_trim": "Elevation 4WD 5.3L V8",
+      "new_msrp_usd": 72600,
+      "new_destination_usd": 2795,
+      "new_mpg_combined": 17,
+      "price_source": "https://gmauthority.com/blog/2026/09/gmc-yukon-discount-lease-finance-deals-incentives-offers-september-2026/",
+      "price_confidence": "approximate",
+      "price_note": "SLE trim dropped; Elevation is now the base trim. GM Authority lists $75,395 incl. $2,795 dest."
     },
     {
       "id": "honda-passport-2024",
@@ -1864,7 +2442,16 @@
         "brake_service_usd": 620,
         "brake_life_miles": 65000,
         "misc_annual_usd": 260
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2026,
+      "new_trim": "RTL AWD 3.5L V6",
+      "new_msrp_usd": 44950,
+      "new_destination_usd": 1450,
+      "new_mpg_combined": 21,
+      "price_source": "https://www.cars.com/research/honda-passport-2026/",
+      "price_confidence": "approximate",
+      "price_note": "EX-L trim dropped in the 2026 redesign; RTL is the closest trim. Launch MSRP was $44,750."
     },
     {
       "id": "mazda-cx90-2024",
@@ -1893,7 +2480,16 @@
         "brake_service_usd": 620,
         "brake_life_miles": 70000,
         "misc_annual_usd": 260
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2026,
+      "new_trim": "3.3 Turbo Preferred AWD (mild hybrid)",
+      "new_msrp_usd": 43450,
+      "new_destination_usd": 1645,
+      "new_mpg_combined": 25,
+      "price_source": "https://www.mazdausa.com/vehicles/cx-90/compare-vehicle-specs-and-trims",
+      "price_confidence": "approximate",
+      "price_note": "Price from search results citing mazdausa.com; Cars.com lists a different figure."
     },
     {
       "id": "vw-atlas-2024",
@@ -1922,7 +2518,16 @@
         "brake_service_usd": 640,
         "brake_life_miles": 65000,
         "misc_annual_usd": 280
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2026,
+      "new_trim": "SE 4MOTION 2.0L Turbo",
+      "new_msrp_usd": 41210,
+      "new_destination_usd": 1475,
+      "new_mpg_combined": 22,
+      "price_source": "https://media.vw.com/press-kits/301",
+      "price_confidence": "approximate",
+      "price_note": "All-new 2027 Atlas also announced: SE 4MOTION $43,610 incl. $1,525 dest, 23 mpg."
     },
     {
       "id": "cadillac-escalade-2024",
@@ -1951,7 +2556,16 @@
         "brake_service_usd": 1010,
         "brake_life_miles": 55000,
         "misc_annual_usd": 440
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2026,
+      "new_trim": "Escalade (base, formerly Luxury) 4WD 6.2L V8",
+      "new_msrp_usd": 94100,
+      "new_destination_usd": 2895,
+      "new_mpg_combined": 16,
+      "price_source": "https://gmauthority.com/blog/2025/07/2026-cadillac-escalade-gets-trim-level-name-changes/",
+      "price_confidence": "approximate",
+      "price_note": "2026 rename: the old Luxury is now the base 'Escalade' ($91,100 RWD + $3,000 4WD); the new 'Luxury' is the old Premium Luxury."
     },
     {
       "id": "lexus-nx350-2024",
@@ -1978,7 +2592,16 @@
         "brake_service_usd": 640,
         "brake_life_miles": 80000,
         "misc_annual_usd": 280
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2026,
+      "new_trim": "NX 350 Premium AWD 2.4L Turbo",
+      "new_msrp_usd": 46750,
+      "new_destination_usd": 1395,
+      "new_mpg_combined": 24,
+      "price_source": "https://pressroom.lexus.com/2026-lexus-nx-adds-grades-and-drivetrain/",
+      "price_confidence": "verified",
+      "price_note": "Lexus lists $48,145 including $1,395 DPH (launch pricing)."
     },
     {
       "id": "audi-q5-2024",
@@ -2006,7 +2629,16 @@
         "brake_service_usd": 800,
         "brake_life_miles": 60000,
         "misc_annual_usd": 390
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2026,
+      "new_trim": "Q5 Premium TFSI quattro 2.0L Turbo",
+      "new_msrp_usd": 52800,
+      "new_destination_usd": 1295,
+      "new_mpg_combined": 24,
+      "price_source": "https://www.cars.com/research/audi-q5-2026/",
+      "price_confidence": "approximate",
+      "price_note": "New-generation Q5. Price derived from $54,095 incl. $1,295 dest; audiusa.com blocked fetching."
     },
     {
       "id": "acura-mdx-2024",
@@ -2035,7 +2667,16 @@
         "brake_service_usd": 670,
         "brake_life_miles": 70000,
         "misc_annual_usd": 300
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2026,
+      "new_trim": "SH-AWD w/Technology Package 3.5L V6",
+      "new_msrp_usd": 59400,
+      "new_destination_usd": 1350,
+      "new_mpg_combined": 21,
+      "price_source": "https://www.cars.com/research/acura-mdx-2026/",
+      "price_confidence": "approximate",
+      "price_note": "Acura pages blocked fetching; JD Power lists $60,750 incl. dest."
     },
     {
       "id": "buick-enclave-2024",
@@ -2064,7 +2705,16 @@
         "brake_service_usd": 640,
         "brake_life_miles": 65000,
         "misc_annual_usd": 290
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2026,
+      "new_trim": "Sport Touring AWD 2.5L Turbo",
+      "new_msrp_usd": 51900,
+      "new_destination_usd": 1995,
+      "new_mpg_combined": 21,
+      "price_source": "https://www.cars.com/research/buick-enclave-2026/",
+      "price_confidence": "approximate",
+      "price_note": "Essence trim and 3.6L V6 dropped in the 2025 redesign; Sport Touring is the mid trim. Cars.com lists $53,895 incl. $1,995 dest. 2027 Enclave also exists."
     },
     {
       "id": "mitsubishi-outlander-2024",
@@ -2092,7 +2742,16 @@
         "brake_service_usd": 530,
         "brake_life_miles": 70000,
         "misc_annual_usd": 230
-      }
+      },
+      "new_status": "current",
+      "new_model_year": 2026,
+      "new_trim": "SE S-AWC 1.5L Turbo mild hybrid",
+      "new_msrp_usd": 36145,
+      "new_destination_usd": 1745,
+      "new_mpg_combined": 27,
+      "price_source": "https://www.cars.com/research/mitsubishi-outlander-2026/",
+      "price_confidence": "approximate",
+      "price_note": "2.5L replaced by 1.5L turbo mild hybrid. Mitsubishi site lists SE (FWD) from $34,345; S-AWC price from Cars.com. A mandatory $225 Welcome Package is also charged."
     }
   ]
 }
