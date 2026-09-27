@@ -5,9 +5,9 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
-      // Report pages are dynamic user-generated; noindexed anyway via metadata,
-      // but keep them out of crawl to avoid burning crawl budget on every permutation.
-      disallow: "/report",
+      // /report is noindexed via its metadata. Don't block it here too — a
+      // blocked page can't be crawled, so search engines never see the noindex.
+      disallow: "/api/",
     },
     sitemap: "https://goevwv.com/sitemap.xml",
   };

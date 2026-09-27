@@ -121,6 +121,19 @@ fi
 # -----------------------------------------------------------
 # 7. Launch the stack
 # -----------------------------------------------------------
+log "Ensuring 2 GB swap (keeps a 1 GB droplet from locking up under memory pressure)..."
+if ! swapon --show | grep -q '/swapfile'; then
+  if [[ ! -f /swapfile ]]; then
+    fallocate -l 2G /swapfile
+    chmod 600 /swapfile
+    mkswap /swapfile
+  fi
+  swapon /swapfile
+  grep -q '^/swapfile ' /etc/fstab || echo '/swapfile none swap sw 0 0' >> /etc/fstab
+fi
+sysctl -q vm.swappiness=10
+grep -q '^vm.swappiness' /etc/sysctl.conf || echo 'vm.swappiness=10' >> /etc/sysctl.conf
+
 log "Starting goevwv stack..."
 cd "$APP_DIR"
 docker compose pull --ignore-pull-failures

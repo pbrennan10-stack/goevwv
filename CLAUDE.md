@@ -203,7 +203,7 @@ Engine in `lib/household.ts` reuses `lib/calc.ts` energy/DCFC/insurance helpers 
 2. `cd /opt/goevwv && docker compose logs --tail 100` → find the failing container
 3. If app crashes: `docker compose logs app` for Next.js runtime errors
 4. If TLS issues: `docker compose logs caddy` — Let's Encrypt rate limits show up here
-5. Quick rollback: `git reset --hard HEAD~1 && docker compose up -d --build`
+5. Quick rollback (no rebuild): `docker images goevwv` lists the last few builds, tagged by commit. `docker tag goevwv:<previous-sha> goevwv:latest && docker compose up -d --no-build` puts the previous one back in seconds. `curl https://goevwv.com/api/health` shows which commit is live.
 6. Nuclear rollback: restore the most recent DO snapshot from the DigitalOcean dashboard
 
 ## Things NOT to do
