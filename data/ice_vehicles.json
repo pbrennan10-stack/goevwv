@@ -1,7 +1,7 @@
 {
   "_meta": {
     "updated": "2026-09-27",
-    "note": "Maintenance: WV-area averages originally from RepairPal + AAA Your Driving Costs 2024 (+5% for mountain road conditions), inflated 2026-09-23 for repair-cost growth (BLS CPI motor vehicle maintenance & repair +14% over two years): oil, brakes, misc ×1.15; tires ×1.05 (tire CPI ~flat). Insurance: estimated full-coverage annual premium for a 35-45 year old with a clean record in WV, scaled 2026-09-23 against 2026 WV averages (NerdWallet $2,144, Bankrate $2,162, ValuePenguin $2,148, Insurify $1,862): sedans ×1.15, SUVs/minivans ×1.25, pickups and Jeep Wrangler ×1.08. Actual rates vary widely by driver history, coverage level, and ZIP code. tank_gallons: usable tank capacity for refueling-time calculation. Sept 27 2026: added 44 models so every major brand has at least its top-2 US sellers (2025 sales); their insurance and maintenance were estimated on the same basis, calibrated against comparable vehicles already in this file (see insurance_basis / maintenance_basis on each). Each was independently fact-checked."
+    "note": "Maintenance: WV-area averages originally from RepairPal + AAA Your Driving Costs 2024 (+5% for mountain road conditions), inflated 2026-09-23 for repair-cost growth (BLS CPI motor vehicle maintenance & repair +14% over two years): oil, brakes, misc ×1.15; tires ×1.05 (tire CPI ~flat). Insurance: estimated full-coverage annual premium for a 35-45 year old with a clean record in WV, scaled 2026-09-23 against 2026 WV averages (NerdWallet $2,144, Bankrate $2,162, ValuePenguin $2,148, Insurify $1,862): sedans ×1.15, SUVs/minivans ×1.25, pickups and Jeep Wrangler ×1.08. Actual rates vary widely by driver history, coverage level, and ZIP code. tank_gallons: usable tank capacity for refueling-time calculation. Sept 27 2026: added 44 models so every major brand has at least its top-2 US sellers (2025 sales); their insurance and maintenance were estimated on the same basis, calibrated against comparable vehicles already in this file (see insurance_basis / maintenance_basis on each). Each was independently fact-checked. Sept 27 2026 (fairness review): misc_annual_usd raised ×1.5 to cover scheduled items the old figure left out — engine air and cabin filters, spark plugs, transmission fluid, coolant, serpentine belt, brake fluid, 12V battery (RepairPal Sept 2026 itemization for a RAV4: ~$320–390/yr over 100k mi/8 yrs vs ~$210–230 before). EV misc was raised in lib/calc.ts at the same time. Oil changes now follow miles (every 7,500 mi, min 1/yr) instead of oil_changes_per_year."
   },
   "ice_vehicles": [
     {
@@ -30,7 +30,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 670,
         "brake_life_miles": 70000,
-        "misc_annual_usd": 300
+        "misc_annual_usd": 450
       },
       "new_status": "current",
       "new_model_year": 2026,
@@ -68,7 +68,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 650,
         "brake_life_miles": 70000,
-        "misc_annual_usd": 260
+        "misc_annual_usd": 390
       },
       "maintenance_basis": "RepairPal puts the RDX at $497/yr, vs $571/yr for the Acura MDX. Misc is the MDX anchor ($300) × 497/571, about $260. Oil: Acura dealer synthetic 0W-20, same as the MDX and NX anchors ($115). Maintenance Minder spacing is about 7.5-10k miles, so 2 changes a year. Tires: 235/55R19 all-season. I couldn't retrieve a Tire Rack or Discount Tire price (the pages are script-rendered), so $880 sits between the NX ($860) and MDX (255/50R20, $920) anchors. Brakes: 12.4/12.2 in. rotors, about the same as MDX/NX, so $650 every 70k miles. All figures are in the catalog's 2026 dollars because they're anchored to already-inflated anchors.",
       "new_status": "current",
@@ -126,7 +126,7 @@
         "tire_life_miles": 35000,
         "brake_service_usd": 800,
         "brake_life_miles": 50000,
-        "misc_annual_usd": 340
+        "misc_annual_usd": 510
       },
       "maintenance_basis": "RepairPal has no model-level figure for the Giulia. Its Alfa Romeo brand average is $834/yr, vs $928 for the Audi Q5, so misc is about 0.9 × the European-luxury anchors ($370-390), rounded to $340 for the sedan. Oil: European-luxury dealer synthetic on Alfa's 10k-mile/12-month schedule, at $150 once a year, following the 330i ($140) and Q5 ($145) anchors. Tires: 225/45R18 all-season run-flat, the same size and type as the BMW 330i xDrive, so I used that anchor exactly ($950, 35k-mile life). Brakes: Brembo 4-piston front, 13.0/12.5 in. rotors, $800 every 50k miles, between the 330i ($750 every 55k) and Q5 ($800 every 60k) anchors. Figures are in the catalog's 2026 dollars.",
       "new_status": "current",
@@ -185,7 +185,7 @@
         "tire_life_miles": 40000,
         "brake_service_usd": 820,
         "brake_life_miles": 50000,
-        "misc_annual_usd": 350
+        "misc_annual_usd": 525
       },
       "maintenance_basis": "RepairPal has no model-level figure for the Stelvio. Its Alfa Romeo brand average is $834/yr, vs $928/yr for the Audi Q5. Misc is the Q5 anchor ($390) × 834/928, about $350. Oil: European-luxury dealer synthetic (0W-30 Selenia spec) on Alfa's 10k-mile/12-month schedule, following the Q5 ($145) and 330i ($140) convention of 1 change a year, at $150. Tires: 235/55R19 all-season, the same size as the RDX. Live retail prices weren't retrievable, so $920 is between RDX-size pricing and the Q5 anchor ($1,010). Life is 40k like the Q5, since this is a sporty-tuned AWD SUV. Brakes: Brembo 4-piston front, 13.0/12.5 in. rotors on a 4,007 lb SUV, set near the Q5 anchor ($800 every 60k) with a shorter 50k-mile interval. Figures are in the catalog's 2026 dollars, anchored to inflated anchors.",
       "new_status": "current",
@@ -244,7 +244,7 @@
         "tire_life_miles": 50000,
         "brake_service_usd": 650,
         "brake_life_miles": 60000,
-        "misc_annual_usd": 310
+        "misc_annual_usd": 465
       },
       "maintenance_basis": "RepairPal has no Tonale model figure; its Alfa Romeo brand average is $834/yr. The Tonale uses Stellantis' Global Medium Engine 2.0T, shared with the Jeep Compass, and is a smaller, cheaper vehicle than the Giulia and Stelvio. So misc is $310, between the Acura MDX ($300) and the Giulia/Stelvio (about $340-350). Oil: dealer synthetic on the 10k-mile/12-month indicator schedule, 1 change a year at $120, between the VW Tiguan ($110) and Alfa's larger 2.0T ($150). Tires (fact-check revision): the owned 2025 core car and the 2026 Sprint both use 225/55R18 all-season, a common size. Retail prices weren't retrievable, so $760 and 50k-mile life match the VW Tiguan anchor. The earlier $860 / 45k assumed the Veloce's 235/45R19. Brakes (fact-check revision): the 2025 2.0T and the 2026 Sprint have standard single-piston brakes with 12.08 in. front / 10.94 in. rear rotors, not Brembo. So I used $650 every 60k, between the Tiguan ($580 every 70k) and Q5 ($800 every 60k) anchors to allow for Alfa dealer parts pricing. Figures are in the catalog's 2026 dollars.",
       "new_status": "current",
@@ -303,7 +303,7 @@
         "tire_life_miles": 40000,
         "brake_service_usd": 740,
         "brake_life_miles": 60000,
-        "misc_annual_usd": 370
+        "misc_annual_usd": 555
       },
       "maintenance_basis": "Anchored to the catalog Audi Q5 (oil $145x1/yr, tires $1,010/40k, brakes $800/60k, misc $390), which shares the EA888 2.0T engine and the 10k-mile/1-yr synthetic oil interval. CarEdge 10-yr maintenance+repair is $12,641 for the Q3 vs $12,919 for the Q5 (0.98x). RepairPal has no Q3-specific figure; its luxury compact SUV average is $859/yr vs $928 for the Q5 (0.93x). OE tire is 235/55R18 100H all-season, the same size as the VW Tiguan anchor ($760). Tire Rack and SimpleTire price pages would not load, so the tire set is set at $850 with a luxury/OE-brand premium. Q3 total comes to ~0.92x the Q5 annual maintenance.",
       "new_status": "current",
@@ -361,7 +361,7 @@
         "tire_life_miles": 40000,
         "brake_service_usd": 800,
         "brake_life_miles": 60000,
-        "misc_annual_usd": 390
+        "misc_annual_usd": 585
       },
       "new_status": "current",
       "new_model_year": 2026,
@@ -396,7 +396,7 @@
         "tire_life_miles": 35000,
         "brake_service_usd": 750,
         "brake_life_miles": 55000,
-        "misc_annual_usd": 370
+        "misc_annual_usd": 555
       },
       "new_status": "current",
       "new_model_year": 2026,
@@ -432,7 +432,7 @@
         "tire_life_miles": 30000,
         "brake_service_usd": 800,
         "brake_life_miles": 60000,
-        "misc_annual_usd": 400
+        "misc_annual_usd": 600
       },
       "new_status": "current",
       "new_model_year": 2026,
@@ -470,7 +470,7 @@
         "tire_life_miles": 35000,
         "brake_service_usd": 820,
         "brake_life_miles": 50000,
-        "misc_annual_usd": 480
+        "misc_annual_usd": 720
       },
       "maintenance_basis": "Oil at $140 with 1 change/yr follows the catalog BMW 330i anchor (same B46/B48 2.0T; BMW condition-based ~10k/1-yr interval). The 2024 xDrive30i rides on 245/50R19 run-flat all-season tires (MotorTrend/Chrome Data). Run-flats cost more and wear faster, so the tire set is $1,200 per 35k mi, compared with the 330i at $950/35k and the M2 at $1,160/30k. Brakes are $820/50k for a heavier SUV than the 330i ($750/55k). Misc is $480: RepairPal puts the X3 at $1,034/yr vs $928 for the Q5 (1.11x), and CarEdge 10-yr is $19,051 vs $12,919 (1.47x), against a Q5 anchor misc of $390. Total comes to ~1.23x the Q5 anchor. Tire retailer pages would not load.",
       "new_status": "current",
@@ -529,7 +529,7 @@
         "tire_life_miles": 35000,
         "brake_service_usd": 950,
         "brake_life_miles": 50000,
-        "misc_annual_usd": 520
+        "misc_annual_usd": 780
       },
       "maintenance_basis": "The B58 inline-six takes ~7 qt of BMW LL-01 synthetic on a ~10k/1-yr interval, so oil is $160 with 1 change/yr, above the 2.0T X3/330i anchors ($140). Tires are 275/45R20 run-flat all-season per MotorTrend/Chrome Data, set at $1,450 per 35k mi, compared with the Escalade's $1,370/45k and the M2's $1,160/30k. Brakes on this ~5,000-lb SUV are $950/50k (Escalade $1,010/55k). Misc is $520: RepairPal puts the X5 at $1,166/yr vs $1,034 for the X3 (1.13x), and CarEdge 10-yr is $19,459 vs $19,051 (1.02x), so X3 misc ($480) is scaled by ~1.08. Total comes to ~1.14x the X3. Tire retailer pages would not load.",
       "new_status": "current",
@@ -588,7 +588,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 640,
         "brake_life_miles": 65000,
-        "misc_annual_usd": 290
+        "misc_annual_usd": 435
       },
       "new_status": "current",
       "new_model_year": 2026,
@@ -626,7 +626,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 530,
         "brake_life_miles": 65000,
-        "misc_annual_usd": 230
+        "misc_annual_usd": 345
       },
       "maintenance_basis": "RepairPal and CarEdge have no Encore GX maintenance data. Anchored to Equinox/Tucson and the sister Trailblazer (same 1.3T, 9-spd, AWD). Synthetic dexos oil ~$80 at a Buick dealer, 2 per year on the oil-life monitor. The OEM 225/55R18 tire (Cars.com) is priced between the Tucson SEL ($690) and Tiguan ($760) anchors, because a live Tire Rack price could not be fetched. Brakes match the Tucson/CX-5 anchors. Misc includes AWD rear drive unit fluid.",
       "new_status": "current",
@@ -685,7 +685,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 500,
         "brake_life_miles": 70000,
-        "misc_annual_usd": 210
+        "misc_annual_usd": 315
       },
       "maintenance_basis": "The GM 1.2T takes dexos1 0W-20 synthetic (~4 qt) on the oil-life monitor, so oil matches the Chevy Equinox anchor at $75 with 2 changes/yr. The OE tire is 225/60R17 (MotorTrend/Chrome Data), the same size as the Subaru Crosstrek anchor ($650/55k), so the set is $640/55k. Brakes are $500/70k for a light (~3,030-lb) FWD crossover, vs the Equinox's $520/65k and the Seltos's $520/75k. RepairPal has no Envista figure; the sister Chevy Trax (same 1.2T and transmission) is $488/yr vs $537 for the Equinox (0.91x), so the Equinox misc of $230 scales to $210. CarEdge 10-yr is $9,000 for the Trax vs $9,197 for the Equinox. Total comes to ~0.95x the Equinox anchor.",
       "new_status": "current",
@@ -744,7 +744,7 @@
         "tire_life_miles": 45000,
         "brake_service_usd": 1010,
         "brake_life_miles": 55000,
-        "misc_annual_usd": 440
+        "misc_annual_usd": 660
       },
       "new_status": "current",
       "new_model_year": 2026,
@@ -782,7 +782,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 700,
         "brake_life_miles": 65000,
-        "misc_annual_usd": 300
+        "misc_annual_usd": 450
       },
       "maintenance_basis": "RepairPal has insufficient XT5 data; the luxury midsize SUV average is $807/yr. CarEdge 10-yr maintenance and repair: XT5 $9,893, compared with Enclave $9,285, MDX $10,564, RX 350 $7,840 and Q5 $12,919, so the XT5 is set between the Enclave and MDX anchors. Dealer synthetic dexos oil change on the 2.0T LSY is ~$110, 2 per year. The OEM 235/55R20 tire (Cars.com) is priced like the RX 350 anchor ($950/55k) because a live Tire Rack price could not be fetched. Brakes are $700/65k, between the MDX and Q5 anchors. Misc is $300, like the MDX.",
       "new_status": "current",
@@ -839,7 +839,7 @@
         "tire_life_miles": 50000,
         "brake_service_usd": 620,
         "brake_life_miles": 60000,
-        "misc_annual_usd": 280
+        "misc_annual_usd": 420
       },
       "new_status": "current",
       "new_model_year": 2026,
@@ -876,7 +876,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 520,
         "brake_life_miles": 65000,
-        "misc_annual_usd": 230
+        "misc_annual_usd": 345
       },
       "new_status": "current",
       "new_model_year": 2027,
@@ -911,7 +911,7 @@
         "tire_life_miles": 60000,
         "brake_service_usd": 440,
         "brake_life_miles": 70000,
-        "misc_annual_usd": 180
+        "misc_annual_usd": 270
       },
       "new_status": "discontinued",
       "price_confidence": "verified",
@@ -941,7 +941,7 @@
         "tire_life_miles": 50000,
         "brake_service_usd": 780,
         "brake_life_miles": 55000,
-        "misc_annual_usd": 320
+        "misc_annual_usd": 480
       },
       "new_status": "current",
       "new_model_year": 2026,
@@ -979,7 +979,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 710,
         "brake_life_miles": 62000,
-        "misc_annual_usd": 300
+        "misc_annual_usd": 450
       },
       "new_status": "current",
       "new_model_year": 2027,
@@ -1017,7 +1017,7 @@
         "tire_life_miles": 50000,
         "brake_service_usd": 860,
         "brake_life_miles": 55000,
-        "misc_annual_usd": 370
+        "misc_annual_usd": 555
       },
       "new_status": "current",
       "new_model_year": 2027,
@@ -1055,7 +1055,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 520,
         "brake_life_miles": 65000,
-        "misc_annual_usd": 230
+        "misc_annual_usd": 345
       },
       "maintenance_basis": "The RepairPal 'Trailblazer' page covers the old 2002-09 body-on-frame SUV, so it was not used, and CarEdge has no data. Anchored to Trax, Equinox and Crosstrek. Synthetic dexos oil ~$75, 2 per year. The OEM 225/60R17 is the same size as the Crosstrek Premium anchor ($650/set) because a live Tire Rack price could not be fetched. Brakes are $520/65k, like the Equinox. Misc is $230 and includes AWD rear drive unit service. The engine and 9-spd AWD are shared with the Encore GX.",
       "new_status": "current",
@@ -1114,7 +1114,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 620,
         "brake_life_miles": 70000,
-        "misc_annual_usd": 260
+        "misc_annual_usd": 390
       },
       "new_status": "current",
       "new_model_year": 2027,
@@ -1152,7 +1152,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 500,
         "brake_life_miles": 65000,
-        "misc_annual_usd": 210
+        "misc_annual_usd": 315
       },
       "maintenance_basis": "RepairPal Trax average annual repair is $488, but that covers all model years and is mostly the prior generation. CarEdge 10-yr maintenance and repair: Trax $9,000, compared with Equinox $9,197, CR-V $7,636 and Crosstrek $8,459. Anchored to Equinox LT/Seltos LX. Synthetic dexos oil ~$75, 2 per year on the GM oil-life monitor. The OEM 225/60R17 is the same size as the Crosstrek Premium anchor ($650/set) because a live Tire Rack price could not be fetched. Brakes and misc are set slightly below the Equinox for the lighter FWD car.",
       "new_status": "current",
@@ -1211,7 +1211,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 600,
         "brake_life_miles": 60000,
-        "misc_annual_usd": 260
+        "misc_annual_usd": 390
       },
       "new_status": "current",
       "new_model_year": 2026,
@@ -1250,7 +1250,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 600,
         "brake_life_miles": 60000,
-        "misc_annual_usd": 260
+        "misc_annual_usd": 390
       },
       "maintenance_basis": "Mechanically identical to the catalog's Pacifica gas anchor: 3.6L Pentastar V6, 9-speed, FWD, same 235/65R17 all-season tires (Stellantis spec sheet). SimpleTire name-brand 235/65R17 tires run about $153-204 each. RepairPal lists the Voyager at $457/yr vs a $572 minivan average, but that is mostly older-generation data. So the Pacifica anchor values are used unchanged.",
       "new_status": "current",
@@ -1309,7 +1309,7 @@
         "tire_life_miles": 50000,
         "brake_service_usd": 690,
         "brake_life_miles": 55000,
-        "misc_annual_usd": 310
+        "misc_annual_usd": 465
       },
       "new_status": "current",
       "new_model_year": 2026,
@@ -1346,7 +1346,7 @@
         "tire_life_miles": 50000,
         "brake_service_usd": 580,
         "brake_life_miles": 60000,
-        "misc_annual_usd": 260
+        "misc_annual_usd": 390
       },
       "maintenance_basis": "RepairPal has too little data for the Hornet (Dodge brand average ~$634/yr). Anchored to compact turbo SUVs (Escape 2.0 EcoBoost, Bronco Sport, Tiguan): synthetic oil ~$90, twice a year. OE tires are 215/60R17 V-rated all-seasons (Dodge feature sheet); SimpleTire name-brand prices of ~$150-177 each give ~$700/set mounted, 50k-mile life. Brakes $580 per 60k (standard cast calipers; Brembos only with the Track Pack). Misc $260, a bit above compact peers ($230-250), because this low-volume imported model has little independent-repair data.",
       "new_status": "discontinued",
@@ -1399,7 +1399,7 @@
         "tire_life_miles": 45000,
         "brake_service_usd": 690,
         "brake_life_miles": 55000,
-        "misc_annual_usd": 320
+        "misc_annual_usd": 480
       },
       "new_status": "current",
       "new_model_year": 2026,
@@ -1436,7 +1436,7 @@
         "tire_life_miles": 50000,
         "brake_service_usd": 580,
         "brake_life_miles": 70000,
-        "misc_annual_usd": 240
+        "misc_annual_usd": 360
       },
       "new_status": "current",
       "new_model_year": 2026,
@@ -1473,7 +1473,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 600,
         "brake_life_miles": 70000,
-        "misc_annual_usd": 250
+        "misc_annual_usd": 375
       },
       "new_status": "discontinued",
       "price_confidence": "approximate",
@@ -1504,7 +1504,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 550,
         "brake_life_miles": 60000,
-        "misc_annual_usd": 230
+        "misc_annual_usd": 345
       },
       "new_status": "current",
       "new_model_year": 2026,
@@ -1542,7 +1542,7 @@
         "tire_life_miles": 50000,
         "brake_service_usd": 850,
         "brake_life_miles": 55000,
-        "misc_annual_usd": 370
+        "misc_annual_usd": 555
       },
       "new_status": "current",
       "new_model_year": 2026,
@@ -1580,7 +1580,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 620,
         "brake_life_miles": 60000,
-        "misc_annual_usd": 290
+        "misc_annual_usd": 435
       },
       "new_status": "current",
       "new_model_year": 2027,
@@ -1616,7 +1616,7 @@
         "tire_life_miles": 50000,
         "brake_service_usd": 750,
         "brake_life_miles": 55000,
-        "misc_annual_usd": 350
+        "misc_annual_usd": 525
       },
       "new_status": "current",
       "new_model_year": 2026,
@@ -1652,7 +1652,7 @@
         "tire_life_miles": 45000,
         "brake_service_usd": 1040,
         "brake_life_miles": 45000,
-        "misc_annual_usd": 440
+        "misc_annual_usd": 660
       },
       "new_status": "current",
       "new_model_year": 2026,
@@ -1688,7 +1688,7 @@
         "tire_life_miles": 50000,
         "brake_service_usd": 480,
         "brake_life_miles": 85000,
-        "misc_annual_usd": 210
+        "misc_annual_usd": 315
       },
       "new_status": "current",
       "new_model_year": 2026,
@@ -1724,7 +1724,7 @@
         "tire_life_miles": 35000,
         "brake_service_usd": 690,
         "brake_life_miles": 60000,
-        "misc_annual_usd": 350
+        "misc_annual_usd": 525
       },
       "new_status": "current",
       "new_model_year": 2026,
@@ -1759,7 +1759,7 @@
         "tire_life_miles": 50000,
         "brake_service_usd": 620,
         "brake_life_miles": 60000,
-        "misc_annual_usd": 280
+        "misc_annual_usd": 420
       },
       "new_status": "current",
       "new_model_year": 2026,
@@ -1797,7 +1797,7 @@
         "tire_life_miles": 50000,
         "brake_service_usd": 720,
         "brake_life_miles": 60000,
-        "misc_annual_usd": 290
+        "misc_annual_usd": 435
       },
       "maintenance_basis": "RepairPal has too little data for the GV70. Synthetic oil (6.6 qt per Genesis spec) at luxury-dealer pricing, like the Lexus NX/RX anchors ($115-125), twice a year. OE tires are 235/55R19 Michelin Primacy Tour A/S (Genesis spec); SimpleTire name-brand 235/55R19 all-seasons run ~$230-345 each, so a set is about the same as the Audi Q5 anchor ($1,010), with 50k-mile touring-tire life. The 4-piston monobloc front brakes (14.2-in rotors) put brake service between the MDX ($670) and Q5 ($800) anchors. Misc matches the Lexus NX/RX anchors ($280-290).",
       "new_status": "current",
@@ -1856,7 +1856,7 @@
         "tire_life_miles": 45000,
         "brake_service_usd": 780,
         "brake_life_miles": 55000,
-        "misc_annual_usd": 320
+        "misc_annual_usd": 480
       },
       "maintenance_basis": "RepairPal has too little data for the GV80. Synthetic oil for the 2.5T at luxury-dealer pricing (~$120), twice a year, a bit above the NX/MDX anchors ($115). The 2024 2.5T rides on 265/55R19 (Cars.com); SimpleTire 265/55R19 name-brand prices run ~$190-395 each (typically ~$300), so ~$1,200/set mounted, with 45k-mile life for a ~4,500-lb SUV. Brakes $780 per 55k (4-piston front, 14.2-in rotors), between the MDX ($670) and Escalade ($1,010) anchors. Misc $320, between MDX ($300) and Q5 ($390).",
       "new_status": "current",
@@ -1913,7 +1913,7 @@
         "tire_life_miles": 50000,
         "brake_service_usd": 780,
         "brake_life_miles": 55000,
-        "misc_annual_usd": 320
+        "misc_annual_usd": 480
       },
       "new_status": "current",
       "new_model_year": 2026,
@@ -1951,7 +1951,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 520,
         "brake_life_miles": 65000,
-        "misc_annual_usd": 230
+        "misc_annual_usd": 345
       },
       "maintenance_basis": "Anchored to its mechanical twin, the Chevrolet Equinox LT 1.5T (same engine, same 225/65R17 OEM tire size per Cars.com 2024 Terrain SLE AWD specs, similar brakes). The two outside estimates straddle the Equinox: RepairPal average annual repair+maintenance is $558 for Terrain vs $537 for Equinox (compact SUV average $521), while CarEdge's 10-year maintenance+repair is $8,099 vs $9,197. So the Equinox anchor values are kept. Tire Rack/Discount Tire prices render client-side and could not be retrieved, so the tire set uses the same-size anchor. Values are already on the catalog's 2026-inflated WV basis.",
       "new_status": "current",
@@ -2010,7 +2010,7 @@
         "tire_life_miles": 50000,
         "brake_service_usd": 850,
         "brake_life_miles": 55000,
-        "misc_annual_usd": 360
+        "misc_annual_usd": 540
       },
       "new_status": "current",
       "new_model_year": 2026,
@@ -2045,7 +2045,7 @@
         "tire_life_miles": 60000,
         "brake_service_usd": 480,
         "brake_life_miles": 70000,
-        "misc_annual_usd": 180
+        "misc_annual_usd": 270
       },
       "new_status": "current",
       "new_model_year": 2026,
@@ -2081,7 +2081,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 480,
         "brake_life_miles": 75000,
-        "misc_annual_usd": 200
+        "misc_annual_usd": 300
       },
       "new_status": "current",
       "new_model_year": 2026,
@@ -2118,7 +2118,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 490,
         "brake_life_miles": 75000,
-        "misc_annual_usd": 200
+        "misc_annual_usd": 300
       },
       "new_status": "current",
       "new_model_year": 2026,
@@ -2155,7 +2155,7 @@
         "tire_life_miles": 60000,
         "brake_service_usd": 530,
         "brake_life_miles": 70000,
-        "misc_annual_usd": 210
+        "misc_annual_usd": 315
       },
       "new_status": "current",
       "new_model_year": 2027,
@@ -2193,7 +2193,7 @@
         "tire_life_miles": 60000,
         "brake_service_usd": 490,
         "brake_life_miles": 75000,
-        "misc_annual_usd": 190
+        "misc_annual_usd": 285
       },
       "maintenance_basis": "RepairPal average annual repair+maintenance for the HR-V is $301, well below the $466 subcompact-SUV average and the CR-V's $407. CarEdge's 10-year cost is $7,479, vs $7,636 for the CR-V. Oil ($75, twice a year) and tire life (60k) follow the Honda anchors (CR-V/Civic). The tire set uses the OEM 215/60R17 size, priced between the Seltos ($630) and Crosstrek ($650) anchors because Tire Rack/Discount Tire pricing could not be retrieved (client-side rendering). Brakes ($490 / 75k) sit between Civic ($480) and CR-V ($530), since HR-V brakes are 12.3/12.2 in. Misc is set below CR-V/Civic ($210/$200) to reflect the lowest RepairPal cost.",
       "new_status": "current",
@@ -2252,7 +2252,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 580,
         "brake_life_miles": 62000,
-        "misc_annual_usd": 250
+        "misc_annual_usd": 375
       },
       "new_status": "current",
       "new_model_year": 2027,
@@ -2289,7 +2289,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 620,
         "brake_life_miles": 65000,
-        "misc_annual_usd": 260
+        "misc_annual_usd": 390
       },
       "new_status": "current",
       "new_model_year": 2026,
@@ -2327,7 +2327,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 600,
         "brake_life_miles": 62000,
-        "misc_annual_usd": 260
+        "misc_annual_usd": 390
       },
       "new_status": "current",
       "new_model_year": 2026,
@@ -2364,7 +2364,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 620,
         "brake_life_miles": 65000,
-        "misc_annual_usd": 260
+        "misc_annual_usd": 390
       },
       "new_status": "current",
       "new_model_year": 2026,
@@ -2399,7 +2399,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 480,
         "brake_life_miles": 75000,
-        "misc_annual_usd": 200
+        "misc_annual_usd": 300
       },
       "new_status": "current",
       "new_model_year": 2026,
@@ -2437,7 +2437,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 520,
         "brake_life_miles": 75000,
-        "misc_annual_usd": 210
+        "misc_annual_usd": 315
       },
       "maintenance_basis": "RepairPal has no Kona page (subcompact-SUV average $466). CarEdge's 10-year maintenance+repair for the Kona is $8,464, essentially the same as Crosstrek ($8,459) and Tucson ($8,560), so misc uses those anchors' $210. Oil ($80 x 2) and brakes ($520 / 75k) follow the Kia Seltos anchor, which uses the same Smartstream 2.0L MPI/IVT powertrain. The tire set uses the 215/55R18 OEM size from Cars.com's 2024 SEL AWD trim spec, priced slightly above the Crosstrek ($650) and Seltos ($630) anchors for the 18-inch size, because retailer pricing could not be retrieved.",
       "new_status": "current",
@@ -2496,7 +2496,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 620,
         "brake_life_miles": 70000,
-        "misc_annual_usd": 260
+        "misc_annual_usd": 390
       },
       "new_status": "current",
       "new_model_year": 2027,
@@ -2534,7 +2534,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 550,
         "brake_life_miles": 70000,
-        "misc_annual_usd": 230
+        "misc_annual_usd": 345
       },
       "new_status": "current",
       "new_model_year": 2027,
@@ -2569,7 +2569,7 @@
         "tire_life_miles": 60000,
         "brake_service_usd": 460,
         "brake_life_miles": 70000,
-        "misc_annual_usd": 170
+        "misc_annual_usd": 255
       },
       "new_status": "current",
       "new_model_year": 2026,
@@ -2606,7 +2606,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 530,
         "brake_life_miles": 75000,
-        "misc_annual_usd": 210
+        "misc_annual_usd": 315
       },
       "new_status": "current",
       "new_model_year": 2026,
@@ -2645,7 +2645,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 670,
         "brake_life_miles": 70000,
-        "misc_annual_usd": 330
+        "misc_annual_usd": 495
       },
       "maintenance_basis": "Anchored to the Acura MDX Technology (3.5L V6, same 255/50R20 OEM tire size): oil $115 x 2 (full synthetic), tires $920 / 55k, brakes $670 / 70k (QX60 uses 13.78-in front / 12.99-in rear vented rotors). Misc is scaled up from the MDX's $300 because RepairPal's annual repair+maintenance is $639 for the QX60 vs $571 for the MDX (+12%; luxury fullsize SUV average $1,127), and CarEdge's 10-year cost is $11,724 vs $10,564 (+11%). Tire retailer pricing could not be retrieved (client-side rendering), so the same-size anchor is used.",
       "new_status": "current",
@@ -2705,7 +2705,7 @@
         "tire_life_miles": 50000,
         "brake_service_usd": 900,
         "brake_life_miles": 55000,
-        "misc_annual_usd": 360
+        "misc_annual_usd": 540
       },
       "maintenance_basis": "RepairPal average annual repair cost is $718 for the QX80 vs $744 for the Tahoe and $1,007 for the Escalade, so misc = Tahoe anchor $370 x 0.965, about $360. Oil is a synthetic change on the 5.6L V8 at $120 (between the Tahoe's $105 and the Escalade's $130), 3 per year like the other body-on-frame V8 anchors. Tires: the OEM P275/60R20 is the same size as the Tahoe LT, so I used the Tahoe anchor of $1,050 per set at 50k miles. No retailer price was fetched. Brakes are $900 per 55k miles (Tahoe $860, Expedition $850, Escalade $1,010); the QX80 weighs about 5,900 lb.",
       "new_status": "current",
@@ -2764,7 +2764,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 550,
         "brake_life_miles": 65000,
-        "misc_annual_usd": 260
+        "misc_annual_usd": 390
       },
       "maintenance_basis": "RepairPal average annual repair cost is $526 for the Compass vs $426 for the Tucson (x1.23). Applied to the Tucson misc anchor $210, that gives about $260, close to the Bronco Sport ($240) and Tiguan ($250). Oil is a synthetic change on the 2.0L turbo DI engine at $85, 3 per year, matching the Stellantis anchors (Wrangler, Grand Cherokee, Durango) and the Escape 2.0T anchor. Tires: OEM 225/60R17, anchored to 17-in compact-SUV sets (Escape $710, Equinox $680), so $700 per 55k miles. No retailer price was fetched. Brakes are $550 per 65k miles (Escape $550/60k, Seltos $520/75k); the Compass curb weight is about 3,600 lb.",
       "new_status": "current",
@@ -2822,7 +2822,7 @@
         "tire_life_miles": 45000,
         "brake_service_usd": 710,
         "brake_life_miles": 50000,
-        "misc_annual_usd": 350
+        "misc_annual_usd": 525
       },
       "new_status": "current",
       "new_model_year": 2026,
@@ -2860,7 +2860,7 @@
         "tire_life_miles": 50000,
         "brake_service_usd": 670,
         "brake_life_miles": 55000,
-        "misc_annual_usd": 320
+        "misc_annual_usd": 480
       },
       "new_status": "current",
       "new_model_year": 2027,
@@ -2897,7 +2897,7 @@
         "tire_life_miles": 45000,
         "brake_service_usd": 690,
         "brake_life_miles": 50000,
-        "misc_annual_usd": 350
+        "misc_annual_usd": 525
       },
       "new_status": "current",
       "new_model_year": 2026,
@@ -2935,7 +2935,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 580,
         "brake_life_miles": 65000,
-        "misc_annual_usd": 240
+        "misc_annual_usd": 360
       },
       "new_status": "current",
       "new_model_year": 2027,
@@ -2972,7 +2972,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 480,
         "brake_life_miles": 75000,
-        "misc_annual_usd": 200
+        "misc_annual_usd": 300
       },
       "maintenance_basis": "RepairPal has no K4 page yet. The predecessor Kia Forte averages $451/yr vs $452 for the Hyundai Elantra, so misc equals the Elantra SEL anchor ($200). The K4 uses the same 2.0L MPI engine and IVT as the Elantra, so oil ($75 x 2), brakes ($480 per 75k) and tire life (55k) mirror the Elantra anchor. Tires: OEM 225/45R17 on EX is a slightly larger and pricier size than the Elantra's 16-in, so I set $610 per set, in line with the Civic Sport ($610) and Mazda3 ($630) anchors. No retailer price was fetched.",
       "new_status": "current",
@@ -3029,7 +3029,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 520,
         "brake_life_miles": 75000,
-        "misc_annual_usd": 210
+        "misc_annual_usd": 315
       },
       "new_status": "current",
       "new_model_year": 2027,
@@ -3067,7 +3067,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 550,
         "brake_life_miles": 70000,
-        "misc_annual_usd": 230
+        "misc_annual_usd": 345
       },
       "new_status": "current",
       "new_model_year": 2026,
@@ -3105,7 +3105,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 530,
         "brake_life_miles": 75000,
-        "misc_annual_usd": 230
+        "misc_annual_usd": 345
       },
       "maintenance_basis": "RepairPal average annual repair cost is $462 for the Sportage vs $426 for the Tucson (x1.085). Applied to the Tucson misc anchor $210, that gives about $230. Oil, brakes and tire life mirror the Tucson anchor because both use the same Smartstream 2.5L GDI/MPI engine and platform: $80 x 2 per year, $530 brakes per 75k miles, 55k-mile tires. Tires: OEM 235/60R18, the same size as the Honda CR-V LX anchor ($740 per set). No retailer price was fetched.",
       "new_status": "current",
@@ -3164,7 +3164,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 620,
         "brake_life_miles": 62000,
-        "misc_annual_usd": 260
+        "misc_annual_usd": 390
       },
       "new_status": "current",
       "new_model_year": 2027,
@@ -3202,7 +3202,7 @@
         "tire_life_miles": 45000,
         "brake_service_usd": 950,
         "brake_life_miles": 50000,
-        "misc_annual_usd": 500
+        "misc_annual_usd": 750
       },
       "maintenance_basis": "RepairPal has no Defender (L663) page, so I used the Land Rover brand average of $1,174/yr (reliability 2.5/5). Misc is set at ~0.43× that ($500), the same ratio as the Escalade ($1,007→$440) and Q5 ($928→$390) anchors. Oil: Land Rover dealer synthetic service, 1 per year (European-anchor convention). RepairPal's sibling Range Rover oil change is $361-390, and I set the smaller 2.0L I4 at $250. Tires: 255/65R19 on 19-in wheels. Tire Rack, Discount Tire and SimpleTire prices could not be retrieved, so I estimated ~$1,250 installed, scaled from the anchors (Bronco $950, Escalade 22-in $1,370). Tire life is 45k on this 5,100-lb off-road-oriented SUV (Wrangler/Bronco anchors 45k). Brakes: $950 per 50k, above the Q5 ($800) and below the Escalade ($1,010), for a heavy vehicle with Land Rover parts pricing.",
       "new_status": "current",
@@ -3260,7 +3260,7 @@
         "tire_life_miles": 40000,
         "brake_service_usd": 1150,
         "brake_life_miles": 50000,
-        "misc_annual_usd": 540
+        "misc_annual_usd": 810
       },
       "maintenance_basis": "RepairPal Range Rover: $1,258/yr average repair and maintenance (2.0/5 reliability), against a $1,127 luxury full-size SUV average. Misc is ~0.43× that ($540), the Escalade/Q5 anchor ratio. Oil: RepairPal estimate $361-390. The catalog's Audi Q5 anchor ($145) matches RepairPal's Q5 figure, but RepairPal runs well above anchors for some other models, so I set $300 at 1 per year (European convention). Brakes: RepairPal pads $675-737 versus $524-585 for the Q5 (anchor $800) and $345-402 for the Escalade (anchor $1,010), so $1,150 per 50k for a ~5,200-lb vehicle. Tires: 275/50R21. Retailer prices could not be retrieved, so I estimated ~$1,650 installed, above the Escalade 22-in anchor ($1,370). Tire life is 40k, matching the Q5 luxury anchor. Fact-check: at 12k mi/yr this comes to ~$1,610/yr. That is above the Escalade anchor (~$1,415) and RepairPal's $1,258 × 1.15 catalog inflation (~$1,450), which is plausible for this model but at the high end.",
       "new_status": "current",
@@ -3317,7 +3317,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 640,
         "brake_life_miles": 80000,
-        "misc_annual_usd": 280
+        "misc_annual_usd": 420
       },
       "new_status": "current",
       "new_model_year": 2026,
@@ -3354,7 +3354,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 670,
         "brake_life_miles": 80000,
-        "misc_annual_usd": 290
+        "misc_annual_usd": 435
       },
       "new_status": "current",
       "new_model_year": 2026,
@@ -3393,7 +3393,7 @@
         "tire_life_miles": 50000,
         "brake_service_usd": 650,
         "brake_life_miles": 55000,
-        "misc_annual_usd": 360
+        "misc_annual_usd": 540
       },
       "maintenance_basis": "Oil: RepairPal Aviator oil change $258-287 vs Ford Explorer $179-208 (x1.4). Applied to the Explorer anchor ($85) that gives about $120. Kept at 3 per year to match the Explorer anchor, which uses the same Ford twin-turbo V6 family. Tires: OEM 255/55R20 all-season (cars.com). Tire Rack/Discount Tire pricing could not be fetched, so this is an anchor-based estimate in line with 20-in luxury SUVs (RX $950, MDX $920), with a shorter 50k life for a heavy 400-hp SUV. Brakes: RepairPal Aviator pads $260-317 is about 4% above the Explorer ($248-305), so Explorer anchor $620 -> about $650, with 55k life for the heavier vehicle. Misc: RepairPal has no Aviator rating (insufficient data). Lincoln brand average is $879/yr, the MKX $811, and luxury midsize SUVs $807. Interpolating between the Enclave ($720 -> $290) and Q5 ($928 -> $390) anchors gives about $360.",
       "new_status": "current",
@@ -3452,7 +3452,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 600,
         "brake_life_miles": 70000,
-        "misc_annual_usd": 360
+        "misc_annual_usd": 540
       },
       "maintenance_basis": "RepairPal has no Corsair reliability page. I used its predecessor, the Lincoln MKC: $853/yr, 3.5/5 reliability (luxury compact average $859). Misc is ~0.43× that ($360), the Q5/Escalade anchor ratio. Oil: RepairPal's estimator gives $244-273, but it runs ~2× the anchor on the related Ford Explorer. I set $110 × 2 per year, in line with the NX ($115) and Bronco Sport/Edge ($100) anchors. Brakes: $600 per 70k, between the Escape ($550) and NX ($640) anchors and next to the Tiguan ($580). Tires: 225/60R18. Retailer prices could not be retrieved, so I estimated $760 installed, matching the Tiguan anchor and below the NX ($860), with 55k life.",
       "new_status": "current",
@@ -3510,7 +3510,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 650,
         "brake_life_miles": 65000,
-        "misc_annual_usd": 350
+        "misc_annual_usd": 525
       },
       "maintenance_basis": "RepairPal has no Nautilus reliability page. I used its predecessor, the Lincoln MKX: $811/yr (luxury midsize average $807; Lincoln brand $879). Misc is ~0.43× that ($350), the same ratio as the Q5/Escalade anchors. Oil: RepairPal's estimator gives $228-257, but it runs ~2× the catalog anchor for the related Ford Explorer ($179-208 vs anchor $85). I set $110 × 2 per year, in line with the MDX/NX ($115) and Enclave/Edge ($100) anchors. Brakes: RepairPal pads $279-336, similar to the MDX/RX anchors, so $650 per 65k. Tires: 255/60R19 per Cars.com. Retailer prices could not be retrieved, so I estimated $900 installed next to the MDX ($920) and Enclave ($860) anchors, with 55k life.",
       "new_status": "current",
@@ -3568,7 +3568,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 550,
         "brake_life_miles": 75000,
-        "misc_annual_usd": 220
+        "misc_annual_usd": 330
       },
       "new_status": "current",
       "new_model_year": 2026,
@@ -3606,7 +3606,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 500,
         "brake_life_miles": 75000,
-        "misc_annual_usd": 220
+        "misc_annual_usd": 330
       },
       "maintenance_basis": "The CX-50 uses the same 2.5L Skyactiv-G engine and 225/65R17 tire size as the CX-5 anchor (S Select AWD). Oil: RepairPal CX-50 $148-183 vs CX-5 $139-169 (+7%), so CX-5 anchor $85 -> $90, 2 per year. Tires: same size as the CX-5 anchor, so $710 and 55k. Tire retailer pages could not be fetched. Brakes: RepairPal CX-50 pads $299-356 vs CX-5 $335-392 (x0.90), so $550 -> about $500, with the CX-5's 75k life. Misc: RepairPal has no CX-50 rating page. The CX-5 averages $447/yr (anchor $220) and the Mazda brand $462, so $220.",
       "new_status": "current",
@@ -3665,7 +3665,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 620,
         "brake_life_miles": 70000,
-        "misc_annual_usd": 260
+        "misc_annual_usd": 390
       },
       "new_status": "current",
       "new_model_year": 2026,
@@ -3701,7 +3701,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 520,
         "brake_life_miles": 75000,
-        "misc_annual_usd": 210
+        "misc_annual_usd": 315
       },
       "new_status": "current",
       "new_model_year": 2026,
@@ -3739,7 +3739,7 @@
         "tire_life_miles": 45000,
         "brake_service_usd": 730,
         "brake_life_miles": 55000,
-        "misc_annual_usd": 380
+        "misc_annual_usd": 570
       },
       "maintenance_basis": "Oil: RepairPal GLC300 $148-176 vs Audi Q5 $130-154 (+14%), so Q5 anchor $145 -> about $165. Mercedes Service A/B runs on 10k mi/1 yr intervals, so 1 per year, like the Q5 and 330i anchors. Tires: OEM 235/60R18 all-season (2024 spec). Retailer prices could not be fetched, so this is anchor-based between the NX ($860) and Q5 ($1,010) with a 45k life (Q5 40k, RX/NX 55k). Brakes: RepairPal GLC300 pads $369-426, between the Explorer ($248-305, anchor $620) and Q5 ($524-585, anchor $800), so about $730 with a 55k life (330i 55k, Q5 60k). Misc: RepairPal has no GLC300 rating (insufficient data). The predecessor GLK350 averages $859/yr and the Mercedes brand $908, vs the Q5 at $928 (anchor $390), so about $380.",
       "new_status": "current",
@@ -3798,7 +3798,7 @@
         "tire_life_miles": 40000,
         "brake_service_usd": 850,
         "brake_life_miles": 50000,
-        "misc_annual_usd": 420
+        "misc_annual_usd": 630
       },
       "maintenance_basis": "Oil: RepairPal GLE350 $166-195 vs Q5 $130-154 (x1.27), so Q5 anchor $145 -> about $185. 1 per year on Mercedes 10k/1-yr service intervals. Tires: OEM 255/50R19 all-season. Retailer prices could not be fetched, so this is anchor-based above the Q5 ($1,010) and below the Escalade 22-in ($1,370), with a 40k life (Q5 40k). Brakes: RepairPal GLE350 pads $439-496 (+18% vs GLC300), so about $850 between the Q5 ($800) and Escalade ($1,010) anchors. Life is 50k for a 4,916-lb SUV. Misc: RepairPal has no GLE350 rating (insufficient data). The predecessor ML350 averages $1,020/yr and the Mercedes brand $908, vs the Q5 at $928 (anchor $390), so about $420.",
       "new_status": "current",
@@ -3856,7 +3856,7 @@
         "tire_life_miles": 40000,
         "brake_service_usd": 620,
         "brake_life_miles": 55000,
-        "misc_annual_usd": 390
+        "misc_annual_usd": 585
       },
       "maintenance_basis": "RepairPal puts the Mini Cooper at $846/yr (ranked 21 of 21 subcompacts, 0.6 unscheduled visits/yr). Interpolating the catalog's RepairPal-to-total relationship between VW Tiguan ($730 RepairPal, about $752 catalog) and Audi Q5 ($928, about $998) targets about $890/yr at 12k mi; this record totals about $886. The dealer synthetic (BMW-spec) oil service is about once a year on MINI's roughly 10k-mile condition-based interval, priced between the VW ($110) and BMW ($140) anchors. The OEM tire is 195/55R16 (Cars.com Cooper S spec), which is run-flat. The set is priced about 30% over the Civic anchor because Tire Rack and Discount Tire prices could not be retrieved. Brakes are priced between the VW and BMW anchors. Misc is set high to reflect RepairPal's below-average reliability.",
       "new_status": "current",
@@ -3914,7 +3914,7 @@
         "tire_life_miles": 40000,
         "brake_service_usd": 650,
         "brake_life_miles": 55000,
-        "misc_annual_usd": 400
+        "misc_annual_usd": 600
       },
       "maintenance_basis": "RepairPal puts the Mini Cooper Countryman at $880/yr (3.5/5, 0.6 unscheduled visits/yr). Interpolating the catalog's RepairPal-to-total relationship between the Tiguan ($730, about $752) and the Audi Q5 ($928, about $998) targets about $938/yr; this record totals about $942 at 12k mi. It uses the same B48 2.0T and dealer synthetic oil service as the Cooper S (about once a year). The OEM tire is 225/50R18 (Cars.com); the set is priced between the Lexus NX ($860) and Audi Q5 ($1,010) anchors because retailer prices could not be retrieved. Brakes are priced between the NX and Q5 anchors.",
       "new_status": "current",
@@ -3972,7 +3972,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 530,
         "brake_life_miles": 70000,
-        "misc_annual_usd": 230
+        "misc_annual_usd": 345
       },
       "new_status": "current",
       "new_model_year": 2026,
@@ -4009,7 +4009,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 520,
         "brake_life_miles": 70000,
-        "misc_annual_usd": 225
+        "misc_annual_usd": 340
       },
       "maintenance_basis": "RepairPal puts the Outlander Sport at $498/yr (4.0/5, 0.3 unscheduled visits/yr), between the Crosstrek ($492, catalog total about $607) and the Outlander ($519, about $636). This record totals about $612/yr at 12k mi. Synthetic 0W-20 oil is changed twice a year, priced like the Toyota and Honda anchors. OEM 225/55R18 tires are priced between the Crosstrek ($650) and Outlander ($710) anchors because retailer prices could not be retrieved. Brakes follow the Seltos/Outlander anchors.",
       "new_status": "current",
@@ -4065,7 +4065,7 @@
         "tire_life_miles": 60000,
         "brake_service_usd": 460,
         "brake_life_miles": 70000,
-        "misc_annual_usd": 170
+        "misc_annual_usd": 255
       },
       "new_status": "current",
       "new_model_year": 2026,
@@ -4102,7 +4102,7 @@
         "tire_life_miles": 50000,
         "brake_service_usd": 600,
         "brake_life_miles": 60000,
-        "misc_annual_usd": 260
+        "misc_annual_usd": 390
       },
       "new_status": "current",
       "new_model_year": 2027,
@@ -4140,7 +4140,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 480,
         "brake_life_miles": 75000,
-        "misc_annual_usd": 200
+        "misc_annual_usd": 300
       },
       "maintenance_basis": "RepairPal has no annual average for the Kicks (not enough data). Oil: RepairPal puts a Kicks oil change at $164-193 against $146-173 for the Rogue (+12%), applied to the Rogue anchor ($75), giving about $85. Brakes: RepairPal pads are $353-410 against $373-430 for the Rogue (x0.95), applied to the Rogue anchor ($510), giving about $480. Brake life of 75k matches the Seltos and Crosstrek anchors for a light (~3,000 lb) crossover. Tires: the OEM SV size is 215/60R17 (tiresize.com), a common inexpensive size. Tire Rack and Discount Tire pages would not load, so the Seltos anchor ($630 / 55k) was used. Misc: CarEdge's 10-yr maintenance and repair estimate is $7,791 for the Kicks against $7,987 for the Rogue (x0.975), applied to the Rogue anchor ($210), giving about $200.",
       "new_status": "current",
@@ -4197,7 +4197,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 600,
         "brake_life_miles": 70000,
-        "misc_annual_usd": 240
+        "misc_annual_usd": 360
       },
       "new_status": "current",
       "new_model_year": 2026,
@@ -4236,7 +4236,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 600,
         "brake_life_miles": 62000,
-        "misc_annual_usd": 270
+        "misc_annual_usd": 405
       },
       "maintenance_basis": "RepairPal's average annual maintenance is $542, identical to the Honda Pilot ($542), so the Pilot anchor was used throughout. Oil: $90, 2x/yr, matching the Nissan Murano and Honda Pilot 3.5L V6 anchors. Tires: the OEM size is 255/60R18 all-season (Nissan spec); the Pilot anchor ($800 / 55k) covers a similar 18-in size, since Tire Rack and Discount Tire pages would not load. Brakes: RepairPal pads are $373-434, scaled by the mean catalog/RepairPal ratio of the Pilot ($600 vs $319-379) and Rogue ($510 vs $373-430) anchors, giving about $600. Brake life follows the Pilot anchor (62k). Misc: CarEdge's 10-yr estimate is $8,178 against $7,881 for the Pilot (+3.8%), applied to the Pilot's $260, giving about $270.",
       "new_status": "current",
@@ -4294,7 +4294,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 510,
         "brake_life_miles": 65000,
-        "misc_annual_usd": 210
+        "misc_annual_usd": 315
       },
       "new_status": "current",
       "new_model_year": 2026,
@@ -4330,7 +4330,7 @@
         "tire_life_miles": 60000,
         "brake_service_usd": 440,
         "brake_life_miles": 70000,
-        "misc_annual_usd": 190
+        "misc_annual_usd": 285
       },
       "maintenance_basis": "RepairPal puts the Sentra at $491/yr (4.0/5, ranked 14 of 36 compacts), close to the Altima ($483, catalog total about $511). This record totals about $513/yr at 12k mi. Oil is priced like the Altima anchor. OEM 205/60R16 is an inexpensive size, so the set is priced just under the Corolla anchor ($550) because retailer prices could not be retrieved. Brakes are priced between the Corolla ($400) and Malibu ($440) anchors.",
       "new_status": "current",
@@ -4389,7 +4389,7 @@
         "tire_life_miles": 35000,
         "brake_service_usd": 1420,
         "brake_life_miles": 50000,
-        "misc_annual_usd": 520
+        "misc_annual_usd": 780
       },
       "maintenance_basis": "European luxury: calibrated to the Audi Q5 anchor via RepairPal. Oil: the RepairPal Cayenne oil change is $270-297 (larger V6 oil capacity), giving about $290 once a year. Brakes: the RepairPal pad replacement is $956-1,013; at the Q5 ratio of 1.44 that is about $1,420, with 50k life assumed. Misc: the RepairPal annual average is $1,231 against $928 for the Q5 (x1.33), applied to the Q5's $390, giving about $520. Tires: no tire retailer page loaded. The staggered 255/55R20 + 295/45R20 N-rated all-season set is anchored to the Cadillac Escalade ($1,370, large luxury SUV). Life is 35k (staggered, heavy vehicle).",
       "new_status": "current",
@@ -4448,7 +4448,7 @@
         "tire_life_miles": 35000,
         "brake_service_usd": 1160,
         "brake_life_miles": 50000,
-        "misc_annual_usd": 530
+        "misc_annual_usd": 795
       },
       "maintenance_basis": "European luxury: calibrated to the Audi Q5 anchor via RepairPal. Oil: the RepairPal Macan oil change is $176-199 (Q5 $130-154, catalog $145), giving about $190 once a year (Porsche's 10k-mile/annual interval). Brakes: the RepairPal pad replacement is $778-835; at the Q5 catalog/RepairPal ratio of 1.44 that is about $1,160, with 50k life assumed for Porsche's performance pads, below the Q5's 60k. Misc: the RepairPal annual average is $1,265 for the Macan against $928 for the Q5 (x1.36), applied to the Q5's $390, giving about $530. Tires: no tire retailer page loaded (Tire Rack blocked). The staggered 235/55R19 + 255/50R19 N-rated set is placed between the Q5 ($1,010, same front size) and the BMW M2 staggered set ($1,160), at about $1,100. Life is 35k because staggered tires cannot be rotated front to rear (330i anchor).",
       "new_status": "current",
@@ -4506,7 +4506,7 @@
         "tire_life_miles": 50000,
         "brake_service_usd": 830,
         "brake_life_miles": 50000,
-        "misc_annual_usd": 320
+        "misc_annual_usd": 480
       },
       "new_status": "current",
       "new_model_year": 2027,
@@ -4543,7 +4543,7 @@
         "tire_life_miles": 45000,
         "brake_service_usd": 1060,
         "brake_life_miles": 45000,
-        "misc_annual_usd": 460
+        "misc_annual_usd": 690
       },
       "new_status": "current",
       "new_model_year": 2026,
@@ -4580,7 +4580,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 600,
         "brake_life_miles": 70000,
-        "misc_annual_usd": 250
+        "misc_annual_usd": 375
       },
       "new_status": "current",
       "new_model_year": 2027,
@@ -4615,7 +4615,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 530,
         "brake_life_miles": 75000,
-        "misc_annual_usd": 210
+        "misc_annual_usd": 315
       },
       "new_status": "current",
       "new_model_year": 2027,
@@ -4652,7 +4652,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 530,
         "brake_life_miles": 75000,
-        "misc_annual_usd": 220
+        "misc_annual_usd": 330
       },
       "new_status": "current",
       "new_model_year": 2026,
@@ -4689,7 +4689,7 @@
         "tire_life_miles": 60000,
         "brake_service_usd": 520,
         "brake_life_miles": 68000,
-        "misc_annual_usd": 210
+        "misc_annual_usd": 315
       },
       "new_status": "current",
       "new_model_year": 2026,
@@ -4726,7 +4726,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 630,
         "brake_life_miles": 65000,
-        "misc_annual_usd": 290
+        "misc_annual_usd": 435
       },
       "new_status": "current",
       "new_model_year": 2026,
@@ -4761,7 +4761,7 @@
         "tire_life_miles": 60000,
         "brake_service_usd": 460,
         "brake_life_miles": 70000,
-        "misc_annual_usd": 170
+        "misc_annual_usd": 255
       },
       "new_status": "current",
       "new_model_year": 2026,
@@ -4796,7 +4796,7 @@
         "tire_life_miles": 65000,
         "brake_service_usd": 400,
         "brake_life_miles": 75000,
-        "misc_annual_usd": 150
+        "misc_annual_usd": 225
       },
       "new_status": "current",
       "new_model_year": 2027,
@@ -4834,7 +4834,7 @@
         "tire_life_miles": 60000,
         "brake_service_usd": 460,
         "brake_life_miles": 75000,
-        "misc_annual_usd": 190
+        "misc_annual_usd": 285
       },
       "maintenance_basis": "RepairPal has no Corolla Cross page (404), so the proxies are the Corolla, which shares the 2.0L M20A engine ($362 a year), and the RAV4 ($429). Oil is 0W-16, 4.8 qt (Toyota spec), placed between the Corolla ($65) and RAV4 ($75) anchors at $70, twice a year. The OEM tire on the LE is 215/65R17 (Toyota 2024/2026 spec), priced like the Crosstrek (225/60R17, $650) and Seltos ($630) anchors at $640, with a 60k-mile life for a light 3,285-lb SUV. Brakes are 12.0-in vented front and 11.1-in solid rear rotors; service is $460 with 75k-mile life, between the Corolla ($400) and Seltos/Crosstrek ($520-530). Misc is $190, between the Corolla ($150) and RAV4 ($230) in line with RepairPal's proxies. Retail tire pages load prices by script and could not be read, so the tire figure is anchored.",
       "new_status": "current",
@@ -4894,7 +4894,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 600,
         "brake_life_miles": 65000,
-        "misc_annual_usd": 250
+        "misc_annual_usd": 375
       },
       "maintenance_basis": "RepairPal has no Grand Highlander page yet (404), so the closest proxy is the Highlander at $489 a year. The engine is the same 2.4L turbo with 0W-20 and 5.6 qt, so oil matches the Highlander XLE anchor at $85, twice a year on Toyota's 10k-mile interval. The OEM tire is 255/65R18 (Cars.com), larger than the Highlander's, so the set is placed at the 3-row anchor level ($820, as for Telluride, Ascent and Traverse) over 55k miles. Brakes are larger (13.38 in front, 13.3 in rear rotors) on a vehicle of about 4,440 lb, so service is set to $600 (the Pilot anchor) with 65k-mile life, versus 70k for the lighter Highlander. Misc is $250, slightly above the Highlander's $240. Tire Rack and Discount Tire load prices by script and could not be read, so the tire figure is anchored to the catalog rather than a retail quote.",
       "new_status": "current",
@@ -4953,7 +4953,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 580,
         "brake_life_miles": 70000,
-        "misc_annual_usd": 240
+        "misc_annual_usd": 360
       },
       "new_status": "current",
       "new_model_year": 2026,
@@ -4989,7 +4989,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 480,
         "brake_life_miles": 90000,
-        "misc_annual_usd": 200
+        "misc_annual_usd": 300
       },
       "new_status": "current",
       "new_model_year": 2027,
@@ -5025,7 +5025,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 550,
         "brake_life_miles": 65000,
-        "misc_annual_usd": 230
+        "misc_annual_usd": 345
       },
       "new_status": "current",
       "new_model_year": 2026,
@@ -5063,7 +5063,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 580,
         "brake_life_miles": 90000,
-        "misc_annual_usd": 240
+        "misc_annual_usd": 360
       },
       "new_status": "current",
       "new_model_year": 2026,
@@ -5099,7 +5099,7 @@
         "tire_life_miles": 50000,
         "brake_service_usd": 630,
         "brake_life_miles": 55000,
-        "misc_annual_usd": 290
+        "misc_annual_usd": 435
       },
       "new_status": "current",
       "new_model_year": 2026,
@@ -5136,7 +5136,7 @@
         "tire_life_miles": 55000,
         "brake_service_usd": 690,
         "brake_life_miles": 62000,
-        "misc_annual_usd": 300
+        "misc_annual_usd": 450
       },
       "new_status": "current",
       "new_model_year": 2026,
@@ -5174,7 +5174,7 @@
         "tire_life_miles": 50000,
         "brake_service_usd": 640,
         "brake_life_miles": 65000,
-        "misc_annual_usd": 280
+        "misc_annual_usd": 420
       },
       "new_status": "current",
       "new_model_year": 2026,
@@ -5211,7 +5211,7 @@
         "tire_life_miles": 50000,
         "brake_service_usd": 580,
         "brake_life_miles": 70000,
-        "misc_annual_usd": 250
+        "misc_annual_usd": 375
       },
       "new_status": "current",
       "new_model_year": 2026,
@@ -5249,7 +5249,7 @@
         "tire_life_miles": 45000,
         "brake_service_usd": 760,
         "brake_life_miles": 60000,
-        "misc_annual_usd": 340
+        "misc_annual_usd": 510
       },
       "maintenance_basis": "RepairPal puts XC60 maintenance at $746 a year, against $928 for the Q5, $571 for the MDX and $550 for the RX 350. Oil is European-luxury synthetic at $140 (Q5 anchor $145, BMW $140), once a year on Volvo's 10k-mile/12-month interval, the same convention as the Q5 anchor. The OEM tire on the 2024 B5 Plus is 235/55R19 (Cars.com), priced like the Q5 anchor at $1,000, with 45k-mile life between the Q5 (40k) and the Lexus anchors (55k). Brakes are $760 with 60k-mile life, between the Q5 ($800 / 60k) and the Lexus anchors ($640-670). Misc is $340, interpolated from RepairPal's $746 between the MDX ($571 → $300 misc) and Q5 ($928 → $390 misc). Retail tire pages load prices by script and could not be read, so the tire figure is anchored.",
       "new_status": "current",
@@ -5309,7 +5309,7 @@
         "tire_life_miles": 40000,
         "brake_service_usd": 820,
         "brake_life_miles": 55000,
-        "misc_annual_usd": 370
+        "misc_annual_usd": 555
       },
       "maintenance_basis": "RepairPal puts XC90 maintenance at $851 a year, against $746 for the XC60, $928 for the Q5 and $571 for the MDX. The engine is the same 2.0L turbo mild hybrid as the XC60, so oil is European-luxury synthetic at $140, once a year on Volvo's 10k-mile/12-month interval. The OEM tire on the 2024 B5 Plus is 275/45R20 (Cars.com), larger than the MDX (about $920) and Q5 ($1,010) anchors and below the Escalade's 22-inch ($1,370), so the set is $1,200 with 40k-mile life for a heavy 3-row SUV on wide tires. Brakes are $820 with 55k-mile life, above the XC60 and Q5 for the added weight. Misc is $370, interpolated from RepairPal's $851 on the MDX→Q5 line ($571 → $300, $928 → $390). Retail tire pages load prices by script and could not be read, so the tire figure is anchored.",
       "new_status": "current",

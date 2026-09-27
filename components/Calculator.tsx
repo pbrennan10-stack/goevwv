@@ -45,13 +45,15 @@ const DEFAULT_INPUT: Omit<CalcInput, "vehicle_ids"> = {
 
 export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxToken }: Props) {
   const baselineGas = federal.calculation_notes.gas_price_baseline_per_gal;
+  // Default to the forecast average, not today's (near-peak) price.
+  const defaultGas = federal.calculation_notes.gas_price_outlook_per_gal?.mid ?? baselineGas.current;
   const [daily, setDaily] = useState(DEFAULT_INPUT.daily_round_trip_mi);
   const [days, setDays] = useState(DEFAULT_INPUT.days_per_week);
   const [utilityId, setUtilityId] = useState(DEFAULT_INPUT.utility_id);
   const [useTOU, setUseTOU] = useState(DEFAULT_INPUT.use_tou);
   const [winter, setWinter] = useState(DEFAULT_INPUT.apply_winter_derate);
   const [mpg, setMpg] = useState(DEFAULT_INPUT.current.mpg);
-  const [gasPrice, setGasPrice] = useState(baselineGas.current);
+  const [gasPrice, setGasPrice] = useState(defaultGas);
   const [iceVehicleId, setIceVehicleId] = useState("");
   const [route, setRoute] = useState<RouteData | null>(null);
   // Resolved origin/destination coords from RouteHelper. Kept separate from
@@ -63,7 +65,7 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
   } | null>(null);
   const [longTrips, setLongTrips] = useState(DEFAULT_INPUT.long_trips_per_year);
   const [longTripMi, setLongTripMi] = useState(DEFAULT_INPUT.long_trip_one_way_mi ?? 200);
-  const [gasSensitivityPrice, setGasSensitivityPrice] = useState(baselineGas.current);
+  const [gasSensitivityPrice, setGasSensitivityPrice] = useState(defaultGas);
   const [ownershipPlan, setOwnershipPlan] = useState<"replace" | "keep">("replace");
 
   // True once the one-time URL-hydration useEffect has run. Gates the URL-sync
@@ -118,7 +120,7 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
     setUseTOU(bool("tou", DEFAULT_INPUT.use_tou));
     setWinter(bool("w", DEFAULT_INPUT.apply_winter_derate));
     setMpg(num("mpg", DEFAULT_INPUT.current.mpg));
-    setGasPrice(num("gas", baselineGas.current));
+    setGasPrice(num("gas", defaultGas));
     setLongTrips(num("lt", DEFAULT_INPUT.long_trips_per_year));
     setLongTripMi(num("ltm", DEFAULT_INPUT.long_trip_one_way_mi ?? 200));
     const vids = p.get("v");
@@ -313,12 +315,9 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
       p.set("hs", String(Math.round(route.highway_avg_speed_mph)));
       p.set("el", String(Math.round(route.elevation_gain_m)));
     }
-    if (routeCoords) {
-      p.set("ox", routeCoords.origin[0].toFixed(5));
-      p.set("oy", routeCoords.origin[1].toFixed(5));
-      p.set("dx", routeCoords.destination[0].toFixed(5));
-      p.set("dy", routeCoords.destination[1].toFixed(5));
-    }
+    // Privacy: home/work coordinates are NOT written to the URL (shared links
+    // would reveal where someone lives and works). hf/hs/el above already
+    // reproduce the numbers; the exact route stays in this browser session.
     const newUrl = `${window.location.pathname}?${p.toString()}`;
     window.history.replaceState({}, "", newUrl);
   }, [hasHydrated, daily, days, utilityId, useTOU, winter, mpg, gasPrice, selectedIds, longTrips, longTripMi, iceVehicleId, ownershipPlan, route, routeCoords]);
@@ -436,7 +435,7 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
                 onChange={(e) => setWinter(e.target.checked)}
                 className="h-4 w-4 rounded accent-brand shrink-0"
               />
-              <span>Apply WV winter range/efficiency derate (~12%/yr)</span>
+              <span>Include WV winter (EVs ~13% more energy, gas ~4% more fuel)</span>
             </label>
           </div>
         </div>
@@ -520,7 +519,7 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
               max={10}
               step={0.05}
               decimals={2}
-              hint={`WV average ~$${baselineGas.current.toFixed(2)} (AAA, ${baselineGas.retrieved_label ?? baselineGas.retrieved ?? "latest"}). Gas prices are volatile — try the slider below.`}
+              hint={`Default $${defaultGas.toFixed(2)} = EIA's forecast average for WV over the next year. Today's AAA WV price is $${baselineGas.current.toFixed(2)} (${baselineGas.retrieved_label ?? baselineGas.retrieved ?? "latest"}), near a peak. Try the slider below.`}
             />
             <SelectField
               label="If you switch to an EV, what happens to this vehicle?"
@@ -863,8 +862,9 @@ function ChargerMapCrossLink({
     if (typeof window === "undefined") return;
     const { origin, destination } = routeCoords;
     const params = new URLSearchParams();
-    params.set("o", `${origin[0].toFixed(5)},${origin[1].toFixed(5)}`);
-    params.set("d", `${destination[0].toFixed(5)},${destination[1].toFixed(5)}`);
+    // Rounded to ~1 km so the link doesn't pinpoint a home or workplace.
+    params.set("o", `${origin[0].toFixed(2)},${origin[1].toFixed(2)}`);
+    params.set("d", `${destination[0].toFixed(2)},${destination[1].toFixed(2)}`);
     params.set("br", "10");
     // Pass the current calculator URL so /chargers can offer a one-click
     // "back to your calculation" that restores every input.
@@ -1121,7 +1121,7 @@ function ResultCard({
       )}
 
       <div className="text-xs text-amber-900 bg-amber-50 ring-1 ring-amber-200 rounded-md p-2 leading-snug">
-        <strong>Resale:</strong> EVs lost ~57% of their value over 5 years in 2026 data (iSeeCars), vs ~42% for all vehicles and ~34% for trucks. WV has only ~5,000 registered EVs — a thin local resale market may mean steeper depreciation. Factor into any long-term financial plan.
+        <strong>Resale:</strong> early EVs lost value faster than gas cars — 5-year-old EVs kept ~43% of their price in 2026 data (iSeeCars) vs ~58% for all vehicles — partly from one-time shocks like Tesla&rsquo;s 2023 price cuts, while gas cars of that age were propped up by the pandemic car shortage. Used-EV prices firmed in 2026 as gas rose. The <a href="/plan" className="underline">household planner</a> includes purchase price and shows resale as a low / middle / high range.
       </div>
     </article>
   );
@@ -1485,16 +1485,17 @@ function Assumptions({
               <strong>{Math.round(highwayAvgSpeedMph!)} mph on highway segments</strong>.
               At that speed EV energy use is roughly{" "}
               <strong>
-                {Math.round(((0.60 + 0.40 * Math.pow(highwayAvgSpeedMph! / 55, 2)) - 1) * 100)}% higher
+                {Math.max(0, Math.round(((0.60 + 0.40 * Math.pow(highwayAvgSpeedMph! / 65, 2)) - 1) * 100))}% higher
               </strong>{" "}
-              than the EPA highway test (55 mph) because aerodynamic drag scales with the square of speed.
+              than the EPA highway label (which already reflects ~65 mph driving) because aerodynamic drag scales with the square of speed.
               This is already factored into the energy cost shown above.
             </li>
           )}
           <li>
-            Winter derate: <strong>{winter ? "on" : "off"}</strong>. When on we
-            add ~12% to annual kWh to reflect 4 cold-weather months with ~28%
-            range loss from heaters and battery chemistry. Winter also slows
+            Winter: <strong>{winter ? "on" : "off"}</strong>. When on we
+            add ~13% to annual kWh (4 cold months with ~28% range loss) and ~4%
+            to gas use (~8% for hybrids) — gas cars lose efficiency in the cold
+            too. Winter also slows
             DCFC by ~25% when the battery is cold; we bake in an 8% annualized
             charge-time uplift when this toggle is on.
           </li>
@@ -1525,8 +1526,10 @@ function Assumptions({
             <li>
               Maintenance comparison: ICE costs use vehicle-specific data (oil
               changes, tires, brakes, misc). EV costs use class-based estimates —
-              no oil changes, ~70% lower brake costs from regenerative braking,
-              similar tire costs, $100/yr misc (cabin filter + wipers only).
+              no oil changes, lower brake costs from regenerative braking, EV-rated
+              tires that cost ~25–30% more and wear a bit faster, and $215/yr misc
+              (cabin filter, 12V battery, brake fluid, rotations, caliper care on
+              salt roads). Gas oil changes follow your miles (every 7,500).
               Numbers are WV-area averages; actual costs vary by shop and driving habits.
             </li>
           )}

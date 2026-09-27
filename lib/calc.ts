@@ -40,10 +40,31 @@ export const CO2_KG_PER_GAL_GASOLINE = 8.887; // EPA direct tailpipe CO2
 // coal-only worst case.) Refreshed 2026-09-23.
 export const CO2_KG_PER_KWH_WV_GRID = 0.44;
 
-// Winter in WV effectively adds ~12% to annual kWh consumption for BEVs
-// if we assume ~4 cold months with ~28% range loss on those months only.
-// (0.28 * 4/12 = ~0.093, rounded up for HVAC and slower DCFC losses)
-export const ANNUAL_WINTER_KWH_MULTIPLIER = 1.12;
+// WV winter, applied to BOTH sides so neither gets a one-sided penalty.
+// EVs: ~28% range loss in ~4 cold months means 1/(1−0.28) − 1 ≈ 39% more kWh
+// per mile in those months; averaged over the year: 1 + 0.389 × 4/12 ≈ 1.13.
+export const ANNUAL_WINTER_KWH_MULTIPLIER = 1 + (1 / (1 - 0.28) - 1) * (4 / 12);
+// Gas cars lose efficiency in the cold too. fueleconomy.gov: ~15% worse at
+// 20°F for conventional cars vs ~39% for EVs (ratio 0.385). Scaling the site's
+// 28% EV loss by that ratio → ~10.8% mpg loss in cold months ≈ +12% gallons ×
+// 4/12 ≈ +4%/yr. Hybrids lose 30–34% in the cold → ~+8%/yr (also used for a
+// PHEV's gas miles). Source: https://www.fueleconomy.gov/feg/coldweather.shtml
+export const ICE_WINTER_FUEL_MULTIPLIER = 1.04;
+export const HYBRID_WINTER_FUEL_MULTIPLIER = 1.08;
+
+// Conventional hybrids (not plug-ins) are identified by their trim name.
+export function isHybridTrim(trim: string | undefined | null): boolean {
+  return !!trim && /hybrid/i.test(trim) && !/plug-?in/i.test(trim);
+}
+
+// Commute days: 50 working weeks a year (two weeks off). Shared by the
+// calculator and the household planner so they agree.
+export const WORK_WEEKS_PER_YEAR = 50;
+
+// Plug-in hybrids keep a full engine (oil, filters, spark plugs, coolant) on
+// top of EV parts. Consumer Reports: PHEVs cost ~1.4¢/mi more than BEVs at
+// 0–50k mi (2026 dollars) ≈ $160/yr at 12k mi. Added to EV maintenance.
+export const PHEV_MAINTENANCE_EXTRA_USD = 160;
 
 // -- Fueling / charging time constants --
 const ICE_TANK_GAL = 14;           // US average passenger car tank
@@ -76,7 +97,7 @@ function homeChargeSessions(daily_mi: number, days_per_week: number, range_mi: n
   // Charge when battery drops below ~20% capacity (usable = 80% of rated range).
   const usable = Math.max(range_mi * 0.8, 1);
   const daysPerCharge = Math.max(1, Math.floor(usable / Math.max(daily_mi, 1)));
-  return Math.ceil((days_per_week * 52) / daysPerCharge);
+  return Math.ceil((days_per_week * WORK_WEEKS_PER_YEAR) / daysPerCharge);
 }
 
 export function dcfcStopsPerRoundTrip(
@@ -112,7 +133,7 @@ export function dcfcStopsPerRoundTrip(
 }
 
 function annualMiles(daily: number, daysPerWeek: number): number {
-  return daily * daysPerWeek * 52;
+  return daily * daysPerWeek * WORK_WEEKS_PER_YEAR;
 }
 
 export function effectiveRatePerKwh(
@@ -129,16 +150,17 @@ export function effectiveRatePerKwh(
   return { rate: r.flat_rate_per_kwh, mode: "flat", meterAnnualUsd: 0 };
 }
 
-// At highway speeds above the EPA test (~55 mph), aerodynamic drag raises EV energy use.
-// Drag force ∝ v², so energy/mile for the aero component ∝ v².
-// At 55 mph, aero drag ≈ 40% of total highway energy on a typical EV;
-// rolling resistance and accessories make up the rest (roughly constant per mile).
-// Formula: multiplier = (1 - aeroFrac) + aeroFrac × (v/55)²
-// Real-world validation (Model Y): +25% at 70 mph, +45% at 80 mph vs 55 mph.
+// Above typical highway speeds, aerodynamic drag raises EV energy use
+// (drag ∝ v², ~40% of highway energy is aero). The EPA highway label already
+// includes a real-world adjustment (the 0.7 factor / 5-cycle tests), so it is
+// treated as a ~65-mph figure, not a 55-mph one — only speeds ABOVE 65 add
+// energy. (Gas cars also lose mpg at speed and aren't penalized here either;
+// using a 65 baseline keeps the two sides comparable.)
+// Formula: multiplier = (1 - aeroFrac) + aeroFrac × (v/65)²
 function speedEfficiencyMultiplier(highway_avg_speed_mph: number): number {
-  if (highway_avg_speed_mph <= 55) return 1.0;
+  if (highway_avg_speed_mph <= 65) return 1.0;
   const aeroFrac = 0.40;
-  return (1 - aeroFrac) + aeroFrac * Math.pow(highway_avg_speed_mph / 55, 2);
+  return (1 - aeroFrac) + aeroFrac * Math.pow(highway_avg_speed_mph / 65, 2);
 }
 
 export function blendedKwhPer100mi(
@@ -203,18 +225,35 @@ const INSURANCE_CLASS_BASE: Record<string, { usd: number; ref_msrp: number }> = 
   van:       { usd: 2100, ref_msrp: 55000 },
 };
 const INSURANCE_PREMIUM_BRANDS = new Set(["Tesla", "Rivian", "Lucid", "Polestar"]);
+// Premium-repair-network brands cost more to insure. 1.15 (Sept 27 2026, was
+// 1.25): gives Model Y ≈ $2,690 vs MoneyGeek WV $2,747, and R1S ≈ 2.1× an
+// Equinox EV vs ValuePenguin's 2.11×. It's these brands, not EVs in general —
+// Insurify finds WV EVs ~4% cheaper to insure than gas cars.
+const PREMIUM_BRAND_INSURANCE_FACTOR = 1.15;
 
-export function evInsuranceEstimate(vehicle: Vehicle): number {
+// Full-coverage premium for an EV/PHEV worth `value` (defaults to its MSRP).
+// ~40% of a premium (liability) doesn't depend on the car; ~60% scales with
+// its value — so a used or older car costs less to insure.
+export function evInsuranceEstimate(vehicle: Vehicle, value = vehicle.msrp_usd): number {
   const base = INSURANCE_CLASS_BASE[vehicle.class] ?? INSURANCE_CLASS_BASE.sedan;
-  const priceFactor = Math.min(1.8, Math.max(0.85, 0.40 + 0.60 * (vehicle.msrp_usd / base.ref_msrp)));
-  const brandFactor = INSURANCE_PREMIUM_BRANDS.has(vehicle.make) ? 1.25 : 1.0;
+  const priceFactor = Math.min(1.8, Math.max(0.85, 0.40 + 0.60 * (value / base.ref_msrp)));
+  const brandFactor = INSURANCE_PREMIUM_BRANDS.has(vehicle.make) ? PREMIUM_BRAND_INSURANCE_FACTOR : 1.0;
   return Math.round((base.usd * priceFactor * brandFactor) / 10) * 10;
 }
 
-// Extra kWh per year from climbing hills.
-// On a round-trip commute the ascent one way is the descent the other way,
-// so we multiply gain by 2. Regen recovers REGEN_EFFICIENCY of descent energy;
-// the remainder is the net loss.
+// Same 40/60 idea for a car you already own: scale its new-car premium by
+// what it's worth now. Never more than the new-car premium.
+export function insuranceAtValue(newCarPremium: number, newPrice: number, value: number): number {
+  if (!newPrice || newPrice <= 0) return newCarPremium;
+  const factor = Math.min(1, 0.40 + 0.60 * (value / newPrice));
+  return Math.round((newCarPremium * factor) / 10) * 10;
+}
+
+// Extra kWh per year from climbing hills. A round-trip commute climbs the
+// net height difference once and descends it once. Climbing costs m·g·h at
+// ~90% drivetrain efficiency (÷0.9); regen gets back ~70% on the way down.
+// Net loss per round trip ≈ m·g·h × (1/0.9 − 0.7). (Gas cars recover nothing
+// downhill, so this is not a penalty EVs pay that gas cars avoid.)
 function elevationExtraKwhPerYear(
   vehicle: Vehicle,
   elevation_gain_m: number,
@@ -222,8 +261,8 @@ function elevationExtraKwhPerYear(
 ): number {
   if (elevation_gain_m <= 0) return 0;
   const mass = vehicleMassKg(vehicle);
-  const climbJoules = mass * 9.81 * elevation_gain_m; // per one-way trip
-  const roundTripNet = climbJoules * 2 * (1 - REGEN_EFFICIENCY); // round trip, after regen
+  const climbJoules = mass * 9.81 * elevation_gain_m;
+  const roundTripNet = climbJoules * (1 / 0.9 - REGEN_EFFICIENCY);
   return (roundTripNet / 3_600_000) * trips_per_year;
 }
 
@@ -232,6 +271,14 @@ export function gallonsPerYear(vehicle: Vehicle, gasMiles: number): number {
   if (vehicle.powertrain !== "phev") return 0;
   const mpg = vehicle.efficiency_mpg_hybrid ?? 35;
   return gasMiles / mpg;
+}
+
+// Public fast-charging price for this vehicle. Tesla owners pay close to the
+// member rate on the Supercharger network; everyone else pays walk-up prices.
+export function dcfcRateFor(v: Vehicle, fed: FederalData): number {
+  const d = fed.calculation_notes.dcfc_rate_per_kwh;
+  const walkUp = d?.current ?? DCFC_FALLBACK_RATE_PER_KWH;
+  return v.make === "Tesla" && d?.member_rate ? d.member_rate : walkUp;
 }
 
 export function stateAnnualFee(
@@ -264,8 +311,14 @@ function federalCredit(vehicle: Vehicle, fed: FederalData): number {
   return fed.federal_ev_tax_credits.new_ev_credit.max_amount_usd;
 }
 
+// Oil changes follow the miles you drive: synthetic-oil intervals and oil-life
+// monitors typically run 7,500–10,000 mi. At least one change a year (oil
+// ages even when parked). Per-model intervals aren't verified, so one
+// conservative interval is used for every gas vehicle.
+export const OIL_CHANGE_INTERVAL_MI = 7500;
+
 export function annualIceMaintenance(v: IceVehicle, annual_miles: number): MaintenanceCosts {
-  const oil = v.maintenance.oil_change_usd * v.maintenance.oil_changes_per_year;
+  const oil = v.maintenance.oil_change_usd * Math.max(1, annual_miles / OIL_CHANGE_INTERVAL_MI);
   const tires = (v.maintenance.tire_set_usd / v.maintenance.tire_life_miles) * annual_miles;
   const brakes = (v.maintenance.brake_service_usd / v.maintenance.brake_life_miles) * annual_miles;
   const misc = v.maintenance.misc_annual_usd;
@@ -273,17 +326,19 @@ export function annualIceMaintenance(v: IceVehicle, annual_miles: number): Maint
 }
 
 export function annualEvMaintenance(vehicle: Vehicle, annual_miles: number): MaintenanceCosts {
-  // Tires: similar to ICE but slightly shorter life due to regenerative torque
-  // Brakes: ~70% cheaper because regen braking extends pad/rotor life 3-5x
-  // No oil changes. Misc = cabin air filter + wiper fluid only.
+  // Tires: EV-rated tires cost ~25–30% more and wear ~13% faster (weight, torque).
+  // Brakes: regen does most of the stopping, so about one axle of pads per
+  // 100k mi (RepairPal Sept 2026: EV axle job $432–489).
+  // No oil changes. Misc ($215/yr, Sept 27 2026, was $115): cabin/HEPA filter,
+  // 12V battery every 2–4 yrs (EVs wear them out sooner — Recurrent), brake
+  // fluid, tire rotations, and brake caliper cleaning on WV salt roads.
   const isTruck = vehicle.class === "truck" || vehicle.class === "van";
   const isSuv = vehicle.class === "suv" || vehicle.class === "minivan";
-  // Refreshed 2026-09-23: EV-rated tire prices, +15% repair inflation (BLS CPI).
   const tireSet = isTruck ? 1250 : isSuv ? 950 : 750;
   const tireMi = 48000;
-  const brakeSvc = isTruck ? 320 : isSuv ? 230 : 185;
+  const brakeSvc = isTruck ? 600 : isSuv ? 460 : 430;
   const brakeMi = 100000;
-  const misc = 115;
+  const misc = 215;
   const tires = (tireSet / tireMi) * annual_miles;
   const brakes = (brakeSvc / brakeMi) * annual_miles;
   return { oil_usd: 0, tires_usd: tires, brakes_usd: brakes, misc_usd: misc, total_usd: tires + brakes + misc };
@@ -320,13 +375,17 @@ export function calculate(input: CalcInput, ctx: CalcContext): CalcReturn {
   // Total annual miles includes both commute and long trips — this is what the
   // user actually drives in a year and what every fuel/energy figure scales on.
   const miles = commuteMi + longTripMi;
-  const trips_per_year = input.days_per_week * 52;
+  const trips_per_year = input.days_per_week * WORK_WEEKS_PER_YEAR;
   const highway_fraction = input.route?.highway_fraction ?? DEFAULT_HIGHWAY_FRACTION;
   const highway_avg_speed_mph = input.route?.highway_avg_speed_mph ?? 55;
   const elevation_gain_m = input.route?.elevation_gain_m ?? 0;
   const { rate, mode, meterAnnualUsd } = effectiveRatePerKwh(ctx.utility, input.use_tou);
-  const dcfcRate =
-    ctx.fed.calculation_notes.dcfc_rate_per_kwh?.current ?? DCFC_FALLBACK_RATE_PER_KWH;
+  // Winter hits gas cars too (see ICE_WINTER_FUEL_MULTIPLIER). The current car
+  // is treated as a hybrid only when its catalog trim says so.
+  const derate = input.apply_winter_derate;
+  const currentWinterMult = !derate ? 1
+    : isHybridTrim(input.current.ice_vehicle?.trim) ? HYBRID_WINTER_FUEL_MULTIPLIER
+    : ICE_WINTER_FUEL_MULTIPLIER;
 
   // Current ICE fueling time — use vehicle's actual tank size if known.
   // Fuel consumption is across all miles (commute + long trips).
@@ -335,7 +394,7 @@ export function calculate(input: CalcInput, ctx: CalcContext): CalcReturn {
   const currentFuelingMin = currentFillups * ICE_FILLUP_MIN;
 
   // Current-car baseline — gas and CO₂ covers all annual miles
-  const currentGallons = miles / Math.max(input.current.mpg, 1);
+  const currentGallons = (miles / Math.max(input.current.mpg, 1)) * currentWinterMult;
   const currentGasCost = currentGallons * input.current.gas_price_per_gal;
   const currentCo2 = currentGallons * CO2_KG_PER_GAL_GASOLINE;
   const currentMaint = input.current.ice_vehicle
@@ -368,8 +427,9 @@ export function calculate(input: CalcInput, ctx: CalcContext): CalcReturn {
     let dcfcCost = 0;
     let gasFillupsEv = 0;
     let gasFuelingMinEv = 0;
-    const phevGas = gallonsPerYear(v, Math.max(0, miles - phevElecMi));
+    const phevGas = gallonsPerYear(v, Math.max(0, miles - phevElecMi)) * (derate ? HYBRID_WINTER_FUEL_MULTIPLIER : 1);
     const phevGasCost = phevGas * input.current.gas_price_per_gal;
+    const dcfcRate = dcfcRateFor(v, ctx.fed);
 
     if (v.powertrain === "bev") {
       const dailyRange = v.epa_range_mi ?? 200;
@@ -420,9 +480,12 @@ export function calculate(input: CalcInput, ctx: CalcContext): CalcReturn {
     const fee = stateAnnualFee(v, ctx.fed);
     // Include EV maintenance + insurance only when ICE vehicle is selected (apples-to-apples)
     const evMaint = currentMaint ? annualEvMaintenance(v, miles) : null;
-    const evMaintUsd = evMaint?.total_usd ?? 0;
+    const evMaintUsd = (evMaint?.total_usd ?? 0) + (evMaint && v.powertrain === "phev" ? PHEV_MAINTENANCE_EXTRA_USD : 0);
     const evInsurance = currentMaint ? evInsuranceEstimate(v) : 0;
-    const annualTotal = totalEnergyCost + fee.usd + evMaintUsd + evInsurance;
+    // The base WV registration applies to every car — add it to the EV side
+    // whenever it's added to the gas side, so it never counts as a saving.
+    const evFeeUsd = fee.usd + currentRegUsd;
+    const annualTotal = totalEnergyCost + evFeeUsd + evMaintUsd + evInsurance;
     const savings = currentTotalUsd - annualTotal;
     const fiveYrOp = annualTotal * 5;
     const fiveYrSave = savings * 5;
@@ -471,7 +534,7 @@ export function calculate(input: CalcInput, ctx: CalcContext): CalcReturn {
       vehicle: v,
       annual_miles: miles,
       annual_energy_cost_usd: totalEnergyCost,
-      annual_state_fee_usd: fee.usd,
+      annual_state_fee_usd: evFeeUsd,
       annual_maintenance_usd: evMaintUsd,
       annual_insurance_usd: evInsurance,
       annual_total_usd: annualTotal,

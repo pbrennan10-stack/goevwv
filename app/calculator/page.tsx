@@ -17,6 +17,7 @@ export const metadata: Metadata = {
   title: "EV Cost Calculator",
   description:
     "Enter your commute, pick up to three EVs or PHEVs, and see WV-specific numbers on charging cost, annual savings, winter range, and 5-year running costs.",
+  alternates: { canonical: "/calculator" },
 };
 
 export default function CalculatorPage() {

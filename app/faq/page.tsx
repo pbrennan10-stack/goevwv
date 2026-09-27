@@ -4,7 +4,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { fmtUSD } from "@/lib/calc";
 import { getChargingInfra, getFederalData, getUtilities, getVehicles } from "@/lib/data";
-import { costPer100Mi, fmtCents } from "@/lib/scenario";
+import { comparisonGasPrice, costPer100Mi, fmtCents } from "@/lib/scenario";
 
 // Plain-language answers to the questions West Virginians actually search
 // for. Every number is read from data/*, so the answers stay current with
@@ -29,7 +29,7 @@ function buildFaq(): QA[] {
   const utilities = getUtilities().filter((u) => u.id !== "rural_coops");
   const infra = getChargingInfra();
   const ref = getVehicles().find((v) => v.id === "chevy-equinox-ev-2025");
-  const gas = fed.calculation_notes.gas_price_baseline_per_gal;
+  const gasNow = comparisonGasPrice(fed);
   const fees = fed.wv_state_fees;
   const base = fees.standard_registration_fee?.amount_usd ?? 0;
   const bev = fees.bev_annual_fee.amount_usd;
@@ -41,7 +41,7 @@ function buildFaq(): QA[] {
   const ss = infra.statewide_summary;
   const aep = utilities.find((u) => u.id === "aep");
   const aepRebate = aep?.rebates[0];
-  const gasPer100 = (100 / 25) * gas.current;
+  const gasPer100 = (100 / 25) * gasNow;
 
   const out: QA[] = [
     {
@@ -56,7 +56,7 @@ function buildFaq(): QA[] {
     {
       q: "How much does it cost to charge an electric car in West Virginia?",
       a: ref
-        ? `Home electricity on West Virginia's big utilities runs about ${(lo * 100).toFixed(1)}–${(hi * 100).toFixed(1)}¢ per kWh. For a typical compact electric SUV like the ${ref.make} ${ref.model}, that's roughly ${fmtCents(costPer100Mi(ref, lo))}–${fmtCents(costPer100Mi(ref, hi))} per 100 miles with winter losses included. A 25 mpg gas car at ${fmtCents(gas.current)}/gal spends about ${fmtCents(gasPer100)} per 100 miles.${dcfc ? ` Public fast chargers cost more — about ${Math.round(dcfc * 100)}¢/kWh — but most drivers use them only on road trips.` : ""}`
+        ? `Home electricity on West Virginia's big utilities runs about ${(lo * 100).toFixed(1)}–${(hi * 100).toFixed(1)}¢ per kWh. For a typical compact electric SUV like the ${ref.make} ${ref.model}, that's roughly ${fmtCents(costPer100Mi(ref, lo))}–${fmtCents(costPer100Mi(ref, hi))} per 100 miles with winter losses included. A 25 mpg gas car at ${fmtCents(gasNow)}/gal (the forecast average) spends about ${fmtCents(gasPer100)} per 100 miles.${dcfc ? ` Public fast chargers cost more — about ${Math.round(dcfc * 100)}¢/kWh — but most drivers use them only on road trips.` : ""}`
         : `Home electricity on West Virginia's big utilities runs about ${(lo * 100).toFixed(1)}–${(hi * 100).toFixed(1)}¢ per kWh.`,
       more: { href: "/utilities", label: "Rates for each utility" },
     },
