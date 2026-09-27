@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Logo } from "@/components/Logo";
 import { SiteHeader } from "@/components/SiteHeader";
 import { cargoSeatsUpLabel } from "@/lib/capability";
-import { getFederalData, getIceVehicles, getUtilities, getVehicles } from "@/lib/data";
+import { getFederalData, getIceVehicles, getOwnershipAssumptions, getUtilities, getVehicles } from "@/lib/data";
 
 export const metadata: Metadata = {
   title: "State of the Data",
@@ -126,6 +126,7 @@ export default function StateOfTheDataPage() {
   const federal = getFederalData();
   const utilities = getUtilities();
   const evs = getVehicles();
+  const own = getOwnershipAssumptions();
   const gasCars = getIceVehicles();
   const capCounts = (list: { capability_confidence?: string }[]) => ({
     verified: list.filter((v) => v.capability_confidence === "verified").length,
@@ -755,6 +756,39 @@ export default function StateOfTheDataPage() {
               retrieved="Methodology set 2026-04-19"
               confidence="verified"
               notes="OpenChargeMap catalogs many specific connector variants (e.g., 'CCS (Type 1)', 'CCS (Type 2)', 'SAE J1772 CCS'); we collapse these into the handful of categories a driver actually cares about. 'Tesla' here means the legacy proprietary port — new vehicles with NACS show under NACS."
+            />
+          </Section>
+
+          <Section
+            title="Household planner: purchase price and resale"
+            summary="WV sales tax, how much new vehicles keep of their value, and what your current vehicles lose — used by the /plan household planner."
+          >
+            <SourceRow
+              label="WV motor vehicle sales tax"
+              value={`${Math.round(own.wv_purchase_tax.rate * 100)}% of price minus trade-in, + ${own.wv_purchase_tax.title_fee_usd} title`}
+              source="WV Code §11-15-3c; WV DMV titles page"
+              sourceUrl="https://code.wvlegislature.gov/11-15-3C/"
+              retrieved="2026-09-27"
+              confidence="verified"
+              notes="Replaced the old 'privilege tax' in 2008; 6% since July 2017. No county or city add-on on vehicle sales. Trade-in must be titled in WV to the buyer. We treat destination charges as taxable (not stated explicitly). Lien recording ($10) isn't modeled."
+            />
+            <SourceRow
+              label="Value kept after 5 years (new vehicles)"
+              value={`EVs ${Math.round(own.retention_5yr.bev * 1000) / 10}% · all vehicles ${Math.round(own.retention_5yr.gas * 1000) / 10}% · trucks ${Math.round(own.retention_5yr.gas_truck * 1000) / 10}%`}
+              source="iSeeCars 'Cars That Hold Their Value' study (2026)"
+              sourceUrl="https://www.iseecars.com/cars-that-hold-their-value-study"
+              retrieved="2026-09-27"
+              confidence="verified"
+              notes="Based on ~950,000 five-year-old vehicles sold Mar 2025–Feb 2026 — i.e., 2020–21 models, when EV prices and tax credits were changing fast. Used-EV values firmed in 2026 as gas prices rose (Cox Automotive: used EV listing prices up ~8% year over year in Jul–Aug 2026; Manheim wholesale EV values ahead of non-EVs, though the gap narrowed from +11% in May to +2% by mid-September). Gains were mostly in cheaper, older EVs. The planner uses the study figure by default and lets you slide your own estimate. No published plug-in hybrid figure exists; we use the all-vehicle average."
+            />
+            <SourceRow
+              label="What a vehicle you already own loses per year"
+              value={`~${Math.round(own.older_vehicle_annual_depreciation * 100)}% a year`}
+              source="Kelley Blue Book (8–12% a year after the first two years)"
+              sourceUrl="https://www.kbb.com/car-advice/how-to-beat-car-depreciation/"
+              retrieved="2026-09-27"
+              confidence="approximate"
+              notes="Midpoint of KBB's range; older, high-mileage cars lose value more slowly. The planner asks you what your car is worth today — your own number beats any estimate."
             />
           </Section>
 

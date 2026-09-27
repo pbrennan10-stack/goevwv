@@ -36,6 +36,15 @@ retention_5yr:
     5 years for an average 2026 model at wholesale (auction) prices — lower than
     iSeeCars' retail figures. Early EVs had steep depreciation partly from price
     cuts and lapsed tax credits; newer EVs may hold value differently.
+    2026 trend: used-EV values firmed as gas prices rose — Cox Automotive's
+    used EV average listing price was up ~8% year over year in Jul–Aug 2026,
+    and Manheim wholesale EV values ran ahead of non-EVs (+11% YoY in May,
+    narrowing to +2% by mid-September). Gains were concentrated in cheaper,
+    older EVs; used EVs over $40k still fell, and ~500k lease returns in 2026
+    add supply. Not enough to justify a new 5-year figure — the planner's
+    slider lets people apply their own view. Revisit with iSeeCars' next
+    study (~Mar 2027).
+  trend_source: "https://www.coxautoinc.com/market-insights/"
 
 # How much a vehicle you already own loses per year if you keep it:
 # midpoint of Kelley Blue Book's "8–12% each year" after the first two years.

@@ -94,14 +94,15 @@ export default async function VehiclePage({ params }: Params) {
     ["Starting MSRP", `${fmtUSD(v.msrp_usd)} (before destination)`],
   ];
   if (v.powertrain === "bev") {
-    if (v.epa_range_mi) specs.push(["EPA range", `${v.epa_range_mi} mi`]);
+    if (v.epa_range_mi)
+      specs.push([v.epa_rated === false ? "Range (maker's estimate)" : "EPA range", `${v.epa_range_mi} mi`]);
     if (v.winter_range_mi)
       specs.push(["WV winter estimate", `~${v.winter_range_mi} mi`]);
     if (v.highway_range_mi)
       specs.push(["Realistic 70 mph highway range", `~${v.highway_range_mi} mi`]);
   } else {
     if (v.epa_range_mi_electric)
-      specs.push(["Electric range (EPA)", `${v.epa_range_mi_electric} mi`]);
+      specs.push([v.epa_rated === false ? "Electric range (maker's estimate)" : "Electric range (EPA)", `${v.epa_range_mi_electric} mi`]);
     if (v.efficiency_mpg_hybrid)
       specs.push(["Hybrid mode", `${v.efficiency_mpg_hybrid} mpg`]);
   }

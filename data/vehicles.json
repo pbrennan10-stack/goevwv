@@ -50,7 +50,8 @@
       "assembly_location": "Fremont, CA / Austin, TX",
       "assembly_country": "US",
       "notes": "Dominant US EV SUV. Supercharger access. Verify pricing after recent Tesla adjustments. Formerly 'Long Range AWD' — Tesla renamed it 'Premium' in 2026 and raised the price $1,000 (May 2026). Battery size and 10–80% time are not published by Tesla; values are estimates.",
-      "status": "current"
+      "status": "current",
+      "destination_usd": 1640
     },
     {
       "id": "tesla-model-3-2025",
@@ -92,7 +93,8 @@
       "assembly_location": "Fremont, CA",
       "assembly_country": "US",
       "notes": "Efficient sedan, strong Supercharger network. Formerly 'Long Range RWD' (renamed 'Premium' in 2026). A cheaper Model 3 Standard is also in the catalog.",
-      "status": "current"
+      "status": "current",
+      "destination_usd": 1640
     },
     {
       "id": "chevy-equinox-ev-2025",
@@ -131,7 +133,8 @@
       "assembly_location": "Ramos Arizpe, Mexico",
       "assembly_country": "Mexico",
       "notes": "Most compelling mid-priced BEV SUV for WV market. Native NACS port from MY2027. Earlier data wrongly listed Ingersoll, Ontario assembly and understated energy use.",
-      "status": "current"
+      "status": "current",
+      "destination_usd": 1800
     },
     {
       "id": "ford-f150-lightning-2025",
@@ -261,7 +264,8 @@
       "status": "current",
       "variant_group": "silverado-ev-grp",
       "variant_label": "Extended Range",
-      "variant_primary": true
+      "variant_primary": true,
+      "destination_usd": 2595
     },
     {
       "id": "rivian-r1t-2025",
@@ -304,7 +308,8 @@
       "assembly_location": "Normal, IL",
       "assembly_country": "US",
       "notes": "Premium adventure truck. Limited WV dealer presence. AALA-exempt (GVWR >8,500 lbs — heavy vehicles not required to disclose parts content). Rivian dropped the 'Dual Standard' LFP pack for MY2027; Premium (old Large pack) is now the entry trim. Range on standard 20-inch wheels. Battery and charge time approximate. Peak DC kW for MY2027 not published; the figure shown carries over from 2026.",
-      "status": "current"
+      "status": "current",
+      "destination_usd": 1895
     },
     {
       "id": "rivian-r1t-large-2025",
@@ -346,7 +351,8 @@
       "assembly_location": "Normal, IL",
       "assembly_country": "US",
       "notes": "Largest pack option — ~140 kWh / 380 mi EPA (20-inch wheels). AALA-exempt (GVWR >8,500 lbs). $7k step up from Premium for meaningful extra range. Old 'Max' pack, renamed Premium Long Range for MY2027. Battery approximate.",
-      "status": "current"
+      "status": "current",
+      "destination_usd": 1895
     },
     {
       "id": "ford-mustang-mache-2025",
@@ -388,7 +394,8 @@
       "assembly_location": "Cuautitlán, Mexico",
       "assembly_country": "Mexico",
       "notes": "Established Ford dealer network in WV makes service convenient.",
-      "status": "current"
+      "status": "current",
+      "destination_usd": 2045
     },
     {
       "id": "ford-mustang-mache-er-2025",
@@ -429,7 +436,8 @@
       "assembly_location": "Cuautitlán, Mexico",
       "assembly_country": "Mexico",
       "notes": "Premium with Extended Range 91 kWh pack — 320 mi EPA. Meaningful step up from Select Standard Range for WV drivers who regularly do longer trips. MSRP is approximate (Premium $40,595 + Extended Range option ~$5,245); confirm on ford.com.",
-      "status": "current"
+      "status": "current",
+      "destination_usd": 2045
     },
     {
       "id": "hyundai-ioniq-5-2025",
@@ -470,7 +478,8 @@
       "assembly_location": "Ellabell, GA (Hyundai Metaplant America)",
       "assembly_country": "US",
       "notes": "Class-leading DCFC speed. Assembled in Georgia (Metaplant opened 2024). Hyundai cut Ioniq 5 prices ~$9k for MY2026 after the federal credit ended (+$250 for MY2027).",
-      "status": "current"
+      "status": "current",
+      "destination_usd": 1650
     },
     {
       "id": "hyundai-ioniq-5-lr-2025",
@@ -510,7 +519,8 @@
       "assembly_location": "Ellabell, GA (Hyundai Metaplant America)",
       "assembly_country": "US",
       "notes": "Long Range 84 kWh pack — 318 mi EPA. Same 800V ultra-fast DCFC. Common step-up trim for WV buyers who want highway range without Tesla pricing. Hyundai cut Ioniq 5 prices ~$9k for MY2026. Hyundai publishes 10–80% in ~20 min but no peak kW; the 235 kW figure is from independent tests of earlier models.",
-      "status": "current"
+      "status": "current",
+      "destination_usd": 1650
     },
     {
       "id": "kia-ev6-2025",
@@ -552,7 +562,8 @@
       "assembly_location": "West Point, GA (Kia Manufacturing Georgia)",
       "assembly_country": "US",
       "notes": "Shares 800V platform with Ioniq 5. Fast DCFC. Highest US/CA parts content of any EV on this list (MY2025 AALA). Kia cut EV6 prices ~$5k for MY2026. US/Canadian parts % is the MY2025 figure.",
-      "status": "current"
+      "status": "current",
+      "destination_usd": 1545
     },
     {
       "id": "kia-ev6-lr-2025",
@@ -593,7 +604,8 @@
       "assembly_location": "West Point, GA (Kia Manufacturing Georgia)",
       "assembly_country": "US",
       "notes": "Wind trim with 84 kWh Long Range pack — 319 mi EPA. Same 800V platform as Ioniq 5 LR. Topped the 2025 AALA index at 80% US/CA parts. Light Long Range RWD ($41,200) is a cheaper way to get the 84 kWh pack. US/Canadian parts % is the MY2025 figure.",
-      "status": "current"
+      "status": "current",
+      "destination_usd": 1545
     },
     {
       "id": "nissan-leaf-2026",
@@ -631,7 +643,8 @@
       "assembly_location": "Tochigi, Japan",
       "assembly_country": "Japan",
       "notes": "All-new 3rd-gen Leaf on Nissan's AmpR Medium platform (shared with Ariya), now a crossover SUV rather than a hatchback. 75 kWh pack, 303 mi EPA, native NACS DCFC at 150 kW. MY2025 was the outgoing 40 kWh / 149 mi / CHAdeMO 2nd-gen carryover; this row reflects the fall-2025 3rd-gen that dealers are actually selling. Japan-built. One of the cheapest new EVs (with the Chevy Bolt). The cheaper 52 kWh 'S' trim was cancelled/delayed; S+ charges at 7.2 kW at home (higher trims may differ).",
-      "status": "current"
+      "status": "current",
+      "destination_usd": 1495
     },
     {
       "id": "chevy-blazer-ev-2025",
@@ -713,7 +726,8 @@
       "assembly_country": "US",
       "notes": "Assembled in Tennessee. The 62 kWh Standard trim was dropped; Pro RWD is now the entry trim. US/Canadian parts % is the MY2025 figure.",
       "status": "final_year",
-      "status_note": "Chattanooga production ended April 2026; MY2026 dealer inventory expected into 2027."
+      "status_note": "Chattanooga production ended April 2026; MY2026 dealer inventory expected into 2027.",
+      "destination_usd": 1475
     },
     {
       "id": "vw-id4-pro-s-2025",
@@ -755,7 +769,8 @@
       "assembly_country": "US",
       "notes": "Pro S trim with 82 kWh larger battery — 291 mi EPA. TN-assembled. 3 yrs Electrify America included.",
       "status": "final_year",
-      "status_note": "Chattanooga production ended April 2026; MY2026 dealer inventory expected into 2027."
+      "status_note": "Chattanooga production ended April 2026; MY2026 dealer inventory expected into 2027.",
+      "destination_usd": 1475
     },
     {
       "id": "honda-prologue-2025",
@@ -797,7 +812,8 @@
       "assembly_country": "Mexico",
       "notes": "GM platform under Honda skin. Strong Honda dealer network in WV. Assembled in Mexico despite Honda branding. Honda cut MSRP $7,500 in April 2026 but reduced dealer cash by about the same amount, so real transaction prices barely moved.",
       "status": "final_year",
-      "status_note": "Honda ends Prologue sales after MY2026; no Honda EV is planned for the US in 2027."
+      "status_note": "Honda ends Prologue sales after MY2026; no Honda EV is planned for the US in 2027.",
+      "destination_usd": 1495
     },
     {
       "id": "toyota-bz4x-2025",
@@ -835,7 +851,8 @@
       "assembly_location": "Motomachi, Japan",
       "assembly_country": "Japan",
       "notes": "Toyota reliability reputation. Manufactured in Japan. Renamed from bZ4X to bZ for 2026 with a larger battery and NACS port. AWD XLE is $39,900 / 288 mi; base XLE FWD (57.7 kWh) is $34,980 / 236 mi.",
-      "status": "current"
+      "status": "current",
+      "destination_usd": 1595
     },
     {
       "id": "toyota-rav4-prime-2025",
@@ -871,7 +888,9 @@
       "assembly_location": "Japan",
       "assembly_country": "Japan",
       "notes": "Excellent WV option: ~52 mi electric covers most commutes, gas backup eliminates range anxiety. Assembled in Japan. New-generation replacement for the RAV4 Prime. Electric range (52 mi; some sources say 54 for SE) and hybrid-mode mpg (40) are Toyota projections — not yet EPA-listed. Total range uses Toyota's '490+ mi' (other sources claim 550–600). SE charges at 7 kW with no DC fast charging (XSE/Woodland get 11 kW and CCS). Not yet EPA-rated (2026-09-27): range and efficiency are Toyota's estimates for the redesigned 2026 model; city/highway split removed because the estimate we had was internally inconsistent.",
-      "status": "current"
+      "status": "current",
+      "destination_usd": 1450,
+      "epa_rated": false
     },
     {
       "id": "ford-escape-phev-2025",
@@ -1032,7 +1051,8 @@
       "assembly_country": "Belgium",
       "notes": "Small premium crossover. US production moved from China to Belgium for MY2026 and the price dropped ~$6k; the 'Core' trim is gone.",
       "status": "final_year",
-      "status_note": "Volvo is ending US EX30 sales in 2026 (dealer order cutoff March 2026); remaining inventory only."
+      "status_note": "Volvo is ending US EX30 sales in 2026 (dealer order cutoff March 2026); remaining inventory only.",
+      "destination_usd": 1295
     },
     {
       "id": "kia-niro-ev-2025",
@@ -1113,7 +1133,8 @@
       "assembly_location": "West Point, GA (Kia Manufacturing Georgia)",
       "assembly_country": "US",
       "notes": "Flagship 3-row family EV. US-assembled since late 2024. Biggest recent addition to the family-SUV EV segment. Previously listed as 'Wind RWD', which doesn't exist; the specs match Light Long Range RWD. Kia has been running ~$10k customer cash on the EV9.",
-      "status": "current"
+      "status": "current",
+      "destination_usd": 1645
     },
     {
       "id": "cadillac-lyriq-2025",
@@ -1152,7 +1173,8 @@
       "assembly_location": "Spring Hill, TN",
       "assembly_country": "US",
       "notes": "Premium US-assembled EV on GM platform. GM dealer network broad in WV.",
-      "status": "current"
+      "status": "current",
+      "destination_usd": 1795
     },
     {
       "id": "toyota-prius-prime-2025",
@@ -1190,7 +1212,8 @@
       "assembly_location": "Tsutsumi, Japan",
       "assembly_country": "Japan",
       "notes": "Benchmark PHEV efficiency — ~51 mpg on gas, 44 mi all-electric. Japan-assembled. Renamed from Prius Prime. Efficiency figures are MY2025 EPA; MY2027 EPA listing pending. EPA check (2026-09-27, fueleconomy.gov dataset): epa_range_mi_electric 44→45, efficiency_mpg_hybrid 51→52. EPA has no 2026 or 2027 Prius PHEV yet, so this uses the latest year (2025). 2024 Prius Prime SE is identical (45 mi, 52 mpg). The site's 51 mpg is the highway figure.",
-      "status": "current"
+      "status": "current",
+      "destination_usd": 1295
     },
     {
       "id": "subaru-solterra-2025",
@@ -1228,7 +1251,8 @@
       "assembly_location": "Motomachi, Japan",
       "assembly_country": "Japan",
       "notes": "Badge-engineered twin of the Toyota bZ (formerly bZ4X) with Subaru AWD. Strong Subaru dealer presence in WV. Japan-assembled. Larger 74.7 kWh battery and NACS port from MY2026. Standard AWD.",
-      "status": "current"
+      "status": "current",
+      "destination_usd": 1475
     },
     {
       "id": "bmw-i4-2025",
@@ -1266,7 +1290,8 @@
       "assembly_location": "Munich, Germany",
       "assembly_country": "Germany",
       "notes": "Entry-luxury BMW EV sedan. Germany-built. Earlier data used the discontinued eDrive35's $52,200 price; eDrive40 is $57,900. 333 mi is the EPA rating on the standard 18-inch wheels; optional 19-inch wheels are rated 307 mi.",
-      "status": "current"
+      "status": "current",
+      "destination_usd": 1350
     },
     {
       "id": "polestar-2-2025",
@@ -1347,7 +1372,8 @@
       "assembly_location": "Austin, TX (Gigafactory Texas)",
       "assembly_country": "US",
       "notes": "Polarizing design but high mindshare. Highway range derated further than Model Y/3 due to massive frontal area. A cheaper Dual Motor AWD trim ($69,990, same EPA range) launched in 2026. 10–80% time is a third-party estimate.",
-      "status": "current"
+      "status": "current",
+      "destination_usd": 1995
     },
     {
       "id": "bmw-x5-xdrive50e-2025",
@@ -1429,7 +1455,8 @@
       "assembly_location": "Normal, IL",
       "assembly_country": "US",
       "notes": "3-row SUV sibling of R1T. AALA-exempt (GVWR >8,500 lbs). Rivian dropped the 'Dual Standard' LFP pack for MY2027; Premium is now the entry trim. Battery and charge time approximate. Peak DC kW for MY2027 not published; the figure shown carries over from 2026.",
-      "status": "current"
+      "status": "current",
+      "destination_usd": 1895
     },
     {
       "id": "rivian-r1s-large-2025",
@@ -1471,7 +1498,8 @@
       "assembly_location": "Normal, IL",
       "assembly_country": "US",
       "notes": "Large pack variant — 135 kWh / 352 mi EPA. AALA-exempt. $5k step up for meaningful extra range on long trips.",
-      "status": "current"
+      "status": "current",
+      "destination_usd": 1895
     },
     {
       "id": "mercedes-eqb-2025",
@@ -1550,7 +1578,8 @@
       "status": "final_year",
       "status_note": "MY2026 is the final model year for the EQE sedan.",
       "real_world_range_factor": 1.16,
-      "real_world_range_source": "https://www.consumerreports.org/cars/mercedes-benz/eqe/2026/road-test-report/"
+      "real_world_range_source": "https://www.consumerreports.org/cars/mercedes-benz/eqe/2026/road-test-report/",
+      "destination_usd": 1250
     },
     {
       "id": "mercedes-eqe-suv-2025",
@@ -1560,7 +1589,7 @@
       "year": 2027,
       "class": "suv",
       "powertrain": "bev",
-      "msrp_usd": 68900,
+      "msrp_usd": 67450,
       "epa_range_mi": 253,
       "winter_range_mi": 204,
       "highway_range_mi": 225,
@@ -1588,10 +1617,11 @@
       "us_canadian_parts_pct": 20,
       "assembly_location": "Tuscaloosa, AL (MBUSI)",
       "assembly_country": "US",
-      "notes": "US-assembled at Mercedes' Tuscaloosa plant. Popular mid-size luxury SUV. EPA-listed for MY2027, though some reports say EQE production ends in 2026 — confirm availability with a dealer. Range correction (2026-09-27): Mercedes' EPA ratings are conservative — independent tests beat them up to ~75 mph (Consumer Reports 70-mph test of the EQE 350 4MATIC SUV: 284 mi vs 253 EPA (1.12); Edmunds mixed-driving tests 1.15–1.24). Winter range and efficiency here are scaled by the lowest matching test (1.12×); highway range was already calibrated to 70-mph tests and is unchanged. Before correction: winter 182 mi, 42 kWh/100 mi.",
+      "notes": "US-assembled at Mercedes' Tuscaloosa plant. Popular mid-size luxury SUV. EPA-listed for MY2027, though some reports say EQE production ends in 2026 — confirm availability with a dealer. Range correction (2026-09-27): Mercedes' EPA ratings are conservative — independent tests beat them up to ~75 mph (Consumer Reports 70-mph test of the EQE 350 4MATIC SUV: 284 mi vs 253 EPA (1.12); Edmunds mixed-driving tests 1.15–1.24). Winter range and efficiency here are scaled by the lowest matching test (1.12×); highway range was already calibrated to 70-mph tests and is unchanged. Before correction: winter 182 mi, 42 kWh/100 mi. Price check (2026-09-27): msrp_usd 68900→67450. mbusa.com: 2027 EQE 320 4MATIC SUV 'Starting at $67,450 MSRP' (and 320+ SUV $64,950). The $68,900 figure is KBB's price including destination, which implies a $1,450 destination.",
       "status": "current",
       "real_world_range_factor": 1.12,
-      "real_world_range_source": "https://www.consumerreports.org/cars/mercedes-benz/eqe-suv/2025/road-test-report/"
+      "real_world_range_source": "https://www.consumerreports.org/cars/mercedes-benz/eqe-suv/2025/road-test-report/",
+      "destination_usd": 1450
     },
     {
       "id": "lucid-air-grand-touring-2025",
@@ -1669,7 +1699,8 @@
       "assembly_location": "Casa Grande, AZ (AMP-1)",
       "assembly_country": "US",
       "notes": "Lucid's first SUV; 3-row seating with optional 6-seat captain's chairs. 400 kW peak DCFC is class-leading — adds ~200 mi in 11 min on a 350 kW+ charger. Native NACS DCFC port, so Superchargers are plug-and-charge. Rare in WV dealer inventory; most sales online-direct.",
-      "status": "current"
+      "status": "current",
+      "destination_usd": 1850
     },
     {
       "id": "mercedes-eqs-450plus-sedan-2025",
@@ -1709,7 +1740,8 @@
       "notes": "Mercedes flagship luxury sedan — 390 mi EPA (MY2026), one of the longest-range German EVs sold in the US. German-assembled. Used-market shoppers: early EQS (2022-2023) depreciated heavily, strong used-buyer value. Refreshed for 2027 (800-volt, 122 kWh). Range and efficiency shown are MY2026 EPA values; MY2027 ratings pending. Range correction (2026-09-27): Mercedes' EPA ratings are conservative — independent tests beat them up to ~75 mph (InsideEVs 70-mph test of EQS 450+: 395 mi vs 350 EPA (1.13); Edmunds 1.21. Tests are of the earlier ~108 kWh pack). Winter range and efficiency here are scaled by the lowest matching test (1.13×); highway range was already calibrated to 70-mph tests and is unchanged. Before correction: winter 281 mi, 33 kWh/100 mi. EPA check (2026-09-27, fueleconomy.gov dataset): efficiency_kwh_per_100mi 29.2→30.1, efficiency_kwh_per_100mi_city 26.5→30.1, efficiency_kwh_per_100mi_highway 32.7→30.1. EPA has no 2027 EQS 450+. The 2027 EQS sedans in EPA are the EQS 500 4MATIC (443 mi, 29.6/30.1/29.1 kWh) and 580 4MATIC (434 mi), so this uses the 2026 450+. Range 390 matches. Site efficiency x 1.13 = 33.0/29.9/36.95 against EPA 34.0/34.0/34.1, which does not match. The new values are EPA / 1.13, keeping the site's real_world_range_factor convention. Consider moving this entry to the 2027 EQS 500 4MATIC, since the 450+ is not in the 2027 EPA list.",
       "status": "current",
       "real_world_range_factor": 1.13,
-      "real_world_range_source": "https://insideevs.com/reviews/583112/mercedes-eqs-70mph-range-test/"
+      "real_world_range_source": "https://insideevs.com/reviews/583112/mercedes-eqs-70mph-range-test/",
+      "destination_usd": 1350
     },
     {
       "id": "tesla-model-s-long-range-2025",
@@ -1719,7 +1751,7 @@
       "year": 2026,
       "class": "sedan",
       "powertrain": "bev",
-      "msrp_usd": 84990,
+      "msrp_usd": 94990,
       "epa_range_mi": 410,
       "winter_range_mi": 295,
       "highway_range_mi": 280,
@@ -1748,7 +1780,7 @@
       "us_canadian_parts_pct": 65,
       "assembly_location": "Fremont, CA",
       "assembly_country": "US",
-      "notes": "Tesla flagship sedan, 410 mi EPA. MY2026 price cut to $74,990 before Tesla ceased Model S/X production in April 2026 — dealer and used-market inventory remains active. Highway range in practice typically 290–320 mi (Tesla EPA is known to overstate; WV elevation and cold compound this). Supercharger network access is the main practical advantage.",
+      "notes": "Tesla flagship sedan, 410 mi EPA. MY2026 price cut to $74,990 before Tesla ceased Model S/X production in April 2026 — dealer and used-market inventory remains active. Highway range in practice typically 290–320 mi (Tesla EPA is known to overstate; WV elevation and cold compound this). Supercharger network access is the main practical advantage. Price check (2026-09-27): msrp_usd 84990→94990. Discontinued status confirmed: production ended Q2 2026, with the last car built in May 2026. The last configurator price was $94,990 after the Aug 2025 +$10k increase that bundled FSD, free Supercharging and Premium Connectivity; the 'Long Range' name was dropped. CarsDirect (2026-04-13) reports remaining inventory was raised another $15k to $109,990+. $84,990 was the June 2025 price.",
       "status": "discontinued",
       "status_note": "Production ended May 2026. Used market only; price shown is the last new MSRP."
     },
@@ -1792,7 +1824,8 @@
       "assembly_location": "Fremont, CA / Austin, TX",
       "assembly_country": "US",
       "notes": "Model Y Performance — 3.3s 0-60, uprated brakes, lowered suspension, 21-inch wheels. Range drops ~25 mi vs LR due to wheels/motor. Updated for the 2026 new-body Model Y Performance ($57,990 after a $500 increase in May 2026; 306 mi EPA). Battery size and charge time are unconfirmed estimates.",
-      "status": "current"
+      "status": "current",
+      "destination_usd": 1640
     },
     {
       "id": "tesla-model-3-performance-2025",
@@ -1833,7 +1866,8 @@
       "assembly_location": "Fremont, CA",
       "assembly_country": "US",
       "notes": "Model 3 Performance — 2.9s 0-60, track-tuned suspension, adaptive dampers. Fastest sub-$60k EV sedan on the market. MY2027 EPA figures (316 mi); price unchanged at $54,990. Battery size is unconfirmed.",
-      "status": "current"
+      "status": "current",
+      "destination_usd": 1640
     },
     {
       "id": "rivian-r1t-performance-2025",
@@ -1875,7 +1909,8 @@
       "assembly_location": "Normal, IL",
       "assembly_country": "US",
       "notes": "Dual-motor Performance (now the Premium trim's $5,000 power upgrade) — 665 hp, 3.4s 0-60, same tow/payload as Standard. For MY2027 the standard pack is ~108.5 kWh usable (300 mi EPA on 20-inch wheels); the Long Range pack (~140 kWh, 380 mi) is an upgrade. Rivian renamed trims for MY2027: its new 'Performance' trim is the former tri-motor (~$101k), not this dual-motor version. Price = Premium + $5,000 power upgrade; destination extra.",
-      "status": "current"
+      "status": "current",
+      "destination_usd": 1895
     },
     {
       "id": "rivian-r1s-performance-2025",
@@ -1917,7 +1952,8 @@
       "assembly_location": "Normal, IL",
       "assembly_country": "US",
       "notes": "Dual-motor Performance (now the Premium trim's $5,000 power upgrade) — 665 hp, 3.4s 0-60 for a 3-row full-size SUV. For MY2027 the standard pack is ~108.5 kWh usable (300 mi EPA on 20-inch wheels); the Long Range pack (~140 kWh, 380 mi) is an upgrade. Rivian renamed trims for MY2027: its new 'Performance' trim is the former tri-motor (~$101k), not this dual-motor version. Price = Premium + $5,000 power upgrade; destination extra.",
-      "status": "current"
+      "status": "current",
+      "destination_usd": 1895
     },
     {
       "id": "cadillac-escalade-iq-2025",
@@ -1927,7 +1963,7 @@
       "year": 2026,
       "class": "suv",
       "powertrain": "bev",
-      "msrp_usd": 127700,
+      "msrp_usd": 127405,
       "epa_range_mi": 460,
       "winter_range_mi": 331,
       "highway_range_mi": 388,
@@ -1956,8 +1992,10 @@
       "us_canadian_parts_pct": 56,
       "assembly_location": "Detroit, MI (Factory ZERO)",
       "assembly_country": "US",
-      "notes": "Cadillac flagship EV — 200 kWh battery (largest in class), ~460 mi range (Cadillac estimate), 750 hp in Velocity Max launch mode. Same Detroit plant as Silverado EV. Not EPA-labeled (too heavy), so range and efficiency are manufacturer/third-party figures. MSRP approximate ($130,300 including destination). MY2027 adds a native NACS port. Range and efficiency are GM's estimates — the Escalade IQ is heavy enough to be exempt from EPA fuel-economy labels.",
-      "status": "current"
+      "notes": "Cadillac flagship EV — 200 kWh battery (largest in class), ~460 mi range (Cadillac estimate), 750 hp in Velocity Max launch mode. Same Detroit plant as Silverado EV. Not EPA-labeled (too heavy), so range and efficiency are manufacturer/third-party figures. MSRP approximate ($130,300 including destination). MY2027 adds a native NACS port. Range and efficiency are GM's estimates — the Escalade IQ is heavy enough to be exempt from EPA fuel-economy labels. Price check (2026-09-27): msrp_usd 127700→127405. $127,700 was the 2025 Luxury 1 price ($129,990 incl. destination). For 2026 Luxury, KBB lists $130,300 incl. $2,895 destination, and pre-freight-hike pricing was $129,795 incl. $2,390. Both give $127,405. Destination rose Dec 2025 (GM Authority).",
+      "status": "current",
+      "destination_usd": 2895,
+      "epa_rated": false
     },
     {
       "id": "nissan-ariya-2025",
@@ -2086,7 +2124,7 @@
       "year": 2025,
       "class": "sedan",
       "powertrain": "bev",
-      "msrp_usd": 59995,
+      "msrp_usd": 59595,
       "epa_range_mi": 274,
       "winter_range_mi": 197,
       "highway_range_mi": 218,
@@ -2113,9 +2151,10 @@
       "us_canadian_parts_pct": 45,
       "assembly_location": "Windsor, Ontario, Canada",
       "assembly_country": "Canada",
-      "notes": "Stellantis electric muscle car — retuned Fratzonic exhaust audio, 496 hp R/T dual motor AWD. Canada-assembled. EPA range is for 18-inch wheels (308 mi on 20-inch). Battery is usable capacity.",
-      "status": "final_year",
-      "status_note": "Dodge dropped the R/T after MY2025; only leftover R/Ts remain. MY2027 is Scat Pack only ($72,495)."
+      "notes": "Stellantis electric muscle car — retuned Fratzonic exhaust audio, 496 hp R/T dual motor AWD. Canada-assembled. EPA range is for 18-inch wheels (308 mi on 20-inch). Battery is usable capacity. Price check (2026-09-27): status final_year→discontinued, msrp_usd 59995→59595. The R/T was dropped for MY2026 and has no 2027 return; the 2027 EV is Scat Pack only (KBB). $59,995 is the 2026 Scat Pack price, not the R/T. The 2025 R/T launched at $59,595 + $1,995 ($61,590 per CarGurus/KBB). Carscoops/Edmunds cite $57,995, possibly after a price adjustment. Please verify the msrp.",
+      "status": "discontinued",
+      "status_note": "Electric Charger Daytona R/T dropped after MY2025; 2026/2027 electric Charger is Scat Pack only.",
+      "destination_usd": 1995
     },
     {
       "tax_credit_eligible": false,
@@ -2151,7 +2190,8 @@
       "us_canadian_parts_pct": 17,
       "assembly_location": "Kansas City, KS (Fairfax Assembly)",
       "assembly_country": "US",
-      "notes": "Returns for 2027 with an LFP battery and native NACS. Cheapest new EV in the catalog ($28,995 with destination). City/highway split derived from EPA MPGe."
+      "notes": "Returns for 2027 with an LFP battery and native NACS. Cheapest new EV in the catalog ($28,995 with destination). City/highway split derived from EPA MPGe.",
+      "destination_usd": 1395
     },
     {
       "tax_credit_eligible": false,
@@ -2188,7 +2228,8 @@
       "capability_note": "Kia US spec: 26.1 / 56.5 cu ft with cargo floor at lowest level; front trunk 0.88 cu ft. No towing capacity listed. Sub-trunk: Kia's figure is measured with the cargo floor at its lowest level, so it includes the under-floor space; separate size not published.",
       "assembly_location": "Pesquería, Nuevo León, Mexico",
       "assembly_country": "Mexico",
-      "notes": "Priced August 2026. Light FWD ($29,890, 221 mi) and Wind AWD ($38,690, 280 mi) also offered. US-market EV3s are built in Mexico (production started Aug 2026; the earliest units may be Korean-built). Peak DC ~128 kW is the European spec; Kia US publishes only 10–80% times. EPA check (2026-09-27, fueleconomy.gov dataset): efficiency_kwh_per_100mi_highway 32.4→33. The highway figure differs by 0.6 (32.4 vs 33.0). City (25.7 vs 26) is within tolerance."
+      "notes": "Priced August 2026. Light FWD ($29,890, 221 mi) and Wind AWD ($38,690, 280 mi) also offered. US-market EV3s are built in Mexico (production started Aug 2026; the earliest units may be Korean-built). Peak DC ~128 kW is the European spec; Kia US publishes only 10–80% times. EPA check (2026-09-27, fueleconomy.gov dataset): efficiency_kwh_per_100mi_highway 32.4→33. The highway figure differs by 0.6 (32.4 vs 33.0). City (25.7 vs 26) is within tolerance.",
+      "destination_usd": 1495
     },
     {
       "tax_credit_eligible": false,
@@ -2229,7 +2270,8 @@
       "assembly_country": "US",
       "notes": "Cheaper, de-contented Model Y (late 2025). Standard AWD is $41,990 / 294 mi. Battery (~69.5 kWh usable) and 7.7 kW home charging are from press reviews; Tesla doesn't publish them. 10–80% time is an estimate.",
       "variant_group": "tesla-model-y-2025-grp",
-      "variant_label": "Standard"
+      "variant_label": "Standard",
+      "destination_usd": 1640
     },
     {
       "tax_credit_eligible": false,
@@ -2269,7 +2311,8 @@
       "assembly_country": "US",
       "notes": "Cheaper Model 3 trim (late 2025). Tesla doesn't publish battery size or charge times: battery is assumed to match the Model Y Standard (same 321-mi EPA range and efficiency), and home charging (~7.7 kW) and 10–80% time are unconfirmed estimates.",
       "variant_group": "tesla-model-3-2025-grp",
-      "variant_label": "Standard"
+      "variant_label": "Standard",
+      "destination_usd": 1640
     },
     {
       "tax_credit_eligible": false,
@@ -2309,7 +2352,8 @@
       "assembly_country": "US",
       "notes": "With the F-150 Lightning cancelled, this is the cheapest full-size electric pickup. EPA figures are MY2026 (2027 carries over). Towing (8,500 lb) and payload (2,350 lb) are GM Fleet's MY2026 WT Standard Range figures; 2027 ratings not yet published. Battery size is a third-party estimate; whether MSRP includes destination is unconfirmed; 10–80% time not published.",
       "variant_group": "silverado-ev-grp",
-      "variant_label": "WT Standard Range"
+      "variant_label": "WT Standard Range",
+      "destination_usd": 2595
     },
     {
       "tax_credit_eligible": false,
@@ -2345,7 +2389,8 @@
       "capability_note": "Toyota spec: 25.3 behind rear seat, 59.5 behind front seat (JBL-equipped figures). No frunk. Towing not listed on Toyota spec page. Sub-trunk: no data.",
       "assembly_location": "Japan",
       "assembly_country": "Japan",
-      "notes": "Standard AWD. Shares the 74.7 kWh battery with the bZ, Solterra, Trailseeker, and Uncharted. Not rated to tow."
+      "notes": "Standard AWD. Shares the 74.7 kWh battery with the bZ, Solterra, Trailseeker, and Uncharted. Not rated to tow.",
+      "destination_usd": 1450
     },
     {
       "tax_credit_eligible": false,
@@ -2382,7 +2427,8 @@
       "capability_note": "Subaru spec: Premium/Limited 31.3 / 74.0 cu ft (Touring 30.4 / 71.8). No frunk. Towing 3,500 lb per Subaru launch info; not shown on the spec page. Sub-trunk: no data.",
       "assembly_location": "Japan",
       "assembly_country": "Japan",
-      "notes": "Wagon-style electric Subaru with standard AWD and a 3,500 lb tow rating — a natural fit for WV. 10–80% time approximate. EPA check (2026-09-27, fueleconomy.gov dataset): efficiency_kwh_per_100mi_highway 31.5→30.8. The highway figure is 0.7 off (31.5 vs 30.8). City 26.7 vs 27.0 is within tolerance. 20in: 274 mi."
+      "notes": "Wagon-style electric Subaru with standard AWD and a 3,500 lb tow rating — a natural fit for WV. 10–80% time approximate. EPA check (2026-09-27, fueleconomy.gov dataset): efficiency_kwh_per_100mi_highway 31.5→30.8. The highway figure is 0.7 off (31.5 vs 30.8). City 26.7 vs 27.0 is within tolerance. 20in: 274 mi.",
+      "destination_usd": 1450
     },
     {
       "tax_credit_eligible": false,
@@ -2419,7 +2465,8 @@
       "capability_note": "Subaru spec: 20.8 cu ft with deck board up / 23.0 with deck board in lower position. No max cargo or towing figure listed. No frunk. Sub-trunk: 2.2 cu ft = difference between deck-board lower and upper positions.",
       "assembly_location": "Motomachi, Japan",
       "assembly_country": "Japan",
-      "notes": "Compact electric Subaru. Premium FWD is $34,995 / 308 mi. Not rated to tow."
+      "notes": "Compact electric Subaru. Premium FWD is $34,995 / 308 mi. Not rated to tow.",
+      "destination_usd": 1450
     },
     {
       "tax_credit_eligible": false,
@@ -2456,7 +2503,8 @@
       "capability_note": "Hyundai spec: 86.9 / 46.7 / 21.9 cu ft behind 1st/2nd/3rd row; SE AWD 7 seats, 5,000 lb with trailer brakes (RWD S: 3,500). Frunk volume not listed on Hyundai US spec page. Sub-trunk: no data. Frunk re-tried; still not found.",
       "assembly_location": "Ellabell, GA (Hyundai Metaplant America)",
       "assembly_country": "US",
-      "notes": "Three-row electric SUV. There is no plug-in minivan on the US market anymore; this and the Kia EV9 are the closest family haulers. Peak DC 233 kW and 10.9 kW home charging per Hyundai spec and US reports."
+      "notes": "Three-row electric SUV. There is no plug-in minivan on the US market anymore; this and the Kia EV9 are the closest family haulers. Peak DC 233 kW and 10.9 kW home charging per Hyundai spec and US reports.",
+      "destination_usd": 1600
     },
     {
       "tax_credit_eligible": false,
@@ -2493,7 +2541,8 @@
       "assembly_country": "Germany",
       "notes": "Mercedes' new entry EV, effectively replacing the EQB. 374 mi is the best-case configuration. Range correction (2026-09-27): Mercedes' EPA ratings are conservative — independent tests beat them up to ~75 mph (Edmunds CLA 250+: 434 mi vs 374 EPA (1.16); CLA 350 tests 1.23). Winter range and efficiency here are scaled by the lowest matching test (1.16×); highway range was already calibrated to 70-mph tests and is unchanged. Before correction: winter 269 mi, 27 kWh/100 mi.",
       "real_world_range_factor": 1.16,
-      "real_world_range_source": "https://www.edmunds.com/car-news/2026-mercedes-benz-cla-ev-range-charging-test-feature.html"
+      "real_world_range_source": "https://www.edmunds.com/car-news/2026-mercedes-benz-cla-ev-range-charging-test-feature.html",
+      "destination_usd": 1250
     },
     {
       "tax_credit_eligible": false,
@@ -2566,7 +2615,8 @@
       "capability_note": "Hyundai spec: 31.9 seats up; 66.3 SAE seats folded (71.8 by Hyundai 'max' method). 2,000 lb with trailer brakes (1,650 without). Sub-trunk: no data.",
       "assembly_location": "Ulsan, South Korea",
       "assembly_country": "South Korea",
-      "notes": "Standard AWD. MSRP approximate (sources vary $40,325–40,825)."
+      "notes": "Standard AWD. MSRP approximate (sources vary $40,325–40,825).",
+      "destination_usd": 1600
     },
     {
       "tax_credit_eligible": false,
@@ -2602,7 +2652,8 @@
       "capability_note": "Kia spec (SAE, dual-level floor lowest position): 34.5 / 65.5 cu ft. 2,000 lb braked / 1,653 unbraked; requires additional equipment. Sub-trunk: figure is measured with the dual-level floor in its lowest position, so under-floor space is included; separate size not published.",
       "assembly_location": "Gwangju, South Korea",
       "assembly_country": "South Korea",
-      "notes": "Standard AWD. Whether MSRP includes destination is unconfirmed. EPA check (2026-09-27, fueleconomy.gov dataset): epa_range_mi_electric 34→33. The 1-mi difference is within the rounding tolerance, but it is not rounding: 34 is the 2025 rating (id 48667, with 430 total). 2026 is 33. All other figures match."
+      "notes": "Standard AWD. Whether MSRP includes destination is unconfirmed. EPA check (2026-09-27, fueleconomy.gov dataset): epa_range_mi_electric 34→33. The 1-mi difference is within the rounding tolerance, but it is not rounding: 34 is the 2025 rating (id 48667, with 430 total). 2026 is 33. All other figures match.",
+      "destination_usd": 1495
     },
     {
       "tax_credit_eligible": false,
@@ -2638,7 +2689,8 @@
       "capability_note": "Kia spec: behind 1st/2nd/3rd row 75.5 / 38.5-45.0 / 12.6 cu ft (2nd-row figure varies with seat slide; lower value used). EX is 7-passenger (6 with Premium Package). 2,000 lb towing. Sub-trunk: has a dual-level cargo floor; size and whether it is in the SAE figure not stated.",
       "assembly_location": "South Korea",
       "assembly_country": "South Korea",
-      "notes": "Three-row plug-in hybrid. Seat count, cargo, and towing unconfirmed."
+      "notes": "Three-row plug-in hybrid. Seat count, cargo, and towing unconfirmed.",
+      "destination_usd": 1445
     },
     {
       "tax_credit_eligible": false,
@@ -2674,7 +2726,168 @@
       "capability_note": "Mitsubishi spec (with sunroof): 30.8 behind 2nd row, 64.7 behind front seats; behind-3rd-row figure not listed. 7 seats std; 1,500 lb max towing. Sub-trunk: no data.",
       "assembly_location": "Japan",
       "assembly_country": "Japan",
-      "notes": "The only 7-seat plug-in hybrid under ~$45k. Charges slowly at home (3.3 kW, ~6.5 hours on Level 2). DC fast charging uses CHAdeMO, which few US stations still support."
+      "notes": "The only 7-seat plug-in hybrid under ~$45k. Charges slowly at home (3.3 kW, ~6.5 hours on Level 2). DC fast charging uses CHAdeMO, which few US stations still support.",
+      "destination_usd": 1745
+    },
+    {
+      "id": "ford-e-transit-2026",
+      "make": "Ford",
+      "model": "E-Transit",
+      "trim": "350 Cargo Van Low Roof 148\" WB",
+      "year": 2026,
+      "class": "van",
+      "powertrain": "bev",
+      "msrp_usd": 53260,
+      "destination_usd": 2395,
+      "epa_range_mi": 159,
+      "winter_range_mi": 114,
+      "highway_range_mi": 127,
+      "efficiency_kwh_per_100mi": 56,
+      "battery_kwh": 89,
+      "charging": {
+        "home_max_kw": 10.5,
+        "dcfc_peak_kw": 176,
+        "dcfc_10_to_80_min": 28,
+        "connector_home": "J1772",
+        "connector_dcfc": "CCS1"
+      },
+      "seats": 2,
+      "cargo_behind_row2_cu_ft": 277.7,
+      "cargo_max_cu_ft": 277.7,
+      "frunk_cu_ft": 0,
+      "subtrunk_cu_ft": 0,
+      "row2_includes_subtrunk": null,
+      "towing_lbs": 0,
+      "payload_lbs": 3320,
+      "tax_credit_eligible": false,
+      "assembly_location": "Kansas City Assembly Plant, Claycomo, Missouri",
+      "assembly_country": "USA",
+      "status": "current",
+      "capability_source": "https://californiahvip.org/wp-content/uploads/2026/02/AL-MY-2026-Ford-Transit-Spec-Sheet-251209.pdf",
+      "capability_confidence": "verified",
+      "capability_note": "From Ford Pro's 2026 E-Transit page (captured in the California HVIP spec-sheet PDF, Dec 2025): starting MSRP $53,260 excluding destination; 89 kWh usable battery; 2 seats; low roof cargo volume 277.7 cu ft behind first row (Ford also lists 311.9 cu ft 'maximum cargo volume' for this body); T-350 Low Roof Long 148\" WB RWD GVWR 9,500 lb, max payload 3,320 lb. Range 159 mi is Ford's estimate on EPA test cycles for the low roof (KBB lists 143-159 mi across roofs); the van is over 8,500 lb GVWR so there is no official EPA label. Destination $2,395 is derived (KBB's $55,655 destination-included price minus Ford's $53,260), not a published Ford figure. Charging: 2026 moved to a single onboard charger standard (~10.5 kW per Autoblog/Yahoo search excerpts) with dual onboard chargers optional (2025 figure was 19.2 kW); 176 kW DC peak per Ford via search excerpts; ~28 min 10-80% per KBB. CCS1/J1772 ports; Ford offers a NACS adapter for Supercharger access. Not rated for towing (Ford gives no E-Transit cargo van tow rating). Efficiency is an estimate: 89 kWh / 159 mi. Highway range = 159 x 0.80 (no independent 70-mph test of the 89 kWh US van found; an EV Pulse/InsideEVs-type test of the older 68 kWh pack is not comparable). Many Ford spec pages blocked fetching; several figures come from search excerpts.",
+      "notes": "The most common and cheapest full-size electric work van, built in Missouri and serviced at any Ford commercial dealer. Its roughly 159-mile estimate falls fast in a WV winter, on the interstate, or with a heavy load, so it suits local service routes that return to a charger each night, not long hauls between job sites. It can't tow.",
+      "epa_rated": false
+    },
+    {
+      "id": "mercedes-esprinter-2025",
+      "make": "Mercedes-Benz",
+      "model": "eSprinter",
+      "trim": "2500 Cargo Van Standard Roof 144\" WB, 81 kWh",
+      "year": 2025,
+      "class": "van",
+      "powertrain": "bev",
+      "msrp_usd": 61180,
+      "destination_usd": 2295,
+      "epa_range_mi": 150,
+      "winter_range_mi": 108,
+      "highway_range_mi": 120,
+      "efficiency_kwh_per_100mi": 54,
+      "battery_kwh": 81,
+      "charging": {
+        "home_max_kw": 9.6,
+        "dcfc_peak_kw": 115,
+        "dcfc_10_to_80_min": 32,
+        "connector_home": "J1772",
+        "connector_dcfc": "CCS1"
+      },
+      "seats": 2,
+      "cargo_behind_row2_cu_ft": 319,
+      "cargo_max_cu_ft": 319,
+      "frunk_cu_ft": 0,
+      "subtrunk_cu_ft": 0,
+      "row2_includes_subtrunk": null,
+      "towing_lbs": null,
+      "payload_lbs": 3516,
+      "tax_credit_eligible": false,
+      "assembly_location": "Ladson, South Carolina",
+      "assembly_country": "USA",
+      "status": "current",
+      "capability_source": "https://www.mbvans.com/en/esprinter",
+      "capability_confidence": "approximate",
+      "capability_note": "mbvans.com (fetched 2026-09-27) still labels the current van the 2025 eSprinter Cargo Van and gives US range estimates of 150 mi (81 kWh) to 206 mi (113 kWh). Autoblog lists a 2026 model as a carryover with similar pricing, but no 2026 MSRP was found. PRICE CAVEAT: mbvans.com shows 'Starting at $52,700' with no explanation of what that includes. The $61,180 used here is the published MSRP for the 2025 2500 Standard Roof 144\" (MBUSA launch pricing via Charged EVs, and cars.com). KBB's $63,475 = $61,180 + $2,295 destination, which matches InsideEVs' $2,295 destination figure. Confirm with a dealer. Over 8,500 lb GVWR (up to 9,370 lb), so no EPA label: 150 mi is Mercedes' US estimate. Mercedes' 204 mi figure for this pack is a WLTP city number; don't use it. 81 kWh usable per MBUSA release via Charged EVs. Cargo 319 cu ft and payload up to 3,516 lb for the 144\" standard roof are from MBUSA release excerpts. 115 kW DC peak with ~32 min 10-80% for the 81 kWh pack comes from search excerpts. One dealer page calls 115 kW an 'upgraded' capability and quotes 50 kW as the standard rate, so confirm DC charging equipment on the order. 9.6 kW AC is from dealer pages. No US tow rating found. Seats: cargo vans are commonly 2-seat; cars.com lists 3, likely with the optional passenger bench. Assembly in Ladson, SC is reported by search results and dealer sources, not from a Mercedes spec page. Efficiency is an estimate: 81 kWh / 150 mi. Highway range = 150 x 0.80. InsideEVs' highway test was of the 113 kWh 170\" van, a different configuration.",
+      "notes": "Premium van with the best ride and cabin in the class, built in South Carolina. The short-wheelbase, 81 kWh version is the cheapest way in, but its roughly 150-mile estimate is the lowest here and will be closer to 100 miles on a cold WV morning. The longer 113 kWh version goes farther but costs about $10k more. Check the dealer's current price, because Mercedes' website shows a lower 'starting at' figure than published MSRPs.",
+      "epa_rated": false
+    },
+    {
+      "id": "ram-promaster-ev-2026",
+      "make": "Ram",
+      "model": "ProMaster EV",
+      "trim": "Tradesman 3500 Cargo Van High Roof 159\" WB",
+      "year": 2026,
+      "class": "van",
+      "powertrain": "bev",
+      "msrp_usd": 56495,
+      "destination_usd": 2095,
+      "epa_range_mi": 164,
+      "winter_range_mi": 118,
+      "highway_range_mi": 131,
+      "efficiency_kwh_per_100mi": 67.1,
+      "battery_kwh": 110,
+      "charging": {
+        "home_max_kw": 11,
+        "dcfc_peak_kw": 150,
+        "dcfc_10_to_80_min": null,
+        "connector_home": "J1772",
+        "connector_dcfc": "CCS1"
+      },
+      "seats": 2,
+      "cargo_behind_row2_cu_ft": 463,
+      "cargo_max_cu_ft": 463,
+      "frunk_cu_ft": 0,
+      "subtrunk_cu_ft": 0,
+      "row2_includes_subtrunk": null,
+      "towing_lbs": null,
+      "payload_lbs": 3170,
+      "tax_credit_eligible": false,
+      "assembly_location": "Saltillo Van Assembly Plant, Saltillo, Coahuila, Mexico",
+      "assembly_country": "Mexico",
+      "status": "current",
+      "capability_source": "https://www.ramtrucks.com/electric/ram-promaster-ev/specs.ram-promaster-ev-cargo-van-tradesman-high-roof-159-wb.html",
+      "capability_confidence": "approximate",
+      "capability_note": "Ram's spec page for this configuration (read in a browser on 2026-09-27; it is labeled 2025 MY and the site also has a 2026 tab) gives base price $56,495 excluding destination, destination $2,095, 268 hp FWD, 2 seats, GVWR 9,350 lb, GCWR 12,000 lb, and 463 cu ft cargo volume (160.2\" cargo length). No 2026-specific MSRP was found, so the price is the 2025 figure. Ram's 2026 ProMaster EV pages give 164 mi 'cargo van combined city/hwy' range and a 110 kWh battery. The range is a manufacturer estimate from internal simulation at 50% payload, not an EPA rating (GVWR over 8,500 lb). Ram says 110 kWh but does not state whether that is usable, so efficiency (110/164 = 67.1 kWh/100 mi) is an estimate and may overstate consumption. Payload of 3,170 lb is Ram's 2026 'maximum payload'; the exact figure for this configuration was not confirmed. 11 kW Level 2 and 150 kW DC peak are from Motor1/InsideEVs launch coverage via search excerpts; no published 10-80% time was found. Ram publishes no tow rating for the EV (GCWR is listed, but no trailer rating), so towing is null. Highway range = 164 x 0.80 (no independent 70-mph test found). Assembly at Saltillo, Mexico is from general knowledge of ProMaster production, not a Ram EV spec page. Verify with Ram.",
+      "notes": "The roomiest box of the mainstream vans (463 cu ft, 21-inch load floor) at a price close to the E-Transit. It's front-wheel drive, which helps on wet roads but gives less grip than AWD on steep, snowy WV grades. Ram's 164-mile range estimate assumes a half load, so plan for well under that in winter or at full payload.",
+      "epa_rated": false
+    },
+    {
+      "id": "rivian-commercial-van-500-2025",
+      "make": "Rivian",
+      "model": "Commercial Van",
+      "trim": "Delivery 500",
+      "year": 2025,
+      "class": "van",
+      "powertrain": "bev",
+      "msrp_usd": 79900,
+      "destination_usd": 3000,
+      "epa_range_mi": 161,
+      "winter_range_mi": 116,
+      "highway_range_mi": 129,
+      "efficiency_kwh_per_100mi": 62.1,
+      "battery_kwh": 100,
+      "charging": {
+        "home_max_kw": 11,
+        "dcfc_peak_kw": 100,
+        "dcfc_10_to_80_min": null,
+        "connector_home": "J1772",
+        "connector_dcfc": "CCS1"
+      },
+      "seats": 1,
+      "cargo_behind_row2_cu_ft": 487,
+      "cargo_max_cu_ft": 487,
+      "frunk_cu_ft": 0,
+      "subtrunk_cu_ft": 0,
+      "row2_includes_subtrunk": null,
+      "towing_lbs": null,
+      "payload_lbs": 2663,
+      "tax_credit_eligible": false,
+      "assembly_location": "Normal, Illinois",
+      "assembly_country": "USA",
+      "status": "current",
+      "capability_source": "https://rivian.com/fleet",
+      "capability_confidence": "approximate",
+      "capability_note": "rivian.com/fleet (read 2026-09-27) lists: Delivery 500 starting at $79,900 plus taxes and fees; est. range 161 mi; 487 cu ft; payload 2,663 lb; GVWR 9,500 lb; FWD; interior cargo height 6'10\". The page links a 2025 spec sheet. Rivian calls 161 mi a manufacturer estimate from simulation and EPA test cycles, not an official EPA value. The $3,000 destination is from Green Car Reports ($82,900 including $3,000 destination). 100 kWh usable LFP pack, 11 kW AC, 100 kW DC and CCS1 port come from Green Car Reports and the MY25-26 Rivian reference guide via search excerpts. No 10-80% time or tow rating was found. SEATS: the Rivian van is built as a single-seat (driver-only) delivery van; this was not confirmed on the fleet page, so verify. Sold only to registered businesses (fleets as small as 1 vehicle) through Rivian Fleet Sales. Rivian's FAQ says no personal-use purchases. Rivian has announced larger-battery (~30% more range) and AWD variants, initially for Amazon; they were not on the public fleet page as of this check. Efficiency is an estimate: 100 kWh / 161 mi. Highway range = 161 x 0.80 (no independent test found). Assembly: Rivian's Normal, IL plant (widely reported).",
+      "notes": "A purpose-built walk-in delivery van, the same design Amazon uses, with a huge 487 cu ft box. It's pricey and has less payload than the Ford or Ram. Only registered businesses can buy it, directly from Rivian (no dealers; service at Rivian centers or by mobile service, and the nearest centers to WV are out of state). It makes sense for a WV business running dense package or parts routes, less so for a tradesperson hauling heavy materials.",
+      "epa_rated": false
     }
   ]
 }

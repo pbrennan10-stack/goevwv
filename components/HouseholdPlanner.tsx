@@ -217,7 +217,7 @@ export function HouseholdPlanner({ catalog }: Props) {
   }, [s, hydrated]);
 
   const cand = catalog.evs.find((v) => `ev:${v.id}` === s.candRef);
-  const defaultPrice = cand ? cand.msrp_usd + ((cand as Vehicle & { destination_usd?: number }).destination_usd ?? 0) : 0;
+  const defaultPrice = cand ? cand.msrp_usd + (cand.destination_usd ?? 0) : 0;
   const price = s.priceOverride ?? defaultPrice;
 
   const input: HouseholdInput = {
@@ -538,6 +538,11 @@ function PlanResults({
             Running costs {runDiff >= 0 ? `drop ${usd(runDiff)}` : `rise ${usd(-runDiff)}`} a year; the rest is the price of the vehicle, minus what it&apos;s worth when you&apos;re done.
           </span>
         </p>
+        {plan.unassigned.length > 0 && (
+          <p className="rounded-lg bg-red-50 ring-1 ring-red-200 p-2 text-sm text-red-900">
+            This plan&apos;s total leaves out {plan.unassigned.map((u) => u.label.toLowerCase()).join(" and ")} — no vehicle in it can do {plan.unassigned.length > 1 ? "them" : "it"}. It isn&apos;t a real option as-is.
+          </p>
+        )}
         <p className="text-sm text-ink">
           <strong>Cash up front:</strong> {usd(plan.upfrontCash)}{s.replaces ? " after your trade-in" : ""} (price + WV 6% sales tax + title).
         </p>
@@ -592,7 +597,7 @@ function PlanResults({
               className="accent-emerald-700" aria-label="Resale value after 5 years" />
             <span className="text-xs text-ink-soft">
               {s.retention5yOverride == null
-                ? `Default ${Math.round(defaultRetention * 100)}% from iSeeCars' 2026 study of 5-year-old ${cand.powertrain === "phev" ? "vehicles" : "EVs"} — early EVs lost value fast; newer ones may hold up better. Slide to your own view.`
+                ? `Default ${Math.round(defaultRetention * 100)}% from iSeeCars' 2026 study of 5-year-old ${cand.powertrain === "phev" ? "vehicles" : "EVs"}. Used-EV prices firmed in 2026 as gas prices rose (Cox Automotive: up ~8% year over year this summer), so newer EVs may hold value better than early ones did. Slide to your own view.`
                 : <>Your estimate. <button type="button" className="text-brand hover:underline" onClick={() => set({ retention5yOverride: null })}>Reset to {Math.round(defaultRetention * 100)}%</button></>}
             </span>
           </label>
