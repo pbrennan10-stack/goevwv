@@ -12,6 +12,7 @@ import {
   fit,
   planHousehold,
   retention,
+  usedBreakEvenPrice,
   type Catalog,
   type HouseholdInput,
   type TripInput,
@@ -60,6 +61,10 @@ interface State {
   years: number;
   overrides: Record<string, string>;
   retention5yOverride: number | null;
+  // New gas vehicle to compare against: "auto" = new version of the vehicle
+  // being replaced (when it's still sold), null = no comparison.
+  gasRef: string | null;
+  gasPriceOverride: number | null;
 }
 
 function initialState(cat: Catalog): State {
@@ -79,6 +84,8 @@ function initialState(cat: Catalog): State {
     years: cat.own.ownership_years_default,
     overrides: {},
     retention5yOverride: null,
+    gasRef: "auto",
+    gasPriceOverride: null,
   };
 }
 
@@ -220,9 +227,18 @@ export function HouseholdPlanner({ catalog }: Props) {
   const defaultPrice = cand ? cand.msrp_usd + (cand.destination_usd ?? 0) : 0;
   const price = s.priceOverride ?? defaultPrice;
 
+  const buyableGas = catalog.ice.filter((v) => v.new_status === "current" && v.new_msrp_usd);
+  const replacedRef = s.owned.find((o) => o.key === s.replaces)?.ref;
+  const autoGas = replacedRef && buyableGas.some((v) => `ice:${v.id}` === replacedRef) ? replacedRef : null;
+  const gasRef = s.gasRef === "auto" ? autoGas : s.gasRef;
+  const gasVehicle = gasRef ? buyableGas.find((v) => `ice:${v.id}` === gasRef) : undefined;
+  const gasDefaultPrice = gasVehicle ? (gasVehicle.new_msrp_usd ?? 0) + (gasVehicle.new_destination_usd ?? 0) : 0;
+  const gasPrice = s.gasPriceOverride ?? gasDefaultPrice;
+
   const input: HouseholdInput = {
     owned: s.owned,
     candidate: cand ? { ref: s.candRef, price, replaces: s.replaces } : null,
+    gasAlternative: gasVehicle ? { ref: `ice:${gasVehicle.id}`, price: gasPrice } : null,
     drivers: s.drivers,
     errandsMiPerWeek: s.errandsMiPerWeek,
     errandsPeople: s.errandsPeople,
@@ -439,12 +455,43 @@ export function HouseholdPlanner({ catalog }: Props) {
               </button>
             ))}
           </div>
+
+          <h3 className="text-xl font-bold text-ink pt-2">Compare with a new gas vehicle</h3>
+          <p className="text-ink-muted -mt-2">
+            If it&apos;s time to replace a vehicle anyway, the real question is new EV <em>vs.</em> new gas — not vs. keeping what you have.
+          </p>
+          <Card className="space-y-3">
+            <label className="flex flex-col gap-1">
+              <span className="text-sm font-medium text-ink">New gas vehicle to compare</span>
+              <select value={gasRef ?? ""}
+                onChange={(e) => set({ gasRef: e.target.value || null, gasPriceOverride: null })}
+                className="w-full rounded-lg border border-slate-300 px-3 py-2.5 bg-white">
+                <option value="">No comparison</option>
+                {[...buyableGas].sort((a, b) => `${a.make} ${a.model}`.localeCompare(`${b.make} ${b.model}`)).map((v) => (
+                  <option key={v.id} value={`ice:${v.id}`}>
+                    {v.new_model_year ?? ""} {v.make} {v.model} {trimWithoutModel(v.new_trim ?? v.trim, v.model)} — {usd((v.new_msrp_usd ?? 0) + (v.new_destination_usd ?? 0))}
+                  </option>
+                ))}
+              </select>
+            </label>
+            {gasVehicle && (
+              <div className="grid grid-cols-2 gap-3">
+                <Num label="Price you'd pay" prefix="$" step={250} max={300000} value={gasPrice} onChange={(n) => set({ gasPriceOverride: n })} />
+                <div className="text-sm text-ink-muted self-end pb-2">
+                  {gasVehicle.new_mpg_combined ?? gasVehicle.mpg_combined} mpg (EPA){gasVehicle.price_confidence === "approximate" ? " · price approximate" : ""}
+                </div>
+              </div>
+            )}
+            {s.gasRef === "auto" && !autoGas && replacedRef && (
+              <p className="text-sm text-ink-soft">The vehicle you&apos;re replacing isn&apos;t in our new-vehicle price list — pick a comparable one above.</p>
+            )}
+          </Card>
         </section>
       )}
 
       {/* STEP 4 — YOUR PLAN */}
       {s.step === 3 && (
-        <PlanResults s={s} set={set} result={result} catalog={catalog} price={price} cand={cand}
+        <PlanResults s={s} set={set} result={result} catalog={catalog} price={price} cand={cand} gasVehicle={gasVehicle} input={input}
           defaultRetention={defaultRetention}
           copied={copied}
           onShare={async () => {
@@ -474,8 +521,10 @@ export function HouseholdPlanner({ catalog }: Props) {
 // ---------- Results ----------
 
 function PlanResults({
-  s, set, result, catalog, price, cand, defaultRetention, onShare, copied,
+  s, set, result, catalog, price, cand, gasVehicle, input, defaultRetention, onShare, copied,
 }: {
+  gasVehicle: IceVehicle | undefined;
+  input: HouseholdInput;
   s: State;
   set: (p: Partial<State>) => void;
   result: ReturnType<typeof planHousehold>;
@@ -486,7 +535,7 @@ function PlanResults({
   onShare: () => void;
   copied: boolean;
 }) {
-  const { today, plan, uses, planUnits } = result;
+  const { today, plan, uses, planUnits, gasAlt } = result;
   if (!plan || !cand) return <p className="text-ink-muted">Pick a vehicle to try in step 3.</p>;
   const diff = today.totalOverPeriod - plan.totalOverPeriod;
   const runDiff = today.runningPerYear - plan.runningPerYear;
@@ -502,11 +551,30 @@ function PlanResults({
     set({ overrides: { ...s.overrides, [useId]: next.key } });
   };
 
-  const rows: [string, number, number][] = [
-    ["Gas & charging", sum(today.units.map((u) => u.energy)), sum(plan.units.map((u) => u.energy))],
-    ["Maintenance", sum(today.units.map((u) => u.maintenance)), sum(plan.units.map((u) => u.maintenance))],
-    ["Insurance (estimate)", sum(today.units.map((u) => u.insurance)), sum(plan.units.map((u) => u.insurance))],
-    ["WV registration & EV fees", sum(today.units.map((u) => u.registration)), sum(plan.units.map((u) => u.registration))],
+  // Columns: today, the EV plan, and (optionally) a new gas vehicle instead.
+  const cols = [
+    { label: "Keep what you have", short: "Today", r: today },
+    { label: `New ${cand.model}`, short: cand.model, r: plan },
+    ...(gasAlt && gasVehicle ? [{ label: `New ${gasVehicle.model}`, short: gasVehicle.model, r: gasAlt }] : []),
+  ];
+  const rows: [string, (r: typeof today) => number][] = [
+    ["Gas & charging", (r) => sum(r.units.map((u) => u.energy))],
+    ["Maintenance", (r) => sum(r.units.map((u) => u.maintenance))],
+    ["Insurance (estimate)", (r) => sum(r.units.map((u) => u.insurance))],
+    ["WV registration & EV fees", (r) => sum(r.units.map((u) => u.registration))],
+  ];
+  const vsGas = gasAlt ? gasAlt.totalOverPeriod - plan.totalOverPeriod : null;
+  const runVsGas = gasAlt ? gasAlt.runningPerYear - plan.runningPerYear : null;
+  // Years until the EV's running-cost savings cover its extra up-front cost.
+  const priceGap = gasAlt ? plan.upfrontCash - gasAlt.upfrontCash : null;
+  const breakEvenYears =
+    priceGap != null && runVsGas != null && runVsGas > 0 && priceGap > 0 ? priceGap / runVsGas : null;
+  // What a USED one of the same model would need to cost to tie each option.
+  const usedVsGas = gasAlt && gasVehicle ? usedBreakEvenPrice(plan, gasAlt.totalOverPeriod, input, catalog) : null;
+  const usedVsToday = usedBreakEvenPrice(plan, today.totalOverPeriod, input, catalog);
+  const usedTargets = [
+    ...(gasAlt && gasVehicle ? [{ label: `beat a new ${gasVehicle.model}`, p: usedVsGas }] : []),
+    { label: "beat keeping what you have", p: usedVsToday },
   ];
 
   return (
@@ -520,20 +588,33 @@ function PlanResults({
 
       <Card className="bg-brand-bg ring-emerald-200 space-y-3">
         <p className="text-sm text-ink-muted">Whole-household cost over {Y} years — buying, owning, and driving everything in your driveway.</p>
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <div className="text-xs text-ink-soft">Today</div>
-            <div className="text-2xl font-extrabold text-ink">{usd(today.totalOverPeriod)}</div>
-            <div className="text-xs text-ink-soft">{today.units.map((u) => u.unit.short).join(" + ")}</div>
-          </div>
-          <div>
-            <div className="text-xs text-ink-soft">With the {cand.model}</div>
-            <div className="text-2xl font-extrabold text-ink">{usd(plan.totalOverPeriod)}</div>
-            <div className="text-xs text-ink-soft">{plan.units.map((u) => u.unit.short).join(" + ")}</div>
-          </div>
+        <div className={`grid gap-3 ${cols.length === 3 ? "grid-cols-3" : "grid-cols-2"}`}>
+          {cols.map((c) => (
+            <div key={c.label} className="min-w-0">
+              <div className="text-xs text-ink-soft">{c.label}</div>
+              <div className={`${cols.length === 3 ? "text-lg sm:text-2xl" : "text-2xl"} font-extrabold text-ink`}>{usd(c.r.totalOverPeriod)}</div>
+              <div className="text-xs text-ink-soft break-words">{c.r.units.map((u) => u.unit.short).join(" + ")}</div>
+            </div>
+          ))}
         </div>
-        <p className={`text-lg font-bold ${diff >= 0 ? "text-emerald-800" : "text-amber-800"}`}>
-          {diff >= 0 ? `Saves about ${usd(diff)} over ${Y} years` : `Costs about ${usd(-diff)} more over ${Y} years`}
+        {vsGas != null && runVsGas != null && gasVehicle && (
+          <p className={`text-lg font-bold ${vsGas >= 0 ? "text-emerald-800" : "text-amber-800"}`}>
+            vs. a new {gasVehicle.model}: the {cand.model}{" "}
+            {vsGas >= 0 ? `saves about ${usd(vsGas)}` : `costs about ${usd(-vsGas)} more`} over {Y} years
+            <span className="block text-sm font-medium text-ink-muted">
+              Running costs are {usd(Math.abs(runVsGas))} a year {runVsGas >= 0 ? "lower" : "higher"}
+              {priceGap != null && priceGap > 0 ? `; it costs ${usd(priceGap)} more up front` : priceGap != null && priceGap < 0 ? `, and it costs ${usd(-priceGap)} less up front` : ""}
+              {breakEvenYears != null ? ` — the savings cover that in about ${breakEvenYears < 1 ? "a year" : `${Math.round(breakEvenYears * 10) / 10} years`}` : ""}.
+              {" "}
+              {vsGas < 0 && runVsGas > 0
+                ? `But it's expected to be worth less when you sell it, and that outweighs the savings over ${Y} years — try the resale setting below.`
+                : "Totals include each vehicle's expected resale value."}
+            </span>
+          </p>
+        )}
+        <p className={`${vsGas != null ? "text-base" : "text-lg"} font-bold ${diff >= 0 ? "text-emerald-800" : "text-amber-800"}`}>
+          {vsGas != null ? "vs. keeping what you have: " : ""}
+          {diff >= 0 ? `saves about ${usd(diff)} over ${Y} years` : `costs about ${usd(-diff)} more over ${Y} years`}
           <span className="block text-sm font-medium text-ink-muted">
             Running costs {runDiff >= 0 ? `drop ${usd(runDiff)}` : `rise ${usd(-runDiff)}`} a year; the rest is the price of the vehicle, minus what it&apos;s worth when you&apos;re done.
           </span>
@@ -548,6 +629,39 @@ function PlanResults({
         </p>
       </Card>
 
+      {/* Used break-even */}
+      <Card className="space-y-2">
+        <h3 className="font-bold text-ink">Buying a used {cand.model} instead?</h3>
+        <p className="text-sm text-ink-muted">
+          We don&apos;t track used prices — they vary too much by year, miles, and battery health. Instead, here&apos;s
+          what a used one would need to cost to come out ahead over {Y} years:
+        </p>
+        <ul className="space-y-1.5">
+          {usedTargets.map((t) => (
+            <li key={t.label} className="flex items-baseline justify-between gap-3 border-b border-slate-100 pb-1.5">
+              <span className="text-sm text-ink">To {t.label}</span>
+              <span className="font-bold text-ink whitespace-nowrap">
+                {t.p == null
+                  ? "not possible"
+                  : t.p >= price
+                    ? "any price below new"
+                    : `${usd(Math.floor(t.p / 500) * 500)} or less`}
+              </span>
+            </li>
+          ))}
+        </ul>
+        <p className="text-xs text-ink-soft">
+          New, it&apos;s {usd(price)}.
+          {usedTargets.some((t) => t.p != null && t.p >= price)
+            ? ` A new ${cand.model} already comes out ahead there, so a used one priced below new does too.`
+            : ""}
+          {" "}Assumes a used one drives and charges like new and loses value at the same rate as a new one
+          (~{Math.round((1 - Math.pow(retain, 1 / 5)) * 100)}% a year, from the resale setting below), with WV sales tax after trade-in.
+          Check the battery&apos;s health report before you buy — range fades slowly with age, and most EV batteries carry an
+          8-year/100,000-mile warranty.
+        </p>
+      </Card>
+
       {/* Breakdown */}
       <Card>
         <h3 className="font-bold text-ink mb-2">Where the money goes</h3>
@@ -556,33 +670,32 @@ function PlanResults({
             <thead>
               <tr className="text-left text-ink-soft border-b border-slate-200">
                 <th className="py-2 pr-3 font-medium">Per year</th>
-                <th className="py-2 pr-3 font-medium text-right">Today</th>
-                <th className="py-2 font-medium text-right">With {cand.model}</th>
+                {cols.map((c) => <th key={c.label} className="py-2 pl-2 font-medium text-right">{c.short}</th>)}
               </tr>
             </thead>
             <tbody>
-              {rows.map(([label, a, b]) => (
+              {rows.map(([label, get]) => (
                 <tr key={label} className="border-b border-slate-100">
                   <td className="py-2 pr-3">{label}</td>
-                  <td className="py-2 pr-3 text-right">{usd(a)}</td>
-                  <td className="py-2 text-right">{usd(b)}</td>
+                  {cols.map((c) => <td key={c.label} className="py-2 pl-2 text-right">{usd(get(c.r))}</td>)}
                 </tr>
               ))}
               <tr className="border-b border-slate-200 font-semibold">
                 <td className="py-2 pr-3">Running costs</td>
-                <td className="py-2 pr-3 text-right">{usd(today.runningPerYear)}</td>
-                <td className="py-2 text-right">{usd(plan.runningPerYear)}</td>
+                {cols.map((c) => <td key={c.label} className="py-2 pl-2 text-right">{usd(c.r.runningPerYear)}</td>)}
               </tr>
               <tr>
                 <td className="py-2 pr-3">Lost value over {Y} years<span className="block text-xs text-ink-soft">buying new, and what your cars lose as they age</span></td>
-                <td className="py-2 pr-3 text-right align-top">{usd(today.capitalOverPeriod)}</td>
-                <td className="py-2 text-right align-top">{usd(plan.capitalOverPeriod)}</td>
+                {cols.map((c) => <td key={c.label} className="py-2 pl-2 text-right align-top">{usd(c.r.capitalOverPeriod)}</td>)}
               </tr>
             </tbody>
           </table>
         </div>
         <ul className="mt-3 space-y-1 text-xs text-ink-soft">
           {plan.units.map((u) => <li key={u.unit.key}><strong className="text-ink-muted">{u.unit.short}:</strong> {u.capitalNote}</li>)}
+          {gasAlt?.units.filter((u) => u.unit.isNew).map((u) => (
+            <li key="gas-new"><strong className="text-ink-muted">{u.unit.short} (new, instead):</strong> {u.capitalNote}</li>
+          ))}
           {s.replaces && today.units.filter((u) => u.unit.key === s.replaces).map((u) => (
             <li key="sold"><strong className="text-ink-muted">{u.unit.short} (if kept):</strong> {u.capitalNote}</li>
           ))}
@@ -685,12 +798,17 @@ function PlanResults({
           <li>Selling a car you own isn&apos;t free money — it&apos;s value you&apos;d otherwise watch shrink. So &ldquo;today&rdquo; includes what your current cars lose over {Y} years.</li>
           <li>Charging uses your utility&apos;s marginal rate with WV winter losses; road-trip miles beyond the first charge use public fast chargers at ${catalog.fed.calculation_notes.dcfc_rate_per_kwh?.current.toFixed(2) ?? "0.55"}/kWh. Towing cuts EV range about 45%.</li>
           <li>Insurance is an estimate for a 35–45-year-old WV driver with a clean record; your quote will differ. Financing isn&apos;t included.</li>
-          <li>Comparing a new EV with keeping an older car usually favors keeping the older car — new vehicles lose value fastest. The fairer question for many families is which vehicle to buy <em>when</em> it&apos;s time to replace one.</li>
+          <li>Comparing a new EV with keeping an older car usually favors keeping the older car — new vehicles lose value fastest. That&apos;s why we also compare against buying a <em>new gas vehicle</em>: the fairer question when it&apos;s time to replace one. The gas vehicle uses its current EPA mpg, MSRP + destination, and all-vehicle resale value (trucks: truck resale value).</li>
         </ul>
         <p className="mt-3">Every source is on <Link href="/state-of-the-data" className="text-brand hover:underline">State of the Data</Link>.</p>
       </details>
     </section>
   );
+}
+
+// Some trim names repeat the model ("Q5 Premium" on an Audi Q5).
+function trimWithoutModel(trim: string, model: string) {
+  return trim.toLowerCase().startsWith(`${model.toLowerCase()} `) ? trim.slice(model.length + 1) : trim;
 }
 
 function sum(xs: number[]) {

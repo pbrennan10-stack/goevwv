@@ -42,7 +42,7 @@ export interface OwnedInput {
 }
 
 export interface CandidateInput {
-  ref: string;            // "ev:<id>"
+  ref: string;            // "ev:<id>" (or "ice:<id>" for a new gas alternative)
   price: number;          // what you'd pay before tax (MSRP + destination by default)
   replaces: string | null; // owned key it replaces, or null = add as another vehicle
 }
@@ -66,6 +66,8 @@ export interface TripInput {
 export interface HouseholdInput {
   owned: OwnedInput[];
   candidate: CandidateInput | null;
+  // Optional: the NEW gas vehicle you'd otherwise buy (same "replaces").
+  gasAlternative: { ref: string; price: number } | null;
   drivers: DriverInput[];
   errandsMiPerWeek: number;
   errandsPeople: number;
@@ -122,12 +124,15 @@ export function resolveUnit(ref: string, key: string, cat: Catalog, mpgOverride?
     const v = cat.ice.find((x) => x.id === id);
     if (!v) return null;
     const cap: Capability = { seats: v.seats ?? 5, ...v } as Capability;
+    const year = isNew && v.new_model_year ? v.new_model_year : v.year;
+    const trim = isNew && v.new_trim ? v.new_trim : v.trim;
+    const baseMpg = isNew && v.new_mpg_combined ? v.new_mpg_combined : v.mpg_combined;
     return {
       key, isNew, ice: v, cap, cls: v.class,
-      name: `${v.year} ${v.make} ${v.model}${v.trim ? ` ${v.trim}` : ""}`,
+      name: `${year} ${v.make} ${v.model}${trim ? ` ${trim}` : ""}`,
       short: v.model,
       pt: "gas",
-      mpg: mpgOverride && mpgOverride > 0 ? mpgOverride : v.mpg_combined,
+      mpg: mpgOverride && mpgOverride > 0 ? mpgOverride : baseMpg,
     };
   }
   return null;
@@ -375,11 +380,13 @@ export function runScenario(
     let capitalOverPeriod = 0;
     let capitalNote = "";
     if (unit.isNew) {
-      const price = opts.candidatePrice ?? unit.ev?.msrp_usd ?? 0;
+      const price = opts.candidatePrice ?? newVehiclePrice(unit);
       const tradeIn = opts.soldKey ? opts.owned.find((o) => o.key === opts.soldKey)?.valueNow ?? 0 : 0;
       const taxBase = own.wv_purchase_tax.trade_in_reduces_base ? Math.max(0, price - tradeIn) : price;
       const tax = taxBase * own.wv_purchase_tax.rate + own.wv_purchase_tax.title_fee_usd;
-      const r5 = h.retention5yOverride;
+      // The resale slider is the user's view of the EV; a gas alternative
+      // always uses the sourced segment figure.
+      const r5 = unit.pt !== "gas" ? h.retention5yOverride : null;
       const resale = price * (r5 != null ? Math.pow(r5, Y / 5) : retention(unit.pt, unit.cls, Y, own));
       capitalOverPeriod = price + tax - resale;
       upfrontCash = price + tax - tradeIn;
@@ -410,11 +417,56 @@ export function runScenario(
   };
 }
 
+// "What would a USED one need to cost?" Given a scenario with a new vehicle,
+// solve for the purchase price at which buying that model used makes the
+// scenario's total equal `targetTotal` (e.g. the new-gas or keep-today total).
+// A used vehicle runs the same (efficiency, fees, maintenance) and loses value
+// at the SAME yearly rate as a new one of its type (the retention curve is
+// geometric, so a used EV keeps r5^(Y/5) of its price just like a new one —
+// including the user's resale slider). Using a gentler rate for used than new
+// would let a "used" one priced above new come out ahead, which is nonsense.
+// WV sales tax applies to price minus trade-in. Insurance is left at the
+// new-vehicle estimate (conservative). Returns null when even a free vehicle
+// wouldn't get there.
+export function usedBreakEvenPrice(
+  scenario: ScenarioResult,
+  targetTotal: number,
+  h: HouseholdInput,
+  cat: Catalog,
+): number | null {
+  const unit = scenario.units.find((u) => u.unit.isNew);
+  if (!unit) return null;
+  const fixed = scenario.totalOverPeriod - unit.capitalOverPeriod; // everything except this vehicle's price/resale
+  const r5 = unit.unit.pt !== "gas" && h.retention5yOverride != null
+    ? h.retention5yOverride
+    : retention(unit.unit.pt, unit.unit.cls, 5, cat.own);
+  const keep = Math.pow(r5, h.years / 5); // share of price left at the end
+  const { rate, title_fee_usd: title, trade_in_reduces_base } = cat.own.wv_purchase_tax;
+  const sold = h.candidate?.replaces;
+  const tradeIn = sold ? h.owned.find((o) => o.key === sold)?.valueNow ?? 0 : 0;
+  const budget = targetTotal - fixed - title; // what price + tax − resale may add up to
+  // capital(P) = P + rate·(P − tradeIn) − keep·P   when P ≥ tradeIn (or no trade-in credit)
+  let p = trade_in_reduces_base
+    ? (budget + rate * tradeIn) / (1 + rate - keep)
+    : budget / (1 + rate - keep);
+  if (trade_in_reduces_base && p < tradeIn) p = budget / (1 - keep); // taxable base floors at 0
+  return p > 0 ? p : null;
+}
+
+// Default price of a new vehicle: MSRP + destination when known.
+export function newVehiclePrice(u: Unit): number {
+  if (u.ev) return u.ev.msrp_usd + (u.ev.destination_usd ?? 0);
+  if (u.ice) return (u.ice.new_msrp_usd ?? 0) + (u.ice.new_destination_usd ?? 0);
+  return 0;
+}
+
 export interface PlanResult {
   uses: Use[];
   today: ScenarioResult;
   plan: ScenarioResult | null;
   planUnits: Unit[];
+  gasAlt: ScenarioResult | null;
+  gasAltUnits: Unit[];
 }
 
 export function planHousehold(h: HouseholdInput, cat: Catalog): PlanResult {
@@ -425,13 +477,18 @@ export function planHousehold(h: HouseholdInput, cat: Catalog): PlanResult {
   const today = runScenario(ownedUnits, uses, h, cat, {
     overrides: {}, owned: h.owned, soldKey: null, candidatePrice: null,
   });
-  if (!h.candidate) return { uses, today, plan: null, planUnits: ownedUnits };
-  const cand = resolveUnit(h.candidate.ref, "new", cat, undefined, true);
-  if (!cand) return { uses, today, plan: null, planUnits: ownedUnits };
-  const sold = h.candidate.replaces;
-  const planUnits = [...ownedUnits.filter((u) => u.key !== sold), cand];
-  const plan = runScenario(planUnits, uses, h, cat, {
-    overrides: h.overrides, owned: h.owned, soldKey: sold, candidatePrice: h.candidate.price,
-  });
-  return { uses, today, plan, planUnits };
+  const sold = h.candidate?.replaces ?? null;
+  const withNew = (ref: string, price: number, overrides: Record<string, string>) => {
+    const unit = resolveUnit(ref, "new", cat, undefined, true);
+    if (!unit) return null;
+    const units = [...ownedUnits.filter((u) => u.key !== sold), unit];
+    return { units, result: runScenario(units, uses, h, cat, { overrides, owned: h.owned, soldKey: sold, candidatePrice: price }) };
+  };
+  const ev = h.candidate ? withNew(h.candidate.ref, h.candidate.price, h.overrides) : null;
+  const gas = h.candidate && h.gasAlternative ? withNew(h.gasAlternative.ref, h.gasAlternative.price, {}) : null;
+  return {
+    uses, today,
+    plan: ev?.result ?? null, planUnits: ev?.units ?? ownedUnits,
+    gasAlt: gas?.result ?? null, gasAltUnits: gas?.units ?? [],
+  };
 }

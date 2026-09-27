@@ -236,6 +236,17 @@ export interface IceVehicleMaintenance {
 }
 
 export interface IceVehicle extends Partial<Capability> {
+  // The same vehicle bought NEW today (current model year), for the planner's
+  // "new EV vs new gas" comparison. Absent/discontinued = can't be bought new.
+  new_model_year?: number;
+  new_trim?: string;
+  new_msrp_usd?: number | null;
+  new_destination_usd?: number | null;
+  new_mpg_combined?: number | null;
+  new_status?: "current" | "discontinued";
+  price_source?: string;
+  price_confidence?: "verified" | "approximate";
+  price_note?: string;
   id: string;
   year: number;
   make: string;

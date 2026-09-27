@@ -155,7 +155,8 @@ The first-time droplet setup is in `docs/REBUILD_RUNBOOK.md`. The bootstrap scri
 - [ ] Set up UptimeRobot (free, 5-min ping to https://goevwv.com)
 - [x] v1.1: charger map using OpenChargeMap API (free key required) — live fetch + committed snapshot fallback
 - [x] Household planner at /plan (Sept 2026): multiple vehicles/drivers/trips, auto-assignment with override, trip fit (seats, luggage, towing, charging stops), purchase price + WV sales tax + resale over an ownership period
-- [ ] Planner: compare against buying a new GAS vehicle (needs MSRPs in ice_vehicles.json); financing (APR reference in ownership.yaml); fold /calculator into /plan once it covers route/elevation inputs
+- [x] Planner: new EV vs new gas comparison + used-EV break-even price (Sept 2026)
+- [ ] Planner: financing (APR reference in ownership.yaml); fold /calculator into /plan once it covers route/elevation inputs
 - [ ] Road trips modeled separately at interstate speed; utility lookup by address; contact/feedback link
 - [ ] Move the repo out of OneDrive (or pin it "Always keep on this device") — OneDrive turned .git files into online-only placeholders in Sept 2026 and broke commits
 - [ ] v1.1: dealer/installer directory — curated YAML + map overlay
@@ -171,7 +172,7 @@ The first-time droplet setup is in `docs/REBUILD_RUNBOOK.md`. The bootstrap scri
 
 ## Household planner (/plan)
 
-Engine in `lib/household.ts` reuses `lib/calc.ts` energy/DCFC/insurance helpers — change per-mile math there, not in the planner. Total over N years = running costs × N + lost value (new vehicle: price + WV 6% sales tax after trade-in + title − resale via `retention_5yr` or the user's slider; kept vehicles: `older_vehicle_annual_depreciation`). The sold vehicle's would-be depreciation stays in the "today" scenario, which keeps the comparison fair. Each use goes to the cheapest vehicle whose `fit()` isn't "no". `scripts/smoke-household.ts` is a quick sanity run (see its header).
+Engine in `lib/household.ts` reuses `lib/calc.ts` energy/DCFC/insurance helpers — change per-mile math there, not in the planner. Total over N years = running costs × N + lost value (new vehicle: price + WV 6% sales tax after trade-in + title − resale via `retention_5yr` or the user's slider; kept vehicles: `older_vehicle_annual_depreciation`). The sold vehicle's would-be depreciation stays in the "today" scenario, which keeps the comparison fair. Three scenarios: keep today, new EV, and new gas (default = new version of the replaced vehicle; prices in `ice_vehicles.json` `new_*` fields). `usedBreakEvenPrice()` solves for the used-EV price that ties another scenario (used = same running costs, depreciates at the older-vehicle rate); we deliberately do not track used prices. Each use goes to the cheapest vehicle whose `fit()` isn't "no". `scripts/smoke-household.ts` is a quick sanity run (see its header).
 
 ## Principles
 
