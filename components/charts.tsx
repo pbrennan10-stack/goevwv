@@ -18,7 +18,7 @@ const fmt$ = (n: number) => `$${Math.round(n).toLocaleString("en-US")}`;
 // ---------- Horizontal bars (one value per row) ----------
 
 export interface BarRow {
-  label: string;
+  label: React.ReactNode;
   value: number;
   color?: string;
   valueLabel?: string;   // defaults to $value
@@ -28,14 +28,18 @@ export interface BarRow {
 export function HBars({ rows, ariaLabel, max }: { rows: BarRow[]; ariaLabel: string; max?: number }) {
   const scale = max ?? Math.max(1, ...rows.map((r) => r.value));
   return (
-    <div role="img" aria-label={ariaLabel} className="chart space-y-3">
-      {rows.map((r) => (
-        <div key={r.label}>
+    // Labels and values are real text (so tap-to-explain terms inside them
+    // work); the bars themselves are decorative, and a hidden sentence
+    // summarizes the chart for screen readers.
+    <div className="chart space-y-3">
+      <p className="sr-only">{ariaLabel}</p>
+      {rows.map((r, i) => (
+        <div key={i}>
           <div className="flex items-baseline justify-between gap-3 text-sm">
             <span className="text-ink font-medium">{r.label}</span>
             <span className="text-ink font-bold tabular-nums">{r.valueLabel ?? fmt$(r.value)}</span>
           </div>
-          <div className="mt-1 h-4 rounded-full bg-slate-100 overflow-hidden">
+          <div aria-hidden className="mt-1 h-4 rounded-full bg-slate-100 overflow-hidden">
             <div
               className="h-full rounded-full motion-safe:transition-[width] motion-safe:duration-500"
               style={{ width: `${Math.max(1, (r.value / scale) * 100)}%`, background: r.color ?? CHART_COLORS.neutral }}

@@ -1,0 +1,85 @@
+{
+  "_meta": "Plain-English definitions for tap-to-explain terms (components/Term.tsx) and /learn/glossary. Keep each 'short' under ~30 words and free of numbers that go stale.",
+  "terms": {
+    "ev": {
+      "term": "EV",
+      "short": "Electric vehicle. On this site it covers fully electric cars and plug-in hybrids, unless we say 'fully electric'."
+    },
+    "bev": {
+      "term": "Fully electric (BEV)",
+      "short": "Runs only on a battery you charge by plugging in. No gas engine, no gas tank, no oil changes."
+    },
+    "phev": {
+      "term": "Plug-in hybrid (PHEV)",
+      "short": "A battery you plug in for roughly 20–50 electric miles, then a gas engine takes over. Saves money only if you actually plug it in."
+    },
+    "hybrid": {
+      "term": "Hybrid",
+      "short": "A gas car with a small battery that helps the engine and recharges itself. It never plugs in (a Prius, or today's Camry)."
+    },
+    "fast-charger": {
+      "term": "Fast charger (DC fast charging)",
+      "short": "Public high-power chargers, mostly along highways. A typical stop takes the battery from about 10% to 80% in 20–45 minutes, but costs several times home electricity."
+    },
+    "level1": {
+      "term": "Regular outlet (Level 1)",
+      "short": "An ordinary 120-volt household outlet and the cord that comes with the car. Slow — about 40 miles overnight — but it's free and enough for many commutes."
+    },
+    "level2": {
+      "term": "Level 2 charger",
+      "short": "A 240-volt charger (the kind of outlet a clothes dryer uses), installed by an electrician. Refills most EVs overnight."
+    },
+    "kwh": {
+      "term": "kWh (kilowatt-hour)",
+      "short": "The unit your power bill charges for — electricity's version of a gallon. Most EVs go about 3 miles on one."
+    },
+    "cents-per-kwh": {
+      "term": "¢ per kWh",
+      "short": "What your utility charges for one kWh of electricity — like the price per gallon at the pump."
+    },
+    "range": {
+      "term": "Range (EPA)",
+      "short": "How far an EV goes on a full charge in the government's standard test. Real trips vary with speed, hills, and weather."
+    },
+    "winter-range": {
+      "term": "WV winter range",
+      "short": "Our estimate for a freezing West Virginia day, when heating the cabin and a cold battery cut range by roughly a quarter."
+    },
+    "highway-range": {
+      "term": "Highway range (70 mph)",
+      "short": "How far it goes at a steady 70 mph in mild weather. Lower than the EPA number because wind resistance rises with speed."
+    },
+    "efficiency": {
+      "term": "Efficiency (kWh per 100 miles)",
+      "short": "How much electricity it uses to go 100 miles. Lower is better — the EV version of higher mpg."
+    },
+    "battery": {
+      "term": "Battery size (kWh)",
+      "short": "How much energy the battery holds — the size of the 'tank.' Bigger usually means more range, and a longer charge."
+    },
+    "tou": {
+      "term": "Off-peak EV rate (time-of-use)",
+      "short": "A utility rate that charges less for electricity at night and on weekends, in exchange for charging then. Some require a separate EV meter."
+    },
+    "resale": {
+      "term": "Resale value",
+      "short": "What the car is worth when you sell it, as a share of its sticker price. Early EVs lost value fast; nobody knows yet how today's will do, so we show a range."
+    },
+    "msrp": {
+      "term": "Sticker price (MSRP)",
+      "short": "The manufacturer's suggested price. Dealers often sell for less (or more). Destination is the delivery fee added to every new car."
+    },
+    "frunk": {
+      "term": "Frunk / sub-trunk",
+      "short": "Extra storage in an EV: a front trunk where a gas engine would be, and often a hidden bin under the rear cargo floor."
+    },
+    "one-pedal": {
+      "term": "Regenerative braking",
+      "short": "Lifting off the pedal slows the car by turning the motor into a generator, putting energy back in the battery — so brake pads last much longer."
+    },
+    "wv-ev-fee": {
+      "term": "WV EV fee",
+      "short": "West Virginia charges fully electric cars an extra yearly registration fee (less for plug-in hybrids) because they pay no gas tax."
+    }
+  }
+}

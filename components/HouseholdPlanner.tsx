@@ -8,6 +8,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { CHART_COLORS, StackedBars } from "@/components/charts";
+import { Term } from "@/components/Term";
 import { ANNUAL_WINTER_KWH_MULTIPLIER, dcfcStopMiles } from "@/lib/calc";
 import { cargoSeatsUpLabel } from "@/lib/capability";
 import {
@@ -151,6 +152,8 @@ export function HouseholdPlanner({ catalog }: Props) {
   const [s, setS] = useState<PlanState>(() => initialState(catalog));
   const [hydrated, setHydrated] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [fromShare, setFromShare] = useState(false);
+  const [fromQuick, setFromQuick] = useState(false);
   const set = (patch: Partial<PlanState>) => setS((prev) => ({ ...prev, ...patch }));
 
   useEffect(() => {
@@ -158,7 +161,10 @@ export function HouseholdPlanner({ catalog }: Props) {
     const q = params.get("h");
     const loaded = q ? sanitizeLoaded(decodeState(q), catalog) : null;
     const evParam = params.get("ev");
-    if (loaded) setS((prev) => ({ ...prev, ...loaded, step: 3 }));
+    if (loaded) {
+      setS((prev) => ({ ...prev, ...loaded, step: 3 }));
+      if (params.get("from") === "quick") setFromQuick(true); else setFromShare(true);
+    }
     else if (evParam && catalog.evs.some((v) => v.id === evParam)) setS((prev) => ({ ...prev, candRef: `ev:${evParam}` }));
     setHydrated(true);
   }, [catalog]);
@@ -389,7 +395,7 @@ export function HouseholdPlanner({ catalog }: Props) {
                 {CHARGING_OPTIONS.map((c) => <option key={c.v} value={c.v}>{c.label}</option>)}
               </select>
               <span className="text-xs text-ink-soft">
-                A regular outlet adds ~40 miles overnight — enough for many commutes. A Level 2 charger costs ~${catalog.own.home_charging_setup.level2_installed_usd.toLocaleString("en-US")} installed
+                A <Term id="level1">regular outlet</Term> adds ~40 miles overnight — enough for many commutes. A <Term id="level2">Level 2 charger</Term> costs ~${catalog.own.home_charging_setup.level2_installed_usd.toLocaleString("en-US")} installed
                 {utility?.rebates.some((r) => r.type === "l2_charger") ? ` (${utility.name} gives a rebate)` : ""}. Renters without a place to plug in pay public charging prices.
               </span>
             </label>
@@ -478,12 +484,19 @@ export function HouseholdPlanner({ catalog }: Props) {
 
       {/* STEP 4 — YOUR PLAN */}
       {s.step === 3 && (
-        <PlanResults s={s} set={set} result={result} catalog={catalog} price={price} cand={cand} gasVehicle={gasVehicle} input={input} tips={tips}
+        <PlanResults fromShare={fromShare} fromQuick={fromQuick} onStartOwn={() => { setS(initialState(catalog)); setFromShare(false); window.history.replaceState(null, "", window.location.pathname); window.scrollTo({ top: 0 }); }} s={s} set={set} result={result} catalog={catalog} price={price} cand={cand} gasVehicle={gasVehicle} input={input} tips={tips}
           defaultRetention={defaultRetention}
           copied={copied}
           onShare={async () => {
             const url = window.location.href;
-            if (navigator.share) { try { await navigator.share({ title: "Our household EV plan", url }); } catch { /* closed */ } return; }
+            // Share the result, not just a link.
+            const p = result.plan, other = result.gasAlt ?? result.today;
+            const otherName = result.gasAlt && gasVehicle ? `a new ${gasVehicle.model}` : "keeping our current car";
+            const d = p ? other.totalOverPeriod - p.totalOverPeriod : 0;
+            const text = p && cand
+              ? `Our household plan: a ${cand.model} ${d >= 0 ? `saves about ${Math.round(d).toLocaleString("en-US")}` : `costs about ${Math.round(-d).toLocaleString("en-US")} more`} vs ${otherName} over ${s.years} years in WV, purchase price and resale included. Try yours:`
+              : "Our household EV plan for West Virginia:";
+            if (navigator.share) { try { await navigator.share({ title: "Our household EV plan", text, url }); } catch { /* closed */ } return; }
             try { await navigator.clipboard.writeText(url); setCopied(true); setTimeout(() => setCopied(false), 1800); } catch { window.prompt("Copy this link:", url); }
           }} />
       )}
@@ -508,8 +521,11 @@ export function HouseholdPlanner({ catalog }: Props) {
 // ---------- Results ----------
 
 function PlanResults({
-  s, set, result, catalog, price, cand, gasVehicle, input, tips, defaultRetention, onShare, copied,
+  s, set, result, catalog, price, cand, gasVehicle, input, tips, defaultRetention, onShare, copied, fromShare, fromQuick, onStartOwn,
 }: {
+  fromShare: boolean;
+  fromQuick: boolean;
+  onStartOwn: () => void;
   gasVehicle: IceVehicle | undefined;
   input: HouseholdInput;
   tips: { retention5: number | null; gasPrice: number | null } | null;
@@ -580,11 +596,23 @@ function PlanResults({
   return (
     <section className="space-y-5">
       <div className="flex items-start justify-between gap-3">
-        <h2 className="text-2xl font-bold text-ink">Your household plan</h2>
+        <h2 className="text-2xl font-bold text-ink">{fromShare ? "A household plan someone shared" : "Your household plan"}</h2>
         <button type="button" onClick={onShare} className="shrink-0 min-h-11 px-3 text-sm font-semibold text-brand-dark hover:underline">
           {copied ? "Link copied ✓" : "Share plan"}
         </button>
       </div>
+      {fromQuick && (
+        <p className="rounded-xl bg-brand-bg ring-1 ring-emerald-200 p-3 text-sm text-emerald-900">
+          Filled in from your 4 answers, with a typical WV household for the rest. Use the steps above to change anything —
+          your car&apos;s real value and mileage make the biggest difference.
+        </p>
+      )}
+      {fromShare && (
+        <div className="rounded-xl bg-sky-50 ring-1 ring-sky-200 p-3 text-sm text-sky-900 flex flex-wrap items-center justify-between gap-2">
+          <span>This is someone else&apos;s driveway and driving. Your answer depends on yours.</span>
+          <button type="button" onClick={onStartOwn} className="min-h-10 rounded-lg bg-white ring-1 ring-sky-300 px-3 font-semibold">Start your own plan →</button>
+        </div>
+      )}
 
       <Card className="bg-brand-bg ring-emerald-200 space-y-3">
         <p className="text-sm text-ink-muted">Whole-household cost over {Y} years — buying, owning, and driving everything in your driveway.</p>
@@ -632,7 +660,7 @@ function PlanResults({
         )}
         <div className="rounded-xl bg-white/70 ring-1 ring-emerald-200 p-3 space-y-2">
           <p className="text-sm font-semibold text-ink">
-            {cand.model} vs. {otherLabel} — it depends on resale value
+            {cand.model} vs. {otherLabel} — it depends on <Term id="resale">resale value</Term>
           </p>
           <ul className="grid grid-cols-3 gap-2 text-center">
             {scenarios.map((sc) => (

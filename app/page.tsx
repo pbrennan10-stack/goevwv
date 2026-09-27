@@ -3,6 +3,7 @@ import { AiDataNotice } from "@/components/AiDataNotice";
 import { CHART_COLORS, HBars } from "@/components/charts";
 import { QuickAnswer } from "@/components/QuickAnswer";
 import { SiteHeader } from "@/components/SiteHeader";
+import { Term } from "@/components/Term";
 import { ANNUAL_WINTER_KWH_MULTIPLIER, ICE_WINTER_FUEL_MULTIPLIER } from "@/lib/calc";
 import { getFederalData, getIceVehicles, getOwnershipAssumptions, getUtilities, getVehicles } from "@/lib/data";
 import type { Catalog } from "@/lib/household";
@@ -61,8 +62,8 @@ export default function HomePage() {
               ariaLabel={`100 miles costs about ${$(c.gas)} in gas, ${$(c.home)} charging at home, and ${$(c.publicFast)} at public fast chargers.`}
               rows={[
                 { label: "Gas", value: c.gas, valueLabel: $(c.gas), color: CHART_COLORS.gas, note: `at ${$(c.gasPrice)}/gal (forecast average)` },
-                { label: "Charging at home", value: c.home, valueLabel: $(c.home), color: CHART_COLORS.ev, note: `at ~${(c.homeRate * 100).toFixed(0)}¢ per kWh (WV utilities)` },
-                { label: "Public fast charger", value: c.publicFast, valueLabel: $(c.publicFast), color: CHART_COLORS.neutral, note: `at ~${(c.dcfcRate * 100).toFixed(0)}¢ per kWh — mostly on road trips` },
+                { label: <>Charging at home (<Term id="kwh">per kWh</Term>)</>, value: c.home, valueLabel: $(c.home), color: CHART_COLORS.ev, note: `at ~${(c.homeRate * 100).toFixed(0)}¢ per kWh (WV utilities)` },
+                { label: <Term id="fast-charger">Public fast charger</Term>, value: c.publicFast, valueLabel: $(c.publicFast), color: CHART_COLORS.neutral, note: `at ~${(c.dcfcRate * 100).toFixed(0)}¢ per kWh — mostly on road trips` },
               ]}
             />
             <p className="mt-3 text-xs text-ink-soft">Where you charge matters more than which EV you pick.</p>

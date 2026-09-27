@@ -54,6 +54,9 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
   const [winter, setWinter] = useState(DEFAULT_INPUT.apply_winter_derate);
   const [mpg, setMpg] = useState(DEFAULT_INPUT.current.mpg);
   const [gasPrice, setGasPrice] = useState(defaultGas);
+  // Arriving with vehicles already picked (guide pages, shared links): start
+  // with the long vehicle picker collapsed so the results aren't buried.
+  const [pickerCollapsed, setPickerCollapsed] = useState(false);
   const [iceVehicleId, setIceVehicleId] = useState("");
   const [route, setRoute] = useState<RouteData | null>(null);
   // Resolved origin/destination coords from RouteHelper. Kept separate from
@@ -127,6 +130,7 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
     if (vids) {
       const ids = vids.split(",").filter(Boolean).slice(0, 3);
       setSelectedIds(ids);
+      if (ids.length) setPickerCollapsed(true);
       // If any selected id is a non-primary variant of a group, remember
       // that choice so the picker card displays the correct variant on load.
       const choices: Record<string, string> = {};
@@ -624,7 +628,7 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
               (v) => !v.variant_group || v.variant_primary,
             ),
           ).map(({ cls, list }) => (
-            <details key={cls} open className="rounded-xl ring-1 ring-slate-200 overflow-hidden">
+            <details key={cls} open={!pickerCollapsed} className="rounded-xl ring-1 ring-slate-200 overflow-hidden">
               <summary className="list-none cursor-pointer select-none flex items-center justify-between gap-2 px-4 py-3 bg-slate-50 hover:bg-slate-100 transition">
                 <div className="flex items-baseline gap-2">
                   <span className="font-semibold text-ink text-sm">
@@ -719,7 +723,14 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
         </div>
       </section>
 
+      {out && outSensitivity && selectedIds.length > 0 && (
+        <a href="#results" className="sticky bottom-3 z-20 flex items-center justify-center rounded-xl bg-brand hover:bg-brand-dark text-white font-semibold px-5 py-3 shadow-lg">
+          See results for {selectedIds.length} vehicle{selectedIds.length > 1 ? "s" : ""} ↓
+        </a>
+      )}
+
       {out && outSensitivity && (
+        <div id="results" className="scroll-mt-4">
         <Results
           out={out}
           utility={utility}
@@ -734,6 +745,7 @@ export function Calculator({ vehicles, iceVehicles, utilities, federal, mapboxTo
           vehicles={vehicles}
           onTrimChange={swapTrim}
         />
+        </div>
       )}
 
       <Assumptions

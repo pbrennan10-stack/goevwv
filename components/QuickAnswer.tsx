@@ -104,7 +104,7 @@ export function QuickAnswer({ catalog }: { catalog: Catalog }) {
       utilityId, gasRef: "auto", homeCharging: answer.homeCharging,
       ...(answer.none ? {} : { candRef: `ev:${answer.ev.id}` }),
     };
-    return `/plan?h=${encodeState(partial)}`;
+    return `/plan?from=quick&h=${encodeState(partial)}`;
   }, [answer, commute, utilityId, catalog]);
 
   const reset = () => { setParking(null); setKind(null); setCommute(null); setTrips(null); };
