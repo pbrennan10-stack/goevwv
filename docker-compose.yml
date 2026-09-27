@@ -10,6 +10,7 @@ services:
       context: .
       args:
         NEXT_PUBLIC_MAPBOX_TOKEN: ${NEXT_PUBLIC_MAPBOX_TOKEN}
+        NEXT_PUBLIC_GOATCOUNTER_CODE: ${NEXT_PUBLIC_GOATCOUNTER_CODE:-}
         OPENCHARGEMAP_API_KEY: ${OPENCHARGEMAP_API_KEY}
     image: goevwv:latest
     container_name: goevwv-app

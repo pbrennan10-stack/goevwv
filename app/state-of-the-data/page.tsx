@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Logo } from "@/components/Logo";
+import { SiteHeader } from "@/components/SiteHeader";
 import { getFederalData, getUtilities } from "@/lib/data";
 
 export const metadata: Metadata = {
@@ -132,43 +133,7 @@ export default function StateOfTheDataPage() {
 
   return (
     <main className="mx-auto max-w-content px-4 sm:px-6 py-8 sm:py-12">
-      <header className="mb-10">
-        <div className="flex items-center justify-between gap-4 flex-wrap">
-          <Link href="/">
-            <Logo className="text-2xl" />
-          </Link>
-          <nav className="text-sm text-ink-soft flex items-center">
-            <Link href="/" className="hover:text-ink transition px-2 py-2">
-              Home
-            </Link>
-            <span className="text-slate-300">·</span>
-            <Link
-              href="/calculator"
-              className="hover:text-ink transition px-2 py-2"
-            >
-              Calculator
-            </Link>
-            <span className="text-slate-300">·</span>
-            <Link href="/chargers" className="hover:text-ink transition px-2 py-2">
-              Charger Map
-            </Link>
-            <span className="text-slate-300">·</span>
-            <Link
-              href="/about"
-              className="hover:text-ink transition px-2 py-2"
-            >
-              Why EVs Matter
-            </Link>
-            <span className="text-slate-300">·</span>
-            <Link
-              href="/state-of-the-data"
-              className="text-brand font-semibold transition px-2 py-2"
-            >
-              State of the Data
-            </Link>
-          </nav>
-        </div>
-      </header>
+      <SiteHeader active="/state-of-the-data" />
 
       <article className="max-w-3xl mx-auto">
         <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-ink leading-tight mb-3">

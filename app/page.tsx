@@ -1,38 +1,12 @@
 import Link from "next/link";
 import { FitCheck } from "@/components/FitCheck";
+import { SiteHeader } from "@/components/SiteHeader";
 import { Logo } from "@/components/Logo";
 
 export default function HomePage() {
   return (
     <main className="mx-auto max-w-content px-4 sm:px-6 py-8 sm:py-12">
-      <header className="mb-10">
-        <div className="flex items-center justify-between gap-4 flex-wrap">
-          <Logo className="text-2xl" />
-          <nav className="text-sm text-ink-soft flex items-center">
-            <Link
-              href="/calculator"
-              className="hover:text-ink transition px-2 py-2"
-            >
-              Calculator
-            </Link>
-            <span className="text-slate-300">·</span>
-            <Link href="/chargers" className="hover:text-ink transition px-2 py-2">
-              Charger Map
-            </Link>
-            <span className="text-slate-300">·</span>
-            <Link href="/about" className="hover:text-ink transition px-2 py-2">
-              Why EVs Matter
-            </Link>
-            <span className="text-slate-300">·</span>
-            <Link
-              href="/state-of-the-data"
-              className="hover:text-ink transition px-2 py-2"
-            >
-              State of the Data
-            </Link>
-          </nav>
-        </div>
-      </header>
+      <SiteHeader />
 
       <section className="mb-10 sm:mb-14">
         <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-ink leading-tight">
@@ -73,6 +47,23 @@ export default function HomePage() {
       </section>
 
       <FitCheck />
+
+      <section className="mt-14 grid gap-4 sm:grid-cols-3">
+        {[
+          { href: "/ev", title: "Browse every EV", body: "Winter range, charging cost, and yearly savings for every model sold in WV." },
+          { href: "/utilities", title: "Your utility's EV rates", body: "Appalachian Power, Mon Power, Potomac Edison, Wheeling Power — rates and rebates." },
+          { href: "/faq", title: "Quick answers", body: "The $200 WV fee, what happened to tax credits, chargers, hills, and cold." },
+        ].map((c) => (
+          <Link
+            key={c.href}
+            href={c.href}
+            className="rounded-xl border border-slate-200 bg-white p-5 hover:border-brand transition"
+          >
+            <h2 className="font-bold text-ink">{c.title} →</h2>
+            <p className="mt-1 text-sm text-ink-muted">{c.body}</p>
+          </Link>
+        ))}
+      </section>
 
       <footer className="mt-16 pb-8 border-t border-slate-200 pt-6 text-sm text-ink-soft">
         <p>

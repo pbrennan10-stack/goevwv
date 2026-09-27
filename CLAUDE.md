@@ -27,6 +27,8 @@ Intentional non-choices: no Postgres, Redis, auth, email, or background workers.
 - **`NEXT_PUBLIC_MAPBOX_TOKEN`** — Mapbox token for RouteHelper (geocoding/directions) and ChargerMap rendering. Embedded in the client bundle at build.
 - **`OPENCHARGEMAP_API_KEY`** — Free key from openchargemap.org. Used server-side to fetch the WV charger list for `/chargers`, both at build time and by the daily background refresh (so docker-compose passes it to the running container too). Without it at build, the page shows a graceful "temporarily unavailable" fallback; a failed daily refresh keeps the last good page.
 
+- **`NEXT_PUBLIC_GOATCOUNTER_CODE`** (optional) — GoatCounter site code (the `xyz` in `xyz.goatcounter.com`). When set, the root layout loads GoatCounter's cookie-free page counter; when unset, no analytics script loads.
+
 Locally these live in `.env.local` (gitignored). On the droplet they live in `/opt/goevwv/.env`, read by `docker compose` and forwarded as build-args per `docker-compose.yml`.
 
 ## Repo layout
@@ -141,11 +143,15 @@ The first-time droplet setup is in `docs/REBUILD_RUNBOOK.md`. The bootstrap scri
 - [ ] Road trips modeled separately at interstate speed; utility lookup by address; contact/feedback link
 - [ ] Move the repo out of OneDrive (or pin it "Always keep on this device") — OneDrive turned .git files into online-only placeholders in Sept 2026 and broke commits
 - [ ] v1.1: dealer/installer directory — curated YAML + map overlay
-- [ ] v1.2: rebate & TOU explainer page — dedicated route per utility
+- [x] v1.2: rebate & TOU explainer page — dedicated route per utility (/utilities/[id], Sept 2026)
 - [ ] v1.2: optional Decap CMS admin at /admin for YAML-averse editing
 - [ ] v2.0: business-mode toggle + fleet TCO (multi-vehicle input, depot charging, commercial tariff, Section 179/bonus depreciation)
 - [x] Favicons, OG images, sitemap.xml, robots.txt
 - [x] `VERIFY_BEFORE_LAUNCH` markers cleaned up (v1.0.6); per-field confidence now lives on `/state-of-the-data`
+
+## Guide pages (SEO)
+
+`/ev/[id]`, `/utilities/[id]`, and `/faq` are statically generated from `data/*` at build time, so they refresh automatically with every data update — no copy to maintain. They show one "typical WV driver" example (`lib/scenario.ts`: 30 mi/day, 5 days/wk, 4 long trips, 25 mpg, AEP) and deep-link into the calculator with the same inputs; keep `TYPICAL` in step with `DEFAULT_INPUT` in `components/Calculator.tsx`. New vehicles and utilities get pages and sitemap entries automatically. Co-ops are excluded from `/utilities/[id]` because their rates are unverified.
 
 ## Principles
 
