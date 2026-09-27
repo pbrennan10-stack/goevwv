@@ -352,13 +352,13 @@ export default function StateOfTheDataPage() {
                   notes="On-peak base 17.077¢ plus riders. The calculator assumes TOU users charge 100% off-peak; any daytime charging hits this higher rate."
                 />
                 <SourceRow
-                  label="Off-Peak EV Charging — separate meter basic charge"
+                  label="Off-Peak EV Charging — EV submeter monthly charge"
                   value={`$${(aep.residential.tou_monthly_meter_charge ?? 0).toFixed(2)}/month`}
-                  source="AEP WV tariff, Sheets 22-1 / 22-2"
+                  source="Confirmed by a program participant (the site owner)"
                   sourceUrl="https://www.appalachianpower.com/clean-energy/electric-cars/wv-off-peak"
-                  retrieved="2026-09-23"
+                  retrieved="2026-09-27"
                   confidence="verified"
-                  notes="The EV circuit gets its own meter, which carries its own basic charge (also the minimum bill) — $168/year. New this refresh: the calculator now includes it when you pick the TOU option. At a ~4¢/kWh discount, TOU only breaks even above roughly 4,200 kWh/year of charging (about 13,000–14,000 EV miles). Also requires a licensed electrician to install the meter base (one-time cost, not modeled)."
+                  notes="The EV circuit gets a submeter installed behind the house meter, with no monthly charge. (Our September 2026 refresh wrongly added a $14.02/month basic charge; corrected September 27.) So every off-peak kWh saves about 4¢ versus the standard rate. The one-time cost is a licensed electrician installing the meter base and passing inspection, which isn't modeled."
                 />
               </>
             ) : null}
@@ -435,7 +435,7 @@ export default function StateOfTheDataPage() {
                 />
                 <SourceRow
                   label="Off-Peak EV Charging (Schedule PEV)"
-                  value="Available — same rates and meter charge as AEP"
+                  value="Available — same rates and submeter setup as AEP"
                   source="Wheeling Power tariff No. 21, Sheet 22-1"
                   sourceUrl="https://www.appalachianpower.com/clean-energy/electric-cars/wv-off-peak"
                   retrieved="2026-09-23"

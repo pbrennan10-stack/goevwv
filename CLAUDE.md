@@ -90,7 +90,7 @@ docker compose logs app --tail 50 -f
 ## Calculation methodology (important — document in UI if you change)
 
 - **Winter derate:** +12% annual kWh (4 cold months × ~28% range loss, averaged). Toggleable in UI; default ON.
-- **TOU rate:** 100% off-peak rate assumed — users who opt into TOU are committed to overnight charging. The separate EV meter's monthly basic charge (`tou_monthly_meter_charge`, $14.02 for AEP/Wheeling Schedule PEV) is added to annual energy cost.
+- **TOU rate:** 100% off-peak rate assumed — users who opt into TOU are committed to overnight charging. Any monthly charge on the EV meter (`tou_monthly_meter_charge`) is added to annual energy cost. For AEP/Wheeling Schedule PEV it is $0 — the EV submeter sits behind the house meter with no monthly fee (owner-confirmed Sept 2026; an earlier refresh wrongly used $14.02).
 - **PHEV split:** commute-aware, assuming nightly charging — each commute day uses min(round trip, electric range) electric miles, each long trip gets one battery's worth; winter derate shrinks electric range by the same 1.12 factor. (Replaced a fixed 65/35 split in Sept 2026.)
 - **Grid CO₂ factor:** 0.44 kg/kWh — EPA eGRID RFCW subregion incl. grid losses (WV is in PJM). EIA's WV in-state rate (0.87) is shown as a coal-only worst case.
 - **EV insurance:** class base × (0.40 + 0.60 × MSRP / class reference MSRP), clamped 0.85–1.8, × 1.25 for Tesla/Rivian/Lucid/Polestar. Gas-vehicle insurance is per-model in `ice_vehicles.json`.

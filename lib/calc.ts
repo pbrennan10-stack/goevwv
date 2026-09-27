@@ -121,7 +121,7 @@ function effectiveRatePerKwh(
   const r = utility.residential;
   if (useTOU && r.tou_available && r.tou_schedule) {
     // Users who opt into TOU charge overnight (off-peak) by design — use 100% off-peak rate.
-    // A separately metered EV circuit carries its own monthly basic charge.
+    // Any monthly charge on the EV (sub)meter is added here; AEP/Wheeling's is $0.
     const meterAnnualUsd = (r.tou_monthly_meter_charge ?? 0) * 12;
     return { rate: r.tou_schedule.off_peak_rate_per_kwh, mode: "tou", meterAnnualUsd };
   }
@@ -459,7 +459,7 @@ export function calculate(input: CalcInput, ctx: CalcContext): CalcReturn {
       warnings.push(
         meterAnnualUsd > 0
           ? `This utility's EV TOU rate requires a separate meter (one-time electrician cost) with its own ${fmtUSD(meterAnnualUsd / 12)}/month basic charge — included above. It only pays off if you charge a lot.`
-          : "This utility's EV TOU rate requires a separate meter install; factor in one-time cost.",
+          : "This utility's EV TOU rate requires an EV submeter installed by a licensed electrician — a one-time cost not included above.",
       );
     }
 

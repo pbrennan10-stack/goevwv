@@ -70,6 +70,14 @@ export default async function UtilityPage({ params }: Params) {
   const s = typicalScenario(examples, u, fed);
   const r = u.residential;
   const touMeterYr = (r.tou_monthly_meter_charge ?? 0) * 12;
+  // Off-peak savings for the typical driver, using the first example vehicle's
+  // home-charged kWh (DCFC road-trip energy isn't billed by the utility).
+  const refResult = s.results[0];
+  const touSavingsYr =
+    r.tou_schedule && refResult
+      ? (refResult.kwh_per_year - refResult.annual_dcfc_kwh) *
+        (r.flat_rate_per_kwh - r.tou_schedule.off_peak_rate_per_kwh)
+      : 0;
 
   return (
     <main className="mx-auto max-w-content px-4 sm:px-6 py-8 sm:py-12">
@@ -96,7 +104,7 @@ export default async function UtilityPage({ params }: Params) {
           <Card
             label="EV time-of-use rate"
             value={r.tou_available && r.tou_schedule ? `${cents(r.tou_schedule.off_peak_rate_per_kwh)}/kWh` : "Not offered"}
-            note={r.tou_available && r.tou_schedule ? "Off-peak, on a separate meter" : "No residential EV rate in WV"}
+            note={r.tou_available && r.tou_schedule ? "Off-peak, on an EV submeter — no monthly fee" : "No residential EV rate in WV"}
           />
           <Card
             label="Rebates"
@@ -168,10 +176,20 @@ export default async function UtilityPage({ params }: Params) {
               {cents(r.tou_schedule.off_peak_rate_per_kwh)}/kWh versus{" "}
               {cents(r.tou_schedule.on_peak_rate_per_kwh)} on-peak.
               {r.tou_requires_separate_meter &&
-                ` It requires a separate EV meter, which an electrician installs${
-                  touMeterYr ? ` and which carries its own ${fmtUSD(touMeterYr / 12)}/month charge (${fmtUSD(touMeterYr)}/yr)` : ""
-                }.`}
+                (touMeterYr
+                  ? ` It requires a separate EV meter, which an electrician installs and which carries its own ${fmtUSD(touMeterYr / 12)}/month charge (${fmtUSD(touMeterYr)}/yr).`
+                  : " Your charger goes on its own circuit with an EV submeter installed behind your house meter. There's no monthly fee for it; the only cost is a one-time electrician install and inspection.")}
             </p>
+            {touMeterYr === 0 && (
+              <p className="mt-2 text-ink-muted">
+                Each off-peak kWh saves{" "}
+                {cents(r.flat_rate_per_kwh - r.tou_schedule.off_peak_rate_per_kwh)}. For the typical
+                driver above, charging overnight and on weekends saves about{" "}
+                <strong>{fmtUSD(touSavingsYr)} a year</strong> versus the standard rate — more if you
+                drive more. Whether it&apos;s worth it comes down to how quickly that pays back the
+                electrician&apos;s bill. The calculator&apos;s time-of-use option shows your number.
+              </p>
+            )}
             {touMeterYr > 0 && (
               <p className="mt-2 text-ink-muted">
                 Each kWh saves {cents(r.flat_rate_per_kwh - r.tou_schedule.off_peak_rate_per_kwh)}, so

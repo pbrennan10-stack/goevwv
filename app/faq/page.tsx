@@ -80,7 +80,7 @@ function buildFaq(): QA[] {
     const t = aep.residential.tou_schedule;
     out.push({
       q: "Does Appalachian Power have a special EV charging rate?",
-      a: `Yes. ${aep.residential.tou_program_name ?? "Its EV time-of-use rate"} charges ${(t.off_peak_rate_per_kwh * 100).toFixed(1)}¢/kWh off-peak (${t.off_peak_hours}) instead of ${(aep.residential.flat_rate_per_kwh * 100).toFixed(1)}¢. It requires a separate meter with its own monthly charge, so it only pays off if you charge a lot — roughly 13,000+ EV miles a year. Wheeling Power (also an AEP company) offers the same program; Mon Power and Potomac Edison don't offer an EV rate in West Virginia.`,
+      a: `Yes. ${aep.residential.tou_program_name ?? "Its EV time-of-use rate"} charges ${(t.off_peak_rate_per_kwh * 100).toFixed(1)}¢/kWh off-peak (${t.off_peak_hours}) instead of ${(aep.residential.flat_rate_per_kwh * 100).toFixed(1)}¢. ${(aep.residential.tou_monthly_meter_charge ?? 0) > 0 ? `It requires a separate meter with its own $${aep.residential.tou_monthly_meter_charge}/month charge, so it only pays off if you charge a lot.` : "Your charger gets an EV submeter installed behind the house meter. There's no monthly fee, just a one-time electrician install, so if you charge overnight and on weekends it saves about 4¢ on every kWh."} Wheeling Power (also an AEP company) offers the same program; Mon Power and Potomac Edison don't offer an EV rate in West Virginia.`,
       more: { href: "/utilities/aep", label: "Appalachian Power details" },
     });
   }
