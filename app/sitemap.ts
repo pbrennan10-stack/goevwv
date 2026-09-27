@@ -12,6 +12,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return [
     page("", 1.0),
+    page("/plan", 0.9),
     page("/calculator", 0.9),
     page("/ev", 0.9),
     page("/utilities", 0.9),

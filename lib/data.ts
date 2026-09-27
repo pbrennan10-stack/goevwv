@@ -5,6 +5,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import yaml from "js-yaml";
+import type { OwnershipAssumptions } from "./household";
 import type { ChargingInfraData, FederalData, IceVehicle, Utility, Vehicle } from "./types";
 
 const DATA_DIR = path.join(process.cwd(), "data");
@@ -101,4 +102,8 @@ export function getIceVehicles(): IceVehicle[] {
 
 export function getChargingInfra(): ChargingInfraData {
   return readYaml<ChargingInfraData>("charging_corridors.yaml");
+}
+
+export function getOwnershipAssumptions(): OwnershipAssumptions {
+  return readYaml<OwnershipAssumptions>("ownership.yaml");
 }

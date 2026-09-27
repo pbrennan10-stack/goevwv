@@ -21,6 +21,7 @@ const CLASS_ORDER: [VehicleClass, string][] = [
   ["sedan", "Sedans"],
   ["hatchback", "Hatchbacks"],
   ["minivan", "Minivans"],
+  ["van", "Cargo vans"],
   ["other", "Other"],
 ];
 

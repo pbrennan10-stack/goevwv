@@ -850,8 +850,6 @@
       "epa_range_mi_total": 490,
       "winter_range_mi_electric": 37,
       "efficiency_kwh_per_100mi": 33,
-      "efficiency_kwh_per_100mi_city": 33,
-      "efficiency_kwh_per_100mi_highway": 44,
       "efficiency_mpg_hybrid": 40,
       "battery_kwh": 22.7,
       "charging": {
@@ -872,7 +870,7 @@
       "us_canadian_parts_pct": 0,
       "assembly_location": "Japan",
       "assembly_country": "Japan",
-      "notes": "Excellent WV option: ~52 mi electric covers most commutes, gas backup eliminates range anxiety. Assembled in Japan. New-generation replacement for the RAV4 Prime. Electric range (52 mi; some sources say 54 for SE) and hybrid-mode mpg (40) are Toyota projections — not yet EPA-listed. Total range uses Toyota's '490+ mi' (other sources claim 550–600). SE charges at 7 kW with no DC fast charging (XSE/Woodland get 11 kW and CCS).",
+      "notes": "Excellent WV option: ~52 mi electric covers most commutes, gas backup eliminates range anxiety. Assembled in Japan. New-generation replacement for the RAV4 Prime. Electric range (52 mi; some sources say 54 for SE) and hybrid-mode mpg (40) are Toyota projections — not yet EPA-listed. Total range uses Toyota's '490+ mi' (other sources claim 550–600). SE charges at 7 kW with no DC fast charging (XSE/Woodland get 11 kW and CCS). Not yet EPA-rated (2026-09-27): range and efficiency are Toyota's estimates for the redesigned 2026 model; city/highway split removed because the estimate we had was internally inconsistent.",
       "status": "current"
     },
     {
@@ -965,12 +963,12 @@
       "class": "sedan",
       "powertrain": "bev",
       "msrp_usd": 42900,
-      "epa_range_mi": 361,
-      "winter_range_mi": 260,
-      "highway_range_mi": 290,
-      "efficiency_kwh_per_100mi": 25,
-      "efficiency_kwh_per_100mi_city": 22,
-      "efficiency_kwh_per_100mi_highway": 29,
+      "epa_range_mi": 342,
+      "winter_range_mi": 246,
+      "highway_range_mi": 275,
+      "efficiency_kwh_per_100mi": 26,
+      "efficiency_kwh_per_100mi_city": 23.1,
+      "efficiency_kwh_per_100mi_highway": 27.7,
       "battery_kwh": 77.4,
       "charging": {
         "home_max_kw": 10.9,
@@ -990,7 +988,7 @@
       "us_canadian_parts_pct": 0,
       "assembly_location": "Asan, South Korea",
       "assembly_country": "South Korea",
-      "notes": "Most efficient non-Tesla EV. Aerodynamic sedan shape. Assembled in South Korea — 0% US/CA content.",
+      "notes": "Most efficient non-Tesla EV. Aerodynamic sedan shape. Assembled in South Korea — 0% US/CA content. EPA check (2026-09-27, fueleconomy.gov dataset): epa_range_mi 361→342, efficiency_kwh_per_100mi 25→26, efficiency_kwh_per_100mi_city 22→23.1, efficiency_kwh_per_100mi_highway 29→27.7. 361 mi was the 2023-2024 Long Range RWD rating (ids 46622/46957). The 2025 refresh is rated 342. The site's 25/22/29 kWh match neither year. The 2025 20in RWD is 291 mi.",
       "status": "discontinued",
       "status_note": "Hyundai dropped the regular Ioniq 6 from the US for MY2026 (only the ~$70k Ioniq 6 N remains). Used market only."
     },
@@ -1165,13 +1163,13 @@
       "class": "sedan",
       "powertrain": "phev",
       "msrp_usd": 33980,
-      "epa_range_mi_electric": 44,
+      "epa_range_mi_electric": 45,
       "epa_range_mi_total": 600,
       "winter_range_mi_electric": 32,
       "efficiency_kwh_per_100mi": 26,
       "efficiency_kwh_per_100mi_city": 24,
       "efficiency_kwh_per_100mi_highway": 29,
-      "efficiency_mpg_hybrid": 51,
+      "efficiency_mpg_hybrid": 52,
       "battery_kwh": 13.6,
       "charging": {
         "home_max_kw": 3.5,
@@ -1191,7 +1189,7 @@
       "us_canadian_parts_pct": 0,
       "assembly_location": "Tsutsumi, Japan",
       "assembly_country": "Japan",
-      "notes": "Benchmark PHEV efficiency — ~51 mpg on gas, 44 mi all-electric. Japan-assembled. Renamed from Prius Prime. Efficiency figures are MY2025 EPA; MY2027 EPA listing pending.",
+      "notes": "Benchmark PHEV efficiency — ~51 mpg on gas, 44 mi all-electric. Japan-assembled. Renamed from Prius Prime. Efficiency figures are MY2025 EPA; MY2027 EPA listing pending. EPA check (2026-09-27, fueleconomy.gov dataset): epa_range_mi_electric 44→45, efficiency_mpg_hybrid 51→52. EPA has no 2026 or 2027 Prius PHEV yet, so this uses the latest year (2025). 2024 Prius Prime SE is identical (45 mi, 52 mpg). The site's 51 mpg is the highway figure.",
       "status": "current"
     },
     {
@@ -1267,7 +1265,7 @@
       "us_canadian_parts_pct": 0,
       "assembly_location": "Munich, Germany",
       "assembly_country": "Germany",
-      "notes": "Entry-luxury BMW EV sedan. Germany-built. Earlier data used the discontinued eDrive35's $52,200 price; eDrive40 is $57,900.",
+      "notes": "Entry-luxury BMW EV sedan. Germany-built. Earlier data used the discontinued eDrive35's $52,200 price; eDrive40 is $57,900. 333 mi is the EPA rating on the standard 18-inch wheels; optional 19-inch wheels are rated 307 mi.",
       "status": "current"
     },
     {
@@ -1279,12 +1277,12 @@
       "class": "sedan",
       "powertrain": "bev",
       "msrp_usd": 51300,
-      "epa_range_mi": 320,
-      "winter_range_mi": 230,
-      "highway_range_mi": 260,
-      "efficiency_kwh_per_100mi": 27,
-      "efficiency_kwh_per_100mi_city": 24,
-      "efficiency_kwh_per_100mi_highway": 31,
+      "epa_range_mi": 314,
+      "winter_range_mi": 226,
+      "highway_range_mi": 255,
+      "efficiency_kwh_per_100mi": 29.6,
+      "efficiency_kwh_per_100mi_city": 27.4,
+      "efficiency_kwh_per_100mi_highway": 32.4,
       "battery_kwh": 82,
       "charging": {
         "home_max_kw": 11,
@@ -1307,7 +1305,7 @@
       "us_canadian_parts_pct": 0,
       "assembly_location": "Luqiao, China",
       "assembly_country": "China",
-      "notes": "Volvo/Geely sub-brand. China-assembled — no IRA credit and subject to import tariffs.",
+      "notes": "Volvo/Geely sub-brand. China-assembled — no IRA credit and subject to import tariffs. EPA check (2026-09-27, fueleconomy.gov dataset): epa_range_mi 320→314, efficiency_kwh_per_100mi 27→29.6, efficiency_kwh_per_100mi_city 24→27.4, efficiency_kwh_per_100mi_highway 31→32.4. 320 mi was the 2024 Single Motor 19in rating. The site's 27/24/31 kWh match no EPA row. 2025 20in: 300 mi.",
       "status": "discontinued",
       "status_note": "Withdrawn from the US (tariffs and the connected-vehicle rule bar MY2027+). Used market only."
     },
@@ -1479,17 +1477,17 @@
       "id": "mercedes-eqb-2025",
       "make": "Mercedes-Benz",
       "model": "EQB 250+",
-      "trim": "4MATIC",
+      "trim": "FWD",
       "year": 2025,
       "class": "suv",
       "powertrain": "bev",
       "msrp_usd": 54850,
-      "epa_range_mi": 227,
-      "winter_range_mi": 163,
-      "highway_range_mi": 200,
-      "efficiency_kwh_per_100mi": 34,
-      "efficiency_kwh_per_100mi_city": 30,
-      "efficiency_kwh_per_100mi_highway": 39,
+      "epa_range_mi": 251,
+      "winter_range_mi": 181,
+      "highway_range_mi": 221,
+      "efficiency_kwh_per_100mi": 31.5,
+      "efficiency_kwh_per_100mi_city": 29.7,
+      "efficiency_kwh_per_100mi_highway": 33.7,
       "battery_kwh": 70.5,
       "charging": {
         "home_max_kw": 9.6,
@@ -1510,7 +1508,7 @@
       "us_canadian_parts_pct": 0,
       "assembly_location": "Kecskemét, Hungary",
       "assembly_country": "Hungary",
-      "notes": "Entry-luxury Mercedes EV SUV. Compact platform, 5-seat. Hungary-assembled — no IRA credit. Slowest DCFC of the Mercedes lineup (100 kW peak).",
+      "notes": "Entry-luxury Mercedes EV SUV. Compact platform, 5-seat. Hungary-assembled — no IRA credit. Slowest DCFC of the Mercedes lineup (100 kW peak). EPA check (2026-09-27, fueleconomy.gov dataset): trim 4MATIC→FWD, epa_range_mi 227→251, efficiency_kwh_per_100mi 34→31.5, efficiency_kwh_per_100mi_city 30→29.7, efficiency_kwh_per_100mi_highway 39→33.7. The EQB 250+ is FWD only, so the '4MATIC' trim is wrong. 227 mi was the 2022 EQB 350 4MATIC rating (id 46332) and matches no 2025 configuration. Keeping the entry model gives 'EQB 250+ FWD' at 251 mi. Every 2025 4MATIC version is rated 205-207 mi. The EQB has no real_world_range_factor, so the EPA values apply directly.",
       "status": "discontinued",
       "status_note": "Discontinued in the US after MY2025. Used market only. The new electric CLA is Mercedes' entry EV."
     },
@@ -1685,9 +1683,9 @@
       "epa_range_mi": 390,
       "winter_range_mi": 317,
       "highway_range_mi": 345,
-      "efficiency_kwh_per_100mi": 29.2,
-      "efficiency_kwh_per_100mi_city": 26.5,
-      "efficiency_kwh_per_100mi_highway": 32.7,
+      "efficiency_kwh_per_100mi": 30.1,
+      "efficiency_kwh_per_100mi_city": 30.1,
+      "efficiency_kwh_per_100mi_highway": 30.1,
       "battery_kwh": 122,
       "charging": {
         "home_max_kw": 11,
@@ -1708,7 +1706,7 @@
       "us_canadian_parts_pct": 0,
       "assembly_location": "Sindelfingen, Germany",
       "assembly_country": "Germany",
-      "notes": "Mercedes flagship luxury sedan — 390 mi EPA (MY2026), one of the longest-range German EVs sold in the US. German-assembled. Used-market shoppers: early EQS (2022-2023) depreciated heavily, strong used-buyer value. Refreshed for 2027 (800-volt, 122 kWh). Range and efficiency shown are MY2026 EPA values; MY2027 ratings pending. Range correction (2026-09-27): Mercedes' EPA ratings are conservative — independent tests beat them up to ~75 mph (InsideEVs 70-mph test of EQS 450+: 395 mi vs 350 EPA (1.13); Edmunds 1.21. Tests are of the earlier ~108 kWh pack). Winter range and efficiency here are scaled by the lowest matching test (1.13×); highway range was already calibrated to 70-mph tests and is unchanged. Before correction: winter 281 mi, 33 kWh/100 mi.",
+      "notes": "Mercedes flagship luxury sedan — 390 mi EPA (MY2026), one of the longest-range German EVs sold in the US. German-assembled. Used-market shoppers: early EQS (2022-2023) depreciated heavily, strong used-buyer value. Refreshed for 2027 (800-volt, 122 kWh). Range and efficiency shown are MY2026 EPA values; MY2027 ratings pending. Range correction (2026-09-27): Mercedes' EPA ratings are conservative — independent tests beat them up to ~75 mph (InsideEVs 70-mph test of EQS 450+: 395 mi vs 350 EPA (1.13); Edmunds 1.21. Tests are of the earlier ~108 kWh pack). Winter range and efficiency here are scaled by the lowest matching test (1.13×); highway range was already calibrated to 70-mph tests and is unchanged. Before correction: winter 281 mi, 33 kWh/100 mi. EPA check (2026-09-27, fueleconomy.gov dataset): efficiency_kwh_per_100mi 29.2→30.1, efficiency_kwh_per_100mi_city 26.5→30.1, efficiency_kwh_per_100mi_highway 32.7→30.1. EPA has no 2027 EQS 450+. The 2027 EQS sedans in EPA are the EQS 500 4MATIC (443 mi, 29.6/30.1/29.1 kWh) and 580 4MATIC (434 mi), so this uses the 2026 450+. Range 390 matches. Site efficiency x 1.13 = 33.0/29.9/36.95 against EPA 34.0/34.0/34.1, which does not match. The new values are EPA / 1.13, keeping the site's real_world_range_factor convention. Consider moving this entry to the 2027 EQS 500 4MATIC, since the 450+ is not in the 2027 EPA list.",
       "status": "current",
       "real_world_range_factor": 1.13,
       "real_world_range_source": "https://insideevs.com/reviews/583112/mercedes-eqs-70mph-range-test/"
@@ -1958,7 +1956,7 @@
       "us_canadian_parts_pct": 56,
       "assembly_location": "Detroit, MI (Factory ZERO)",
       "assembly_country": "US",
-      "notes": "Cadillac flagship EV — 200 kWh battery (largest in class), ~460 mi range (Cadillac estimate), 750 hp in Velocity Max launch mode. Same Detroit plant as Silverado EV. Not EPA-labeled (too heavy), so range and efficiency are manufacturer/third-party figures. MSRP approximate ($130,300 including destination). MY2027 adds a native NACS port.",
+      "notes": "Cadillac flagship EV — 200 kWh battery (largest in class), ~460 mi range (Cadillac estimate), 750 hp in Velocity Max launch mode. Same Detroit plant as Silverado EV. Not EPA-labeled (too heavy), so range and efficiency are manufacturer/third-party figures. MSRP approximate ($130,300 including destination). MY2027 adds a native NACS port. Range and efficiency are GM's estimates — the Escalade IQ is heavy enough to be exempt from EPA fuel-economy labels.",
       "status": "current"
     },
     {
@@ -2171,7 +2169,7 @@
       "highway_range_mi": 257,
       "efficiency_kwh_per_100mi": 29,
       "efficiency_kwh_per_100mi_city": 25.7,
-      "efficiency_kwh_per_100mi_highway": 32.4,
+      "efficiency_kwh_per_100mi_highway": 33,
       "battery_kwh": 81.4,
       "charging": {
         "home_max_kw": 11.5,
@@ -2190,7 +2188,7 @@
       "capability_note": "Kia US spec: 26.1 / 56.5 cu ft with cargo floor at lowest level; front trunk 0.88 cu ft. No towing capacity listed. Sub-trunk: Kia's figure is measured with the cargo floor at its lowest level, so it includes the under-floor space; separate size not published.",
       "assembly_location": "Pesquería, Nuevo León, Mexico",
       "assembly_country": "Mexico",
-      "notes": "Priced August 2026. Light FWD ($29,890, 221 mi) and Wind AWD ($38,690, 280 mi) also offered. US-market EV3s are built in Mexico (production started Aug 2026; the earliest units may be Korean-built). Peak DC ~128 kW is the European spec; Kia US publishes only 10–80% times."
+      "notes": "Priced August 2026. Light FWD ($29,890, 221 mi) and Wind AWD ($38,690, 280 mi) also offered. US-market EV3s are built in Mexico (production started Aug 2026; the earliest units may be Korean-built). Peak DC ~128 kW is the European spec; Kia US publishes only 10–80% times. EPA check (2026-09-27, fueleconomy.gov dataset): efficiency_kwh_per_100mi_highway 32.4→33. The highway figure differs by 0.6 (32.4 vs 33.0). City (25.7 vs 26) is within tolerance."
     },
     {
       "tax_credit_eligible": false,
@@ -2365,7 +2363,7 @@
       "highway_range_mi": 225,
       "efficiency_kwh_per_100mi": 29,
       "efficiency_kwh_per_100mi_city": 26.7,
-      "efficiency_kwh_per_100mi_highway": 31.5,
+      "efficiency_kwh_per_100mi_highway": 30.8,
       "battery_kwh": 74.7,
       "charging": {
         "home_max_kw": 11,
@@ -2384,7 +2382,7 @@
       "capability_note": "Subaru spec: Premium/Limited 31.3 / 74.0 cu ft (Touring 30.4 / 71.8). No frunk. Towing 3,500 lb per Subaru launch info; not shown on the spec page. Sub-trunk: no data.",
       "assembly_location": "Japan",
       "assembly_country": "Japan",
-      "notes": "Wagon-style electric Subaru with standard AWD and a 3,500 lb tow rating — a natural fit for WV. 10–80% time approximate."
+      "notes": "Wagon-style electric Subaru with standard AWD and a 3,500 lb tow rating — a natural fit for WV. 10–80% time approximate. EPA check (2026-09-27, fueleconomy.gov dataset): efficiency_kwh_per_100mi_highway 31.5→30.8. The highway figure is 0.7 off (31.5 vs 30.8). City 26.7 vs 27.0 is within tolerance. 20in: 274 mi."
     },
     {
       "tax_credit_eligible": false,
@@ -2581,7 +2579,7 @@
       "class": "suv",
       "powertrain": "phev",
       "msrp_usd": 40490,
-      "epa_range_mi_electric": 34,
+      "epa_range_mi_electric": 33,
       "epa_range_mi_total": 470,
       "winter_range_mi_electric": 24,
       "efficiency_mpg_hybrid": 36,
@@ -2604,7 +2602,7 @@
       "capability_note": "Kia spec (SAE, dual-level floor lowest position): 34.5 / 65.5 cu ft. 2,000 lb braked / 1,653 unbraked; requires additional equipment. Sub-trunk: figure is measured with the dual-level floor in its lowest position, so under-floor space is included; separate size not published.",
       "assembly_location": "Gwangju, South Korea",
       "assembly_country": "South Korea",
-      "notes": "Standard AWD. Whether MSRP includes destination is unconfirmed."
+      "notes": "Standard AWD. Whether MSRP includes destination is unconfirmed. EPA check (2026-09-27, fueleconomy.gov dataset): epa_range_mi_electric 34→33. The 1-mi difference is within the rounding tolerance, but it is not rounding: 34 is the 2025 rating (id 48667, with 430 total). 2026 is 33. All other figures match."
     },
     {
       "tax_credit_eligible": false,

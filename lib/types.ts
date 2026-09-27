@@ -7,6 +7,7 @@ export type VehicleClass =
   | "truck"
   | "hatchback"
   | "minivan"
+  | "van"
   | "other";
 
 // Seating, cargo, and towing — what the household planner checks a trip

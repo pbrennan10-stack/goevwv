@@ -1727,13 +1727,14 @@ function powertrainLabel(p: string): string {
   }
 }
 
-const CLASS_ORDER: Vehicle["class"][] = ["truck", "suv", "sedan", "hatchback", "minivan", "other"];
+const CLASS_ORDER: Vehicle["class"][] = ["truck", "suv", "sedan", "hatchback", "minivan", "van", "other"];
 const CLASS_LABELS: Record<Vehicle["class"], string> = {
   truck: "Trucks",
   suv: "SUVs",
   sedan: "Sedans",
   hatchback: "Hatchbacks",
   minivan: "Minivans",
+  van: "Cargo vans",
   other: "Other",
 };
 

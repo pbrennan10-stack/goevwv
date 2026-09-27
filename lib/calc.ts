@@ -22,6 +22,7 @@ const DEFAULT_HIGHWAY_FRACTION = 0.45;
 function vehicleMassKg(v: Vehicle): number {
   switch (v.class) {
     case "truck":    return 2800;
+    case "van":      return 3200;
     case "suv":      return 2100;
     case "sedan":    return 1900;
     case "hatchback": return 1600;
@@ -30,46 +31,46 @@ function vehicleMassKg(v: Vehicle): number {
 }
 
 // EPA constants
-const CO2_KG_PER_GAL_GASOLINE = 8.887; // EPA direct tailpipe CO2
+export const CO2_KG_PER_GAL_GASOLINE = 8.887; // EPA direct tailpipe CO2
 // Grid emissions factor for EV charging in WV. WV sits in the PJM grid and
 // exports much of its coal power, so we use EPA eGRID's RFCW subregion rate
 // (the grid WV homes actually draw from), consistent with EPA/DOE practice:
 // eGRID2023 rev2 RFCW total output 926.6 lb CO2e/MWh + 4.2% grid losses
 // = 0.439 kg/kWh. (EIA's WV in-state generation rate is 0.867 kg/kWh — a
 // coal-only worst case.) Refreshed 2026-09-23.
-const CO2_KG_PER_KWH_WV_GRID = 0.44;
+export const CO2_KG_PER_KWH_WV_GRID = 0.44;
 
 // Winter in WV effectively adds ~12% to annual kWh consumption for BEVs
 // if we assume ~4 cold months with ~28% range loss on those months only.
 // (0.28 * 4/12 = ~0.093, rounded up for HVAC and slower DCFC losses)
-const ANNUAL_WINTER_KWH_MULTIPLIER = 1.12;
+export const ANNUAL_WINTER_KWH_MULTIPLIER = 1.12;
 
 // -- Fueling / charging time constants --
 const ICE_TANK_GAL = 14;           // US average passenger car tank
 const ICE_FILLUP_MIN = 5;          // drive in, pump, pay, drive out
 const EV_HOME_PLUG_MIN = 1.5;      // plug in + unplug (at home, passive)
 const LONG_TRIP_ONE_WAY_MI = 200;  // WV → Pittsburgh / DC / Charlotte typical
-const DCFC_DEFAULT_MIN = 30;       // 10→80% on a 50–150 kW charger (warm, unobstructed)
+export const DCFC_DEFAULT_MIN = 30;       // 10→80% on a 50–150 kW charger (warm, unobstructed)
 
 // Every DCFC stop has non-charging overhead the base "10→80%" spec ignores:
 // walk to charger, plug in, authenticate, wait for session init, unplug, drive out.
 // 4 min is conservative; real-world can be 5–8 min on older networks.
-const DCFC_PER_STOP_OVERHEAD_MIN = 4;
+export const DCFC_PER_STOP_OVERHEAD_MIN = 4;
 
 // Cold-weather DCFC is slower because battery thermal management throttles the
 // charge curve when the pack is below operating temp. Typically 20–40% slower
 // across 4 cold WV months. Annualized: (4/12) × ~25% = ~8% longer on average.
 // Only applied when winter derate toggle is ON (user controls this).
-const DCFC_WINTER_TIME_MULTIPLIER = 1.08;
+export const DCFC_WINTER_TIME_MULTIPLIER = 1.08;
 
 // DCFC stops charge 10%→80% SoC (past 80% the taper slows to a crawl), so each
 // stop adds 70% of battery capacity. Fallback for vehicles missing battery_kwh.
-const DCFC_STOP_SOC_FRACTION = 0.70;
-const DCFC_FALLBACK_BATTERY_KWH = 60;
+export const DCFC_STOP_SOC_FRACTION = 0.70;
+export const DCFC_FALLBACK_BATTERY_KWH = 60;
 
 // Fallback DCFC rate if federal.yaml doesn't carry one. WV-area walk-up
 // average as of 2026-09-23.
-const DCFC_FALLBACK_RATE_PER_KWH = 0.55;
+export const DCFC_FALLBACK_RATE_PER_KWH = 0.55;
 
 function homeChargeSessions(daily_mi: number, days_per_week: number, range_mi: number): number {
   // Charge when battery drops below ~20% capacity (usable = 80% of rated range).
@@ -78,7 +79,7 @@ function homeChargeSessions(daily_mi: number, days_per_week: number, range_mi: n
   return Math.ceil((days_per_week * 52) / daysPerCharge);
 }
 
-function dcfcStopsPerRoundTrip(
+export function dcfcStopsPerRoundTrip(
   highwayRangeMi: number,
   oneWayMi: number,
 ): { stops: number; extraMiRoundTrip: number } {
@@ -114,7 +115,7 @@ function annualMiles(daily: number, daysPerWeek: number): number {
   return daily * daysPerWeek * 52;
 }
 
-function effectiveRatePerKwh(
+export function effectiveRatePerKwh(
   utility: Utility,
   useTOU: boolean,
 ): { rate: number; mode: "flat" | "tou"; meterAnnualUsd: number } {
@@ -140,7 +141,7 @@ function speedEfficiencyMultiplier(highway_avg_speed_mph: number): number {
   return (1 - aeroFrac) + aeroFrac * Math.pow(highway_avg_speed_mph / 55, 2);
 }
 
-function blendedKwhPer100mi(
+export function blendedKwhPer100mi(
   vehicle: Vehicle,
   highway_fraction: number,
   highway_avg_speed_mph = 55,
@@ -197,10 +198,13 @@ const INSURANCE_CLASS_BASE: Record<string, { usd: number; ref_msrp: number }> = 
   suv:       { usd: 1900, ref_msrp: 36000 },
   minivan:   { usd: 1800, ref_msrp: 42000 },
   truck:     { usd: 2000, ref_msrp: 52000 },
+  // Cargo vans: personal-auto estimate at a work-van reference price. Business
+  // (commercial auto) policies vary widely — treat as a rough placeholder.
+  van:       { usd: 2100, ref_msrp: 55000 },
 };
 const INSURANCE_PREMIUM_BRANDS = new Set(["Tesla", "Rivian", "Lucid", "Polestar"]);
 
-function evInsuranceEstimate(vehicle: Vehicle): number {
+export function evInsuranceEstimate(vehicle: Vehicle): number {
   const base = INSURANCE_CLASS_BASE[vehicle.class] ?? INSURANCE_CLASS_BASE.sedan;
   const priceFactor = Math.min(1.8, Math.max(0.85, 0.40 + 0.60 * (vehicle.msrp_usd / base.ref_msrp)));
   const brandFactor = INSURANCE_PREMIUM_BRANDS.has(vehicle.make) ? 1.25 : 1.0;
@@ -223,14 +227,14 @@ function elevationExtraKwhPerYear(
   return (roundTripNet / 3_600_000) * trips_per_year;
 }
 
-function gallonsPerYear(vehicle: Vehicle, gasMiles: number): number {
+export function gallonsPerYear(vehicle: Vehicle, gasMiles: number): number {
   // Only PHEVs burn gas in our catalog — the miles beyond each charge.
   if (vehicle.powertrain !== "phev") return 0;
   const mpg = vehicle.efficiency_mpg_hybrid ?? 35;
   return gasMiles / mpg;
 }
 
-function stateAnnualFee(
+export function stateAnnualFee(
   vehicle: Vehicle,
   fed: FederalData,
 ): { usd: number; label: string } {
@@ -253,7 +257,7 @@ function federalCredit(vehicle: Vehicle, fed: FederalData): number {
   if (fed.federal_ev_tax_credits.new_ev_credit.active === false) return 0;
   if (!vehicle.tax_credit_eligible) return 0;
   const msrpCap =
-    vehicle.class === "suv" || vehicle.class === "truck" || vehicle.class === "minivan"
+    vehicle.class === "suv" || vehicle.class === "truck" || vehicle.class === "minivan" || vehicle.class === "van"
       ? fed.federal_ev_tax_credits.new_ev_credit.msrp_caps.suvs_trucks_vans
       : fed.federal_ev_tax_credits.new_ev_credit.msrp_caps.cars;
   if (vehicle.msrp_usd > msrpCap) return 0;
@@ -272,7 +276,7 @@ export function annualEvMaintenance(vehicle: Vehicle, annual_miles: number): Mai
   // Tires: similar to ICE but slightly shorter life due to regenerative torque
   // Brakes: ~70% cheaper because regen braking extends pad/rotor life 3-5x
   // No oil changes. Misc = cabin air filter + wiper fluid only.
-  const isTruck = vehicle.class === "truck";
+  const isTruck = vehicle.class === "truck" || vehicle.class === "van";
   const isSuv = vehicle.class === "suv" || vehicle.class === "minivan";
   // Refreshed 2026-09-23: EV-rated tire prices, +15% repair inflation (BLS CPI).
   const tireSet = isTruck ? 1250 : isSuv ? 950 : 750;

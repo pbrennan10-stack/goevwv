@@ -6,6 +6,7 @@ import { Logo } from "./Logo";
 // show up everywhere at once.
 
 const NAV = [
+  { href: "/plan", label: "Plan your household" },
   { href: "/calculator", label: "Calculator" },
   { href: "/ev", label: "EVs" },
   { href: "/utilities", label: "Utilities" },
