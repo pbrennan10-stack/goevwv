@@ -5,6 +5,8 @@ name: Deploy
 # `next build` itself — building there ran it out of memory (Sept 2026: the
 # box thrashed, SSH dropped with "Broken pipe", and the site went down).
 # If any step fails, the previously running containers keep serving.
+# Each image is also tagged with its commit, and the droplet keeps the last
+# three for instant rollback (see "If something breaks" in CLAUDE.md).
 
 on:
   push:
@@ -41,10 +43,13 @@ jobs:
           OCM: ${{ secrets.OPENCHARGEMAP_API_KEY }}
           GOATCOUNTER: ${{ secrets.NEXT_PUBLIC_GOATCOUNTER_CODE }}
         run: |
-          docker build -t goevwv:latest \
+          SHA="${GITHUB_SHA::7}"
+          echo "SHA=$SHA" >> "$GITHUB_ENV"
+          docker build -t goevwv:latest -t "goevwv:$SHA" \
             --build-arg NEXT_PUBLIC_MAPBOX_TOKEN="$MAPBOX" \
             --build-arg OPENCHARGEMAP_API_KEY="$OCM" \
             --build-arg NEXT_PUBLIC_GOATCOUNTER_CODE="$GOATCOUNTER" \
+            --build-arg GIT_SHA="$SHA" \
             .
 
       - name: Set up SSH
@@ -59,21 +64,30 @@ jobs:
           printf 'Host droplet\n  HostName %s\n  User root\n  IdentityFile ~/.ssh/deploy_key\n  ServerAliveInterval 30\n  ServerAliveCountMax 10\n' "$HOST" > ~/.ssh/config
 
       - name: Ship image to droplet
-        run: docker save goevwv:latest | gzip | ssh droplet 'gunzip | docker load'
+        run: docker save goevwv:latest "goevwv:$SHA" | gzip | ssh droplet 'gunzip | docker load'
 
       - name: Update config and restart
         run: |
-          ssh droplet "cd /opt/goevwv \
-            && git fetch origin && git reset --hard origin/main \
-            && docker compose up -d --no-build \
-            && docker image prune -f \
-            && docker compose ps"
+          ssh droplet 'bash -s' <<'REMOTE'
+          set -euo pipefail
+          cd /opt/goevwv
+          git fetch origin && git reset --hard origin/main
+          docker compose up -d --no-build
+          # Keep the 3 newest commit-tagged images for rollback; remove older ones.
+          docker images goevwv --format '{{.CreatedAt}}|{{.Tag}}' \
+            | grep -v '|latest$' | sort -r | tail -n +4 | cut -d'|' -f2 \
+            | xargs -r -I{} docker rmi "goevwv:{}" || true
+          docker image prune -f
+          # Reclaim build cache left by old on-droplet builds (none happen now).
+          docker builder prune -af >/dev/null 2>&1 || true
+          docker compose ps
+          REMOTE
 
-      - name: Check the live site
+      - name: Check the new version is live
         run: |
-          for i in $(seq 1 12); do
-            code=$(curl -s -o /dev/null -m 10 -w '%{http_code}' https://goevwv.com/ || true)
-            if [ "$code" = "200" ]; then echo "goevwv.com is up"; exit 0; fi
-            echo "Waiting for goevwv.com (got $code)…"; sleep 10
+          for i in $(seq 1 18); do
+            body=$(curl -s -m 10 https://goevwv.com/api/health || true)
+            if echo "$body" | grep -q "\"build\":\"$SHA\""; then echo "goevwv.com is serving $SHA"; exit 0; fi
+            echo "Waiting for $SHA (got: ${body:-no response})"; sleep 10
           done
-          echo "::error::goevwv.com did not return 200 after deploy"; exit 1
+          echo "::error::goevwv.com is not serving build $SHA after deploy"; exit 1

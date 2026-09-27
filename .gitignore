@@ -31,3 +31,6 @@ next-env.d.ts
 
 # OS
 Thumbs.db
+
+# Stray tsc output (compile scripts with --outDir outside the repo)
+lib/**/*.js

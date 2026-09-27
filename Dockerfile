@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.7
-# Multi-stage build for Next.js 14 standalone output.
+# Multi-stage build for Next.js 15 standalone output.
 # Produces a small (~200MB) runtime image with only what's needed.
 
 # -------- Stage 1: install deps --------
@@ -29,6 +29,10 @@ RUN npm run build
 # -------- Stage 3: runtime --------
 FROM node:20-alpine AS runner
 WORKDIR /app
+
+# Commit this image was built from — reported by /api/health.
+ARG GIT_SHA=dev
+ENV GIT_SHA=$GIT_SHA
 
 ENV NODE_ENV=production \
     PORT=3000 \
