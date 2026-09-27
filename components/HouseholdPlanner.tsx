@@ -605,7 +605,10 @@ function PlanResults({
               Running costs are {usd(Math.abs(runVsGas))} a year {runVsGas >= 0 ? "lower" : "higher"}
               {priceGap != null && priceGap > 0 ? `; it costs ${usd(priceGap)} more up front` : priceGap != null && priceGap < 0 ? `, and it costs ${usd(-priceGap)} less up front` : ""}
               {breakEvenYears != null ? ` — the savings cover that in about ${breakEvenYears < 1 ? "a year" : `${Math.round(breakEvenYears * 10) / 10} years`}` : ""}.
-              {" "}Totals include each vehicle&apos;s expected resale value.
+              {" "}
+              {vsGas < 0 && runVsGas > 0
+                ? `But it's expected to be worth less when you sell it, and that outweighs the savings over ${Y} years — try the resale setting below.`
+                : "Totals include each vehicle's expected resale value."}
             </span>
           </p>
         )}
@@ -640,8 +643,8 @@ function PlanResults({
               <span className="font-bold text-ink whitespace-nowrap">
                 {t.p == null
                   ? "not possible"
-                  : t.p >= price * 0.95
-                    ? "any fair used price"
+                  : t.p >= price
+                    ? "any price below new"
                     : `${usd(Math.floor(t.p / 500) * 500)} or less`}
               </span>
             </li>
@@ -649,13 +652,13 @@ function PlanResults({
         </ul>
         <p className="text-xs text-ink-soft">
           New, it&apos;s {usd(price)}.
-          {usedTargets.some((t) => t.p != null && t.p >= price * 0.95)
-            ? " “Any fair used price” means the math works out anywhere below the new price — a used one skips the steep first-years drop in value."
+          {usedTargets.some((t) => t.p != null && t.p >= price)
+            ? ` A new ${cand.model} already comes out ahead there, so a used one priced below new does too.`
             : ""}
-          {usedVsGas != null && usedVsGas < price * 0.95 ? ` A used one priced ${Math.round((1 - usedVsGas / price) * 100)}%+ below new beats the new gas option.` : ""}
-          {" "}Assumes the used one drives and charges like new, then loses about {Math.round(catalog.own.older_vehicle_annual_depreciation * 100)}% of its value a year
-          (Kelley Blue Book), with WV sales tax after trade-in. Check the battery&apos;s health report before you buy — range fades
-          slowly with age, and most EV batteries carry an 8-year/100,000-mile warranty.
+          {" "}Assumes a used one drives and charges like new and loses value at the same rate as a new one
+          (~{Math.round((1 - Math.pow(retain, 1 / 5)) * 100)}% a year, from the resale setting below), with WV sales tax after trade-in.
+          Check the battery&apos;s health report before you buy — range fades slowly with age, and most EV batteries carry an
+          8-year/100,000-mile warranty.
         </p>
       </Card>
 

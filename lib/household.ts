@@ -420,12 +420,14 @@ export function runScenario(
 // "What would a USED one need to cost?" Given a scenario with a new vehicle,
 // solve for the purchase price at which buying that model used makes the
 // scenario's total equal `targetTotal` (e.g. the new-gas or keep-today total).
-// A used vehicle runs the same (efficiency, fees, maintenance) but loses value
-// like an older car — older_vehicle_annual_depreciation per year — instead of
-// a new vehicle's steep early drop. WV sales tax applies to price minus
-// trade-in. Insurance is left at the new-vehicle estimate (conservative: a
-// used car usually costs a little less to insure). Returns null when even a
-// free vehicle wouldn't get there.
+// A used vehicle runs the same (efficiency, fees, maintenance) and loses value
+// at the SAME yearly rate as a new one of its type (the retention curve is
+// geometric, so a used EV keeps r5^(Y/5) of its price just like a new one —
+// including the user's resale slider). Using a gentler rate for used than new
+// would let a "used" one priced above new come out ahead, which is nonsense.
+// WV sales tax applies to price minus trade-in. Insurance is left at the
+// new-vehicle estimate (conservative). Returns null when even a free vehicle
+// wouldn't get there.
 export function usedBreakEvenPrice(
   scenario: ScenarioResult,
   targetTotal: number,
@@ -435,7 +437,10 @@ export function usedBreakEvenPrice(
   const unit = scenario.units.find((u) => u.unit.isNew);
   if (!unit) return null;
   const fixed = scenario.totalOverPeriod - unit.capitalOverPeriod; // everything except this vehicle's price/resale
-  const keep = Math.pow(1 - cat.own.older_vehicle_annual_depreciation, h.years); // share of price left at the end
+  const r5 = unit.unit.pt !== "gas" && h.retention5yOverride != null
+    ? h.retention5yOverride
+    : retention(unit.unit.pt, unit.unit.cls, 5, cat.own);
+  const keep = Math.pow(r5, h.years / 5); // share of price left at the end
   const { rate, title_fee_usd: title, trade_in_reduces_base } = cat.own.wv_purchase_tax;
   const sold = h.candidate?.replaces;
   const tradeIn = sold ? h.owned.find((o) => o.key === sold)?.valueNow ?? 0 : 0;
