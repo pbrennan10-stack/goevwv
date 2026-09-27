@@ -3,6 +3,7 @@ import Link from "next/link";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { fmtUSD } from "@/lib/calc";
+import { cargoMilesPerKwh, cargoSeatsUpLabel, medianIndex } from "@/lib/capability";
 import { getFederalData, getUtilities, getVehicles } from "@/lib/data";
 import { TYPICAL, costPer100Mi, powertrainLabel, typicalScenario, vehicleName, fmtCents } from "@/lib/scenario";
 import type { VehicleClass } from "@/lib/types";
@@ -29,6 +30,7 @@ export default function EvIndexPage() {
   const aep = getUtilities().find((u) => u.id === "aep")!;
   const scenario = typicalScenario(vehicles, aep, fed);
   const byId = new Map(scenario.results.map((r) => [r.vehicle.id, r]));
+  const cargoIndex = medianIndex(vehicles.map(cargoMilesPerKwh));
 
   return (
     <main className="mx-auto max-w-content px-4 sm:px-6 py-8 sm:py-12">
@@ -39,9 +41,18 @@ export default function EvIndexPage() {
       <p className="mt-3 text-base text-ink-muted max-w-prose">
         Every model in our catalog, with the numbers that matter here: range
         on a cold morning, what a year of charging costs on Appalachian Power,
-        and how that compares with a {TYPICAL.mpg} mpg gas car for a{" "}
+        how much luggage fits with every seat in use, and how that compares with a {TYPICAL.mpg} mpg gas car for a{" "}
         {TYPICAL.daily_round_trip_mi}-mile daily commute. Savings include WV&apos;s
         annual EV fee. Tap any vehicle for the details.
+      </p>
+      <p className="mt-3 text-sm text-ink-muted max-w-prose">
+        <strong className="text-ink">Cargo-miles index</strong> combines luggage
+        room with efficiency: cubic feet of space (every seat full, including
+        any front trunk and under-floor storage) times miles per kWh. It&apos;s
+        the passenger-car version of the ton-miles-per-gallon figure freight
+        haulers use. 100 is the median vehicle here; 130 means about 30% more
+        luggage carried per unit of electricity. Pickups use a bed, so they
+        aren&apos;t scored.
       </p>
 
       {CLASS_ORDER.map(([cls, label]) => {
@@ -63,6 +74,8 @@ export default function EvIndexPage() {
                     <th className="py-2 pr-4 font-medium">Vehicle</th>
                     <th className="py-2 pr-4 font-medium">MSRP</th>
                     <th className="py-2 pr-4 font-medium">WV winter range</th>
+                    <th className="py-2 pr-4 font-medium">Seats · luggage room</th>
+                    <th className="py-2 pr-4 font-medium">Cargo-miles index</th>
                     <th className="py-2 pr-4 font-medium">Per 100 mi (AEP)</th>
                     <th className="py-2 font-medium">Saves / yr vs gas</th>
                   </tr>
@@ -95,6 +108,11 @@ export default function EvIndexPage() {
                                 ? `${v.epa_range_mi_electric} mi electric`
                                 : "—"}
                         </td>
+                        <td className="py-2 pr-4">
+                          {v.seats}
+                          {cargoSeatsUpLabel(v) ? ` · ${cargoSeatsUpLabel(v)}` : ""}
+                        </td>
+                        <td className="py-2 pr-4">{cargoIndex(cargoMilesPerKwh(v)) ?? "—"}</td>
                         <td className="py-2 pr-4">
                           {v.powertrain === "bev"
                             ? fmtCents(costPer100Mi(v, aep.residential.flat_rate_per_kwh))

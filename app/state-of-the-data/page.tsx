@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Logo } from "@/components/Logo";
 import { SiteHeader } from "@/components/SiteHeader";
-import { getFederalData, getUtilities } from "@/lib/data";
+import { cargoSeatsUpLabel } from "@/lib/capability";
+import { getFederalData, getIceVehicles, getUtilities, getVehicles } from "@/lib/data";
 
 export const metadata: Metadata = {
   title: "State of the Data",
@@ -124,6 +125,14 @@ function Section({
 export default function StateOfTheDataPage() {
   const federal = getFederalData();
   const utilities = getUtilities();
+  const evs = getVehicles();
+  const gasCars = getIceVehicles();
+  const capCounts = (list: { capability_confidence?: string }[]) => ({
+    verified: list.filter((v) => v.capability_confidence === "verified").length,
+    approximate: list.filter((v) => v.capability_confidence === "approximate").length,
+  });
+  const evCap = capCounts(evs);
+  const gasCap = capCounts(gasCars);
 
   const aep = utilities.find((u) => u.id === "aep");
   const monPower = utilities.find((u) => u.id === "mon_power");
@@ -148,6 +157,19 @@ export default function StateOfTheDataPage() {
           Last reviewed: {LAST_REVIEWED}. Rates and programs change; refresh
           quarterly or when major legislation passes.
         </p>
+
+        <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 mb-8 text-sm text-amber-900">
+          <p className="font-semibold mb-1">AI-assisted data — please double-check</p>
+          <p>
+            This data is aggregated with the help of AI tools that search and
+            cross-check manufacturer specs, EPA ratings, utility tariffs, and
+            published reviews. That makes a site like this possible for one
+            person to maintain, but it can get things wrong — a misread spec
+            sheet, an outdated figure, a trim mix-up. The confidence tags below
+            say how well each number is backed up. Confirm anything you&rsquo;re
+            relying on with the manufacturer, your utility, or a dealer.
+          </p>
+        </div>
 
         <div className="bg-surface-raised border border-slate-200 rounded-lg p-5 mb-10">
           <h2 className="text-sm font-bold text-ink uppercase tracking-wide mb-2">
@@ -734,6 +756,86 @@ export default function StateOfTheDataPage() {
               confidence="verified"
               notes="OpenChargeMap catalogs many specific connector variants (e.g., 'CCS (Type 1)', 'CCS (Type 2)', 'SAE J1772 CCS'); we collapse these into the handful of categories a driver actually cares about. 'Tesla' here means the legacy proprietary port — new vehicles with NACS show under NACS."
             />
+          </Section>
+
+          <Section
+            title="Seats, cargo, and towing"
+            summary="Luggage space (including front trunks and under-floor storage) and tow ratings for every vehicle, used on the EV pages and the household planner."
+          >
+            <div className="text-sm text-ink-muted leading-relaxed space-y-3">
+              <p>
+                Gathered in September 2026 by AI research agents working from
+                manufacturer spec pages, owner&rsquo;s manuals, towing guides,
+                and reviews, then range-checked. Each vehicle carries its own
+                source link and a confidence level. EVs and plug-ins:{" "}
+                {evCap.verified} verified, {evCap.approximate} approximate.
+                Gas vehicles: {gasCap.verified} verified, {gasCap.approximate}{" "}
+                approximate. &ldquo;Approximate&rdquo; usually means the
+                manufacturer&rsquo;s page blocked automated reading and the
+                figure came from a review or dealer listing.
+              </p>
+              <p>
+                <strong className="text-ink">How we count luggage space:</strong>{" "}
+                rear cargo behind the 2nd row with the seats up, plus any
+                under-floor sub-trunk the manufacturer doesn&rsquo;t already
+                include in that figure, plus the front trunk. When we can&rsquo;t
+                tell whether a quoted figure includes the under-floor well, we
+                assume it does rather than risk counting it twice. Most
+                automakers don&rsquo;t publish sub-trunk sizes, so some vehicles
+                have a little more room than shown. Tow ratings are for the
+                listed trim; many require an optional tow package.
+              </p>
+              <p>
+                <strong className="text-ink">Known soft spots:</strong> cargo
+                figures differ between US (SAE) and European measurement
+                standards, and a few manufacturers&rsquo; US figures look
+                inconsistent with their own European numbers (Mercedes EQE is
+                under review). Pickup trucks are described by bed length, not
+                cubic feet.
+              </p>
+              <details className="rounded-lg border border-slate-200 bg-white">
+                <summary className="cursor-pointer px-3 py-2 font-medium text-ink">
+                  Per-vehicle sources (EVs and plug-ins)
+                </summary>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs">
+                    <thead>
+                      <tr className="text-left text-ink-soft border-b border-slate-200">
+                        <th className="py-2 px-3 font-medium">Vehicle</th>
+                        <th className="py-2 pr-3 font-medium">Seats · luggage</th>
+                        <th className="py-2 pr-3 font-medium">Towing</th>
+                        <th className="py-2 pr-3 font-medium">Confidence</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {evs.map((v) => (
+                        <tr key={v.id} className="border-b border-slate-100 align-top">
+                          <td className="py-2 px-3">
+                            {v.capability_source ? (
+                              <a href={v.capability_source} target="_blank" rel="noopener noreferrer" className="text-brand hover:underline">
+                                {v.make} {v.model} {v.trim}
+                              </a>
+                            ) : (
+                              `${v.make} ${v.model} ${v.trim}`
+                            )}
+                            {v.capability_note ? (
+                              <span className="block text-ink-soft mt-0.5">{v.capability_note}</span>
+                            ) : null}
+                          </td>
+                          <td className="py-2 pr-3 whitespace-nowrap">
+                            {v.seats}{cargoSeatsUpLabel(v) ? ` · ${cargoSeatsUpLabel(v)}` : ""}
+                          </td>
+                          <td className="py-2 pr-3 whitespace-nowrap">
+                            {v.towing_lbs === 0 ? "Not rated" : v.towing_lbs ? `${v.towing_lbs.toLocaleString("en-US")} lb` : "—"}
+                          </td>
+                          <td className="py-2 pr-3">{v.capability_confidence ?? "—"}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+            </div>
           </Section>
 
           <Section

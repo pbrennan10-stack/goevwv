@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AiDataNotice } from "@/components/AiDataNotice";
 import { FitCheck } from "@/components/FitCheck";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Logo } from "@/components/Logo";
@@ -76,6 +77,7 @@ export default function HomePage() {
           </Link>{" "}
           page for every source and retrieval date.
         </p>
+        <AiDataNotice className="mt-3" />
         <p className="mt-3 text-xs">
           &copy; {new Date().getFullYear()} GoEV WV. Built by Patrick Brennan in West Virginia.
         </p>

@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { fmtNum, fmtUSD } from "@/lib/calc";
+import { capabilitySpecs } from "@/lib/capability";
 import { getFederalData, getUtilities, getVehicles } from "@/lib/data";
 import {
   STATUS_LABEL,
@@ -112,8 +113,7 @@ export default async function VehiclePage({ params }: Params) {
       `~${v.charging.dcfc_10_to_80_min} min (${v.charging.dcfc_peak_kw} kW peak)`,
     ]);
   specs.push(["Charge port", v.charging.connector_dcfc]);
-  specs.push(["Seats", String(v.seats)]);
-  if (v.towing_lbs) specs.push(["Towing", `${fmtNum(v.towing_lbs)} lbs`]);
+  specs.push(...capabilitySpecs(v));
   if (v.zero_to_sixty_s) specs.push(["0–60 mph", `${v.zero_to_sixty_s} s`]);
   if (v.assembly_location) specs.push(["Built in", v.assembly_location]);
 
