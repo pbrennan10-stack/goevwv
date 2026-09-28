@@ -9,12 +9,13 @@ import { getFederalData, getOwnershipAssumptions, getUtilities, getVehicles } fr
 
 // What 100 miles costs in WV — computed from the data files so it updates
 // itself with every refresh. Median current-EV efficiency, winter included on
-// both sides, gas at the forecast average.
+// both sides, gas at today's AAA WV average (a snapshot, not a multi-year
+// comparison, so today's price rather than the forecast).
 function per100(fed: ReturnType<typeof getFederalData>, utilities: ReturnType<typeof getUtilities>, evs: ReturnType<typeof getVehicles>) {
   const effs = evs.filter((v) => v.powertrain === "bev" && v.status === "current" && v.class !== "van")
     .map((v) => v.efficiency_kwh_per_100mi).sort((a, b) => a - b);
   const medianKwh = effs[Math.floor(effs.length / 2)] * ANNUAL_WINTER_KWH_MULTIPLIER;
-  const gas = fed.calculation_notes.gas_price_outlook_per_gal?.mid ?? fed.calculation_notes.gas_price_baseline_per_gal.current;
+  const gas = fed.calculation_notes.gas_price_baseline_per_gal.current;
   const rates = utilities.filter((u) => u.id !== "rural_coops").map((u) => u.residential.flat_rate_per_kwh);
   const home = (Math.min(...rates) + Math.max(...rates)) / 2;
   const dcfc = fed.calculation_notes.dcfc_rate_per_kwh?.current ?? 0.55;
@@ -55,7 +56,7 @@ export default function HomePage() {
             <HBars
               ariaLabel={`100 miles costs about ${$(c.gas)} in gas, ${$(c.home)} charging at home, and ${$(c.publicFast)} at public fast chargers.`}
               rows={[
-                { label: "Gas", value: c.gas, valueLabel: $(c.gas), color: CHART_COLORS.gas, note: `at ${$(c.gasPrice)}/gal (forecast average)` },
+                { label: "Gas", value: c.gas, valueLabel: $(c.gas), color: CHART_COLORS.gas, note: `at ${$(c.gasPrice)}/gal (today's WV average, AAA)` },
                 { label: <>Charging at home (<Term id="kwh">per kWh</Term>)</>, value: c.home, valueLabel: $(c.home), color: CHART_COLORS.ev, note: `at ~${(c.homeRate * 100).toFixed(0)}¢ per kWh (WV utilities)` },
                 { label: <Term id="fast-charger">Public fast charger</Term>, value: c.publicFast, valueLabel: $(c.publicFast), color: CHART_COLORS.neutral, note: `at ~${(c.dcfcRate * 100).toFixed(0)}¢ per kWh — mostly on road trips` },
               ]}

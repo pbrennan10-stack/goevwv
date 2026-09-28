@@ -170,19 +170,18 @@ calculation_notes:
       28% remains slightly conservative. Re-checked 2026-09-23.
 
   gas_price_baseline_per_gal:
-    current: 4.37
+    current: 4.36
     source: "AAA West Virginia average"
     source_url: "https://gasprices.aaa.com/?state=WV"
-    retrieved: "2026-09-23"
+    retrieved: "2026-09-28"
     retrieved_label: "Sept 2026"
     notes: >
-      AAA WV average regular on 2026-09-23 was $4.373 (week ago $4.137, month
-      ago $3.957, year ago $2.971; US average $4.474). Prices were rising
-      fast at this snapshot, so this default sits near a local peak and
-      flatters EV savings versus a typical year — the gas-price slider in the
-      calculator lets users test lower prices. Metro spread $4.27–$4.40
-      (AAA showed an apparent outlier for Morgantown, excluded). Refresh
-      quarterly.
+      AAA WV average regular on 2026-09-28 was $4.362 (week ago $4.368, month
+      ago $3.953, year ago $2.994; US average $4.477). Prices jumped in
+      September and have held near this level, so today's price sits near a
+      local peak and flatters EV savings versus a typical year — the homepage
+      "What 100 miles costs" chart shows it, while multi-year comparisons
+      default to the forecast below. Refresh when the price moves.
 
   # What gas is likely to AVERAGE over the next year or so — the default for
   # multi-year cost comparisons, so results don't hinge on today's spike.
