@@ -2,35 +2,20 @@ import Link from "next/link";
 import { AiDataNotice } from "@/components/AiDataNotice";
 import { CHART_COLORS, HBars } from "@/components/charts";
 import { FitCheck } from "@/components/FitCheck";
+import { LEARN_PAGES } from "@/components/LearnLayout";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Term } from "@/components/Term";
-import { ANNUAL_WINTER_KWH_MULTIPLIER, ICE_WINTER_FUEL_MULTIPLIER } from "@/lib/calc";
 import { getFederalData, getOwnershipAssumptions, getUtilities, getVehicles } from "@/lib/data";
-
-// What 100 miles costs in WV — computed from the data files so it updates
-// itself with every refresh. Median current-EV efficiency, winter included on
-// both sides, gas at today's AAA WV average (a snapshot, not a multi-year
-// comparison, so today's price rather than the forecast).
-function per100(fed: ReturnType<typeof getFederalData>, utilities: ReturnType<typeof getUtilities>, evs: ReturnType<typeof getVehicles>) {
-  const effs = evs.filter((v) => v.powertrain === "bev" && v.status === "current" && v.class !== "van")
-    .map((v) => v.efficiency_kwh_per_100mi).sort((a, b) => a - b);
-  const medianKwh = effs[Math.floor(effs.length / 2)] * ANNUAL_WINTER_KWH_MULTIPLIER;
-  const gas = fed.calculation_notes.gas_price_baseline_per_gal.current;
-  const rates = utilities.filter((u) => u.id !== "rural_coops").map((u) => u.residential.flat_rate_per_kwh);
-  const home = (Math.min(...rates) + Math.max(...rates)) / 2;
-  const dcfc = fed.calculation_notes.dcfc_rate_per_kwh?.current ?? 0.55;
-  return {
-    gas: (100 / 25) * ICE_WINTER_FUEL_MULTIPLIER * gas, gasPrice: gas,
-    home: medianKwh * home, homeRate: home,
-    publicFast: medianKwh * dcfc, dcfcRate: dcfc,
-  };
-}
+import { typicalFigures } from "@/lib/typical";
 
 export default function HomePage() {
   const fed = getFederalData();
   const utilities = getUtilities();
   const evs = getVehicles();
-  const c = per100(fed, utilities, evs);
+  const tf = typicalFigures(fed, utilities, evs);
+  // A snapshot, not a multi-year comparison, so gas at today's AAA WV average
+  // rather than the forecast.
+  const c = { gas: tf.gasTodayPer100, gasPrice: tf.gasToday, home: tf.homePer100, homeRate: tf.homeRate, publicFast: tf.publicPer100, dcfcRate: tf.dcfcRate };
   const own = getOwnershipAssumptions();
   const $ = (n: number) => "$" + n.toFixed(2);
   return (
@@ -103,6 +88,20 @@ export default function HomePage() {
             <p className="mt-1 text-sm text-ink-muted">{c.body}</p>
           </Link>
         ))}
+      </section>
+
+      <section className="mt-8 rounded-2xl bg-surface-sunken ring-1 ring-slate-200 p-5">
+        <h2 className="font-bold text-ink">New to EVs? Start with EV 101</h2>
+        <p className="mt-1 text-sm text-ink-muted">Short, plain-English explainers with West Virginia numbers.</p>
+        <ul className="mt-3 flex flex-wrap gap-2">
+          {LEARN_PAGES.map((p) => (
+            <li key={p.slug}>
+              <Link href={`/learn/${p.slug}`} className="inline-flex min-h-10 items-center rounded-full bg-white ring-1 ring-slate-300 px-3 text-sm text-ink hover:ring-brand">
+                {p.title}
+              </Link>
+            </li>
+          ))}
+        </ul>
       </section>
 
       <footer className="mt-16 pb-8 border-t border-slate-200 pt-6 text-sm text-ink-soft">

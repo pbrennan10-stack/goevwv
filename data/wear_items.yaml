@@ -1,0 +1,88 @@
+# What wears out: a typical compact SUV, gas vs electric, used for the
+# /learn/what-wears-out chart. Prices are typical shop prices (RepairPal
+# estimates, Sept 2026, for a Toyota RAV4 / Nissan Leaf-class vehicle);
+# intervals are common service schedules — your owner's manual may differ.
+# Researched with AI assistance (Sept 2026); approximate.
+#
+# interval_mi: replace every N miles. interval_years: replace every N years
+# (whichever the item follows). ev_interval_mi / ev_interval_years override
+# for EVs. applies_to: gas | ev | both.
+
+horizon_years: 5
+miles_per_year: 12000
+
+items:
+  - item: "Oil and filter changes"
+    applies_to: gas
+    interval_mi: 7500
+    cost_usd: 128
+    note: "Synthetic oil at a shop (quick-lube places charge less). EVs have no engine oil."
+  - item: "Engine air filter"
+    applies_to: gas
+    interval_mi: 15000
+    cost_usd: 62
+  - item: "Spark plugs"
+    applies_to: gas
+    interval_mi: 100000
+    cost_usd: 204
+  - item: "Transmission fluid"
+    applies_to: gas
+    interval_mi: 35000
+    cost_usd: 329
+    note: "Generic interval; some makers specify longer."
+  - item: "Serpentine belt"
+    applies_to: gas
+    interval_mi: 100000
+    cost_usd: 141
+  - item: "Brake pads (per axle)"
+    applies_to: both
+    interval_mi: 50000
+    ev_interval_mi: 100000
+    cost_usd: 357
+    note: "EVs slow down mostly with regenerative braking, so pads last far longer. On salted WV roads, have EV brakes cleaned and lubricated yearly so they don't corrode from disuse."
+  - item: "Brake fluid"
+    applies_to: both
+    interval_years: 3
+    cost_usd: 243
+  - item: "Tires (set of 4)"
+    applies_to: both
+    interval_mi: 55000
+    ev_interval_mi: 48000
+    cost_usd: 740
+    ev_cost_usd: 950
+    note: "EV-rated tires cost more and wear a bit faster (weight and instant torque)."
+  - item: "Tire rotation"
+    applies_to: both
+    interval_mi: 7500
+    cost_usd: 60
+  - item: "12-volt battery"
+    applies_to: both
+    interval_years: 4
+    ev_interval_years: 3
+    cost_usd: 260
+    note: "EVs still have a small 12V battery for accessories; owners report replacing it sooner (Recurrent)."
+  - item: "Cabin air filter"
+    applies_to: both
+    interval_mi: 15000
+    cost_usd: 105
+  - item: "Coolant"
+    applies_to: both
+    interval_mi: 100000
+    cost_usd: 213
+
+sources:
+  - "https://repairpal.com/estimator/toyota/rav4/oil-change-cost"
+  - "https://repairpal.com/estimator/nissan/leaf/brake-pad-replacement-cost"
+  - "https://www.recurrentauto.com/research/there-are-12-volt-batteries-in-electric-vehicles"
+  - "https://www.recurrentauto.com/research/whats-so-special-about-used-ev-tires"
+  - "https://advocacy.consumerreports.org/wp-content/uploads/2020/10/EV-Ownership-Cost-Final-Report-1.pdf"
+
+# The big EV-only item: the high-voltage battery. Covered by federal-minimum
+# 8-year/100,000-mile warranties; typical capacity loss ~2%/yr (Geotab,
+# Recurrent); replacements outside recalls are rare.
+battery:
+  warranty: "8 years / 100,000 miles (federal minimum; some makers offer 10/100k)"
+  fade_per_year_pct: 2
+  sources:
+    - "https://www.geotab.com/blog/ev-battery-health/"
+    - "https://www.recurrentauto.com/research/how-long-do-ev-batteries-last"

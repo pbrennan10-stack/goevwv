@@ -34,3 +34,6 @@ Thumbs.db
 
 # Stray tsc output (compile scripts with --outDir outside the repo)
 lib/**/*.js
+
+# Compiled test output (npm test)
+.test-build/

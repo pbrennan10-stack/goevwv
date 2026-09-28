@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Logo } from "@/components/Logo";
 import { SiteHeader } from "@/components/SiteHeader";
 import { cargoSeatsUpLabel } from "@/lib/capability";
-import { getFederalData, getIceVehicles, getOwnershipAssumptions, getUtilities, getVehicles } from "@/lib/data";
+import { getFederalData, getIceVehicles, getOwnershipAssumptions, getUtilities, getVehicles, getWearData } from "@/lib/data";
 
 export const metadata: Metadata = {
   title: "State of the Data",
@@ -134,6 +134,13 @@ export default function StateOfTheDataPage() {
   });
   const evCap = capCounts(evs);
   const gasCap = capCounts(gasCars);
+  const all = [...evs, ...gasCars];
+  const feat = {
+    total: all.length,
+    verified: all.filter((v) => v.features?.confidence === "verified").length,
+    approximate: all.filter((v) => v.features?.confidence === "approximate").length,
+  };
+  const wear = getWearData();
 
   const aep = utilities.find((u) => u.id === "aep");
   const monPower = utilities.find((u) => u.id === "mon_power");
@@ -890,6 +897,57 @@ export default function StateOfTheDataPage() {
                   </table>
                 </div>
               </details>
+            </div>
+          </Section>
+
+          <Section
+            title="Standard equipment"
+            summary="Driver assist, safety, and winter-comfort features that come standard on the trim we price. Facts only — we don't put a dollar value on them."
+          >
+            <div className="text-sm text-ink-muted leading-relaxed space-y-3">
+              <p>
+                Drafted in September 2026 by AI research agents from maker spec
+                sheets, press releases, and dealer trim guides, then checked a
+                second time field by field. {feat.verified + feat.approximate} of{" "}
+                {feat.total} vehicles have been checked: {feat.verified} against
+                the maker&rsquo;s own spec pages (&ldquo;verified&rdquo;) and{" "}
+                {feat.approximate} against dealer and review trim guides when the
+                maker&rsquo;s site blocked automated reading
+                (&ldquo;approximate&rdquo;). The rest show &ldquo;not finished
+                checking&rdquo; rather than an unchecked guess.
+              </p>
+              <p>
+                <strong className="text-ink">How to read it:</strong> each fact
+                applies to the one trim we price. &ldquo;Not standard&rdquo;
+                usually means it&rsquo;s an extra-cost option or comes on a
+                higher trim. &ldquo;Not confirmed&rdquo; means sources disagreed
+                or didn&rsquo;t say. Driver-assist features change often through
+                software and model-year updates (Tesla made Autosteer a paid
+                feature in January 2026), so confirm with the dealer. Each
+                vehicle page links its source.
+              </p>
+            </div>
+          </Section>
+
+          <Section
+            title="What wears out (EV 101)"
+            summary="Service intervals and typical shop prices behind the gas-vs-electric maintenance chart."
+          >
+            <div className="text-sm text-ink-muted leading-relaxed space-y-3">
+              <p>
+                A typical compact SUV over {wear.horizon_years} years and{" "}
+                {(wear.horizon_years * wear.miles_per_year).toLocaleString("en-US")} miles:
+                common service intervals and RepairPal shop-price estimates
+                (September 2026), with EV intervals for brakes, tires, and the
+                12-volt battery from Recurrent and Consumer Reports. Kept in{" "}
+                <code>data/wear_items.yaml</code>. Approximate — your owner&rsquo;s
+                manual may differ.
+              </p>
+              <ul className="list-disc pl-5">
+                {[...wear.sources, ...wear.battery.sources].map((u) => (
+                  <li key={u}><a href={u} className="text-brand hover:underline break-all" rel="noopener">{u}</a></li>
+                ))}
+              </ul>
             </div>
           </Section>
 

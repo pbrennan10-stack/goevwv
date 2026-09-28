@@ -8,6 +8,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { CHART_COLORS, StackedBars } from "@/components/charts";
+import { EquipmentCompare } from "@/components/Equipment";
 import { Term } from "@/components/Term";
 import { ANNUAL_WINTER_KWH_MULTIPLIER, dcfcStopMiles } from "@/lib/calc";
 import { cargoSeatsUpLabel } from "@/lib/capability";
@@ -736,6 +737,17 @@ function PlanResults({
           8-year/100,000-mile warranty.
         </p>
       </Card>
+
+      {gasVehicle && (cand.features || gasVehicle.features) && (
+        <Card>
+          <h3 className="font-bold text-ink mb-1">What comes standard</h3>
+          <p className="text-sm text-ink-muted mb-2">Safety, driver-assist and winter features on the trims we priced — not a dollar value, just what you get.</p>
+          <EquipmentCompare
+            a={{ name: cand.model, f: cand.features, isEv: cand.powertrain !== "hybrid" }}
+            b={{ name: gasVehicle.model, f: gasVehicle.features, isEv: false }}
+          />
+        </Card>
+      )}
 
       {/* Breakdown */}
       <Card>

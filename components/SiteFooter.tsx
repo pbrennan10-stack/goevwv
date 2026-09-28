@@ -19,6 +19,7 @@ export function SiteFooter() {
         <Link href="/plan" className="hover:text-ink">Plan your household</Link>
         <Link href="/calculator" className="hover:text-ink">Calculator</Link>
         <Link href="/ev" className="hover:text-ink">All EVs</Link>
+        <Link href="/learn" className="hover:text-ink">EV 101</Link>
         <Link href="/utilities" className="hover:text-ink">WV utility EV rates</Link>
         <Link href="/chargers" className="hover:text-ink">Charger map</Link>
         <Link href="/faq" className="hover:text-ink">FAQ</Link>

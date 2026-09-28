@@ -9,6 +9,7 @@ import {
   getUtilities,
   getVehicles,
 } from "@/lib/data";
+import type { Features } from "@/lib/features";
 import type { Catalog } from "@/lib/household";
 
 export const metadata: Metadata = {
@@ -18,12 +19,15 @@ export const metadata: Metadata = {
   alternates: { canonical: "/plan" },
 };
 
+// The planner shows equipment yes/no only; the long research notes stay on /ev.
+const slim = (f?: Features): Features | undefined => (f ? { ...f, note: undefined, source: undefined } : undefined);
+
 export default function PlanPage() {
   // Long free-text fields aren't used by the planner; drop them to keep the
   // page light on phones.
   const catalog: Catalog = {
-    evs: getVehicles().map((v) => ({ ...v, notes: "", capability_note: undefined, capability_source: undefined })),
-    ice: getIceVehicles().map((v) => ({ ...v, capability_note: undefined, capability_source: undefined })),
+    evs: getVehicles().map((v) => ({ ...v, notes: "", capability_note: undefined, capability_source: undefined, features: slim(v.features) })),
+    ice: getIceVehicles().map((v) => ({ ...v, capability_note: undefined, capability_source: undefined, price_note: undefined, features: slim(v.features) })),
     utilities: getUtilities(),
     fed: getFederalData(),
     own: getOwnershipAssumptions(),
