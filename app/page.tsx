@@ -1,12 +1,11 @@
 import Link from "next/link";
 import { AiDataNotice } from "@/components/AiDataNotice";
 import { CHART_COLORS, HBars } from "@/components/charts";
+import { FitCheck } from "@/components/FitCheck";
 import { LEARN_PAGES } from "@/components/LearnLayout";
-import { QuickAnswer } from "@/components/QuickAnswer";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Term } from "@/components/Term";
-import { getFederalData, getIceVehicles, getOwnershipAssumptions, getUtilities, getVehicles } from "@/lib/data";
-import type { Catalog } from "@/lib/household";
+import { getFederalData, getOwnershipAssumptions, getUtilities, getVehicles } from "@/lib/data";
 import { typicalFigures } from "@/lib/typical";
 
 export default function HomePage() {
@@ -14,13 +13,10 @@ export default function HomePage() {
   const utilities = getUtilities();
   const evs = getVehicles();
   const tf = typicalFigures(fed, utilities, evs);
-  const c = { gas: tf.gasPer100, gasPrice: tf.gasPrice, home: tf.homePer100, homeRate: tf.homeRate, publicFast: tf.publicPer100, dcfcRate: tf.dcfcRate };
-  const catalog: Catalog = {
-    evs: evs.filter((v) => v.status === "current").map((v) => ({ ...v, notes: "", capability_note: undefined, capability_source: undefined })),
-    ice: getIceVehicles().filter((v) => ["toyota-camry-2024", "honda-crv-2024", "honda-odyssey-2024", "chevy-silverado-2024"].includes(v.id))
-      .map((v) => ({ ...v, capability_note: undefined, capability_source: undefined, price_note: undefined })),
-    utilities, fed, own: getOwnershipAssumptions(),
-  };
+  // A snapshot, not a multi-year comparison, so gas at today's AAA WV average
+  // rather than the forecast.
+  const c = { gas: tf.gasTodayPer100, gasPrice: tf.gasToday, home: tf.homePer100, homeRate: tf.homeRate, publicFast: tf.publicPer100, dcfcRate: tf.dcfcRate };
+  const own = getOwnershipAssumptions();
   const $ = (n: number) => "$" + n.toFixed(2);
   return (
     <main className="mx-auto max-w-content px-4 sm:px-6 py-8 sm:py-12">
@@ -45,7 +41,7 @@ export default function HomePage() {
             <HBars
               ariaLabel={`100 miles costs about ${$(c.gas)} in gas, ${$(c.home)} charging at home, and ${$(c.publicFast)} at public fast chargers.`}
               rows={[
-                { label: "Gas", value: c.gas, valueLabel: $(c.gas), color: CHART_COLORS.gas, note: `at ${$(c.gasPrice)}/gal (forecast average)` },
+                { label: "Gas", value: c.gas, valueLabel: $(c.gas), color: CHART_COLORS.gas, note: `at ${$(c.gasPrice)}/gal (today's WV average, AAA)` },
                 { label: <>Charging at home (<Term id="kwh">per kWh</Term>)</>, value: c.home, valueLabel: $(c.home), color: CHART_COLORS.ev, note: `at ~${(c.homeRate * 100).toFixed(0)}¢ per kWh (WV utilities)` },
                 { label: <Term id="fast-charger">Public fast charger</Term>, value: c.publicFast, valueLabel: $(c.publicFast), color: CHART_COLORS.neutral, note: `at ~${(c.dcfcRate * 100).toFixed(0)}¢ per kWh — mostly on road trips` },
               ]}
@@ -53,8 +49,8 @@ export default function HomePage() {
             <p className="mt-3 text-xs text-ink-soft">Where you charge matters more than which EV you pick.</p>
           </div>
           <div className="flex flex-col gap-3">
-            <a href="#quick" className="inline-flex items-center justify-center rounded-xl bg-brand hover:bg-brand-dark text-white font-semibold px-5 py-3 transition shadow-sm">
-              Get a quick answer — 4 taps ↓
+            <a href="#fit-check" className="inline-flex items-center justify-center rounded-xl bg-brand hover:bg-brand-dark text-white font-semibold px-5 py-3 transition shadow-sm">
+              Take the 3-question fit check ↓
             </a>
             <Link href="/plan" className="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white hover:border-brand text-ink font-semibold px-5 py-3 transition">
               Plan your whole household →
@@ -74,7 +70,7 @@ export default function HomePage() {
         </p>
       </section>
 
-      <QuickAnswer catalog={catalog} />
+      <FitCheck level2InstalledUsd={own.home_charging_setup.level2_installed_usd} />
 
       <section className="mt-14 grid gap-4 sm:grid-cols-2">
         {[

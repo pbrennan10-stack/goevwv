@@ -164,6 +164,7 @@ export function HouseholdPlanner({ catalog }: Props) {
     const evParam = params.get("ev");
     if (loaded) {
       setS((prev) => ({ ...prev, ...loaded, step: 3 }));
+      // from=quick: links made by the retired homepage quick answer (Sept 2026).
       if (params.get("from") === "quick") setFromQuick(true); else setFromShare(true);
     }
     else if (evParam && catalog.evs.some((v) => v.id === evParam)) setS((prev) => ({ ...prev, candRef: `ev:${evParam}` }));

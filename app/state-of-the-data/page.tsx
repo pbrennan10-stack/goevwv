@@ -590,7 +590,7 @@ export default function StateOfTheDataPage() {
               sourceUrl="https://gasprices.aaa.com/?state=WV"
               retrieved={federal.calculation_notes.gas_price_baseline_per_gal.retrieved ?? "2026-09-23"}
               confidence="verified"
-              notes="AAA's WV average was $4.373 on September 23, 2026 — up from $3.96 a month earlier and $2.97 a year earlier (US average $4.47). This is near a peak, so it is NOT the default for multi-year comparisons (see the forecast below) — it's offered as the 'Today' option."
+              notes="AAA's WV average was $4.362 on September 28, 2026 — up from $3.95 a month earlier and $2.99 a year earlier (US average $4.48). The homepage's 'What 100 miles costs' chart uses it. It's near a peak, so it is NOT the default for multi-year comparisons (see the forecast below) — it's offered as the 'Today' option."
             />
             {federal.calculation_notes.gas_price_outlook_per_gal && (
               <SourceRow

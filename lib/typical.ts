@@ -22,6 +22,7 @@ export function typicalFigures(fed: FederalData, utilities: Utility[], evs: Vehi
     medianKwhPer100, milesPerKwh: 100 / medianKwhPer100,
     gasPrice, gasToday, homeRate, homeLow, homeHigh, dcfcRate, mpg,
     gasPer100: (100 / mpg) * ICE_WINTER_FUEL_MULTIPLIER * gasPrice,
+    gasTodayPer100: (100 / mpg) * ICE_WINTER_FUEL_MULTIPLIER * gasToday,
     homePer100: kwhPer100 * homeRate,
     publicPer100: kwhPer100 * dcfcRate,
     // CO₂ per mile, WV grid (PJM/RFCW) vs gasoline.
