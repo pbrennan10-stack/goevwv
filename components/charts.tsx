@@ -99,34 +99,3 @@ export function StackedBars({ rows, ariaLabel, legend = true }: { rows: StackRow
     </div>
   );
 }
-
-// ---------- Diverging range strip ("EV costs more" ← $0 → "EV saves") ----------
-
-export function SavingsRange({
-  low, mid, high, ariaLabel, leftLabel = "EV costs more", rightLabel = "EV saves",
-}: {
-  low: number; mid: number; high: number;   // positive = EV saves
-  ariaLabel: string; leftLabel?: string; rightLabel?: string;
-}) {
-  const span = Math.max(1000, Math.abs(low), Math.abs(mid), Math.abs(high)) * 1.15;
-  const x = (v: number) => 50 + (v / span) * 50; // percent
-  const lo = Math.min(low, high), hi = Math.max(low, high);
-  return (
-    <div className="chart" role="img" aria-label={ariaLabel}>
-      <div className="relative h-12">
-        <div className="absolute inset-x-0 top-5 h-2 rounded-full bg-slate-100" />
-        <div className="absolute top-5 h-2 rounded-full" style={{ left: `${x(lo)}%`, width: `${x(hi) - x(lo)}%`, background: "rgba(5,150,105,0.35)" }} />
-        <div className="absolute top-2 bottom-2 w-px bg-slate-400" style={{ left: "50%" }} />
-        <div
-          className="absolute top-3.5 h-5 w-5 -ml-2.5 rounded-full border-2 border-white shadow motion-safe:transition-[left] motion-safe:duration-500"
-          style={{ left: `${x(mid)}%`, background: mid >= 0 ? CHART_COLORS.ev : CHART_COLORS.fee }}
-        />
-      </div>
-      <div className="flex justify-between text-xs text-ink-soft">
-        <span>← {leftLabel}</span>
-        <span>$0</span>
-        <span>{rightLabel} →</span>
-      </div>
-    </div>
-  );
-}

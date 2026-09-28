@@ -50,11 +50,11 @@ goevwv/
 │   ├── Calculator.tsx  # Single-vehicle calculator: form + picker + results
 │   ├── SiteHeader.tsx / SiteFooter.tsx  # Shared nav + footer (add new pages here)
 │   ├── AiDataNotice.tsx # "AI-assisted data, may contain errors" notice
-│   ├── QuickAnswer.tsx # Homepage 4-tap quick answer → hands off to /plan
-│   ├── charts.tsx      # Zero-dependency chart kit (HBars, StackedBars, SavingsRange)
+│   ├── FitCheck.tsx    # Homepage 3-question fit check (use cases, not cost) → /calculator
+│   ├── charts.tsx      # Zero-dependency chart kit (HBars, StackedBars)
 │   ├── RangeCargoExplorer.tsx # /ev range + luggage explorer
 │   ├── Term.tsx        # Tap-to-explain popover (data/glossary.json)
-│   └── Logo.tsx, FitCheck.tsx, ChargerMap.tsx, RouteHelper.tsx, …
+│   └── Logo.tsx, ChargerMap.tsx, RouteHelper.tsx, …
 ├── lib/
 │   ├── types.ts        # TS types (Vehicle, Capability, Utility, FederalData, …)
 │   ├── data.ts         # Server-only: loads data/*.json and data/*.yaml
@@ -62,7 +62,7 @@ goevwv/
 │   ├── household.ts    # Household planner engine (assignment, fit, ownership cost)
 │   ├── capability.ts   # Seats/cargo/towing helpers, cargo-miles index
 │   ├── scenario.ts     # "Typical WV driver" defaults for /ev, /utilities, /faq
-│   └── planState.ts    # Planner state, trip presets, ?h= URL encoding (shared with QuickAnswer)
+│   └── planState.ts    # Planner state, trip presets, ?h= URL encoding
 ├── data/
 │   ├── vehicles.json   # ~70 EV/PHEV models incl. cargo vans (capability + source per vehicle)
 │   ├── ice_vehicles.json # ~75 gas vehicles people own today (mpg, insurance, maintenance, capability)
@@ -190,7 +190,7 @@ Engine in `lib/household.ts` reuses `lib/calc.ts` energy/DCFC/insurance helpers 
 
 ## Newcomer path & visuals
 
-- Homepage: "What 100 miles costs" chart + `QuickAnswer` (4 taps → verdict with low/mid/high range → `/plan?from=quick&h=…`).
+- Homepage: "What 100 miles costs" chart + `FitCheck` (home charging, daily miles, long-trip pattern → does an EV fit how you drive, and is a PHEV a better fit → `/calculator?mi=…`). The fit check identifies use cases; it is deliberately not a cost verdict — dollars live in /plan and /calculator. (A Sept 2026 cost-only "quick answer" replaced it for a day and was reverted for that reason.)
 - Tap-to-explain: `<Term id="…">` reads `data/glossary.json` (native Popover API, no library). Explain first use per page only; never inside headings, buttons or select options. `/learn/glossary` lists every term.
 - Charts: use `components/charts.tsx`; no chart libraries. Bars start at zero, values are text, charts print.
 

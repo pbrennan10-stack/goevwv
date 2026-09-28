@@ -32,7 +32,7 @@ export default function GlossaryPage() {
         ))}
       </dl>
       <p className="mt-8 text-sm text-ink-muted">
-        Ready for numbers? <Link href="/#quick" className="text-brand hover:underline">Get a quick answer</Link> or{" "}
+        Ready to try it on your own driving? <Link href="/#fit-check" className="text-brand hover:underline">Take the 3-question fit check</Link> or{" "}
         <Link href="/plan" className="text-brand hover:underline">plan your household</Link>.
       </p>
       <SiteFooter />
