@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
+import { EquipmentList } from "@/components/Equipment";
 import { Term, type TermId } from "@/components/Term";
 
 // Spec labels that get a tap-to-explain definition.
@@ -310,6 +311,18 @@ export default async function VehiclePage({ params }: Params) {
             Sources for every number are on{" "}
             <Link href="/state-of-the-data" className="text-brand hover:underline">State of the Data</Link>.
           </p>
+        </section>
+
+        <section className="mt-10">
+          <h2 className="text-xl font-bold text-ink">What comes standard</h2>
+          {v.features ? (
+            <EquipmentList f={v.features} isEv trim={v.trim} />
+          ) : (
+            <p className="mt-2 text-sm text-ink-muted">
+              We haven&apos;t finished checking this trim&apos;s standard equipment yet. The maker&apos;s build-and-price
+              page lists what&apos;s included.
+            </p>
+          )}
         </section>
 
         {siblings.length > 0 && (

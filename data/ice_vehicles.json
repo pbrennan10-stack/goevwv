@@ -40,7 +40,27 @@
       "new_mpg_combined": 21,
       "price_source": "https://www.cars.com/research/acura-mdx-2026/",
       "price_confidence": "approximate",
-      "price_note": "Acura pages blocked fetching; JD Power lists $60,750 incl. dest."
+      "price_note": "Acura pages blocked fetching; JD Power lists $60,750 incl. dest.",
+      "features": {
+        "driver_assist_level": "lane_centering",
+        "driver_assist_name": "AcuraWatch",
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": true,
+        "ota_updates": "unknown",
+        "remote_climate": true,
+        "power_outlet_v2l": false,
+        "heated_front_seats": true,
+        "heated_steering_wheel": false,
+        "power_liftgate": true,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 12.3,
+        "source": "acura.com/suvs/mdx/features (2026 MDX Features page); acuranews.com 2026 MDX Specifications & Features, Technology column",
+        "confidence": "verified",
+        "note": "Confirmed: every 2026 MDX trim (including Technology) gets AcuraWatch standard = FCW/AEB, blind-spot warning with rear cross-traffic alert, lane keeping assist, adaptive cruise with curve speed assist, and Traffic Jam Assist (low-speed lane centering, hands on wheel). Heated steering wheel and Surround-View Camera are Advance-package-only, not on Technology. Key-fob remote start standard with 3-yr AcuraLink trial. Only 12V outlets. No change from draft."
+      }
     },
     {
       "id": "acura-rdx-2024",
@@ -371,7 +391,27 @@
       "new_mpg_combined": 24,
       "price_source": "https://www.cars.com/research/audi-q5-2026/",
       "price_confidence": "approximate",
-      "price_note": "New-generation Q5. Price derived from $54,095 incl. $1,295 dest; audiusa.com blocked fetching."
+      "price_note": "New-generation Q5. Price derived from $54,095 incl. $1,295 dest; audiusa.com blocked fetching.",
+      "features": {
+        "driver_assist_level": "basic_adas",
+        "driver_assist_name": null,
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": null,
+        "lane_keep": null,
+        "ota_updates": "unknown",
+        "remote_climate": true,
+        "power_outlet_v2l": null,
+        "heated_front_seats": true,
+        "heated_steering_wheel": false,
+        "power_liftgate": true,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 14.5,
+        "source": "kbb.com/audi/q5/2026/specs (Premium column: blind-spot standard, power liftgate standard, heated steering wheel optional, top-view camera optional); search coverage of Audi USA/AudiWorld reporting on 2026 Q5 Audi connect CARE remote start",
+        "confidence": "approximate",
+        "note": "Changed remote_climate from null to true: for the 2026 model year, Audi added remote engine start (app-based via myAudi, no fob button) to the complimentary Audi connect CARE plan included on all Q5 trims including Premium, for 10 years at no charge. AEB and lane departure warning standard; adaptive cruise/active lane keeping not confirmed as standard so left null. Heated wheel and surround/top-view camera confirmed optional on Premium via KBB. Power liftgate confirmed standard."
+      }
     },
     {
       "id": "bmw-330i-2024",
@@ -406,7 +446,27 @@
       "new_mpg_combined": 29,
       "price_source": "https://www.cars.com/research/bmw-330-2026/",
       "price_confidence": "approximate",
-      "price_note": "Price from Cars.com/Edmunds ($51,350 incl. $1,350 dest); 2026 330i is now a mild hybrid."
+      "price_note": "Price from Cars.com/Edmunds ($51,350 incl. $1,350 dest); 2026 330i is now a mild hybrid.",
+      "features": {
+        "driver_assist_level": "basic_adas",
+        "driver_assist_name": "BMW Active Driving Assistant",
+        "aeb": true,
+        "blind_spot": false,
+        "rear_cross_traffic": null,
+        "lane_keep": true,
+        "ota_updates": "vehicle_systems",
+        "remote_climate": false,
+        "power_outlet_v2l": null,
+        "heated_front_seats": true,
+        "heated_steering_wheel": false,
+        "power_liftgate": null,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 14.9,
+        "source": "bmwusa.com/vehicles/3-series/3-series-sedan (2026 3 Series Sedan overview); cars.com/research/bmw-330-2026; edmunds.com/bmw/3-series/2026/st-402084443/features-specs",
+        "confidence": "approximate",
+        "note": "Changed heated_front_seats from null to true: power-adjustable, heated front seats are standard cabin equipment on the 2026 330i xDrive per BMW USA/Cars.com coverage (not gated behind a package). Lane Keeping Assistant standard for 2026; blind-spot detection and adaptive cruise remain part of the ~$1,950 Convenience package (which also bundles heated steering wheel, remote start via My BMW App, head-up display, power trunk release) so those stay false/null. Surround camera lives in the Parking Assistance package. power_liftgate left null (sedan trunk lid, not applicable)."
+      }
     },
     {
       "id": "bmw-m2-2024",
@@ -442,7 +502,27 @@
       "new_mpg_combined": 19,
       "price_source": "https://www.bmwblog.com/2026/01/06/2026-bmw-m2-review-price-performance-changes/",
       "price_confidence": "approximate",
-      "price_note": "Price from BMWBlog/Cars.com (bmwusa.com timed out). Same 19 mpg for 6MT and 8AT. 2027 M2 also listed by EPA."
+      "price_note": "Price from BMWBlog/Cars.com (bmwusa.com timed out). Same 19 mpg for 6MT and 8AT. 2027 M2 also listed by EPA.",
+      "features": {
+        "driver_assist_level": "basic_adas",
+        "driver_assist_name": "BMW Active Driving Assistant",
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": true,
+        "ota_updates": "vehicle_systems",
+        "remote_climate": false,
+        "power_outlet_v2l": null,
+        "heated_front_seats": true,
+        "heated_steering_wheel": false,
+        "power_liftgate": null,
+        "surround_view_camera": null,
+        "wireless_phone_projection": true,
+        "main_screen_in": 14.9,
+        "source": "kbb.com/bmw/m2/2026/specs (base M2 vs M2 CS columns); carsdirect.com/bmw/m2/2026",
+        "confidence": "approximate",
+        "note": "Changed heated_steering_wheel and remote_climate from null to false: KBB's 2026 M2 spec table explicitly lists both as Optional on the base M2 and Standard only on the M2 CS variant, resolving the CarsDirect/KBB conflict noted in the draft (this record is base M2, not CS). Blind-spot alert confirmed standard. Surround-view camera not documented either way, left null. No standard lane centering; OTA based on BMW Remote Software Upgrade, not confirmed for this exact model year."
+      }
     },
     {
       "id": "bmw-x3-2024",
@@ -598,7 +678,27 @@
       "new_mpg_combined": 21,
       "price_source": "https://www.cars.com/research/buick-enclave-2026/",
       "price_confidence": "approximate",
-      "price_note": "Essence trim and 3.6L V6 dropped in the 2025 redesign; Sport Touring is the mid trim. Cars.com lists $53,895 incl. $1,995 dest. 2027 Enclave also exists."
+      "price_note": "Essence trim and 3.6L V6 dropped in the 2025 redesign; Sport Touring is the mid trim. Cars.com lists $53,895 incl. $1,995 dest. 2027 Enclave also exists.",
+      "features": {
+        "driver_assist_level": "basic_adas",
+        "driver_assist_name": null,
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": true,
+        "ota_updates": "unknown",
+        "remote_climate": true,
+        "power_outlet_v2l": false,
+        "heated_front_seats": true,
+        "heated_steering_wheel": true,
+        "power_liftgate": true,
+        "surround_view_camera": true,
+        "wireless_phone_projection": true,
+        "main_screen_in": 30,
+        "source": "buick.com/suvs/previous-year/enclave/sport-touring (2026 ST page); carsdirect.com/buick/enclave/2026",
+        "confidence": "verified",
+        "note": "Confirmed via additional search: Super Cruise is a separate ~$3,670 package (not standard) and the 110V/household outlet is only in the optional Power Package, matching the draft. 30-in curved display is standard across the lineup. Adaptive cruise and lane keep assist standard but no lane centering. No change from draft."
+      }
     },
     {
       "id": "buick-encore-gx-2024",
@@ -754,7 +854,27 @@
       "new_mpg_combined": 16,
       "price_source": "https://gmauthority.com/blog/2025/07/2026-cadillac-escalade-gets-trim-level-name-changes/",
       "price_confidence": "approximate",
-      "price_note": "2026 rename: the old Luxury is now the base 'Escalade' ($91,100 RWD + $3,000 4WD); the new 'Luxury' is the old Premium Luxury."
+      "price_note": "2026 rename: the old Luxury is now the base 'Escalade' ($91,100 RWD + $3,000 4WD); the new 'Luxury' is the old Premium Luxury.",
+      "features": {
+        "driver_assist_level": "hands_free_highway",
+        "driver_assist_name": "Super Cruise",
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": true,
+        "ota_updates": "unknown",
+        "remote_climate": true,
+        "power_outlet_v2l": null,
+        "heated_front_seats": true,
+        "heated_steering_wheel": true,
+        "power_liftgate": true,
+        "surround_view_camera": true,
+        "wireless_phone_projection": true,
+        "main_screen_in": 55,
+        "source": "kbb.com/cadillac/escalade/2026/specs (base/Luxury column: surround view standard, heated steering wheel standard, power outlet standard); general coverage confirming Super Cruise standard across the 2026 Escalade lineup including base trim",
+        "confidence": "verified",
+        "note": "Re-verified against KBB's 2026 spec table: surround-view camera and heated steering wheel are both standard on base/Luxury (one general search snippet suggested surround view was optional, but it conflated Escalade IQ software-recorder coverage; the direct KBB spec table for the gas Escalade confirms standard, so kept as draft). Super Cruise standard with 3-yr OnStar One trial. KBB lists a standard power outlet but does not confirm 120V vs 12V, so power_outlet_v2l stays null. No field values changed from draft."
+      }
     },
     {
       "id": "cadillac-xt5-2024",
@@ -849,7 +969,27 @@
       "new_mpg_combined": 19,
       "price_source": "https://www.cars.com/research/chevrolet-colorado-2026/trims/",
       "price_confidence": "approximate",
-      "price_note": "Same trim/engine. Price from Cars.com; destination $2,095 from search summary of GM sources (unconfirmed)."
+      "price_note": "Same trim/engine. Price from Cars.com; destination $2,095 from search summary of GM sources (unconfirmed).",
+      "features": {
+        "driver_assist_level": "basic_adas",
+        "driver_assist_name": "Chevy Safety Assist",
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": true,
+        "ota_updates": "unknown",
+        "remote_climate": true,
+        "power_outlet_v2l": false,
+        "heated_front_seats": false,
+        "heated_steering_wheel": false,
+        "power_liftgate": null,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 11.3,
+        "source": "https://www.kbb.com/chevrolet/colorado/2026/specs/ ; dealer research pages (millschevy.com, chevyofwarminster.com) confirming standard 11.3-in touchscreen w/ wireless CarPlay/Android Auto and standard Chevy Safety Assist (AEB, blind-spot, rear cross-traffic, lane keep w/ LDW) on every trim",
+        "confidence": "approximate",
+        "note": "Corrected rear_cross_traffic from null to true (standard as part of Chevy Safety Assist). Power_liftgate corrected from false to null — Colorado is a pickup with a tailgate, not a liftgate, per the field's own rule. Heated front seats and the 120V bed outlet confirmed as optional add-ons (LT Convenience Package / accessory), so changed from null to false rather than leaving them unconfirmed. Screen size and standard wireless CarPlay/Android Auto reconfirmed. Chevrolet/GM sites still blocked fetch; based on search excerpts and dealer pages, not a manufacturer spec sheet."
+      }
     },
     {
       "id": "chevy-equinox-2024",
@@ -886,7 +1026,27 @@
       "new_mpg_combined": 27,
       "price_source": "https://www.cars.com/research/chevrolet-equinox-2027/trims/",
       "price_confidence": "approximate",
-      "price_note": "Same trim/engine (redesigned 2025). Price from Cars.com; destination is 2026 Equinox figure ($1,995) per GM Authority."
+      "price_note": "Same trim/engine (redesigned 2025). Price from Cars.com; destination is 2026 Equinox figure ($1,995) per GM Authority.",
+      "features": {
+        "driver_assist_level": "basic_adas",
+        "driver_assist_name": "Chevy Safety Assist",
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": true,
+        "ota_updates": "unknown",
+        "remote_climate": true,
+        "power_outlet_v2l": null,
+        "heated_front_seats": true,
+        "heated_steering_wheel": true,
+        "power_liftgate": false,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 11.3,
+        "source": "carsdirect.com/chevrolet/equinox/2027; kbb.com/chevrolet/equinox/2027; dealer inventory listing (wolfeautomotive.com) for a 2027 Equinox LT AWD showing heated front seats/steering wheel and wireless Apple CarPlay/Android Auto as included; gmauthority.com on the optional Safety & Technology Package that adds HD Surround Vision",
+        "confidence": "approximate",
+        "note": "Re-check corroborates the draft: heated front seats and heated steering wheel are standard on LT; power liftgate needs Convenience Package II and HD Surround Vision (360 camera) needs the Safety & Technology Package, so both stay false. No lane centering standard; Super Cruise is not offered on Equinox. No field values changed."
+      }
     },
     {
       "id": "chevy-malibu-2024",
@@ -951,7 +1111,27 @@
       "new_mpg_combined": 19,
       "price_source": "https://www.cars.com/research/chevrolet-silverado_1500-2026/trims/",
       "price_confidence": "approximate",
-      "price_note": "LT now comes standard with 2.7L turbo-4; 5.3L V8 is an extra-cost option (price not verified, dealer sites say ~$1,500; EPA 5.3L 4WD = 17 mpg). Priced/rated the base 2.7T. Price from Cars.com; $2,795 destination per GM Authority/TFL reports."
+      "price_note": "LT now comes standard with 2.7L turbo-4; 5.3L V8 is an extra-cost option (price not verified, dealer sites say ~$1,500; EPA 5.3L 4WD = 17 mpg). Priced/rated the base 2.7T. Price from Cars.com; $2,795 destination per GM Authority/TFL reports.",
+      "features": {
+        "driver_assist_level": "basic_adas",
+        "driver_assist_name": "Chevy Safety Assist (Super Cruise available)",
+        "aeb": true,
+        "blind_spot": false,
+        "rear_cross_traffic": false,
+        "lane_keep": true,
+        "ota_updates": "vehicle_systems",
+        "remote_climate": true,
+        "power_outlet_v2l": true,
+        "heated_front_seats": null,
+        "heated_steering_wheel": true,
+        "power_liftgate": null,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 13.4,
+        "source": "kbb.com/chevrolet/silverado-1500/2026/specs; gmpartsdirect.com and gm-trucks.com forum listings on standard 120V interior/exterior outlets for LT; dealer pages (lesstanfordchevrolet.com, roncarter-gm.com) which conflict on heated-seat standard status",
+        "confidence": "approximate",
+        "note": "Changed rear_cross_traffic from null to false and power_outlet_v2l from null to true: blind-spot monitoring and rear cross-traffic alert appear bundled in an optional package on LT, while 120V interior+exterior outlets look standard on LT per parts/spec listings. Heated front seats left null — sources directly conflict on whether LT gets heated seats standard or only LTZ/High Country and up. Heated steering wheel confirmed standard on LT. Power_liftgate left null — Silverado is a pickup (tailgate, not liftgate). Super Cruise and adaptive cruise remain optional on LT. Chevrolet/GM sites blocked fetch; OTA scope not directly confirmed for MY2026."
+      }
     },
     {
       "id": "chevy-suburban-2024",
@@ -989,7 +1169,27 @@
       "new_mpg_combined": 16,
       "price_source": "https://www.cars.com/research/chevrolet-suburban-2027/trims/",
       "price_confidence": "approximate",
-      "price_note": "Same trim/engine. Price from Cars.com; $2,795 destination per Cars.com 2026 destination-fee article."
+      "price_note": "Same trim/engine. Price from Cars.com; $2,795 destination per Cars.com 2026 destination-fee article.",
+      "features": {
+        "driver_assist_level": "basic_adas",
+        "driver_assist_name": "Chevy Safety Assist",
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": false,
+        "lane_keep": true,
+        "ota_updates": "unknown",
+        "remote_climate": true,
+        "power_outlet_v2l": true,
+        "heated_front_seats": false,
+        "heated_steering_wheel": false,
+        "power_liftgate": false,
+        "surround_view_camera": true,
+        "wireless_phone_projection": true,
+        "main_screen_in": 17.7,
+        "source": "https://www.carsdirect.com/chevrolet/suburban/2027/specs (fetched directly); https://www.kbb.com/chevrolet/suburban/2027/specs/",
+        "confidence": "approximate",
+        "note": "Direct fetch of the CarsDirect 2027 Suburban spec sheet confirms LS standard equipment includes an interior 120V AC outlet, Blind Zone Steering Assist (blind-spot), and a Surround Vision Recorder (360 camera) — changed power_outlet_v2l (null to true) and surround_view_camera (null to true). The same spec sheet does not list rear cross-traffic alert, heated front seats, heated steering wheel, power liftgate, or remote start as standard on LS, so heated_front_seats changed from null to false and rear_cross_traffic changed from null to false (heated_steering_wheel and power_liftgate were already correctly false). Adaptive cruise/Super Cruise remain unavailable or optional on LS. Chevrolet/GM sites blocked direct fetch; OTA scope unconfirmed."
+      }
     },
     {
       "id": "chevy-tahoe-2024",
@@ -1027,7 +1227,27 @@
       "new_mpg_combined": 17,
       "price_source": "https://www.cars.com/research/chevrolet-tahoe-2027/trims/",
       "price_confidence": "approximate",
-      "price_note": "Price from Cars.com (its LT engine label shows the diesel, but dealer/Chevy sources say 5.3L V8 is standard on LT). Destination $2,795 per TFL/KBB reports on GM full-size SUVs."
+      "price_note": "Price from Cars.com (its LT engine label shows the diesel, but dealer/Chevy sources say 5.3L V8 is standard on LT). Destination $2,795 per TFL/KBB reports on GM full-size SUVs.",
+      "features": {
+        "driver_assist_level": "basic_adas",
+        "driver_assist_name": "Chevy Safety Assist",
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": true,
+        "ota_updates": "vehicle_systems",
+        "remote_climate": true,
+        "power_outlet_v2l": true,
+        "heated_front_seats": true,
+        "heated_steering_wheel": false,
+        "power_liftgate": true,
+        "surround_view_camera": true,
+        "wireless_phone_projection": true,
+        "main_screen_in": 17.7,
+        "source": "https://www.carsdirect.com/chevrolet/tahoe/2027/specs (fetched directly); edmunds.com/chevrolet/tahoe/2027/trims (LT vs LS comparison)",
+        "confidence": "approximate",
+        "note": "Direct fetch of the CarsDirect 2027 Tahoe spec sheet confirms LT standard equipment includes an interior 120V AC outlet, Blind Zone Steering Assist (blind-spot), and a Surround Vision Recorder (360 camera) — matches the draft and is now better corroborated. Edmunds confirms power liftgate and heated front seats are added starting at LT (vs base LS), also matching the draft. Heated steering wheel remains a Comfort package item, not standard. No standard lane centering; Super Cruise is optional via the Advanced Technology package. Chevrolet/GM sites blocked direct fetch; OTA scope not directly confirmed for MY2027. No field values changed."
+      }
     },
     {
       "id": "chevy-trailblazer-2024",
@@ -1124,7 +1344,27 @@
       "new_mpg_combined": 21,
       "price_source": "https://gmauthority.com/blog/2026/06/2027-chevy-traverse-pricing-uncovered/",
       "price_confidence": "approximate",
-      "price_note": "LT $40,800 + $2,000 AWD per GM Authority/Cars.com search results; 2026 LT AWD was $44,695 incl. $1,995."
+      "price_note": "LT $40,800 + $2,000 AWD per GM Authority/Cars.com search results; 2026 LT AWD was $44,695 incl. $1,995.",
+      "features": {
+        "driver_assist_level": "basic_adas",
+        "driver_assist_name": "Chevy Safety Assist",
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": true,
+        "ota_updates": "vehicle_systems",
+        "remote_climate": true,
+        "power_outlet_v2l": null,
+        "heated_front_seats": true,
+        "heated_steering_wheel": true,
+        "power_liftgate": true,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 17.7,
+        "source": "carsdirect.com/chevrolet/traverse/2027; dealer buyer's guides (carterchevroletok.com, deltachevrolet.com) confirming standard heated front seats, heated steering wheel, wireless phone charging, remote start, tri-zone climate, and AutoSense power liftgate on the 2027 Traverse LT AWD",
+        "confidence": "approximate",
+        "note": "Re-check confirms the draft: LT AWD comes standard with heated seats, heated steering wheel, an AutoSense power liftgate, remote start, and Chevy Safety Assist (AEB, blind-spot, rear cross-traffic, lane keep w/ LDW), but no standard lane centering — Super Cruise remains an Enhanced Driving Package option. Surround camera left false (Driver Confidence package item, not confirmed standard). No field values changed."
+      }
     },
     {
       "id": "chevy-trax-2024",
@@ -1221,7 +1461,27 @@
       "new_mpg_combined": 22,
       "price_source": "https://www.cars.com/research/chrysler-pacifica-2026/",
       "price_confidence": "approximate",
-      "price_note": "Touring L trim dropped; Select is now the base gas trim. Cars.com/Edmunds list $44,445 incl. $1,995 dest."
+      "price_note": "Touring L trim dropped; Select is now the base gas trim. Cars.com/Edmunds list $44,445 incl. $1,995 dest.",
+      "features": {
+        "driver_assist_level": "basic_adas",
+        "driver_assist_name": null,
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": true,
+        "ota_updates": "unknown",
+        "remote_climate": null,
+        "power_outlet_v2l": null,
+        "heated_front_seats": true,
+        "heated_steering_wheel": true,
+        "power_liftgate": true,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 10.1,
+        "source": "https://media.stellantisnorthamerica.com/newsrelease.do?id=27056&mid=722 ; https://www.carsdirect.com/2026/chrysler/pacifica ; https://www.kbb.com/chrysler/pacifica/2026/ ; jdpower.com/cars/new-car-previews/2026-chrysler-pacifica-preview ; spitzer.com 2026 Pacifica trim guide",
+        "confidence": "approximate",
+        "note": "Re-check corroborates the draft: Select trim standard equipment includes heated front seats, heated steering wheel, power sliding doors, power liftgate, and the Uconnect 5 10.1-in screen with Apple CarPlay/Android Auto, plus adaptive cruise control. The 360 camera remains a Safety Sphere package item, not standard. Remote start/preconditioning status for Select specifically still could not be confirmed (left null, as drafted). No field values changed."
+      }
     },
     {
       "id": "chrysler-voyager-2024",
@@ -1318,7 +1578,27 @@
       "new_mpg_combined": 20,
       "price_source": "https://www.cars.com/research/dodge-durango-2026/trims/",
       "price_confidence": "approximate",
-      "price_note": "SXT trim dropped; GT is now the base V6 trim. Price from Cars.com (dodge.com blocked); destination not found. 2027 Durango also listed (GT Plus AWD $40,995)."
+      "price_note": "SXT trim dropped; GT is now the base V6 trim. Price from Cars.com (dodge.com blocked); destination not found. 2027 Durango also listed (GT Plus AWD $40,995).",
+      "features": {
+        "driver_assist_level": "none",
+        "driver_assist_name": null,
+        "aeb": false,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": false,
+        "ota_updates": "infotainment_only",
+        "remote_climate": true,
+        "power_outlet_v2l": null,
+        "heated_front_seats": true,
+        "heated_steering_wheel": true,
+        "power_liftgate": true,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 10.1,
+        "source": "dodge.com/durango/technology.html and dodge.com/durango/faq.html (via search extracts); moparinsiders.com and cars.com on the 2026 Durango GT engine lineup (5.7L HEMI V8 standard, 3.6L Pentastar V6 orders reopened as a GT alternative); redwaterdodge.com dealer listing confirming standard heated/vented seats, remote start, and power liftgate on GT/GT Plus",
+        "confidence": "approximate",
+        "note": "Changed driver_assist_level from unknown to none and aeb from null to false: Dodge's own pages list Forward Collision Warning with Full Stop, LaneSense Lane Departure Warning w/ Lane Keep Assist, and Adaptive Cruise Control with Stop as available (optional) on the Durango, not standard — only Blind Spot Monitoring w/ Rear Cross Path Detection and a rear backup camera are standard, consistent with the draft's blind_spot/rear_cross_traffic true and lane_keep false. Changed surround_view_camera from null to false: the 360-degree camera is listed as an available/optional feature across the Durango lineup, not standard. Also confirmed the assigned GT AWD 3.6L V6 trim genuinely exists for MY2026: Dodge initially launched an all-V8 2026 Durango lineup (GT got a standard 5.7L HEMI V8) but later reopened GT orders with the 3.6L Pentastar V6 as an alternative, resolving the draft's 'V8-only lineup' conflict note. Heated seats/wheel and power liftgate confirmed standard on GT. Dodge.com direct fetch returned 403; based on search excerpts, not a verified manufacturer page."
+      }
     },
     {
       "id": "dodge-hornet-2024",
@@ -1409,7 +1689,27 @@
       "new_mpg_combined": 20,
       "price_source": "https://www.ford.com/suvs/bronco/models/big-bend/",
       "price_confidence": "approximate",
-      "price_note": "Sources conflict ($39,525-$41,295); Big Bend is 4-door only for 2026. 20 mpg with 10-spd auto; 7MT is 19."
+      "price_note": "Sources conflict ($39,525-$41,295); Big Bend is 4-door only for 2026. 20 mpg with 10-spd auto; 7MT is 19.",
+      "features": {
+        "driver_assist_level": "basic_adas",
+        "driver_assist_name": "Ford Co-Pilot360",
+        "aeb": true,
+        "blind_spot": false,
+        "rear_cross_traffic": false,
+        "lane_keep": false,
+        "ota_updates": "vehicle_systems",
+        "remote_climate": true,
+        "power_outlet_v2l": false,
+        "heated_front_seats": false,
+        "heated_steering_wheel": null,
+        "power_liftgate": null,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 12,
+        "source": "https://www.ford.com/suvs/bronco/models/big-bend/ ; https://www.carsdirect.com/2026/ford/bronco ; cross-checked against beadleford.net and valorford.com trim guides",
+        "confidence": "approximate",
+        "note": "Corrected heated_front_seats from true to false: heated seats and the 400W Pro Power Onboard outlet are part of the optional Mid Package ($1,540) on Big Bend, not standard (two independent sources agree). Set power_outlet_v2l to false accordingly (0.4kW, optional on this trim). Set power_liftgate to null per Bronco's swing-out tailgate (no liftgate exists to be standard/optional). AEB is standalone-standard; full Co-Pilot360 with BLIS/cross-traffic/lane-keep also requires the Mid Package (confirms draft's original finding). Remote start requires the automatic transmission (7-speed manual also offered). Heated steering wheel left unconfirmed (null). Ford.com's own page text was internally ambiguous on Pro Power, so confidence stays approximate."
+      }
     },
     {
       "id": "ford-bronco-sport-2024",
@@ -1446,7 +1746,27 @@
       "new_mpg_combined": 27,
       "price_source": "https://www.ford.com/suvs/bronco-sport/models/big-bend/",
       "price_confidence": "approximate",
-      "price_note": "Price from Ford Authority/dealer sources; Ford.com did not show price when fetched."
+      "price_note": "Price from Ford Authority/dealer sources; Ford.com did not show price when fetched.",
+      "features": {
+        "driver_assist_level": "basic_adas",
+        "driver_assist_name": "Ford Co-Pilot360",
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": true,
+        "ota_updates": "vehicle_systems",
+        "remote_climate": null,
+        "power_outlet_v2l": null,
+        "heated_front_seats": false,
+        "heated_steering_wheel": false,
+        "power_liftgate": false,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 13.2,
+        "source": "https://www.ford.com/suvs/bronco-sport/models/bronco-sport-big-bend/ ; https://www.carsdirect.com/ford/bronco-sport/2026",
+        "confidence": "approximate",
+        "note": "Corrected driver_assist_level from lane_centering to basic_adas and renamed driver_assist_name from 'Ford Co-Pilot360 Assist+' to base 'Ford Co-Pilot360': Ford's own Big Bend page lists Co-Pilot360 Assist+ (adaptive cruise + lane centering) as an available/optional feature, not standard, though CarsDirect describes it as included on every trim - sources conflict, so treated conservatively as optional. Base BLIS, cross-traffic alert, and lane-keeping warning (not centering) do appear standard across trims per CarsDirect, kept true. Filled in heated_front_seats and heated_steering_wheel as false (confirmed optional; standard starting Outer Banks). Ford Connectivity Package (1 yr) and wireless CarPlay/Android Auto confirmed standard. Remote start and Pro Power Onboard availability on Big Bend unconfirmed, left null."
+      }
     },
     {
       "id": "ford-edge-2024",
@@ -1514,7 +1834,27 @@
       "new_mpg_combined": 28,
       "price_source": "https://www.cars.com/research/ford-escape-2026/trims/",
       "price_confidence": "approximate",
-      "price_note": "2026 is the final Escape model year; production ended Dec 17, 2025, so only remaining new inventory (replacement: Ford Bronco Sport). 2.0L now only on ST-Line Select AWD and up ($33,890, 26 mpg); priced Active AWD 1.5L instead. Destination from ford.com."
+      "price_note": "2026 is the final Escape model year; production ended Dec 17, 2025, so only remaining new inventory (replacement: Ford Bronco Sport). 2.0L now only on ST-Line Select AWD and up ($33,890, 26 mpg); priced Active AWD 1.5L instead. Destination from ford.com.",
+      "features": {
+        "driver_assist_level": "basic_adas",
+        "driver_assist_name": "Ford Co-Pilot360",
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": true,
+        "ota_updates": "vehicle_systems",
+        "remote_climate": false,
+        "power_outlet_v2l": null,
+        "heated_front_seats": false,
+        "heated_steering_wheel": false,
+        "power_liftgate": false,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 8,
+        "source": "https://www.cars.com/research/ford-escape-2026/ ; https://www.jaymaloneford.com/blog/2026/april/11/2026-ford-escape-trim-levels-active-st-line-st-line-select-st-line-elite-platinum-phev.htm ; https://www.ford.com/suvs-crossovers/escape/ (production status)",
+        "confidence": "approximate",
+        "note": "Filled in surround_view_camera as false (not standard on Active; only reachable via the Active Premium Tech Pack alongside the power liftgate - inferred from package structure, not a dedicated confirmation, so kept approximate). Confirmed the base Co-Pilot360 suite (AEB/BLIS/cross-traffic/lane-keep warning) is standard on Active, while adaptive cruise/lane centering (Tech Pack #1), heated seats/wheel/remote start (Cold Weather Pkg or Active Premium Tech Pack), and the power liftgate are all optional, matching the draft. Ford's own site now indicates Escape production is paused, which supports the draft's '2026 likely final model year' note."
+      }
     },
     {
       "id": "ford-expedition-2024",
@@ -1552,7 +1892,27 @@
       "new_mpg_combined": 18,
       "price_source": "https://www.cars.com/research/ford-expedition-2026/",
       "price_confidence": "approximate",
-      "price_note": "XLT trim dropped in the 2025 redesign; Active is the closest trim. 2027 Active 4x4 is listed at $66,600."
+      "price_note": "XLT trim dropped in the 2025 redesign; Active is the closest trim. 2027 Active 4x4 is listed at $66,600.",
+      "features": {
+        "driver_assist_level": "lane_centering",
+        "driver_assist_name": "Ford Co-Pilot360",
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": true,
+        "ota_updates": "vehicle_systems",
+        "remote_climate": false,
+        "power_outlet_v2l": null,
+        "heated_front_seats": false,
+        "heated_steering_wheel": false,
+        "power_liftgate": true,
+        "surround_view_camera": true,
+        "wireless_phone_projection": true,
+        "main_screen_in": 13.2,
+        "source": "https://www.ford.com/suvs/expedition/models/active/ ; https://www.carsdirect.com/2026/ford/expedition ; https://www.cars.com/research/ford-expedition-2026/specs/480172/",
+        "confidence": "approximate",
+        "note": "No field values changed - draft was already accurate. Ford.com's Active model page confirms adaptive cruise with lane centering, the 360-degree camera, and the power Split Gate (power upper liftgate + power lower tailgate) are standard on Active; BlueCruise remains a paid/subscription option; heated steering wheel and key-fob remote start are optional (Touring package). Heated seats and Pro Power Onboard wattage on this trim remain unconfirmed as standard, left matching draft. Caveat: the fetched Ford page content appeared to blend some 2027 wording, so confidence stays approximate rather than verified."
+      }
     },
     {
       "id": "ford-explorer-2024",
@@ -1590,7 +1950,27 @@
       "new_mpg_combined": 23,
       "price_source": "https://www.cars.com/research/ford-explorer-2027/trims/",
       "price_confidence": "approximate",
-      "price_note": "XLT renamed Active from 2025. Price from Cars.com; destination from ford.com (2027 Explorer $1,795)."
+      "price_note": "XLT renamed Active from 2025. Price from Cars.com; destination from ford.com (2027 Explorer $1,795).",
+      "features": {
+        "driver_assist_level": "lane_centering",
+        "driver_assist_name": "Ford Co-Pilot360 Assist 2.0",
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": true,
+        "ota_updates": "vehicle_systems",
+        "remote_climate": false,
+        "power_outlet_v2l": null,
+        "heated_front_seats": true,
+        "heated_steering_wheel": false,
+        "power_liftgate": true,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 13.2,
+        "source": "https://www.ford.com/suvs/explorer/compare-models/ ; https://www.cars.com/research (specs 486722/486727)",
+        "confidence": "verified",
+        "note": "No field values changed - reconfirmed via ford.com's 2027 compare-models page: Co-Pilot360 with adaptive cruise/lane centering standard on Active, heated front seats standard, power liftgate standard, wireless CarPlay/Android Auto standard, 13.2-in display standard, and the 360-camera confirmed NOT standard on Active (starts at ST-Line). Heated steering wheel and BlueCruise confirmed optional/higher-trim, matching draft."
+      }
     },
     {
       "id": "ford-f150-2024",
@@ -1626,7 +2006,27 @@
       "new_mpg_combined": 20,
       "price_source": "https://www.cars.com/research/ford-f_150-2026/trims/",
       "price_confidence": "approximate",
-      "price_note": "Price from Cars.com (ford.com build pages not fetchable); destination from ford.com/auto-shipping-delivery-charges (2026 F-150 $2,795). EPA 2026 F-150 4WD 2.7L = 20 mpg."
+      "price_note": "Price from Cars.com (ford.com build pages not fetchable); destination from ford.com/auto-shipping-delivery-charges (2026 F-150 $2,795). EPA 2026 F-150 4WD 2.7L = 20 mpg.",
+      "features": {
+        "driver_assist_level": "basic_adas",
+        "driver_assist_name": "Ford Co-Pilot360 2.0 (BlueCruise optional)",
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": true,
+        "ota_updates": "vehicle_systems",
+        "remote_climate": null,
+        "power_outlet_v2l": false,
+        "heated_front_seats": false,
+        "heated_steering_wheel": false,
+        "power_liftgate": null,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 12,
+        "source": "https://www.ford.com/trucks/f150/models/xlt/ ; dealer aggregator cross-check on XLT 300A/302A equipment groups (jaymaloneford.com, fordauthority.com)",
+        "confidence": "approximate",
+        "note": "No field values changed - draft was already accurate. Ford.com's XLT model page confirms Co-Pilot360 2.0 (AEB, BLIS w/ cross-traffic alert, lane-keeping system, forward collision warning) is standard on base XLT, but adaptive cruise control is optional (matches basic_adas level). Pro Power Onboard (400W/2kW/2.4kW/7.2kW options) is optional on the 2.7L EcoBoost XLT - standard only on the PowerBoost hybrid, as the draft noted. Heated seats, heated wheel, and the 360-camera are bundled in the optional Mid 302A equipment group, not standard on bare XLT. 12-in SYNC4 display confirmed standard."
+      }
     },
     {
       "id": "ford-f250-2024",
@@ -1661,7 +2061,27 @@
       "new_destination_usd": 2795,
       "price_source": "https://www.cars.com/research/ford-f_250-2026/trims/",
       "price_confidence": "approximate",
-      "price_note": "Base XLT price uses the standard 6.8L V8; the 7.3L V8 is an extra-cost option (not priced). Heavy-duty pickups are not EPA-rated, so mpg null. Destination from ford.com (2026 Super Duty $2,795). Price from Cars.com."
+      "price_note": "Base XLT price uses the standard 6.8L V8; the 7.3L V8 is an extra-cost option (not priced). Heavy-duty pickups are not EPA-rated, so mpg null. Destination from ford.com (2026 Super Duty $2,795). Price from Cars.com.",
+      "features": {
+        "driver_assist_level": "basic_adas",
+        "driver_assist_name": "Ford Co-Pilot360",
+        "aeb": true,
+        "blind_spot": false,
+        "rear_cross_traffic": false,
+        "lane_keep": false,
+        "ota_updates": "vehicle_systems",
+        "remote_climate": false,
+        "power_outlet_v2l": true,
+        "heated_front_seats": true,
+        "heated_steering_wheel": false,
+        "power_liftgate": false,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 8,
+        "source": "https://www.ford.com/trucks/super-duty/2026/",
+        "confidence": "approximate",
+        "note": "Changed heated_front_seats false->true: ford.com's XLT page explicitly lists 'Heated 8-way power front seats' as standard. Full Co-Pilot360 suite (BLIS blind spot/cross-traffic, lane-keep) appears optional on XLT — only AEB confirmed standard, so blind_spot/rear_cross_traffic/lane_keep kept false. power_outlet_v2l, remote_climate, ota_updates, and wireless_phone_projection could not be confirmed on an XLT-specific spec page; kept close to draft but unverified."
+      }
     },
     {
       "id": "ford-maverick-2024",
@@ -1698,7 +2118,27 @@
       "new_mpg_combined": 38,
       "price_source": "https://www.cars.com/research/ford-maverick-2026/trims/",
       "price_confidence": "approximate",
-      "price_note": "Same trim/powertrain. Price from Cars.com; destination from ford.com (2026 Maverick $1,845)."
+      "price_note": "Same trim/powertrain. Price from Cars.com; destination from ford.com (2026 Maverick $1,845).",
+      "features": {
+        "driver_assist_level": "basic_adas",
+        "driver_assist_name": "Ford Co-Pilot360 (partial — AEB & Lane-Keeping standard; full suite optional)",
+        "aeb": true,
+        "blind_spot": false,
+        "rear_cross_traffic": false,
+        "lane_keep": true,
+        "ota_updates": "unknown",
+        "remote_climate": false,
+        "power_outlet_v2l": false,
+        "heated_front_seats": false,
+        "heated_steering_wheel": false,
+        "power_liftgate": false,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 13.2,
+        "source": "https://www.ford.com/trucks/maverick/models/xlt/",
+        "confidence": "verified",
+        "note": "ford.com XLT trim page confirms AEB and Lane-Keeping System standard, while full Co-Pilot360 package, heated seats, and heated steering wheel are listed as optional. Draft was essentially correct. Wireless phone projection standard status not explicitly listed on this page; kept as approximate (true) based on SYNC4 13.2\" being wireless-capable across current Ford lineup."
+      }
     },
     {
       "id": "ford-mustang-gt-2024",
@@ -1734,7 +2174,27 @@
       "new_mpg_combined": 18,
       "price_source": "https://www.edmunds.com/ford/mustang/",
       "price_confidence": "approximate",
-      "price_note": "Price from press/search results; Cars.com lists $46,800. 18 mpg with standard 6MT; 10-speed auto is 19."
+      "price_note": "Price from press/search results; Cars.com lists $46,800. 18 mpg with standard 6MT; 10-speed auto is 19.",
+      "features": {
+        "driver_assist_level": "basic_adas",
+        "driver_assist_name": "Ford Co-Pilot360",
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": true,
+        "ota_updates": "vehicle_systems",
+        "remote_climate": false,
+        "power_outlet_v2l": null,
+        "heated_front_seats": false,
+        "heated_steering_wheel": false,
+        "power_liftgate": null,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 13.2,
+        "source": "https://www.ford.com/cars/mustang/",
+        "confidence": "approximate",
+        "note": "Confirmed: every 2026 Mustang gets standard Co-Pilot360 (AEB, BLIS blind spot, rear cross-traffic, lane-keeping) per Ford — draft correct. Heated seats/wheel confirmed NOT standard on base GT (added on GT Premium and up) — draft correct. power_liftgate correctly null (fastback/coupe with trunk, not applicable)."
+      }
     },
     {
       "id": "ford-ranger-2024",
@@ -1769,7 +2229,27 @@
       "new_mpg_combined": 21,
       "price_source": "https://www.cars.com/research/ford-ranger-2026/trims/",
       "price_confidence": "approximate",
-      "price_note": "Same trim/engine (2.7L V6 optional, 20 mpg). Price from Cars.com; destination from ford.com (2026 Ranger $1,895)."
+      "price_note": "Same trim/engine (2.7L V6 optional, 20 mpg). Price from Cars.com; destination from ford.com (2026 Ranger $1,895).",
+      "features": {
+        "driver_assist_level": "basic_adas",
+        "driver_assist_name": "Ford Co-Pilot360",
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": true,
+        "ota_updates": "unknown",
+        "remote_climate": true,
+        "power_outlet_v2l": false,
+        "heated_front_seats": false,
+        "heated_steering_wheel": false,
+        "power_liftgate": false,
+        "surround_view_camera": false,
+        "wireless_phone_projection": null,
+        "main_screen_in": 10,
+        "source": "https://www.ford.com/trucks/ranger/models/xlt/",
+        "confidence": "verified",
+        "note": "ford.com XLT page directly confirms AEB, BLIS w/ cross-traffic alert, Lane-Keeping System, and Remote Start are ALL standard, and that the 10\" display (not 12\") is standard while 12\" screen and 360-camera are optional — draft mostly correct. Changed wireless_phone_projection from true to null: sources conflict (one claims standard wireless CarPlay/Android Auto, another states 2026 Ranger CarPlay requires a USB cable), and ford.com's own trim page does not list it as standard."
+      }
     },
     {
       "id": "genesis-gv70-2024",
@@ -1923,7 +2403,27 @@
       "new_mpg_combined": 18,
       "price_source": "https://www.cars.com/research/gmc-sierra_1500-2026/trims/",
       "price_confidence": "approximate",
-      "price_note": "SLE now standard with 2.7L turbo-4; 5.3L V8 optional at extra cost (not priced; EPA 5.3L 4WD = 16 mpg). Price from Cars.com; $2,795 destination per press reports on GM full-size trucks."
+      "price_note": "SLE now standard with 2.7L turbo-4; 5.3L V8 optional at extra cost (not priced; EPA 5.3L 4WD = 16 mpg). Price from Cars.com; $2,795 destination per press reports on GM full-size trucks.",
+      "features": {
+        "driver_assist_level": "basic_adas",
+        "driver_assist_name": "GMC Pro Safety",
+        "aeb": true,
+        "blind_spot": false,
+        "rear_cross_traffic": false,
+        "lane_keep": true,
+        "ota_updates": "vehicle_systems",
+        "remote_climate": true,
+        "power_outlet_v2l": true,
+        "heated_front_seats": true,
+        "heated_steering_wheel": true,
+        "power_liftgate": false,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 13.4,
+        "source": "https://www.lighthousegmc.com/blogs/8083/2026-gmc-sierra-1500-sle-specs-features-performance",
+        "confidence": "approximate",
+        "note": "Double-checked the flagged 'suspicious' claim: heated front seats AND heated steering wheel ARE standard on 2026 Sierra SLE per multiple consistent secondary sources — draft was correct, not an error. gmc.com itself returned 403 Forbidden so this could not be verified on the primary manufacturer page; base 'GMC Pro Safety' (not 'Pro Safety Plus') suite on SLE does not include blind spot/rear-cross-traffic standard, consistent with draft."
+      }
     },
     {
       "id": "gmc-terrain-2024",
@@ -2020,7 +2520,27 @@
       "new_mpg_combined": 17,
       "price_source": "https://gmauthority.com/blog/2026/09/gmc-yukon-discount-lease-finance-deals-incentives-offers-september-2026/",
       "price_confidence": "approximate",
-      "price_note": "SLE trim dropped; Elevation is now the base trim. GM Authority lists $75,395 incl. $2,795 dest."
+      "price_note": "SLE trim dropped; Elevation is now the base trim. GM Authority lists $75,395 incl. $2,795 dest.",
+      "features": {
+        "driver_assist_level": "basic_adas",
+        "driver_assist_name": "GMC Pro Safety Plus",
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": true,
+        "ota_updates": "vehicle_systems",
+        "remote_climate": true,
+        "power_outlet_v2l": null,
+        "heated_front_seats": true,
+        "heated_steering_wheel": true,
+        "power_liftgate": true,
+        "surround_view_camera": true,
+        "wireless_phone_projection": true,
+        "main_screen_in": 16.8,
+        "source": "https://www.weldcountygarage.com/2026-gmc-yukon-technology-features/",
+        "confidence": "approximate",
+        "note": "Added driver_assist_name 'GMC Pro Safety Plus' (draft had null). Confirmed Super Cruise is OPTIONAL/available on Elevation (standard only on AT4 Ultimate/Denali Ultimate), and adaptive cruise control itself is also not standard on Elevation (added on higher trims) — so 'basic_adas' level in the draft was correct, not hands_free_highway or lane_centering. gmc.com returned 403 Forbidden; relied on dealer tech-guide and Edmunds-sourced secondary content for feature confirmation (power liftgate, heated seats, screen size, surround camera). heated_steering_wheel and surround_view_camera/wireless_phone_projection are less firmly confirmed than heated seats/power liftgate — treat with slightly lower confidence within this already-approximate record."
+      }
     },
     {
       "id": "honda-accord-2024",
@@ -2055,7 +2575,27 @@
       "new_mpg_combined": 31,
       "price_source": "https://www.cars.com/research/honda-accord-2026/trims/",
       "price_confidence": "approximate",
-      "price_note": "EX trim dropped; SE is the upper non-hybrid 1.5T trim (LX $28,395, 32 mpg). Price from Cars.com; destination from hondanews 2026 Accord summary."
+      "price_note": "EX trim dropped; SE is the upper non-hybrid 1.5T trim (LX $28,395, 32 mpg). Price from Cars.com; destination from hondanews 2026 Accord summary.",
+      "features": {
+        "driver_assist_level": "lane_centering",
+        "driver_assist_name": "Honda Sensing",
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": true,
+        "ota_updates": "infotainment_only",
+        "remote_climate": true,
+        "power_outlet_v2l": false,
+        "heated_front_seats": true,
+        "heated_steering_wheel": false,
+        "power_liftgate": null,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 9,
+        "source": "https://www.hondainfocenter.com/2026/Accord/Feature-Guide/Features-by-Trim/",
+        "confidence": "verified",
+        "note": "Draft's flagged items (heated seats, remote start, wireless CarPlay on 9in screen) all CONFIRMED standard on SE via Honda Info Center - draft was correct there. Changed ota_updates unknown->infotainment_only (HondaLink wireless updates are infotainment-only) and power_outlet_v2l null->false (no household AC outlet on Accord). power_liftgate null (sedan/trunk). Surround-view camera not standard (only multi-angle rearview) - unchanged from draft."
+      }
     },
     {
       "id": "honda-civic-2024",
@@ -2091,7 +2631,27 @@
       "new_mpg_combined": 36,
       "price_source": "https://www.cars.com/research/honda-civic-2026/",
       "price_confidence": "approximate",
-      "price_note": "Price from Cars.com (June 2026: $25,890 incl. $1,195 dest); Honda pages blocked fetching. Launch MSRP was $24,595 with $1,150 dest (Cars.com)."
+      "price_note": "Price from Cars.com (June 2026: $25,890 incl. $1,195 dest); Honda pages blocked fetching. Launch MSRP was $24,595 with $1,150 dest (Cars.com).",
+      "features": {
+        "driver_assist_level": "lane_centering",
+        "driver_assist_name": "Honda Sensing",
+        "aeb": true,
+        "blind_spot": false,
+        "rear_cross_traffic": false,
+        "lane_keep": true,
+        "ota_updates": "infotainment_only",
+        "remote_climate": false,
+        "power_outlet_v2l": false,
+        "heated_front_seats": false,
+        "heated_steering_wheel": false,
+        "power_liftgate": null,
+        "surround_view_camera": false,
+        "wireless_phone_projection": false,
+        "main_screen_in": 7,
+        "source": "https://www.hondainfocenter.com/2026/Civic-Sedan/Feature-Guide/Features-by-Trim/",
+        "confidence": "verified",
+        "note": "Quick confirmation pass: all draft values confirmed correct via Honda Info Center (BSI/cross-traffic and remote start start at Sport trim, not LX; LX has wired not wireless CarPlay/Android Auto on 7in screen; 12V outlet only). Only change: ota_updates unknown->infotainment_only."
+      }
     },
     {
       "id": "honda-civic-hatchback-2024",
@@ -2128,7 +2688,27 @@
       "new_mpg_combined": 34,
       "price_source": "https://www.cars.com/research/honda-civic-2026/",
       "price_confidence": "approximate",
-      "price_note": "1.5L turbo dropped from Sport hatchback; now 2.0L. Price from Cars.com ($29,090 incl. $1,195 dest)."
+      "price_note": "1.5L turbo dropped from Sport hatchback; now 2.0L. Price from Cars.com ($29,090 incl. $1,195 dest).",
+      "features": {
+        "driver_assist_level": "lane_centering",
+        "driver_assist_name": "Honda Sensing",
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": true,
+        "ota_updates": "infotainment_only",
+        "remote_climate": true,
+        "power_outlet_v2l": false,
+        "heated_front_seats": false,
+        "heated_steering_wheel": false,
+        "power_liftgate": false,
+        "surround_view_camera": false,
+        "wireless_phone_projection": false,
+        "main_screen_in": 7,
+        "source": "https://www.hondainfocenter.com/2026/Civic-Hatchback/Feature-Guide/Features-by-Trim/",
+        "confidence": "verified",
+        "note": "Quick confirmation pass: draft confirmed correct via Honda Info Center - Sport hatchback gets BSI+cross-traffic and remote start standard (unlike sedan LX), but still wired (not wireless) CarPlay/Android Auto on 7in screen, no heated seats/wheel. power_liftgate kept as false rather than null: the hatchback liftgate is a standard feature of the body style but it is manually operated, not power-assisted, so false correctly reflects 'no power liftgate' (heated seats/wheel not explicitly itemized either way in source, marked with best-trim-hierarchy inference). Only change: ota_updates unknown->infotainment_only."
+      }
     },
     {
       "id": "honda-crv-2024",
@@ -2165,7 +2745,27 @@
       "new_mpg_combined": 29,
       "price_source": "https://www.cars.com/research/honda-cr_v-2027/trims/",
       "price_confidence": "approximate",
-      "price_note": "Same trim/engine. Price from Cars.com; $1,450 destination from hondanews 2027 CR-V pricing release (search snippet)."
+      "price_note": "Same trim/engine. Price from Cars.com; $1,450 destination from hondanews 2027 CR-V pricing release (search snippet).",
+      "features": {
+        "driver_assist_level": "lane_centering",
+        "driver_assist_name": "Honda Sensing",
+        "aeb": true,
+        "blind_spot": false,
+        "rear_cross_traffic": false,
+        "lane_keep": true,
+        "ota_updates": "infotainment_only",
+        "remote_climate": false,
+        "power_outlet_v2l": false,
+        "heated_front_seats": false,
+        "heated_steering_wheel": false,
+        "power_liftgate": false,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 9,
+        "source": "https://www.hondainfocenter.com/2027/CR-V/Feature-Guide/Features-by-Trim/",
+        "confidence": "verified",
+        "note": "Confirmation pass on actual 2027 CR-V Features-by-Trim page (not just 2026 carryover): draft fully confirmed - LX gets wireless CarPlay/Android Auto + 9in screen standard, but heated seats, heated wheel, remote start, surround camera, blind spot and rear cross-traffic monitor all start at EX and above. Only change: ota_updates unknown->infotainment_only."
+      }
     },
     {
       "id": "honda-hrv-2024",
@@ -2262,7 +2862,27 @@
       "new_mpg_combined": 22,
       "price_source": "https://www.cars.com/research/honda-odyssey-2027/trims/",
       "price_confidence": "approximate",
-      "price_note": "EX trim dropped; EX-L is now the base trim. Price from Cars.com; destination is 2026 Odyssey figure from hondanews summary."
+      "price_note": "EX trim dropped; EX-L is now the base trim. Price from Cars.com; destination is 2026 Odyssey figure from hondanews summary.",
+      "features": {
+        "driver_assist_level": "lane_centering",
+        "driver_assist_name": "Honda Sensing",
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": true,
+        "ota_updates": "infotainment_only",
+        "remote_climate": true,
+        "power_outlet_v2l": null,
+        "heated_front_seats": true,
+        "heated_steering_wheel": false,
+        "power_liftgate": true,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 9,
+        "source": "https://www.hondainfocenter.com/2027/Odyssey/Feature-Guide/Features-by-Trim/",
+        "confidence": "verified",
+        "note": "IMPORTANT: 2027 Odyssey lineup was restructured - EX-L is now the BASE trim (trims are EX-L, Sport-L, Touring, Elite; no LX/EX below it), so this is a different equipment tier than a typical '2nd from bottom' EX-L. Corrected surround_view_camera true->false: EX-L only gets a multi-angle rearview camera, not a true 360/surround system, per Honda Info Center (no trim documents a surround-view system; CabinWatch rear monitor is Touring/Elite only). Confirmed standard on EX-L: BSI+cross-traffic, heated front seats (not heated wheel - that's Sport-L+), remote start, wireless CarPlay/Android Auto, power tailgate AND power sliding doors, 9in screen. Also changed ota_updates unknown->infotainment_only."
+      }
     },
     {
       "id": "honda-passport-2024",
@@ -2299,7 +2919,27 @@
       "new_mpg_combined": 21,
       "price_source": "https://www.cars.com/research/honda-passport-2026/",
       "price_confidence": "approximate",
-      "price_note": "EX-L trim dropped in the 2026 redesign; RTL is the closest trim. Launch MSRP was $44,750."
+      "price_note": "EX-L trim dropped in the 2026 redesign; RTL is the closest trim. Launch MSRP was $44,750.",
+      "features": {
+        "driver_assist_level": "lane_centering",
+        "driver_assist_name": "Honda Sensing",
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": true,
+        "ota_updates": "unknown",
+        "remote_climate": null,
+        "power_outlet_v2l": null,
+        "heated_front_seats": true,
+        "heated_steering_wheel": false,
+        "power_liftgate": true,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 12.3,
+        "source": "https://www.hondainfocenter.com/2026/Passport/Feature-Guide/Features-by-Trim",
+        "confidence": "verified",
+        "note": "Confirmed via 2026 Passport Features-by-Trim page for RTL row: Honda Sensing (CMBS w/ pedestrian detection, ACC w/ low-speed follow, LKAS, BSI w/ cross-traffic monitor) all standard; heated front seats and programmable power tailgate standard; only multi-angle rearview camera (not full surround-view) standard on RTL; wireless CarPlay/Android Auto and 12.3in screen standard. No changes vs draft."
+      }
     },
     {
       "id": "honda-pilot-2024",
@@ -2337,7 +2977,27 @@
       "new_mpg_combined": 21,
       "price_source": "https://www.cars.com/research/honda-pilot-2026/trims/",
       "price_confidence": "approximate",
-      "price_note": "Same trim/engine. Price from Cars.com (hondanews blocked); destination from hondanews 2026 Pilot release summary."
+      "price_note": "Same trim/engine. Price from Cars.com (hondanews blocked); destination from hondanews 2026 Pilot release summary.",
+      "features": {
+        "driver_assist_level": "lane_centering",
+        "driver_assist_name": "Honda Sensing",
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": true,
+        "ota_updates": "unknown",
+        "remote_climate": true,
+        "power_outlet_v2l": false,
+        "heated_front_seats": true,
+        "heated_steering_wheel": false,
+        "power_liftgate": true,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 12.3,
+        "source": "https://www.hondainfocenter.com/2026/Pilot/Feature-Guide/Features-by-Trim",
+        "confidence": "verified",
+        "note": "Quick confirmation pass per instructions: 2026 Pilot EX-L row confirms Sensing suite (CMBS, ACC w/ low-speed follow, LKAS w/ Traffic Jam Assist, BSI + cross-traffic monitor) standard, heated front seats and power tailgate standard (carries over from Sport), remote engine start standard, 12.3in screen and wireless projection standard. No surround-view camera confirmed standard on EX-L. Draft was accurate; no changes."
+      }
     },
     {
       "id": "honda-ridgeline-2024",
@@ -2374,7 +3034,27 @@
       "new_mpg_combined": 21,
       "price_source": "https://www.cars.com/research/honda-ridgeline-2026/",
       "price_confidence": "approximate",
-      "price_note": "Honda configurator/Cars.com list $40,795; Honda launch release cited $40,595. Honda pages blocked fetching."
+      "price_note": "Honda configurator/Cars.com list $40,795; Honda launch release cited $40,595. Honda pages blocked fetching.",
+      "features": {
+        "driver_assist_level": "lane_centering",
+        "driver_assist_name": "Honda Sensing",
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": true,
+        "ota_updates": "unknown",
+        "remote_climate": null,
+        "power_outlet_v2l": true,
+        "heated_front_seats": false,
+        "heated_steering_wheel": false,
+        "power_liftgate": null,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 9,
+        "source": "https://www.hondainfocenter.com/2026/Ridgeline/Feature-Guide/Features-by-Trim",
+        "confidence": "approximate",
+        "note": "2026 Ridgeline Sport row confirms full Sensing suite (CMBS, FCW, LDW, RDM, ACC, LKAS, BSI+cross-traffic) standard; heated seats/wheel and power tailgate NOT standard on Sport (RTL and up only); 9in screen and wireless projection standard. CHANGED power_liftgate from false to null: Ridgeline is a pickup with a manual dual-action bed tailgate, not an SUV liftgate, so the field doesn't apply to this body style. CHANGED power_outlet_v2l from null to true: the 400W in-bed 120V AC outlet is a long-standing standard Ridgeline feature across all trims incl. Sport; not re-confirmed on the trim page this session, so flagged approximate."
+      }
     },
     {
       "id": "hyundai-elantra-2024",
@@ -2409,7 +3089,27 @@
       "new_mpg_combined": 34,
       "price_source": "https://www.cars.com/research/hyundai-elantra-2026/",
       "price_confidence": "approximate",
-      "price_note": "SEL renamed SEL Sport; earlier sources list $23,750. EPA lists 34 (non-ISG) and 35 (stop-start) for the 2.0L IVT."
+      "price_note": "SEL renamed SEL Sport; earlier sources list $23,750. EPA lists 34 (non-ISG) and 35 (stop-start) for the 2.0L IVT.",
+      "features": {
+        "driver_assist_level": "basic_adas",
+        "driver_assist_name": "Hyundai SmartSense",
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": true,
+        "ota_updates": "unknown",
+        "remote_climate": null,
+        "power_outlet_v2l": null,
+        "heated_front_seats": false,
+        "heated_steering_wheel": false,
+        "power_liftgate": null,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 8,
+        "source": "https://joecooperhyundai.com/blog/2026-hyundai-elantra-trim-guide-highlighting-the-new-sel-sport-and-sel-sport-premium",
+        "confidence": "approximate",
+        "note": "CHANGED driver_assist_level from lane_centering to basic_adas: two independent dealer trim-comparison sources agree Smart Cruise Control (adaptive cruise) is added on SEL Sport Premium, i.e. NOT standard on base SEL Sport — this trim gets Lane Keep/Lane Following Assist + blind spot + rear cross-traffic but no standard ACC, which doesn't meet this site's lane_centering bar (imperfect fit for either tier; flagging as a judgment call). Confirmed heated_front_seats=false is correct (also Premium-only add) — draft was right here. hyundaiusa.com returned only JS shell content (no static text), so this relies on secondary sources; treat as approximate pending a manual check of hyundaiusa.com's trim compare tool."
+      }
     },
     {
       "id": "hyundai-kona-2024",
@@ -2506,7 +3206,27 @@
       "new_mpg_combined": 20,
       "price_source": "https://www.cars.com/research/hyundai-palisade-2027/",
       "price_confidence": "approximate",
-      "price_note": "Redesigned in 2026; 3.8L V6 replaced by 3.5L V6. Price from Cars.com ($42,240 FWD + AWD); Hyundai pages blocked fetching."
+      "price_note": "Redesigned in 2026; 3.8L V6 replaced by 3.5L V6. Price from Cars.com ($42,240 FWD + AWD); Hyundai pages blocked fetching.",
+      "features": {
+        "driver_assist_level": "lane_centering",
+        "driver_assist_name": "Hyundai SmartSense",
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": true,
+        "ota_updates": "unknown",
+        "remote_climate": null,
+        "power_outlet_v2l": null,
+        "heated_front_seats": true,
+        "heated_steering_wheel": false,
+        "power_liftgate": true,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 12.3,
+        "source": "https://www.herrnsteinhyundai.com/blog/2027-hyundai-palisade-trims-mpg-towing-and-pricing-guide",
+        "confidence": "approximate",
+        "note": "Found actual 2027 SEL data (not just 2026): confirmed Highway Driving Assist + navigation-based Smart Cruise Control + lane-keeping + blind spot + rear cross-traffic alert are standard across the ENTIRE 2027 Palisade lineup incl. base SE and this SEL AWD trim (one conflicting AI-summarized snippet claimed HDA was Calligraphy-only; two independent sources contradict that and were more detailed/consistent, so treated as the correct read). Heated front seats and hands-free smart liftgate standard on SEL; surround-view camera and heated steering wheel confirmed NOT standard until SEL Premium — draft was right on those. CHANGED driver_assist_name from 'Highway Driving Assist' (a specific feature) to 'Hyundai SmartSense' (the actual suite brand) for consistency with how the field is used elsewhere; HDA is the standard feature providing the lane_centering capability. hyundaiusa.com pages returned JS-shell only, so confidence is approximate."
+      }
     },
     {
       "id": "hyundai-santafe-2024",
@@ -2544,7 +3264,27 @@
       "new_mpg_combined": 23,
       "price_source": "https://www.cars.com/research/hyundai-santa_fe-2027/trims/",
       "price_confidence": "approximate",
-      "price_note": "Same trim/engine. Price from Cars.com; freight $1,600 is the 2026 Santa Fe price-sheet figure (2027 not confirmed)."
+      "price_note": "Same trim/engine. Price from Cars.com; freight $1,600 is the 2026 Santa Fe price-sheet figure (2027 not confirmed).",
+      "features": {
+        "driver_assist_level": "lane_centering",
+        "driver_assist_name": "Hyundai SmartSense (Smart Cruise Control w/ Stop & Go + Lane Following Assist)",
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": true,
+        "ota_updates": "unknown",
+        "remote_climate": true,
+        "power_outlet_v2l": null,
+        "heated_front_seats": true,
+        "heated_steering_wheel": false,
+        "power_liftgate": true,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 12.3,
+        "source": "https://www.hyundaiusa.com/us/en/vehicles/santa-fe/sel (page JS-blocked); corroborated via 2027-specific dealer research pages e.g. https://www.tustinhyundai.com/blog/why-the-2027-hyundai-santa-fe-sel-fits-daily-driving-around-fountain-valley-ca and https://www.cardinalewayhyundai.com/blog/what-to-know-about-the-2027-hyundai-santa-fe",
+        "confidence": "approximate",
+        "note": "All draft values confirmed consistent across multiple 2027-model-year Santa Fe SEL sources: blind-spot/rear-cross-traffic standard lineup-wide since 2026, heated front seats added at SEL, power liftgate + hands-free smart liftgate standard, surround-view camera reserved for Limited/Calligraphy (not SEL), wireless CarPlay/Android Auto standard. main_screen_in (12.3) and ota_updates (unknown) could not be independently reconfirmed this round but nothing contradicted them. No changes needed."
+      }
     },
     {
       "id": "hyundai-sonata-2024",
@@ -2579,7 +3319,27 @@
       "new_mpg_combined": 32,
       "price_source": "https://www.cars.com/research/hyundai-sonata-2026/trims/",
       "price_confidence": "approximate",
-      "price_note": "Same trim/engine. EPA lists 29-32 mpg for FWD 2.5L depending on stop-start; 32 assumed for SE (unconfirmed). Price from Cars.com; $1,245 freight from Hyundai 2026 Sonata price sheet (Aug 2025). 2027 Sonata also EPA-listed."
+      "price_note": "Same trim/engine. EPA lists 29-32 mpg for FWD 2.5L depending on stop-start; 32 assumed for SE (unconfirmed). Price from Cars.com; $1,245 freight from Hyundai 2026 Sonata price sheet (Aug 2025). 2027 Sonata also EPA-listed.",
+      "features": {
+        "driver_assist_level": "lane_centering",
+        "driver_assist_name": "Hyundai SmartSense (Smart Cruise Control w/ Stop & Go + Lane Following Assist)",
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": true,
+        "ota_updates": "unknown",
+        "remote_climate": true,
+        "power_outlet_v2l": null,
+        "heated_front_seats": false,
+        "heated_steering_wheel": false,
+        "power_liftgate": null,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 12.3,
+        "source": "https://www.hyundaiusa.com/us/en/vehicles/sonata/se (page JS-blocked); corroborated via https://www.winnerhyundai.com/blogs/9409/2026-hyundai-sonata-se-sel-sel-sport-and-n-line-guide and https://www.edmunds.com/hyundai/sonata/2026/trims/ (search excerpt)",
+        "confidence": "approximate",
+        "note": "Specifically checked the flagged concern: multiple 2026 Sonata SE sources confirm the FULL SmartSense suite (Forward Collision-Avoidance, Smart Cruise Control w/ Stop&Go, Lane Following/Keeping Assist, Blind-Spot Collision Warning, Rear Cross-Traffic Collision-Avoidance Assist) is standard even on the base SE trim -- this is a case where Hyundai equips the whole safety suite fleet-wide, so lane_centering is correct, not an error. Separately confirmed heated front seats are NOT standard on SE (start at SEL/SEL Sport per pricing breakdown) -- draft's false was already correct. remote_climate=true (Bluelink+ standard, remote start via app/fob, requires subscription after trial) is approximate/plausible but not SE-specifically pinned down. No changes made."
+      }
     },
     {
       "id": "hyundai-tucson-2024",
@@ -2616,7 +3376,27 @@
       "new_mpg_combined": 26,
       "price_source": "https://www.cars.com/research/hyundai-tucson-2026/",
       "price_confidence": "approximate",
-      "price_note": "Cars.com lists SEL AWD $32,550; other sources cite $32,050 (earlier pricing). Freight $1,600 per Hyundai release; Hyundai pages blocked fetching."
+      "price_note": "Cars.com lists SEL AWD $32,550; other sources cite $32,050 (earlier pricing). Freight $1,600 per Hyundai release; Hyundai pages blocked fetching.",
+      "features": {
+        "driver_assist_level": "lane_centering",
+        "driver_assist_name": "Hyundai SmartSense (Smart Cruise Control w/ Stop & Go + Lane Following Assist)",
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": true,
+        "ota_updates": "infotainment_only",
+        "remote_climate": true,
+        "power_outlet_v2l": null,
+        "heated_front_seats": true,
+        "heated_steering_wheel": false,
+        "power_liftgate": true,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 12.3,
+        "source": "https://www.hyundaiusa.com/us/en/vehicles/tucson/compare-specs (page JS-blocked); corroborated via multiple 2026 Tucson dealer research pages describing SEL vs SEL Premium vs Limited standard equipment (e.g. gurneehyundai.com, rustywallacehyundai.com, dorsetthyundai.com)",
+        "confidence": "approximate",
+        "note": "CORRECTED per the flagged concern: Highway Driving Assist is standard only on SEL Premium and Limited, NOT the base SEL -- so driver_assist_name changed from '...(Highway Driving Assist)' to '...(Smart Cruise Control w/ Stop & Go + Lane Following Assist)'. driver_assist_level stays lane_centering because SCC+LFA (adaptive cruise + lane centering, hands on wheel) IS standard on SEL, just not the more advanced HDA branding. Also changed remote_climate from null to true (Bluelink+ remote start confirmed standard on SEL, needs subscription after trial). Confirmed surround_view_camera=false: SEL gets Blind-Spot Collision WARNING (standard fleet-wide) but the camera-based Blind-Spot VIEW MONITOR is Limited-only. heated_front_seats and power_liftgate (hands-free smart liftgate) confirmed standard on SEL."
+      }
     },
     {
       "id": "infiniti-qx60-2024",
@@ -2832,7 +3612,27 @@
       "new_mpg_combined": 19,
       "price_source": "https://www.jeep.com/gladiator/specs.sport-s.html",
       "price_confidence": "approximate",
-      "price_note": "Price from search results citing Jeep/press (jeep.com blocked fetching); Cars.com lists $44,020."
+      "price_note": "Price from search results citing Jeep/press (jeep.com blocked fetching); Cars.com lists $44,020.",
+      "features": {
+        "driver_assist_level": "basic_adas",
+        "driver_assist_name": null,
+        "aeb": true,
+        "blind_spot": false,
+        "rear_cross_traffic": false,
+        "lane_keep": false,
+        "ota_updates": "unknown",
+        "remote_climate": false,
+        "power_outlet_v2l": false,
+        "heated_front_seats": false,
+        "heated_steering_wheel": false,
+        "power_liftgate": null,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 12.3,
+        "source": "https://www.jeep.com/gladiator/technology.html (403 blocked); corroborated via https://www.carsdirect.com/jeep/gladiator/2026, https://www.edmunds.com/jeep/gladiator/2026/st-402090899/features-specs/ (search excerpt), and https://www.capitalone.com/cars/overview/jeep/gladiator/2026",
+        "confidence": "approximate",
+        "note": "RESOLVED the flagged inconsistency: forward-collision warning + AEB AND adaptive cruise control ARE standard starting at Sport S ('Starting with the Sport S, all Gladiators add a forward-collision-warning system and adaptive cruise control' - CarsDirect/Capital One), but there is no lane-centering feature and no branded driver-assist suite name, so it does not meet this taxonomy's 'lane_centering' definition (adaptive cruise + lane centering). Kept as basic_adas since that's the closest available bucket, but flagging that ACC exceeds a strict AEB/LDW-only description -- the taxonomy has no exact match for 'ACC without lane centering.' Blind-spot warning is only available via the optional Active Safety Group (also bundles rear parking sensors + LED taillights); rear-cross-traffic's inclusion in that package could not be confirmed, kept false but low confidence. heated seats/wheel and the 115V outlet are confirmed optional-only (Technology Group), not standard. CHANGED power_liftgate from false to null: Gladiator is a pickup with a tailgate, not an SUV liftgate, so per the field rule ('null for sedans/vehicles without a liftgate') this should be null, not false."
+      }
     },
     {
       "id": "jeep-grand-cherokee-2024",
@@ -2870,7 +3670,27 @@
       "new_mpg_combined": 22,
       "price_source": "https://www.cars.com/research/jeep-grand_cherokee-2027/trims/",
       "price_confidence": "approximate",
-      "price_note": "Same trim/engine. Price from Cars.com; destination is the 2026 Jeep figure ($1,995) per Cars.com destination-fee article."
+      "price_note": "Same trim/engine. Price from Cars.com; destination is the 2026 Jeep figure ($1,995) per Cars.com destination-fee article.",
+      "features": {
+        "driver_assist_level": "basic_adas",
+        "driver_assist_name": null,
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": true,
+        "ota_updates": "infotainment_only",
+        "remote_climate": false,
+        "power_outlet_v2l": null,
+        "heated_front_seats": null,
+        "heated_steering_wheel": false,
+        "power_liftgate": false,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 10.1,
+        "source": "https://www.jeep.com/active-driving-assist.html; https://www.carsdirect.com/jeep/grand-cherokee/2027; https://www.cars.com/research/jeep-grand_cherokee-2027/specs/",
+        "confidence": "approximate",
+        "note": "RESOLVED the flagged inconsistency in favor of keeping basic_adas: Jeep's own Active Driving Assist page confirms ADA (the adaptive-cruise + lane-centering suite) 'is standard on trims equipped with the 2.0L Hurricane 4 Turbo engine, EXCLUDING Laredo and Laredo X' -- this Laredo is the 3.6L V6, so it does NOT get the lane-centering suite standard, meaning basic_adas is correct (not lane_centering) despite general fleet-wide descriptions mentioning adaptive cruise/lane-keep as GC features overall. aeb/blind_spot/rear_cross_traffic/lane_keep=true come from a fleet-wide feature list, not a Laredo-specific standard-equipment page, so treat with some caution (approximate). CONFIRMED main_screen_in=10.1: CarsDirect explicitly states the 2027 GC introduces a 'newly standard 10.1-inch touchscreen' for Laredo/Laredo X, with 12.3-inch on the rest of the lineup -- this resolves the KBB(10.1) vs CarsDirect(8.4) conflict in favor of 10.1 (the 8.4 figure appears to be a stale/prior-gen reference). heated_front_seats stays null/unresolved: found as standard only on Laredo X V6 or via Altitude/Customer Preferred Package, not confirmed for plain base Laredo."
+      }
     },
     {
       "id": "jeep-wrangler-2024",
@@ -2907,7 +3727,27 @@
       "new_mpg_combined": 19,
       "price_source": "https://www.cars.com/research/jeep-wrangler-2026/trims/",
       "price_confidence": "approximate",
-      "price_note": "Base price is V6 manual (19 mpg); 8-speed automatic is extra cost (EPA 20 mpg). Price from Cars.com; Jeep destination $1,995 per Cars.com 2026 destination-fee article. A 2027 Wrangler is also listed by EPA."
+      "price_note": "Base price is V6 manual (19 mpg); 8-speed automatic is extra cost (EPA 20 mpg). Price from Cars.com; Jeep destination $1,995 per Cars.com 2026 destination-fee article. A 2027 Wrangler is also listed by EPA.",
+      "features": {
+        "driver_assist_level": "none",
+        "driver_assist_name": null,
+        "aeb": false,
+        "blind_spot": false,
+        "rear_cross_traffic": false,
+        "lane_keep": false,
+        "ota_updates": "infotainment_only",
+        "remote_climate": false,
+        "power_outlet_v2l": null,
+        "heated_front_seats": false,
+        "heated_steering_wheel": false,
+        "power_liftgate": null,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 12.3,
+        "source": "https://www.jeep.com/wrangler/technology.html (403 on direct fetch; corroborated via https://www.riverfrontchryslerjeep.net/2026-jeep-wrangler-sport-trim-guide/ and other CDJR dealer trim guides)",
+        "confidence": "approximate",
+        "note": "Confirmed the Sport has NO standard forward-collision/driver-assist tech (standard from Sport S up) — resolves prior CarsDirect vs KBB conflict in CarsDirect's favor. Changed power_liftgate false->null: Wrangler uses a swing-out tailgate on every trim, not a liftgate, so this field doesn't apply. Could not load jeep.com directly (403), hence approximate not verified."
+      }
     },
     {
       "id": "kia-carnival-2024",
@@ -2945,7 +3785,27 @@
       "new_mpg_combined": 21,
       "price_source": "https://www.kiamedia.com/us/en/models/carnival/2027/pricing",
       "price_confidence": "verified",
-      "price_note": "Now badged Carnival MPV; 2026 LX was $37,390."
+      "price_note": "Now badged Carnival MPV; 2026 LX was $37,390.",
+      "features": {
+        "driver_assist_level": "lane_centering",
+        "driver_assist_name": "Kia Drive Wise (Smart Cruise Control w/ Stop & Go + Lane Following Assist 2 + Hands-On Detection)",
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": true,
+        "ota_updates": "vehicle_systems",
+        "remote_climate": null,
+        "power_outlet_v2l": false,
+        "heated_front_seats": false,
+        "heated_steering_wheel": false,
+        "power_liftgate": false,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 12.3,
+        "source": "https://www.kiamedia.com/us/en/models/carnival/2027/features",
+        "confidence": "verified",
+        "note": "Changed driver_assist_name: 'Highway Driving Assist' is NOT standard on LX (reserved for SX/SX+); LX gets LFA2/SCC/FCA/BCA/RCTA instead, still lane_centering level. Upgraded ota_updates unknown->vehicle_systems per NHTSA TSBs showing Carnival gets both nav-map and controller/ECU OTA (e.g., cluster software fix)."
+      }
     },
     {
       "id": "kia-k4-2025",
@@ -3039,7 +3899,27 @@
       "new_mpg_combined": 28,
       "price_source": "https://www.kiamedia.com/us/en/models/seltos/2027/pricing",
       "price_confidence": "verified",
-      "price_note": "Redesigned 2027 Seltos; 2026 LX AWD was $24,990 (+$1,495)."
+      "price_note": "Redesigned 2027 Seltos; 2026 LX AWD was $24,990 (+$1,495).",
+      "features": {
+        "driver_assist_level": "lane_centering",
+        "driver_assist_name": "Kia Drive Wise (Smart Cruise Control w/ Stop & Go + Lane Following Assist 2)",
+        "aeb": true,
+        "blind_spot": false,
+        "rear_cross_traffic": false,
+        "lane_keep": true,
+        "ota_updates": "infotainment_only",
+        "remote_climate": null,
+        "power_outlet_v2l": null,
+        "heated_front_seats": false,
+        "heated_steering_wheel": false,
+        "power_liftgate": false,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 12.3,
+        "source": "https://www.kiamedia.com/us/en/models/seltos/2027/features",
+        "confidence": "verified",
+        "note": "All-new-gen 2027 LX confirmed: FCA/SCC2/LKAS/LFA2 standard; heated seats, heated wheel, power liftgate, surround view all optional/unavailable on LX. AWD is optional (not standard) on LX/S/EX, standard only on X-Line SX -- 'LX AWD' is a valid build, just not the default drivetrain. Upgraded ota_updates unknown->infotainment_only (Kia's OTA notes limit Seltos to nav-map-only OTA)."
+      }
     },
     {
       "id": "kia-sorento-2024",
@@ -3077,7 +3957,27 @@
       "new_mpg_combined": 26,
       "price_source": "https://www.kiamedia.com/us/en/models/sorento/2026/pricing",
       "price_confidence": "verified",
-      "price_note": "Same trim/engine. Price and destination from Kia Media. A 2027 Sorento is also EPA-listed (same 26 mpg)."
+      "price_note": "Same trim/engine. Price and destination from Kia Media. A 2027 Sorento is also EPA-listed (same 26 mpg).",
+      "features": {
+        "driver_assist_level": "lane_centering",
+        "driver_assist_name": "Kia Drive Wise (Smart Cruise Control w/ Stop & Go + Lane Following Assist)",
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": true,
+        "ota_updates": "vehicle_systems",
+        "remote_climate": true,
+        "power_outlet_v2l": false,
+        "heated_front_seats": false,
+        "heated_steering_wheel": false,
+        "power_liftgate": false,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 12.3,
+        "source": "https://www.kiamedia.com/us/en/models/sorento/2026/features",
+        "confidence": "verified",
+        "note": "Draft was fully accurate on all safety/comfort fields (confirmed via exact S/O/-- table markers). Only change: ota_updates unknown->vehicle_systems per NHTSA TSBs (Sorento gets nav-map + controller/ECU OTA, incl. a cluster-software fix)."
+      }
     },
     {
       "id": "kia-sportage-2024",
@@ -3174,7 +4074,27 @@
       "new_mpg_combined": 20,
       "price_source": "https://www.kiamedia.com/us/en/models/telluride/2027/pricing",
       "price_confidence": "verified",
-      "price_note": "Redesigned 2027 Telluride replaced the 3.8L V6 with a 2.5L turbo-4 (hybrid also offered). Price and destination from Kia Media."
+      "price_note": "Redesigned 2027 Telluride replaced the 3.8L V6 with a 2.5L turbo-4 (hybrid also offered). Price and destination from Kia Media.",
+      "features": {
+        "driver_assist_level": "lane_centering",
+        "driver_assist_name": "Highway Driving Assist 1.5",
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": true,
+        "ota_updates": "vehicle_systems",
+        "remote_climate": true,
+        "power_outlet_v2l": false,
+        "heated_front_seats": true,
+        "heated_steering_wheel": false,
+        "power_liftgate": true,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 12.3,
+        "source": "https://www.kiamedia.com/us/en/models/telluride/2027/features",
+        "confidence": "verified",
+        "note": "Draft fully confirmed via exact table markers, including the correctly-flagged heated_steering_wheel:false (Optional, not standard, on EX) alongside standard HDA 1.5, heated seats, smart power liftgate, blind spot, rear cross-traffic, FCA, and SCC. No changes."
+      }
     },
     {
       "id": "land-rover-defender-2024",
@@ -3327,7 +4247,27 @@
       "new_mpg_combined": 24,
       "price_source": "https://pressroom.lexus.com/2026-lexus-nx-adds-grades-and-drivetrain/",
       "price_confidence": "verified",
-      "price_note": "Lexus lists $48,145 including $1,395 DPH (launch pricing)."
+      "price_note": "Lexus lists $48,145 including $1,395 DPH (launch pricing).",
+      "features": {
+        "driver_assist_level": "lane_centering",
+        "driver_assist_name": "Lexus Safety System+ 3.0",
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": true,
+        "ota_updates": "unknown",
+        "remote_climate": true,
+        "power_outlet_v2l": false,
+        "heated_front_seats": true,
+        "heated_steering_wheel": false,
+        "power_liftgate": true,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 9.8,
+        "source": "https://www.lexus.com/models/NX ; https://pressroom.lexus.com/2026-lexus-nx-adds-grades-and-drivetrain/ (both blocked on direct fetch this pass; corroborated via search snippets of Edmunds/KBB/dealer trim guides)",
+        "confidence": "approximate",
+        "note": "lexus.com and Edmunds both returned 403 again (same issue as prior pass), so still could not get a primary grade-page fetch through. Search-snippet corroboration confirms blind-spot standard fleet-wide; wireless charging pad ($75) and heated steering wheel (Cold Area Pkg, $150) are extra-cost options on Premium, not standard (matches draft's heated_steering_wheel:false); heated front seats and power liftgate standard even on the base grade. remote_climate true assumes Lexus Remote Connect app/fob start is standard with a post-trial subscription requirement -- could not independently re-verify the subscription term this pass. No field values changed vs draft."
+      }
     },
     {
       "id": "lexus-rx350-2024",
@@ -3364,7 +4304,27 @@
       "new_mpg_combined": 24,
       "price_source": "https://pressroom.lexus.com/2026-lexus-rx-extending-the-range/",
       "price_confidence": "verified",
-      "price_note": "Lexus lists $56,550 including $1,550 DPH."
+      "price_note": "Lexus lists $56,550 including $1,550 DPH.",
+      "features": {
+        "driver_assist_level": "lane_centering",
+        "driver_assist_name": "Lexus Safety System+ 3.0",
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": true,
+        "ota_updates": "infotainment_only",
+        "remote_climate": null,
+        "power_outlet_v2l": null,
+        "heated_front_seats": true,
+        "heated_steering_wheel": true,
+        "power_liftgate": true,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 9.8,
+        "source": "https://www.edmunds.com/lexus/rx/2026/st-402086225/features-specs/ ; https://cars.usnews.com/cars-trucks/lexus/rx-350/specs/rx-350-premium-awd-481488 ; https://www.jmlexus.com/models-rx/ ; https://pressroom.lexus.com/2026-lexus-rx-extending-the-range/",
+        "confidence": "approximate",
+        "note": "No changes from draft. Independently confirmed via search excerpts: Premium adds heated wood/leather steering wheel and heated+ventilated front seats; power rear door (basic power liftgate) is standard, hands-free kick-sensor activation is a separate ~$150 option; surround-view camera is optional on Premium, not standard. Could not reach a full official spec page for Premium AWD specifically (Lexus pressroom and JM Lexus pages did not break out all fields), so kept as approximate. Remote Connect/OTA scope still unconfirmed for this trim."
+      }
     },
     {
       "id": "lincoln-aviator-2024",
@@ -3578,7 +4538,27 @@
       "new_mpg_combined": 26,
       "price_source": "https://news.mazdausa.com/2026-01-13-Mazda-Announces-Pricing-and-Packaging-for-All-New-2026-Mazda-CX-5",
       "price_confidence": "verified",
-      "price_note": "All-new 2026 CX-5; trim renamed 2.5 S Select; AWD standard."
+      "price_note": "All-new 2026 CX-5; trim renamed 2.5 S Select; AWD standard.",
+      "features": {
+        "driver_assist_level": "basic_adas",
+        "driver_assist_name": "i-Activsense",
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": true,
+        "ota_updates": "infotainment_only",
+        "remote_climate": true,
+        "power_outlet_v2l": false,
+        "heated_front_seats": false,
+        "heated_steering_wheel": false,
+        "power_liftgate": false,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 12.9,
+        "source": "https://www.mazdaclaremont.com/mazda-cx-5-trim-comparison-guide.htm ; https://news.mazdausa.com/download/26MY+CX5+Spec+Deck+FINAL.pdf ; https://www.gunthermazda.com/mazda-cx-5-configurations/",
+        "confidence": "verified",
+        "note": "No changes from draft. Dealer trim-comparison chart (sourced from Mazda's own materials) confirms heated front seats, heated steering wheel, and power liftgate are all Preferred-trim-and-up, not on 2.5 S Select. Wireless CarPlay/Android Auto and the 12.9-in screen are standard on Select."
+      }
     },
     {
       "id": "mazda-cx50-2024",
@@ -3675,7 +4655,27 @@
       "new_mpg_combined": 25,
       "price_source": "https://www.mazdausa.com/vehicles/cx-90/compare-vehicle-specs-and-trims",
       "price_confidence": "approximate",
-      "price_note": "Price from search results citing mazdausa.com; Cars.com lists a different figure."
+      "price_note": "Price from search results citing mazdausa.com; Cars.com lists a different figure.",
+      "features": {
+        "driver_assist_level": "basic_adas",
+        "driver_assist_name": "i-Activsense",
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": true,
+        "ota_updates": "unknown",
+        "remote_climate": null,
+        "power_outlet_v2l": false,
+        "heated_front_seats": true,
+        "heated_steering_wheel": true,
+        "power_liftgate": true,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 12.3,
+        "source": "https://www.mazdausa.com/vehicles/cx-90/compare-vehicle-specs-and-trims ; https://www.prnewswire.com/news-releases/2026-mazda-cx-90-pricing-and-packaging-302546061.html ; https://news.mazdausa.com/2025-09-04-2026-Mazda-CX-90-Pricing-and-Packaging",
+        "confidence": "verified",
+        "note": "No changes from draft. Mazda USA's own trim-compare page explicitly lists 'Heated front and 2nd row seats' plus leather seats on 3.3 Turbo Preferred; the pricing/packaging press release confirms ventilated front seats, heated steering wheel, and 12.3-in wireless CarPlay/Android Auto as new-for-2026 standard additions on Preferred. Power liftgate is standard (non-hands-free; hands-free starts at Premium Sport). Cruising & Traffic Support (lane centering) still confirmed as Premium Sport+ only, not Preferred."
+      }
     },
     {
       "id": "mazda-3-hatchback-2024",
@@ -3711,7 +4711,27 @@
       "new_mpg_combined": 29,
       "price_source": "https://news.mazdausa.com/2025-08-19-2026-Mazda3-Pricing-and-Packaging",
       "price_confidence": "verified",
-      "price_note": "MSRP also shown on mazdausa.com."
+      "price_note": "MSRP also shown on mazdausa.com.",
+      "features": {
+        "driver_assist_level": "basic_adas",
+        "driver_assist_name": "i-Activsense",
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": true,
+        "ota_updates": "infotainment_only",
+        "remote_climate": true,
+        "power_outlet_v2l": false,
+        "heated_front_seats": false,
+        "heated_steering_wheel": false,
+        "power_liftgate": false,
+        "surround_view_camera": false,
+        "wireless_phone_projection": false,
+        "main_screen_in": 8.8,
+        "source": "https://www.gullomazda.com/2026-mazda3-hatchback-trim-levels-your-complete-guide/ ; https://news.mazdausa.com/2026-Mazda3 ; https://news.mazdausa.com/download/2026+Mazda3+Spec+Deck.pdf",
+        "confidence": "verified",
+        "note": "No changes from draft. Dealer trim guide (matching Mazda's spec deck) confirms 2.5 S base has wired CarPlay/Android Auto on the 8.8-in screen only; wireless projection starts at Carbon Edition, heated front seats at Preferred, heated steering wheel at Turbo Premium Plus. Hatchback liftgate is manual (not power) on this base trim."
+      }
     },
     {
       "id": "mercedes-benz-glc-2024",
@@ -3982,7 +5002,27 @@
       "new_mpg_combined": 27,
       "price_source": "https://www.cars.com/research/mitsubishi-outlander-2026/",
       "price_confidence": "approximate",
-      "price_note": "2.5L replaced by 1.5L turbo mild hybrid. Mitsubishi site lists SE (FWD) from $34,345; S-AWC price from Cars.com. A mandatory $225 Welcome Package is also charged."
+      "price_note": "2.5L replaced by 1.5L turbo mild hybrid. Mitsubishi site lists SE (FWD) from $34,345; S-AWC price from Cars.com. A mandatory $225 Welcome Package is also charged.",
+      "features": {
+        "driver_assist_level": "lane_centering",
+        "driver_assist_name": "MI-PILOT Assist w/ Navi-link",
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": true,
+        "ota_updates": "unknown",
+        "remote_climate": true,
+        "power_outlet_v2l": false,
+        "heated_front_seats": true,
+        "heated_steering_wheel": false,
+        "power_liftgate": true,
+        "surround_view_camera": true,
+        "wireless_phone_projection": true,
+        "main_screen_in": 12.3,
+        "source": "https://www.mitsubishicars.com/cars-and-suvs/outlander/trims ; https://www.mitsubishi-connect.com/en/SafeguardRemote/Manual/outlander_Quick_US/contents/ ; media.mitsubishicars.com 2026 Outlander Full Pricing and Packaging",
+        "confidence": "verified",
+        "note": "Changed remote_climate from null to true: Mitsubishi's own site confirms 2026 Outlander includes MITSUBISHI CONNECT with a 5-year Safeguard trial and 1-year Remote Services trial (remote start/lock/lights via app, no extra hardware needed), so remote start is effectively standard for the first year, then requires a paid subscription. All other fields unchanged and reconfirmed via Mitsubishi's official SE-vs-SEL trim comparison page: heated steering wheel is SEL-only (SE does NOT have it, confirming the draft), heated front seats/power liftgate/Multi-View (360) camera/wireless CarPlay are standard on SE."
+      }
     },
     {
       "id": "mitsubishi-outlander-sport-2024",
@@ -4075,7 +5115,27 @@
       "new_mpg_combined": 30,
       "price_source": "https://usa.nissannews.com/en-US/releases/2026-nissan-altima-priced-from-27580",
       "price_confidence": "verified",
-      "price_note": "Same trim/engine. Price and destination from Nissan newsroom."
+      "price_note": "Same trim/engine. Price and destination from Nissan newsroom.",
+      "features": {
+        "driver_assist_level": "basic_adas",
+        "driver_assist_name": "Nissan Safety Shield 360",
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": false,
+        "ota_updates": "unknown",
+        "remote_climate": true,
+        "power_outlet_v2l": null,
+        "heated_front_seats": false,
+        "heated_steering_wheel": false,
+        "power_liftgate": null,
+        "surround_view_camera": false,
+        "wireless_phone_projection": false,
+        "main_screen_in": 8,
+        "source": "https://usa.nissannews.com/en-US/releases/2026-nissan-altima-press-kit",
+        "confidence": "verified",
+        "note": "Draft confirmed correct via direct fetch of Nissan's own 2026 Altima press kit. Safety Shield 360 is standard on SV but only includes AEB, blind spot warning, RCTA, rear auto braking, high-beam assist, and Lane Departure Warning (warning only, no steering). ProPILOT Assist, Intelligent Cruise Control, and Intelligent Lane Intervention (the lane-centering pieces) are all optional (SV Premium Pkg) — so basic_adas/lane_keep=false is correct, not an error. Heated seats optional, heated wheel unavailable on SV, remote start standard, 8-in screen standard (12.3-in and wireless CarPlay/AA optional). No change needed."
+      }
     },
     {
       "id": "nissan-frontier-2024",
@@ -4112,7 +5172,27 @@
       "new_mpg_combined": 19,
       "price_source": "https://www.cars.com/research/nissan-frontier-2027/trims/",
       "price_confidence": "approximate",
-      "price_note": "Same trim/engine. Price from Cars.com; destination is 2026 Frontier figure from Nissan newsroom search summary."
+      "price_note": "Same trim/engine. Price from Cars.com; destination is 2026 Frontier figure from Nissan newsroom search summary.",
+      "features": {
+        "driver_assist_level": "basic_adas",
+        "driver_assist_name": "Nissan Safety Shield 360",
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": false,
+        "ota_updates": "unknown",
+        "remote_climate": false,
+        "power_outlet_v2l": false,
+        "heated_front_seats": false,
+        "heated_steering_wheel": false,
+        "power_liftgate": false,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 12.3,
+        "source": "https://usa.nissannews.com/en-US/releases/2027-nissan-frontier-sport-press-kit",
+        "confidence": "verified",
+        "note": "All data field values confirmed unchanged from draft, but confidence upgraded approximate->verified: direct fetch of the official 2027 press kit resolved the draft's noted ambiguity. Intelligent Cruise Control is standard (S) on SV, but no lane-centering/ProPILOT feature is offered on Frontier at all (not even optional) at this trim, so basic_adas/lane_keep=false is correct. 12.3-in screen with wireless CarPlay/Android Auto is standard on SV Crew Cab (confirmed, not a misread). Remote start ($415), heated seats/wheel, and 120V outlet are all optional add-ons/packages, not standard."
+      }
     },
     {
       "id": "nissan-kicks-2025",
@@ -4207,7 +5287,27 @@
       "new_mpg_combined": 23,
       "price_source": "https://usa.nissannews.com/en-US/releases/2026-nissan-murano-priced-from-41670-adds-available-propilot-assist-21",
       "price_confidence": "verified",
-      "price_note": "3.5L V6 replaced by 2.0L turbo I4 (redesigned 2025); AWD standard."
+      "price_note": "3.5L V6 replaced by 2.0L turbo I4 (redesigned 2025); AWD standard.",
+      "features": {
+        "driver_assist_level": "lane_centering",
+        "driver_assist_name": "ProPILOT Assist",
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": true,
+        "ota_updates": "unknown",
+        "remote_climate": true,
+        "power_outlet_v2l": null,
+        "heated_front_seats": true,
+        "heated_steering_wheel": false,
+        "power_liftgate": false,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 12.3,
+        "source": "https://usa.nissannews.com/en-US/releases/2026-nissan-murano-press-kit",
+        "confidence": "verified",
+        "note": "Resolved the draft's flagged power_liftgate conflict: changed from null to false. Direct fetch of Nissan's own 2026 Murano press kit spec grid shows the (motion-activated) power liftgate is optional on SV, and only standard starting at Platinum (SL gets it as an option too) — so SV does NOT get a standard power liftgate; CarsDirect's SV claim appears wrong. All other fields confirmed as drafted: (base, hands-on) ProPILOT Assist standard on SV = lane_centering/lane_keep true; ProPILOT 2.1 is Platinum-only. Remote start and heated front seats standard; heated wheel and Around View Monitor are SL/Platinum only. 12.3-in screen with wireless CarPlay/Android Auto standard on SV."
+      }
     },
     {
       "id": "nissan-pathfinder-2024",
@@ -4304,7 +5404,27 @@
       "new_mpg_combined": 31,
       "price_source": "https://usa.nissannews.com/en-US/releases/release-2704b0eedba2fa91be91a7ae2e22fbd2",
       "price_confidence": "verified",
-      "price_note": "Same trim/engine. Price and destination from Nissan newsroom (2026.5 Rogue)."
+      "price_note": "Same trim/engine. Price and destination from Nissan newsroom (2026.5 Rogue).",
+      "features": {
+        "driver_assist_level": "lane_centering",
+        "driver_assist_name": "ProPILOT Assist",
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": true,
+        "ota_updates": "unknown",
+        "remote_climate": true,
+        "power_outlet_v2l": null,
+        "heated_front_seats": false,
+        "heated_steering_wheel": false,
+        "power_liftgate": true,
+        "surround_view_camera": false,
+        "wireless_phone_projection": false,
+        "main_screen_in": 8,
+        "source": "https://usa.nissannews.com/en-US/releases/2026-nissan-rogue-press-kit",
+        "confidence": "verified",
+        "note": "Specifically double-checked per the flagged concern: base ProPILOT Assist (hands-on) itself provides the adaptive-cruise + lane-centering steering, and is standard on SV — confirmed via press kit and Nissan's own ProPILOT explainer. 'Intelligent Lane Intervention' is a separate backup feature (lane-departure braking intervention when ProPILOT is on standby) that IS optional on SV, but its optional status does not negate the standard lane-centering capability of base ProPILOT, so lane_centering/lane_keep=true is correct as drafted. Power liftgate confirmed standard on SV (resolves the flagged conflict — SV and up get it, base S is manual). Heated seats/wheel optional, 8-in screen with wired-only CarPlay/AA standard (wireless is Platinum-only), Around View Monitor not standard on SV — all match draft."
+      }
     },
     {
       "id": "nissan-sentra-2024",
@@ -4516,7 +5636,27 @@
       "new_mpg_combined": 21,
       "price_source": "https://www.cars.com/research/ram-1500-2027/trims/",
       "price_confidence": "approximate",
-      "price_note": "2024 Tradesman used 5.7L Hemi; 5.7L Hemi is again offered for 2026-27 as an option (EPA 4WD 17-18 mpg), not priced here. Priced base 3.6L mild-hybrid V6. Price from Cars.com; destination $2,595 per Cars.com 2026 destination-fee article."
+      "price_note": "2024 Tradesman used 5.7L Hemi; 5.7L Hemi is again offered for 2026-27 as an option (EPA 4WD 17-18 mpg), not priced here. Priced base 3.6L mild-hybrid V6. Price from Cars.com; destination $2,595 per Cars.com 2026 destination-fee article.",
+      "features": {
+        "driver_assist_level": "lane_centering",
+        "driver_assist_name": null,
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": true,
+        "ota_updates": "unknown",
+        "remote_climate": true,
+        "power_outlet_v2l": false,
+        "heated_front_seats": false,
+        "heated_steering_wheel": false,
+        "power_liftgate": null,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 8.4,
+        "source": "https://www.jaymalonechryslerdodgejeepram.com/blog/2026/march/31/2026-ram-1500-technology-safety-features-explained.htm ; https://www.riverfrontchryslerjeep.net/active-driving-assist-jeep-ram-wagoneer/ ; https://www.newgencdjr.com/blog/2026/september/9/2027-ram-1500-buyers-guide-performance-etorque-reliability-and-specs.htm",
+        "confidence": "approximate",
+        "note": "ramtrucks.com spec pages 403'd repeatedly; used consistent dealer-blog recaps of Ram press materials instead. Adaptive Cruise Control (w/ stop-and-go) and Active Lane Management w/ Lane Keep Assist (steers to keep centered, hands on wheel) are standard on every 2026-2027 Ram 1500 trim incl. Tradesman -> lane_centering. Hands-Free Active Driving Assist is NOT standard on Tradesman (std on Tungsten only), so not hands_free_highway. Blind-spot w/ trailer coverage + rear cross-path also standard fleet-wide per 2027 sources. Screen: 8.4in Uconnect 5 std (12in/14.5in are upgrades). Wireless CarPlay/Android Auto standard since the 2023 DT refresh across all trims. Vinyl bench seat trim = no heated seats/wheel. Power outlet is 12V; the 2kW/120V onboard power system is an option even on Tradesman, so power_outlet_v2l=false. Remote start (key fob) standard; app/cellular remote start likely needs a Uconnect Connect subscription after trial - flagged as a caveat. Ram doesn't brand a unified ADAS suite name, so driver_assist_name left null. power_liftgate set to null (truck/tailgate, not a liftgate) per instructions, correcting the draft's \"false\"."
+      }
     },
     {
       "id": "ram-2500-2024",
@@ -4552,7 +5692,27 @@
       "new_destination_usd": 2595,
       "price_source": "https://www.cars.com/research/ram-2500-2026/",
       "price_confidence": "approximate",
-      "price_note": "Cars.com lists $53,405 incl. $2,595 dest. Heavy-duty pickups are not EPA-rated, so mpg is null."
+      "price_note": "Cars.com lists $53,405 incl. $2,595 dest. Heavy-duty pickups are not EPA-rated, so mpg is null.",
+      "features": {
+        "driver_assist_level": "basic_adas",
+        "driver_assist_name": null,
+        "aeb": true,
+        "blind_spot": false,
+        "rear_cross_traffic": false,
+        "lane_keep": false,
+        "ota_updates": "unknown",
+        "remote_climate": null,
+        "power_outlet_v2l": false,
+        "heated_front_seats": false,
+        "heated_steering_wheel": false,
+        "power_liftgate": null,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 8.4,
+        "source": "https://www.cars.com/research/ram-2500-2026/specs/478537/ ; https://www.beadleschryslercenter.com/blog/2026-ram-2500-technology-safety ; https://media.stellantisnorthamerica.com/newsrelease.do?id=26538&mid=71",
+        "confidence": "approximate",
+        "note": "Confirms draft: Adaptive Cruise Control + Forward Collision Warning-Plus/AEB are standard on Tradesman, but Blind-Spot & Cross-Path Detection AND Active Lane Management/Lane Keep Assist are only in the optional Safety Group ($2,995) -> changed lane_keep from null to false (was previously unconfirmed, now confirmed optional). Cars.com confirms the 12in touchscreen is only available via the Level 1/2 Equipment Groups, so the base Tradesman screen is the 8.4in Uconnect (changed from null). Standard trim uses vinyl seats with no heat option mentioned at this level, so heated_front_seats/heated_steering_wheel changed from null to false (approximate inference, not an explicit spec line). Apple CarPlay is confirmed standard; wireless capability specifically wasn't stated for the 2500 in the sources checked but is inferred from the shared Uconnect 5 platform with the 1500 (approximate, changed from null to true). remote_climate left null: sources say \"keyless start\" is standard but that is not necessarily the same as remote engine start, and no source explicitly confirmed remote start for this trim - true unconfirmed value, did not guess. power_liftgate set to null (truck), correcting draft's null-equivalent handling for a pickup."
+      }
     },
     {
       "id": "subaru-ascent-2024",
@@ -4589,7 +5749,27 @@
       "new_destination_usd": 1495,
       "new_mpg_combined": 22,
       "price_source": "https://media.subaru.com/pressrelease/2455/1/subaru-announces-pricing-2027-ascent-3-row-suv",
-      "price_confidence": "verified"
+      "price_confidence": "verified",
+      "features": {
+        "driver_assist_level": "lane_centering",
+        "driver_assist_name": "EyeSight Driver Assist Technology",
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": true,
+        "ota_updates": "unknown",
+        "remote_climate": null,
+        "power_outlet_v2l": false,
+        "heated_front_seats": true,
+        "heated_steering_wheel": true,
+        "power_liftgate": true,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 11.6,
+        "source": "https://media.subaru.com/pressrelease/2455/subaru-announces-pricing-2027-ascent-3-row-suv ; https://www.carsdirect.com/2026/subaru/ascent",
+        "confidence": "verified",
+        "note": "No changes - draft was already backed by the Subaru press release and is internally consistent (EyeSight, BSD/RCTA, heated seats+wheel, 11.6in screen w/ wireless CarPlay/AA, power rear gate all standard on Premium; surround view and 120V outlet are higher-trim only)."
+      }
     },
     {
       "id": "subaru-crosstrek-2024",
@@ -4625,7 +5805,27 @@
       "new_mpg_combined": 29,
       "price_source": "https://media.subaru.com/pressrelease/2473/1/subaru-crosstrek-pricing-holds-steady-26995-msrp-2027",
       "price_confidence": "verified",
-      "price_note": "2.0L engine dropped; all non-hybrid Crosstreks now use the 2.5L."
+      "price_note": "2.0L engine dropped; all non-hybrid Crosstreks now use the 2.5L.",
+      "features": {
+        "driver_assist_level": "lane_centering",
+        "driver_assist_name": "EyeSight Driver Assist Technology",
+        "aeb": true,
+        "blind_spot": false,
+        "rear_cross_traffic": false,
+        "lane_keep": true,
+        "ota_updates": "unknown",
+        "remote_climate": null,
+        "power_outlet_v2l": null,
+        "heated_front_seats": false,
+        "heated_steering_wheel": false,
+        "power_liftgate": false,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 11.6,
+        "source": "https://media.subaru.com/newsrelease.do?id=2476&mid=158&allImage=1 ; https://www.carsdirect.com/subaru/crosstrek/2027",
+        "confidence": "verified",
+        "note": "No changes - draft already backed by the Subaru press release. EyeSight w/ lane centering standard on Premium; blind-spot/RCTA and heated seats are gated behind a $2,245 option package on this trim, so those stay false."
+      }
     },
     {
       "id": "subaru-forester-2024",
@@ -4662,7 +5862,27 @@
       "new_mpg_combined": 29,
       "price_source": "https://www.cars.com/research/subaru-forester-2026/trims/",
       "price_confidence": "approximate",
-      "price_note": "Same trim/engine. Price from Cars.com (Subaru revised 2026 Forester pricing mid-year); $1,450 destination from Subaru media center."
+      "price_note": "Same trim/engine. Price from Cars.com (Subaru revised 2026 Forester pricing mid-year); $1,450 destination from Subaru media center.",
+      "features": {
+        "driver_assist_level": "lane_centering",
+        "driver_assist_name": "EyeSight Driver Assist Technology",
+        "aeb": true,
+        "blind_spot": false,
+        "rear_cross_traffic": false,
+        "lane_keep": true,
+        "ota_updates": "unknown",
+        "remote_climate": null,
+        "power_outlet_v2l": null,
+        "heated_front_seats": true,
+        "heated_steering_wheel": false,
+        "power_liftgate": false,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 11.6,
+        "source": "https://media.subaru.com/newsrelease.do?id=2363&mid=143&allImage=1 ; https://www.subaru.com/vehicles/forester/2026/features.html",
+        "confidence": "verified",
+        "note": "No changes - draft already backed by the Subaru press release. ACC w/ lane centering standard; blind-spot/RCTA and power rear gate require a $1,200 package on Premium, so those stay false; heated front seats (All-Weather) are standard."
+      }
     },
     {
       "id": "subaru-outback-2024",
@@ -4699,7 +5919,27 @@
       "new_mpg_combined": 27,
       "price_source": "https://www.cars.com/research/subaru-outback-2026/trims/",
       "price_confidence": "approximate",
-      "price_note": "Redesigned 2026 Outback, same trim/engine. Price from Cars.com; $1,450 destination from Subaru media center release."
+      "price_note": "Redesigned 2026 Outback, same trim/engine. Price from Cars.com; $1,450 destination from Subaru media center release.",
+      "features": {
+        "driver_assist_level": "lane_centering",
+        "driver_assist_name": "EyeSight Driver Assist Technology",
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": true,
+        "ota_updates": "unknown",
+        "remote_climate": null,
+        "power_outlet_v2l": null,
+        "heated_front_seats": true,
+        "heated_steering_wheel": false,
+        "power_liftgate": true,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 12.1,
+        "source": "https://media.subaru.com/newsrelease.do?id=2353&mid=176&allImage=1 ; https://www.subaru.com/vehicles/outback/features.html",
+        "confidence": "verified",
+        "note": "Value fields unchanged from draft, but confidence upgraded to verified after locating the actual Subaru 2026 Outback pricing press release: it explicitly confirms Blind-Spot Warning with Rear Cross-Traffic Warning, heated front seats, power rear gate w/ auto-close, and the 12.1in multimedia screen w/ wireless CarPlay/Android Auto are all standard on Premium, while heated steering wheel is package-only. Flag: a secondary source (CarsDirect) checked during this pass incorrectly implied blind-spot detection was NOT standard on Premium - the manufacturer press release overrides that and confirms the draft's original true/true values were correct. Hands-Free Assist remains Touring/Touring XT only, consistent with lane_centering (not hands_free_highway) for Premium."
+      }
     },
     {
       "id": "toyota-4runner-2024",
@@ -4736,7 +5976,27 @@
       "new_mpg_combined": 21,
       "price_source": "https://www.cars.com/research/toyota-4runner-2026/trims/",
       "price_confidence": "approximate",
-      "price_note": "4.0L V6 dropped with the 2025 redesign; 2.4L turbo-4 is the only non-hybrid engine. Price from Cars.com; $1,450 DPH from Toyota pressroom 2026 4Runner release (may have risen since)."
+      "price_note": "4.0L V6 dropped with the 2025 redesign; 2.4L turbo-4 is the only non-hybrid engine. Price from Cars.com; $1,450 DPH from Toyota pressroom 2026 4Runner release (may have risen since).",
+      "features": {
+        "driver_assist_level": "lane_centering",
+        "driver_assist_name": "Toyota Safety Sense 3.0",
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": true,
+        "ota_updates": "infotainment_only",
+        "remote_climate": true,
+        "power_outlet_v2l": null,
+        "heated_front_seats": false,
+        "heated_steering_wheel": false,
+        "power_liftgate": false,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 8,
+        "source": "https://pressroom.toyota.com/the-2026-toyota-4runner-engineered-for-exploration/ ; https://www.4runner6g.com/2026-4runner-pricing-updates-changes-official/ ; https://www.northhollywoodtoyota.com/2026-toyota-4runner-trims-specs",
+        "confidence": "approximate",
+        "note": "Resolved the two previously-unconfirmed fields: heated_front_seats=false and remote_climate=true. Base TRD Off-Road lacks heated seats, heated steering wheel, hands-free power liftgate, and the 14-in screen — all of those are TRD Off-Road PREMIUM-only per two independent dealer/forum trim breakdowns of Toyota's press release (pressroom.toyota.com itself doesn't itemize the base trim's cabin features explicitly, hence approximate). TSS 3.0 confirmed standard fleet-wide. Remote Connect app/fob remote start is standard hardware with a 1-yr free trial, then a paid subscription."
+      }
     },
     {
       "id": "toyota-camry-2024",
@@ -4771,7 +6031,27 @@
       "new_mpg_combined": 51,
       "price_source": "https://www.cars.com/research/toyota-camry-2026/trims/",
       "price_confidence": "approximate",
-      "price_note": "Camry is hybrid-only since 2025; gas-only 2.5L dropped. Price from Cars.com; DPH $1,195 from dealer-site summary."
+      "price_note": "Camry is hybrid-only since 2025; gas-only 2.5L dropped. Price from Cars.com; DPH $1,195 from dealer-site summary.",
+      "features": {
+        "driver_assist_level": "lane_centering",
+        "driver_assist_name": "Toyota Safety Sense 3.0",
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": true,
+        "ota_updates": "infotainment_only",
+        "remote_climate": true,
+        "power_outlet_v2l": null,
+        "heated_front_seats": false,
+        "heated_steering_wheel": false,
+        "power_liftgate": null,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 8,
+        "source": "https://pressroom.toyota.com/toyota-camry-goes-exclusively-hybrid-plus-a-new-look-and-more-technology/ ; https://www.beamantoyota.com/helpful-resources/2026-camry-specifications/",
+        "confidence": "approximate",
+        "note": "No changes — draft confirmed. Dealer spec page explicitly states heated front seats are a package option on LE/SE/Nightshade (not standard) and heated steering wheel is XLE/XSE-only; 8-in screen confirmed standard on LE/SE. Remote start needs Remote Connect trial/subscription. power_liftgate correctly null (sedan trunk lid)."
+      }
     },
     {
       "id": "toyota-corolla-2024",
@@ -4806,7 +6086,27 @@
       "new_mpg_combined": 35,
       "price_source": "https://www.cars.com/research/toyota-corolla-2027/trims/",
       "price_confidence": "approximate",
-      "price_note": "Same trim/engine. Price from Cars.com; DPH is 2026 Toyota car figure ($1,195). MPG assumes LE uses the 1-mode CVT (35); other 2027 Corolla variants 33."
+      "price_note": "Same trim/engine. Price from Cars.com; DPH is 2026 Toyota car figure ($1,195). MPG assumes LE uses the 1-mode CVT (35); other 2027 Corolla variants 33.",
+      "features": {
+        "driver_assist_level": "lane_centering",
+        "driver_assist_name": "Toyota Safety Sense 3.0",
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": true,
+        "ota_updates": "infotainment_only",
+        "remote_climate": true,
+        "power_outlet_v2l": null,
+        "heated_front_seats": false,
+        "heated_steering_wheel": false,
+        "power_liftgate": null,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 8,
+        "source": "https://pressroom.toyota.com/built-for-generations-toyota-corolla-celebrates-60-years-with-2027-special-edition/",
+        "confidence": "verified",
+        "note": "No changes — corroborated by independent dealer research pages: TSS 3.0 std with Lane Tracing Assist/full-speed DRCC, BSM w/ RCTA std on all grades, 8-in Toyota Audio Multimedia w/ wireless CarPlay/AA std on LE. Heated seats remain XSE/Hybrid XLE-only per draft."
+      }
     },
     {
       "id": "toyota-corolla-cross-2024",
@@ -4963,7 +6263,27 @@
       "new_mpg_combined": 24,
       "price_source": "https://www.cars.com/research/toyota-highlander-2026/trims/",
       "price_confidence": "approximate",
-      "price_note": "Same trim/engine. Price from Cars.com; DPH $1,495 from dealer-site summary."
+      "price_note": "Same trim/engine. Price from Cars.com; DPH $1,495 from dealer-site summary.",
+      "features": {
+        "driver_assist_level": "lane_centering",
+        "driver_assist_name": "Toyota Safety Sense 2.5+",
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": true,
+        "ota_updates": "infotainment_only",
+        "remote_climate": true,
+        "power_outlet_v2l": null,
+        "heated_front_seats": true,
+        "heated_steering_wheel": false,
+        "power_liftgate": true,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 8,
+        "source": "https://pressroom.toyota.com/2026-toyota-highlander-gets-standard-all-wheel-drive-across-the-lineup/",
+        "confidence": "verified",
+        "note": "RESOLVED both flagged ambiguities directly from Toyota's press release: XLE has standard SofTex-trimmed heated driver and passenger seats (heated_front_seats=true, was already draft's guess, now verified), but a heated steering wheel is Limited-trim-only, NOT standard on XLE (heated_steering_wheel changed from null to false). Also verified: hands-free power liftgate standard, 8-in Toyota Audio Multimedia screen standard (12.3-in optional), BSM/RCTA and TSS 2.5+ std across the lineup."
+      }
     },
     {
       "id": "toyota-prius-2024",
@@ -4999,7 +6319,27 @@
       "new_mpg_combined": 55,
       "price_source": "https://pressroom.toyota.com/2027-toyota-prius-designed-to-stand-out-built-on-hybrid-innovation/",
       "price_confidence": "verified",
-      "price_note": "2026 LE FWD was $28,550 (57 mpg)."
+      "price_note": "2026 LE FWD was $28,550 (57 mpg).",
+      "features": {
+        "driver_assist_level": "lane_centering",
+        "driver_assist_name": "Toyota Safety Sense 3.0",
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": true,
+        "ota_updates": "unknown",
+        "remote_climate": false,
+        "power_outlet_v2l": null,
+        "heated_front_seats": false,
+        "heated_steering_wheel": false,
+        "power_liftgate": false,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 8,
+        "source": "https://www.carsdirect.com/toyota/prius/2027/specs ; https://www.kbb.com/toyota/prius/2027/specs/ ; https://www.355toyota.com/toyota-prius-trim-levels",
+        "confidence": "approximate",
+        "note": "Replaced draft's 2026-carryover sourcing with actual 2027 MY sources. Confirmed heated seats and heated steering wheel are XLE+ only, not on LE (matches draft). Changed remote_climate from null to false: a KBB 2027 Prius FAQ excerpt states 'None of the 2027 Prius trim levels offer remote start' — unlike other Toyota models, Prius does not offer Remote Connect start on any trim (approximate confidence, search-excerpt sourced, not an official Toyota page)."
+      }
     },
     {
       "id": "toyota-rav4-2024",
@@ -5035,7 +6375,27 @@
       "new_mpg_combined": 42,
       "price_source": "https://www.cars.com/research/toyota-rav4-2026/trims/",
       "price_confidence": "approximate",
-      "price_note": "Redesigned 2026 RAV4 is hybrid-only; gas-only 2.5L dropped. Priced closest trim (LE AWD hybrid). Price from Cars.com (LE FWD $31,900 matches Toyota pressroom); DPH $1,450 from dealer-site summary."
+      "price_note": "Redesigned 2026 RAV4 is hybrid-only; gas-only 2.5L dropped. Priced closest trim (LE AWD hybrid). Price from Cars.com (LE FWD $31,900 matches Toyota pressroom); DPH $1,450 from dealer-site summary.",
+      "features": {
+        "driver_assist_level": "lane_centering",
+        "driver_assist_name": "Toyota Safety Sense 4.0",
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": true,
+        "ota_updates": "infotainment_only",
+        "remote_climate": null,
+        "power_outlet_v2l": false,
+        "heated_front_seats": false,
+        "heated_steering_wheel": false,
+        "power_liftgate": false,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 10.5,
+        "source": "https://pressroom.toyota.com/the-next-adventure-begins-2026-rav4-arrives-this-winter/ ; https://www.autoblog.com/carbuying/the-2026-toyota-rav4-has-many-trims-but-only-one-is-the-smart-buy ; https://www.edmunds.com/car-news/2026-toyota-rav4-pricing.html",
+        "confidence": "verified",
+        "note": "No changes to draft. Confirmed via Toyota pressroom + Autoblog's itemized LE equipment list: fabric seats (no heated seats until SE), leather-wrapped but non-heated wheel, BSM+RCTA standard, standard wireless CarPlay/Android Auto, 10.5-in screen, power liftgate optional (XLE Premium+)."
+      }
     },
     {
       "id": "toyota-sienna-2024",
@@ -5073,7 +6433,27 @@
       "new_mpg_combined": 35,
       "price_source": "https://www.cars.com/research/toyota-sienna-2026/trims/",
       "price_confidence": "approximate",
-      "price_note": "Same trim/powertrain. Price from Cars.com; DPH $1,495 from dealer-site summary."
+      "price_note": "Same trim/powertrain. Price from Cars.com; DPH $1,495 from dealer-site summary.",
+      "features": {
+        "driver_assist_level": "lane_centering",
+        "driver_assist_name": "Toyota Safety Sense 2.0",
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": true,
+        "ota_updates": "infotainment_only",
+        "remote_climate": true,
+        "power_outlet_v2l": false,
+        "heated_front_seats": false,
+        "heated_steering_wheel": false,
+        "power_liftgate": true,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 8,
+        "source": "https://pressroom.toyota.com/2026-toyota-sienna-packs-in-more-standard-features/ ; https://www.edmunds.com/toyota/sienna/2026/trims/ (search excerpt) ; https://www.toyotawoodbridge.com/2026-toyota-sienna-trim-comparison.htm",
+        "confidence": "approximate",
+        "note": "Changed surround_view_camera from null to false: 360-camera is Platinum-only, not on LE (Edmunds trim excerpt). Changed power_outlet_v2l from null to false: the 1500W outlet is confirmed Woodland Edition-exclusive, not LE. Power liftgate on LE confirmed true. Heated seats/wheel confirmed false (XLE+ only). Base fields (BSM/RCTA/lane centering) retained from prior manufacturer-verified source."
+      }
     },
     {
       "id": "toyota-tacoma-2024",
@@ -5109,7 +6489,27 @@
       "new_mpg_combined": 21,
       "price_source": "https://www.cars.com/research/toyota-tacoma-2026/trims/",
       "price_confidence": "approximate",
-      "price_note": "Same trim/engine. Price from Cars.com; destination $1,595 from KBB 2026 Tacoma page. EPA 2026 Tacoma 4WD auto = 21 mpg (2024 catalog value was 23)."
+      "price_note": "Same trim/engine. Price from Cars.com; destination $1,595 from KBB 2026 Tacoma page. EPA 2026 Tacoma 4WD auto = 21 mpg (2024 catalog value was 23).",
+      "features": {
+        "driver_assist_level": "lane_centering",
+        "driver_assist_name": "Toyota Safety Sense 3.0",
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": true,
+        "ota_updates": "infotainment_only",
+        "remote_climate": null,
+        "power_outlet_v2l": false,
+        "heated_front_seats": false,
+        "heated_steering_wheel": false,
+        "power_liftgate": null,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 8,
+        "source": "https://www.gatewaytoyota.com/compare-2026-toyota-tacoma-sr5-vs-2026-toyota-tacoma-trd-off-road-toms-river-nj.htm ; https://www.totallandscapecare.com/home/article/15771973/toyota-reveals-2026-tacoma-choice-of-8-trims-2-cabs-gas-or-hybrid-engines ; pressroom.toyota.com 2026 Tacoma release",
+        "confidence": "approximate",
+        "note": "Resolved the draft's BSM/RCTA ambiguity: multiple trim-comparison sources confirm blind-spot monitor + rear cross-traffic alert are standard from SR5 up, so TRD Off-Road has them standard (changed from true/uncertain to confirmed true). Corrected power_liftgate from false to null per instructions — Tacoma has a tailgate, not a liftgate, so this field doesn't apply (a power tailgate feature exists only in the Premium package, separate from this field)."
+      }
     },
     {
       "id": "toyota-tundra-2024",
@@ -5146,7 +6546,27 @@
       "new_mpg_combined": 19,
       "price_source": "https://www.cars.com/research/toyota-tundra-2026/trims/",
       "price_confidence": "approximate",
-      "price_note": "Same trim/engine. Cars.com listing did not label drivetrain; $51,510 assumed to be 4x4 (2WD $48,510). DPH $2,095 per TFL/dealer summaries."
+      "price_note": "Same trim/engine. Cars.com listing did not label drivetrain; $51,510 assumed to be 4x4 (2WD $48,510). DPH $2,095 per TFL/dealer summaries.",
+      "features": {
+        "driver_assist_level": "lane_centering",
+        "driver_assist_name": "Toyota Safety Sense 2.5",
+        "aeb": true,
+        "blind_spot": false,
+        "rear_cross_traffic": false,
+        "lane_keep": true,
+        "ota_updates": "infotainment_only",
+        "remote_climate": null,
+        "power_outlet_v2l": null,
+        "heated_front_seats": null,
+        "heated_steering_wheel": false,
+        "power_liftgate": null,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 8,
+        "source": "https://www.kbb.com/toyota/tundra-crewmax/2026/specs/ ; https://www.tundras.com/threads/blind-spot.137982/ ; https://pressroom.toyota.com/2026-toyota-tundra-a-bold-new-chapter-in-full-size-pickup-excellence/",
+        "confidence": "approximate",
+        "note": "Resolved the draft's unresolved blind_spot/rear_cross_traffic: KBB spec page plus consistent secondary sources (Tundra owner forum, dealer trim guides) confirm BSM+RCTA is OPTIONAL on SR5 and standard only from Limited up — changed both from null to false. Corrected power_liftgate from false to null per instructions (Tundra is a tailgate, not liftgate, vehicle)."
+      }
     },
     {
       "id": "vw-atlas-2024",
@@ -5184,7 +6604,27 @@
       "new_mpg_combined": 22,
       "price_source": "https://media.vw.com/press-kits/301",
       "price_confidence": "approximate",
-      "price_note": "All-new 2027 Atlas also announced: SE 4MOTION $43,610 incl. $1,525 dest, 23 mpg."
+      "price_note": "All-new 2027 Atlas also announced: SE 4MOTION $43,610 incl. $1,525 dest, 23 mpg.",
+      "features": {
+        "driver_assist_level": "lane_centering",
+        "driver_assist_name": "IQ.DRIVE (Travel Assist)",
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": true,
+        "ota_updates": "unknown",
+        "remote_climate": false,
+        "power_outlet_v2l": false,
+        "heated_front_seats": true,
+        "heated_steering_wheel": true,
+        "power_liftgate": false,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 12,
+        "source": "https://www.teamvw.com/research-aa-atlas-trims/ (direct fetch) ; VW official Atlas equipment language via search excerpt (media.vw.com press kit) ; https://www.carsdirect.com/2026/volkswagen/atlas ; https://www.kbb.com/volkswagen/atlas/2026/",
+        "confidence": "approximate",
+        "note": "Changed heated_steering_wheel from null to true: two independent sources (a dealer research page directly quoting VW's equipment copy, and a separate search of VW's own press-kit language) both state a heated steering wheel with shift paddles is standard across the Atlas lineup including base SE. One other lower-quality aggregator source disagreed (claimed SE w/Technology-only) so this is marked approximate, not verified. Changed power_liftgate from null to false: confirmed NOT standard on base SE — added by the SE w/Technology package (hands-free power liftgate). Also set power_outlet_v2l to false (the 115V 2nd-row outlet is an SE w/Technology addition per the same dealer source), previously null."
+      }
     },
     {
       "id": "vw-tiguan-2024",
@@ -5221,7 +6661,27 @@
       "new_mpg_combined": 25,
       "price_source": "https://media.vw.com/press-kits/2026-tiguan-press-kit",
       "price_confidence": "approximate",
-      "price_note": "Price from the VW 2026 pricing sheet as quoted in search results (PDF blocked fetching)."
+      "price_note": "Price from the VW 2026 pricing sheet as quoted in search results (PDF blocked fetching).",
+      "features": {
+        "driver_assist_level": "lane_centering",
+        "driver_assist_name": "IQ.DRIVE (Travel Assist)",
+        "aeb": true,
+        "blind_spot": true,
+        "rear_cross_traffic": true,
+        "lane_keep": true,
+        "ota_updates": "unknown",
+        "remote_climate": false,
+        "power_outlet_v2l": null,
+        "heated_front_seats": true,
+        "heated_steering_wheel": false,
+        "power_liftgate": true,
+        "surround_view_camera": false,
+        "wireless_phone_projection": true,
+        "main_screen_in": 12.9,
+        "source": "https://www.jimellisvolkswagenkennesaw.com/volkswagen-tiguan-trim-levels/ ; https://www.cars.com/articles/how-much-is-the-2026-volkswagen-tiguan-517845/ ; https://www.carsdirect.com/volkswagen/tiguan/2026 ; https://www.kbb.com/volkswagen/tiguan/2026/",
+        "confidence": "approximate",
+        "note": "Confirmed as drafted: heated steering wheel is NOT standard on SE (Cold Weather Package, or standard only on SEL R-Line Turbo); power liftgate (hands-free) IS standard on SE. No changes needed."
+      }
     },
     {
       "id": "volvo-xc60-2024",

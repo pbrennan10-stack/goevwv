@@ -62,6 +62,9 @@ goevwv/
 │   ├── household.ts    # Household planner engine (assignment, fit, ownership cost)
 │   ├── capability.ts   # Seats/cargo/towing helpers, cargo-miles index
 │   ├── scenario.ts     # "Typical WV driver" defaults for /ev, /utilities, /faq
+│   ├── typical.ts      # Shared "typical WV" figures for prose (per-100-mile cost, CO₂)
+│   ├── features.ts     # Standard-equipment schema + labels
+│   ├── wear.ts         # Maintenance-over-time math for /learn/what-wears-out
 │   └── planState.ts    # Planner state, trip presets, ?h= URL encoding (shared with QuickAnswer)
 ├── data/
 │   ├── vehicles.json   # ~70 EV/PHEV models incl. cargo vans (capability + source per vehicle)
@@ -193,6 +196,12 @@ Engine in `lib/household.ts` reuses `lib/calc.ts` energy/DCFC/insurance helpers 
 - Homepage: "What 100 miles costs" chart + `QuickAnswer` (4 taps → verdict with low/mid/high range → `/plan?from=quick&h=…`).
 - Tap-to-explain: `<Term id="…">` reads `data/glossary.json` (native Popover API, no library). Explain first use per page only; never inside headings, buttons or select options. `/learn/glossary` lists every term.
 - Charts: use `components/charts.tsx`; no chart libraries. Bars start at zero, values are text, charts print.
+- EV 101 (`/learn/*`): short explainers built on `components/LearnLayout.tsx` (`LEARN_PAGES` drives the hub, homepage strip, and sitemap). Every number comes from `data/*` via `lib/typical.ts` (shared per-100-mile, CO₂ figures) or `data/wear_items.yaml` + `lib/wear.ts` (maintenance chart) — never type a number into the copy.
+- Standard equipment: optional `features` object on each vehicle in `vehicles.json` / `ice_vehicles.json` (schema + labels in `lib/features.ts`, display in `components/Equipment.tsx` on `/ev/[id]` and the planner side-by-side). Facts for the priced trim only, no dollar values; `null` = not confirmed; `power_liftgate: null` = no liftgate. Vehicles without `features` show "not finished checking" — don't fill them with unchecked guesses.
+
+## Tests
+
+`npm test` compiles `tests/*.ts` with `tsconfig.test.json` (into `.test-build/`) and runs `node --test`: data sanity, calculator/planner agreement, resale ordering, tipping points, used break-even, share-link round trip, equipment enums. The deploy workflow runs it before building, so a failing test blocks the deploy. Add a test when you change cost math.
 
 ## Principles
 

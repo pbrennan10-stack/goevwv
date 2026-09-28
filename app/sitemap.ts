@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { LEARN_PAGES } from "@/components/LearnLayout";
 import { getUtilities, getVehicles } from "@/lib/data";
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -17,6 +18,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     page("/ev", 0.9),
     page("/utilities", 0.9),
     page("/faq", 0.9),
+    page("/learn", 0.8),
+    ...LEARN_PAGES.map((p) => page(`/learn/${p.slug}`, 0.7)),
     page("/learn/glossary", 0.7),
     page("/chargers", 0.8, "weekly"),
     page("/about", 0.8),

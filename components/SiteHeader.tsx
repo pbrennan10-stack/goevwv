@@ -11,6 +11,7 @@ const NAV = [
   { href: "/ev", label: "EVs" },
   { href: "/utilities", label: "Utilities" },
   { href: "/chargers", label: "Charger Map" },
+  { href: "/learn", label: "EV 101" },
   { href: "/faq", label: "FAQ" },
   { href: "/about", label: "Why EVs Matter" },
   { href: "/state-of-the-data", label: "State of the Data" },

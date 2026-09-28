@@ -1,3 +1,5 @@
+import type { Features } from "./features";
+
 // Shared types matching the shape of data/*.json and data/*.yaml
 
 export type Powertrain = "bev" | "phev" | "hybrid" | "ice";
@@ -39,6 +41,8 @@ export interface Capability {
 }
 
 export interface Vehicle extends Capability {
+  // Standard equipment on the priced trim (lib/features.ts).
+  features?: Features;
   id: string;
   make: string;
   model: string;
@@ -246,6 +250,7 @@ export interface IceVehicleMaintenance {
 }
 
 export interface IceVehicle extends Partial<Capability> {
+  features?: Features;
   // The same vehicle bought NEW today (current model year), for the planner's
   // "new EV vs new gas" comparison. Absent/discontinued = can't be bought new.
   new_model_year?: number;
