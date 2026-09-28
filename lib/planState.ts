@@ -1,7 +1,5 @@
 // Shared shape of a household plan, its presets, and how it's encoded in a
-// shareable URL (?h=…). Used by the planner (components/HouseholdPlanner.tsx)
-// and the homepage quick answer (components/QuickAnswer.tsx), so a link built
-// on the homepage opens the planner already filled in.
+// shareable URL (?h=…). Used by the planner (components/HouseholdPlanner.tsx).
 
 import type { Catalog, HomeCharging, OdometerBand, TripInput } from "./household";
 

@@ -1,12 +1,11 @@
 import Link from "next/link";
 import { AiDataNotice } from "@/components/AiDataNotice";
 import { CHART_COLORS, HBars } from "@/components/charts";
-import { QuickAnswer } from "@/components/QuickAnswer";
+import { FitCheck } from "@/components/FitCheck";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Term } from "@/components/Term";
 import { ANNUAL_WINTER_KWH_MULTIPLIER, ICE_WINTER_FUEL_MULTIPLIER } from "@/lib/calc";
-import { getFederalData, getIceVehicles, getOwnershipAssumptions, getUtilities, getVehicles } from "@/lib/data";
-import type { Catalog } from "@/lib/household";
+import { getFederalData, getOwnershipAssumptions, getUtilities, getVehicles } from "@/lib/data";
 
 // What 100 miles costs in WV — computed from the data files so it updates
 // itself with every refresh. Median current-EV efficiency, winter included on
@@ -31,12 +30,7 @@ export default function HomePage() {
   const utilities = getUtilities();
   const evs = getVehicles();
   const c = per100(fed, utilities, evs);
-  const catalog: Catalog = {
-    evs: evs.filter((v) => v.status === "current").map((v) => ({ ...v, notes: "", capability_note: undefined, capability_source: undefined })),
-    ice: getIceVehicles().filter((v) => ["toyota-camry-2024", "honda-crv-2024", "honda-odyssey-2024", "chevy-silverado-2024"].includes(v.id))
-      .map((v) => ({ ...v, capability_note: undefined, capability_source: undefined, price_note: undefined })),
-    utilities, fed, own: getOwnershipAssumptions(),
-  };
+  const own = getOwnershipAssumptions();
   const $ = (n: number) => "$" + n.toFixed(2);
   return (
     <main className="mx-auto max-w-content px-4 sm:px-6 py-8 sm:py-12">
@@ -69,8 +63,8 @@ export default function HomePage() {
             <p className="mt-3 text-xs text-ink-soft">Where you charge matters more than which EV you pick.</p>
           </div>
           <div className="flex flex-col gap-3">
-            <a href="#quick" className="inline-flex items-center justify-center rounded-xl bg-brand hover:bg-brand-dark text-white font-semibold px-5 py-3 transition shadow-sm">
-              Get a quick answer — 4 taps ↓
+            <a href="#fit-check" className="inline-flex items-center justify-center rounded-xl bg-brand hover:bg-brand-dark text-white font-semibold px-5 py-3 transition shadow-sm">
+              Take the 3-question fit check ↓
             </a>
             <Link href="/plan" className="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white hover:border-brand text-ink font-semibold px-5 py-3 transition">
               Plan your whole household →
@@ -90,7 +84,7 @@ export default function HomePage() {
         </p>
       </section>
 
-      <QuickAnswer catalog={catalog} />
+      <FitCheck level2InstalledUsd={own.home_charging_setup.level2_installed_usd} />
 
       <section className="mt-14 grid gap-4 sm:grid-cols-2">
         {[
