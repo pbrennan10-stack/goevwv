@@ -21,39 +21,89 @@ wv_purchase_tax:
     or on the DMV page). Manufacturer rebates are not subtracted before tax per
     third-party guides. Lien recording adds $10 if financed (not modeled).
 
-# Share of the original price a NEW vehicle keeps after 5 years, by segment.
-# iSeeCars "Cars That Hold Their Value" study, ~950,000 five-year-old vehicles
-# sold Mar 2025–Feb 2026 (published ~Mar 2026): EVs lost 57.2%, all vehicles
-# 41.8%, trucks 34.2%, hybrids 35.4%, SUVs 44.9%.
-retention_5yr:
-  bev: 0.428
-  phev: 0.582       # no published PHEV segment figure; we use the all-vehicle average
-  gas: 0.582        # all vehicles (iSeeCars doesn't publish gas-only)
-  gas_truck: 0.658
+# Share of the LIST price (MSRP + destination, in constant dollars) a NEW
+# vehicle bought in 2026 keeps after 5 years. Three paired scenarios — used
+# EV and gas prices tend to move together, so low goes with low. "mid" is the
+# default; the planner shows all three.
+#
+# Why not just use the latest study? iSeeCars' 2026 study (5-year-old cars
+# sold Mar 2025–Feb 2026: EVs kept 42.8%, all vehicles 58.2%, trucks 65.8%)
+# measures 2020–21 models, a cohort with one-time distortions on BOTH sides:
+#  - Gas: the 2020–21 pandemic production shortfall (14.5–15.0M sales vs ~17M
+#    normal) left 4–6-year-old cars scarce; all-vehicle retention jumped from
+#    54.4% (2025 study) to 58.2% (2026) while real used prices were flat.
+#  - EVs: Tesla's 2023 price cuts (~20% relative to new-vehicle inflation)
+#    dropped the new-car benchmark used EVs compete with, plus the Hertz
+#    sell-off and a lease-return wave. Federal credits mostly did NOT apply to
+#    this Tesla-heavy cohort (Tesla lost the credit end-2019), so no credit
+#    correction is made.
+# Derivation (all constant-dollar): GAS low 0.504 = 2019 study (pre-pandemic);
+# mid 0.544 = 2025 study (normal cohort, same real used-price level); high
+# 0.582 = 2026 study. BEV = gas × EV/gas ratio (0.787 from the 2025 study) ×
+# repricing factor (1.000 / 1.089 / 1.124: how much of Tesla-style price-cut
+# shock repeats) × supply factor (1.00 / 1.02 / 1.03) − 0.005 (study excludes
+# discontinued low-retention EVs like the Bolt). PHEV = gas × 0.90 (Kia Niro
+# PHEV 55.6%, Outlander PHEV 49.6% in the 2026 list). Hybrids = gas × 1.11
+# (64.6% vs 58.2% in the 2026 study). Trucks: 2019 / 2025 / 2026 studies.
+retention_scenarios_5yr:
+  bev:        { low: 0.39,  mid: 0.47,  high: 0.525 }
+  phev:       { low: 0.454, mid: 0.49,  high: 0.524 }
+  gas:        { low: 0.504, mid: 0.544, high: 0.582 }
+  gas_hybrid: { low: 0.559, mid: 0.604, high: 0.646 }
+  gas_truck:  { low: 0.573, mid: 0.596, high: 0.658 }
   source: "https://www.iseecars.com/cars-that-hold-their-value-study"
   notes: >
-    Kelley Blue Book's 2026 residual-value awards project ~45% retention after
-    5 years for an average 2026 model at wholesale (auction) prices — lower than
-    iSeeCars' retail figures. Early EVs had steep depreciation partly from price
-    cuts and lapsed tax credits; newer EVs may hold value differently.
-    2026 trend: used-EV values firmed as gas prices rose — Cox Automotive's
-    used EV average listing price was up ~8% year over year in Jul–Aug 2026,
-    and Manheim wholesale EV values ran ahead of non-EVs (+11% YoY in May,
-    narrowing to +2% by mid-September). Gains were concentrated in cheaper,
-    older EVs; used EVs over $40k still fell, and ~500k lease returns in 2026
-    add supply. Not enough to justify a new 5-year figure — the planner's
-    slider lets people apply their own view. Revisit with iSeeCars' next
-    study (~Mar 2027).
-  trend_source: "https://www.coxautoinc.com/market-insights/"
+    Cross-checks: KBB's 2024 residual awards forecast the average vehicle at
+    42.4% after 60 months (wholesale basis) with the best EVs about equal to
+    average — consistent with a typical-EV/average ratio of ~0.86 (our mid).
+    2026 used-EV prices firmed as gas rose (Cox: used EV listing prices up ~8%
+    YoY Jul–Aug 2026; Manheim EV wholesale ahead of non-EVs, narrowing from +12%
+    in June to +4.5% in August) — treated as support for the high case, not
+    built into mid. iSeeCars adjusts MSRPs for inflation, so these are
+    constant-dollar ratios, matching the site's constant-dollar running costs.
+    Revisit when iSeeCars publishes its next study (~Mar 2027).
+  trend_source: "https://www.coxautoinc.com/insights/q2-2026-muvvi/"
 
-# How much a vehicle you already own loses per year if you keep it:
-# midpoint of Kelley Blue Book's "8–12% each year" after the first two years.
+# How much a vehicle you already own loses per year if you keep it (also used
+# for years 6+ of a new vehicle, when depreciation flattens out): midpoint of
+# Kelley Blue Book's "8–12% each year" after the first two years.
 older_vehicle_annual_depreciation: 0.10
 older_vehicle_source: "https://www.kbb.com/car-advice/how-to-beat-car-depreciation/"
+
+# A USED vehicle you'd buy now (typically 2–4 years old) is past its steepest
+# drop but still losing value faster than an old car. Used for the "what would
+# a used one need to cost?" answer. Approximate (between KBB's 8–12% and the
+# ~16%/yr implied by new-EV 5-year retention).
+used_vehicle_annual_depreciation: 0.12
 
 # Starting guess for what a vehicle you already own is worth, when you haven't
 # entered one — the planner always asks you to replace it with a real number.
 default_owned_value_usd: 15000
+
+# Upkeep rises with mileage. Multipliers on each vehicle's (new-car) yearly
+# maintenance, by odometer band, for vehicles you already own. From Consumer
+# Reports' per-mile maintenance+repair by mileage band (2020 study, converted to
+# 2026 dollars): gas 4.4¢ / 9.4¢ / 12.4¢ per mile; EVs 1.9¢ / 4.4¢ / 6.8¢
+# (100k+ EV figure low-confidence), scaled to this site's new-car baselines.
+owned_maintenance_multiplier:
+  gas: { under_50k: 1.0, "50k_100k": 1.8, over_100k: 2.4 }
+  ev:  { under_50k: 1.0, "50k_100k": 1.6, over_100k: 2.5 }
+  source: "https://advocacy.consumerreports.org/wp-content/uploads/2020/10/EV-Ownership-Cost-Final-Report-1.pdf"
+
+# One-time cost to be able to charge at home. The planner adds it to a new
+# plug-in's cost unless the household already has an EV or chooses a regular
+# 120V outlet. Utility Level 2 charger rebates (e.g. AEP's $300) are subtracted.
+home_charging_setup:
+  level1_usd: 0             # regular outlet + the cord that comes with the car
+  level2_installed_usd: 1200  # charger + electrician, typical (range ~$1,000–2,500; panel upgrades extra)
+  level1_max_daily_mi: 40   # a 120V outlet adds ~40–50 mi overnight; above this we assume Level 2
+  source: "https://www.fixr.com/costs/home-electric-vehicle-charging-station"
+  notes: >
+    Federal home-charger credit (30C) ended June 30, 2026. AEP's Go Electric
+    rebate is $300 for an ENERGY STAR Level 2 charger. AEP/Wheeling's
+    off-peak EV rate requires a hard-wired Level 2 circuit, so choosing it
+    implies Level 2. Households that can't charge at home pay public charging
+    prices for every mile — shown separately.
 
 # For reference if financing is added later (not used yet).
 apr_reference:

@@ -293,8 +293,9 @@ export function ChargerMap({
   useEffect(() => {
     if (typeof window === "undefined") return;
     const p = new URLSearchParams();
-    if (originCoords) p.set("o", `${originCoords[0].toFixed(5)},${originCoords[1].toFixed(5)}`);
-    if (destCoords) p.set("d", `${destCoords[0].toFixed(5)},${destCoords[1].toFixed(5)}`);
+    // Rounded to ~1 km: a shared map link shouldn't pinpoint a home or workplace.
+    if (originCoords) p.set("o", `${originCoords[0].toFixed(2)},${originCoords[1].toFixed(2)}`);
+    if (destCoords) p.set("d", `${destCoords[0].toFixed(2)},${destCoords[1].toFixed(2)}`);
     if (bufferMi !== 10) p.set("br", String(bufferMi));
     if (returnUrl) p.set("return", returnUrl);
     const qs = p.toString();
@@ -528,7 +529,7 @@ export function ChargerMap({
             type="button"
             onClick={onGetRoute}
             disabled={!originCoords || !destCoords || routeLoading}
-            className="rounded-lg bg-brand text-white px-4 py-2 text-sm font-medium disabled:opacity-40 hover:opacity-90 transition"
+            className="rounded-lg bg-brand text-white px-4 py-2 text-sm font-medium disabled:opacity-40 hover:bg-brand-dark transition"
           >
             {routeLoading ? "Loading route…" : "Get route"}
           </button>

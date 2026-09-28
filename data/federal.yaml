@@ -184,6 +184,27 @@ calculation_notes:
       (AAA showed an apparent outlier for Morgantown, excluded). Refresh
       quarterly.
 
+  # What gas is likely to AVERAGE over the next year or so — the default for
+  # multi-year cost comparisons, so results don't hinge on today's spike.
+  # Today's price (above) stays one tap away in the tools. Refresh quarterly
+  # from EIA's Short-Term Energy Outlook, Table 2.
+  gas_price_outlook_per_gal:
+    low: 2.95    # ≈ WV's 2025 level (AAA WV year-ago $2.996) and STEO's Q4-2027 US $3.01
+    mid: 3.45    # EIA STEO Sep-2026 next-4-quarter US average ($3.59) minus WV's usual ~$0.13 discount
+    high: 4.36   # today's AAA WV average
+    source: "EIA Short-Term Energy Outlook (Sept 2026), Table 2; AAA WV"
+    source_url: "https://www.eia.gov/outlooks/steo/tables/pdf/2tab.pdf"
+    retrieved: "2026-09-27"
+    notes: >
+      STEO Sep-2026 US regular: Q4-26 $3.95, Q1-27 $3.52, Q2-27 $3.55, Q3-27
+      $3.34 (avg $3.59). WV has run ~$0.12–0.14 below the US average (AAA today,
+      a month ago, a year ago). Researched with AI assistance; approximate.
+
+  # Electricity isn't frozen either: EIA STEO projects ~2.1% for 2027 and US
+  # residential prices rose ~3.0%/yr 2014–2025. Multi-year comparisons raise
+  # home and public charging prices by this much per year.
+  electricity_annual_increase: 0.025
+
   # Public DC fast charging rate applied to long-trip stops. Home charging
   # stays at the user's utility rate; this only applies to road-trip kWh.
   dcfc_rate_per_kwh:

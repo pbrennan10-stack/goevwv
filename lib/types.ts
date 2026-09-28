@@ -182,6 +182,16 @@ export interface FederalData {
       retrieved?: string;
       retrieved_label?: string;
     };
+    gas_price_outlook_per_gal?: {
+      low: number;
+      mid: number;
+      high: number;
+      source: string;
+      source_url?: string;
+      retrieved?: string;
+      notes?: string;
+    };
+    electricity_annual_increase?: number;
     dcfc_rate_per_kwh?: {
       current: number;
       member_rate?: number;

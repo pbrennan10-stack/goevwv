@@ -7,101 +7,44 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { CHART_COLORS, StackedBars } from "@/components/charts";
+import { Term } from "@/components/Term";
+import { ANNUAL_WINTER_KWH_MULTIPLIER, dcfcStopMiles } from "@/lib/calc";
 import { cargoSeatsUpLabel } from "@/lib/capability";
 import {
+  DESTINATION_FALLBACK_USD,
+  TOW_RANGE_FACTOR,
+  batteryRangeFactor,
   fit,
   planHousehold,
   retention,
+  tippingPoints,
   usedBreakEvenPrice,
   type Catalog,
+  type HomeCharging,
   type HouseholdInput,
-  type TripInput,
+  type OdometerBand,
   type Unit,
+  type Use,
 } from "@/lib/household";
 import type { IceVehicle, Vehicle } from "@/lib/types";
+import {
+  CHARGING_OPTIONS,
+  LUGGAGE,
+  ODOMETER_OPTIONS,
+  decodeState,
+  encodeState,
+  gasOutlook,
+  initialState,
+  sanitizeLoaded,
+  type PlanState,
+} from "@/lib/planState";
 
 interface Props {
   catalog: Catalog;
 }
 
 const usd = (n: number) => `$${Math.round(n).toLocaleString("en-US")}`;
-
-// ---------- Presets ----------
-
-const LUGGAGE = [
-  { v: 8, label: "Light — a couple of bags" },
-  { v: 20, label: "Normal — a suitcase each" },
-  { v: 28, label: "Packed — suitcases + beach/camping gear" },
-  { v: 40, label: "Loaded — gear for a week away" },
-];
-
-interface TripPreset extends TripInput { on: boolean }
-
-const TRIP_PRESETS: TripPreset[] = [
-  { id: "beach", label: "Beach vacation", oneWayMi: 400, perYear: 1, people: 4, luggageCuFt: 28, towLbs: 0, on: true },
-  { id: "family", label: "Visit family", oneWayMi: 220, perYear: 6, people: 2, luggageCuFt: 8, towLbs: 0, on: true },
-  { id: "ski", label: "Ski or lake weekend", oneWayMi: 150, perYear: 3, people: 4, luggageCuFt: 20, towLbs: 0, on: false },
-  { id: "camp", label: "Hunting or fishing camp", oneWayMi: 90, perYear: 4, people: 2, luggageCuFt: 20, towLbs: 0, on: false },
-  { id: "tow", label: "Tow a camper or boat", oneWayMi: 60, perYear: 3, people: 4, luggageCuFt: 8, towLbs: 5000, on: false },
-];
-
-interface State {
-  step: number;
-  owned: { key: string; ref: string; valueNow: number; mpgOverride?: number }[];
-  candRef: string;
-  priceOverride: number | null;
-  replaces: string | null;
-  drivers: { id: number; commuteOneWayMi: number; daysPerWeek: number }[];
-  errandsMiPerWeek: number;
-  errandsPeople: number;
-  trips: TripPreset[];
-  utilityId: string;
-  useTOU: boolean;
-  gasPrice: number;
-  years: number;
-  overrides: Record<string, string>;
-  retention5yOverride: number | null;
-  // New gas vehicle to compare against: "auto" = new version of the vehicle
-  // being replaced (when it's still sold), null = no comparison.
-  gasRef: string | null;
-  gasPriceOverride: number | null;
-}
-
-function initialState(cat: Catalog): State {
-  return {
-    step: 0,
-    owned: [{ key: "a", ref: "ice:honda-crv-2024", valueNow: cat.own.default_owned_value_usd }],
-    candRef: "ev:chevy-equinox-ev-2025",
-    priceOverride: null,
-    replaces: "a",
-    drivers: [{ id: 1, commuteOneWayMi: 21, daysPerWeek: 5 }],
-    errandsMiPerWeek: 60,
-    errandsPeople: 3,
-    trips: TRIP_PRESETS.map((t) => ({ ...t })),
-    utilityId: "aep",
-    useTOU: false,
-    gasPrice: cat.fed.calculation_notes.gas_price_baseline_per_gal.current,
-    years: cat.own.ownership_years_default,
-    overrides: {},
-    retention5yOverride: null,
-    gasRef: "auto",
-    gasPriceOverride: null,
-  };
-}
-
-// State lives in the URL (?h=…) so a plan can be shared or bookmarked.
-function encodeState(s: State): string {
-  const json = JSON.stringify({ ...s, step: undefined });
-  return btoa(unescape(encodeURIComponent(json))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-}
-function decodeState(q: string): Partial<State> | null {
-  try {
-    const b = q.replace(/-/g, "+").replace(/_/g, "/");
-    return JSON.parse(decodeURIComponent(escape(atob(b))));
-  } catch {
-    return null;
-  }
-}
 
 // ---------- Small UI pieces ----------
 
@@ -206,17 +149,25 @@ function FitIcon({ level }: { level: "ok" | "tight" | "no" }) {
 const STEPS = ["Vehicles", "Driving", "Try an EV", "Your plan"];
 
 export function HouseholdPlanner({ catalog }: Props) {
-  const [s, setS] = useState<State>(() => initialState(catalog));
+  const [s, setS] = useState<PlanState>(() => initialState(catalog));
   const [hydrated, setHydrated] = useState(false);
   const [copied, setCopied] = useState(false);
-  const set = (patch: Partial<State>) => setS((prev) => ({ ...prev, ...patch }));
+  const [fromShare, setFromShare] = useState(false);
+  const [fromQuick, setFromQuick] = useState(false);
+  const set = (patch: Partial<PlanState>) => setS((prev) => ({ ...prev, ...patch }));
 
   useEffect(() => {
-    const q = new URLSearchParams(window.location.search).get("h");
-    const loaded = q ? decodeState(q) : null;
-    if (loaded) setS((prev) => ({ ...prev, ...loaded, step: 3 }));
+    const params = new URLSearchParams(window.location.search);
+    const q = params.get("h");
+    const loaded = q ? sanitizeLoaded(decodeState(q), catalog) : null;
+    const evParam = params.get("ev");
+    if (loaded) {
+      setS((prev) => ({ ...prev, ...loaded, step: 3 }));
+      if (params.get("from") === "quick") setFromQuick(true); else setFromShare(true);
+    }
+    else if (evParam && catalog.evs.some((v) => v.id === evParam)) setS((prev) => ({ ...prev, candRef: `ev:${evParam}` }));
     setHydrated(true);
-  }, []);
+  }, [catalog]);
   useEffect(() => {
     if (!hydrated) return;
     const url = `${window.location.pathname}?h=${encodeState(s)}`;
@@ -224,7 +175,7 @@ export function HouseholdPlanner({ catalog }: Props) {
   }, [s, hydrated]);
 
   const cand = catalog.evs.find((v) => `ev:${v.id}` === s.candRef);
-  const defaultPrice = cand ? cand.msrp_usd + (cand.destination_usd ?? 0) : 0;
+  const defaultPrice = cand ? cand.msrp_usd + (cand.destination_usd ?? DESTINATION_FALLBACK_USD) : 0;
   const price = s.priceOverride ?? defaultPrice;
 
   const buyableGas = catalog.ice.filter((v) => v.new_status === "current" && v.new_msrp_usd);
@@ -232,7 +183,7 @@ export function HouseholdPlanner({ catalog }: Props) {
   const autoGas = replacedRef && buyableGas.some((v) => `ice:${v.id}` === replacedRef) ? replacedRef : null;
   const gasRef = s.gasRef === "auto" ? autoGas : s.gasRef;
   const gasVehicle = gasRef ? buyableGas.find((v) => `ice:${v.id}` === gasRef) : undefined;
-  const gasDefaultPrice = gasVehicle ? (gasVehicle.new_msrp_usd ?? 0) + (gasVehicle.new_destination_usd ?? 0) : 0;
+  const gasDefaultPrice = gasVehicle ? (gasVehicle.new_msrp_usd ?? 0) + (gasVehicle.new_destination_usd ?? DESTINATION_FALLBACK_USD) : 0;
   const gasPrice = s.gasPriceOverride ?? gasDefaultPrice;
 
   const input: HouseholdInput = {
@@ -249,8 +200,15 @@ export function HouseholdPlanner({ catalog }: Props) {
     years: s.years,
     overrides: s.overrides,
     retention5yOverride: s.retention5yOverride,
+    homeCharging: s.homeCharging ?? "auto",
   };
-  const result = useMemo(() => planHousehold(input, catalog), [JSON.stringify(input)]); // eslint-disable-line react-hooks/exhaustive-deps
+  const inputKey = JSON.stringify(input);
+  const result = useMemo(() => planHousehold(input, catalog), [inputKey]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Tipping points only matter on the results step (and cost ~80 plan runs).
+  const tips = useMemo(
+    () => (s.step === 3 && input.candidate ? tippingPoints(input, catalog) : null),
+    [inputKey, s.step], // eslint-disable-line react-hooks/exhaustive-deps
+  );
 
   const unitName = (ref: string) => {
     const [k, id] = ref.split(":");
@@ -308,6 +266,15 @@ export function HouseholdPlanner({ catalog }: Props) {
                     <Num label="Your real mpg" suffix="mpg" step={1} min={5} max={80} value={o.mpgOverride ?? u?.mpg_combined ?? 25}
                       onChange={(n) => set({ owned: s.owned.map((x) => (x.key === o.key ? { ...x, mpgOverride: n } : x)) })} />
                   )}
+                  <label className="col-span-2 flex flex-col gap-1">
+                    <span className="text-sm font-medium text-ink">About how many miles are on it?</span>
+                    <select value={o.odometer ?? "50k_100k"}
+                      onChange={(e) => set({ owned: s.owned.map((x) => (x.key === o.key ? { ...x, odometer: e.target.value as OdometerBand } : x)) })}
+                      className="w-full rounded-lg border border-slate-300 px-3 py-2.5 bg-white">
+                      {ODOMETER_OPTIONS.map((opt) => <option key={opt.v} value={opt.v}>{opt.label} miles</option>)}
+                    </select>
+                    <span className="text-xs text-ink-soft">Repairs add up as miles climb — that&apos;s part of the cost of keeping it.</span>
+                  </label>
                 </div>
               </Card>
             );
@@ -405,7 +372,33 @@ export function HouseholdPlanner({ catalog }: Props) {
                 {catalog.utilities.map((u) => <option key={u.id} value={u.id}>{u.name}</option>)}
               </select>
             </label>
-            <Num label="Gas price" prefix="$" suffix="/ gal" step={0.05} min={1} max={10} value={s.gasPrice} onChange={(n) => set({ gasPrice: n })} />
+            <div className="flex flex-col gap-1">
+              <Num label="Gas price (average over the years ahead)" prefix="$" suffix="/ gal" step={0.05} min={1} max={10} value={s.gasPrice} onChange={(n) => set({ gasPrice: n })} />
+              <div className="flex flex-wrap gap-1.5 text-xs">
+                {[
+                  { label: `Forecast $${gasOutlook(catalog).mid.toFixed(2)}`, v: gasOutlook(catalog).mid },
+                  { label: `Today $${gasOutlook(catalog).today.toFixed(2)}`, v: gasOutlook(catalog).today },
+                  { label: `Low $${gasOutlook(catalog).low.toFixed(2)}`, v: gasOutlook(catalog).low },
+                ].map((c) => (
+                  <button key={c.label} type="button" onClick={() => set({ gasPrice: c.v })}
+                    className={`min-h-8 rounded-full border px-2.5 ${Math.abs(s.gasPrice - c.v) < 0.005 ? "border-brand bg-brand-bg text-emerald-900 font-semibold" : "border-slate-300 bg-white text-ink-muted"}`}>
+                    {c.label}
+                  </button>
+                ))}
+              </div>
+              <span className="text-xs text-ink-soft">Forecast = EIA&apos;s outlook for the next year, adjusted for WV. Today&apos;s price is near a peak.</span>
+            </div>
+            <label className="sm:col-span-2 flex flex-col gap-1">
+              <span className="text-sm font-medium text-ink">How would you charge at home?</span>
+              <select value={s.homeCharging ?? "auto"} onChange={(e) => set({ homeCharging: e.target.value as HomeCharging })}
+                className="w-full rounded-lg border border-slate-300 px-3 py-2.5 bg-white">
+                {CHARGING_OPTIONS.map((c) => <option key={c.v} value={c.v}>{c.label}</option>)}
+              </select>
+              <span className="text-xs text-ink-soft">
+                A <Term id="level1">regular outlet</Term> adds ~40 miles overnight — enough for many commutes. A <Term id="level2">Level 2 charger</Term> costs ~${catalog.own.home_charging_setup.level2_installed_usd.toLocaleString("en-US")} installed
+                {utility?.rebates.some((r) => r.type === "l2_charger") ? ` (${utility.name} gives a rebate)` : ""}. Renters without a place to plug in pay public charging prices.
+              </span>
+            </label>
             {utility?.residential.tou_available && (
               <label className="sm:col-span-2 flex items-center gap-2 text-sm text-ink cursor-pointer">
                 <input type="checkbox" checked={s.useTOU} onChange={(e) => set({ useTOU: e.target.checked })} className="h-5 w-5 accent-emerald-700" />
@@ -491,12 +484,19 @@ export function HouseholdPlanner({ catalog }: Props) {
 
       {/* STEP 4 — YOUR PLAN */}
       {s.step === 3 && (
-        <PlanResults s={s} set={set} result={result} catalog={catalog} price={price} cand={cand} gasVehicle={gasVehicle} input={input}
+        <PlanResults fromShare={fromShare} fromQuick={fromQuick} onStartOwn={() => { setS(initialState(catalog)); setFromShare(false); window.history.replaceState(null, "", window.location.pathname); window.scrollTo({ top: 0 }); }} s={s} set={set} result={result} catalog={catalog} price={price} cand={cand} gasVehicle={gasVehicle} input={input} tips={tips}
           defaultRetention={defaultRetention}
           copied={copied}
           onShare={async () => {
             const url = window.location.href;
-            if (navigator.share) { try { await navigator.share({ title: "Our household EV plan", url }); } catch { /* closed */ } return; }
+            // Share the result, not just a link.
+            const p = result.plan, other = result.gasAlt ?? result.today;
+            const otherName = result.gasAlt && gasVehicle ? `a new ${gasVehicle.model}` : "keeping our current car";
+            const d = p ? other.totalOverPeriod - p.totalOverPeriod : 0;
+            const text = p && cand
+              ? `Our household plan: a ${cand.model} ${d >= 0 ? `saves about ${Math.round(d).toLocaleString("en-US")}` : `costs about ${Math.round(-d).toLocaleString("en-US")} more`} vs ${otherName} over ${s.years} years in WV, purchase price and resale included. Try yours:`
+              : "Our household EV plan for West Virginia:";
+            if (navigator.share) { try { await navigator.share({ title: "Our household EV plan", text, url }); } catch { /* closed */ } return; }
             try { await navigator.clipboard.writeText(url); setCopied(true); setTimeout(() => setCopied(false), 1800); } catch { window.prompt("Copy this link:", url); }
           }} />
       )}
@@ -521,12 +521,16 @@ export function HouseholdPlanner({ catalog }: Props) {
 // ---------- Results ----------
 
 function PlanResults({
-  s, set, result, catalog, price, cand, gasVehicle, input, defaultRetention, onShare, copied,
+  s, set, result, catalog, price, cand, gasVehicle, input, tips, defaultRetention, onShare, copied, fromShare, fromQuick, onStartOwn,
 }: {
+  fromShare: boolean;
+  fromQuick: boolean;
+  onStartOwn: () => void;
   gasVehicle: IceVehicle | undefined;
   input: HouseholdInput;
-  s: State;
-  set: (p: Partial<State>) => void;
+  tips: { retention5: number | null; gasPrice: number | null } | null;
+  s: PlanState;
+  set: (p: Partial<PlanState>) => void;
   result: ReturnType<typeof planHousehold>;
   catalog: Catalog;
   price: number;
@@ -544,7 +548,7 @@ function PlanResults({
 
   const moveUse = (useId: string, fromKey: string) => {
     const use = uses.find((u) => u.id === useId)!;
-    const capable = planUnits.filter((u) => fit(u, use).level !== "no");
+    const capable = planUnits.filter((u) => fit(u, use, s.years).level !== "no");
     if (capable.length < 2) return;
     const i = capable.findIndex((u) => u.key === fromKey);
     const next = capable[(i + 1) % capable.length];
@@ -576,27 +580,57 @@ function PlanResults({
     ...(gasAlt && gasVehicle ? [{ label: `beat a new ${gasVehicle.model}`, p: usedVsGas }] : []),
     { label: "beat keeping what you have", p: usedVsToday },
   ];
+  // Resale is the biggest unknown, so show the answer under all three
+  // scenarios (EV and gas resale move together: low with low).
+  const other = gasAlt ?? today;
+  const otherLabel = gasAlt && gasVehicle ? `a new ${gasVehicle.model}` : "keeping what you have";
+  const evMinusOther = (planTotal: number | null, otherTotal: number | null) =>
+    planTotal == null ? null : planTotal - (otherTotal ?? today.totalOverPeriod);
+  const scenarios = [
+    { key: "low", label: "Weak resale", d: evMinusOther(result.range.low.plan, gasAlt ? result.range.low.gasAlt : null) },
+    { key: "mid", label: "Middle estimate", d: plan.totalOverPeriod - other.totalOverPeriod },
+    { key: "high", label: "Strong resale", d: evMinusOther(result.range.high.plan, gasAlt ? result.range.high.gasAlt : null) },
+  ];
+  const outlook = gasOutlook(catalog);
 
   return (
     <section className="space-y-5">
       <div className="flex items-start justify-between gap-3">
-        <h2 className="text-2xl font-bold text-ink">Your household plan</h2>
+        <h2 className="text-2xl font-bold text-ink">{fromShare ? "A household plan someone shared" : "Your household plan"}</h2>
         <button type="button" onClick={onShare} className="shrink-0 min-h-11 px-3 text-sm font-semibold text-brand-dark hover:underline">
           {copied ? "Link copied ✓" : "Share plan"}
         </button>
       </div>
+      {fromQuick && (
+        <p className="rounded-xl bg-brand-bg ring-1 ring-emerald-200 p-3 text-sm text-emerald-900">
+          Filled in from your 4 answers, with a typical WV household for the rest. Use the steps above to change anything —
+          your car&apos;s real value and mileage make the biggest difference.
+        </p>
+      )}
+      {fromShare && (
+        <div className="rounded-xl bg-sky-50 ring-1 ring-sky-200 p-3 text-sm text-sky-900 flex flex-wrap items-center justify-between gap-2">
+          <span>This is someone else&apos;s driveway and driving. Your answer depends on yours.</span>
+          <button type="button" onClick={onStartOwn} className="min-h-10 rounded-lg bg-white ring-1 ring-sky-300 px-3 font-semibold">Start your own plan →</button>
+        </div>
+      )}
 
       <Card className="bg-brand-bg ring-emerald-200 space-y-3">
         <p className="text-sm text-ink-muted">Whole-household cost over {Y} years — buying, owning, and driving everything in your driveway.</p>
-        <div className={`grid gap-3 ${cols.length === 3 ? "grid-cols-3" : "grid-cols-2"}`}>
-          {cols.map((c) => (
-            <div key={c.label} className="min-w-0">
-              <div className="text-xs text-ink-soft">{c.label}</div>
-              <div className={`${cols.length === 3 ? "text-lg sm:text-2xl" : "text-2xl"} font-extrabold text-ink`}>{usd(c.r.totalOverPeriod)}</div>
-              <div className="text-xs text-ink-soft break-words">{c.r.units.map((u) => u.unit.short).join(" + ")}</div>
-            </div>
-          ))}
-        </div>
+        <StackedBars
+          ariaLabel={`Total over ${Y} years: ${cols.map((c) => `${c.label} ${usd(c.r.totalOverPeriod)}`).join("; ")}.`}
+          rows={cols.map((c) => ({
+            label: c.label,
+            sublabel: c.r.units.map((u) => u.unit.short).join(" + "),
+            highlight: c.r === plan,
+            segments: [
+              { key: "capital", label: "Lost value (price − resale)", value: c.r.capitalOverPeriod, color: CHART_COLORS.gas },
+              { key: "energy", label: "Gas & charging", value: sum(c.r.units.map((u) => u.energy)) * Y, color: CHART_COLORS.phev },
+              { key: "maint", label: "Maintenance", value: sum(c.r.units.map((u) => u.maintenance)) * Y, color: "#0f766e" },
+              { key: "ins", label: "Insurance", value: sum(c.r.units.map((u) => u.insurance)) * Y, color: CHART_COLORS.neutral },
+              { key: "fees", label: "WV fees", value: sum(c.r.units.map((u) => u.registration)) * Y, color: CHART_COLORS.fee },
+            ],
+          }))}
+        />
         {vsGas != null && runVsGas != null && gasVehicle && (
           <p className={`text-lg font-bold ${vsGas >= 0 ? "text-emerald-800" : "text-amber-800"}`}>
             vs. a new {gasVehicle.model}: the {cand.model}{" "}
@@ -624,8 +658,48 @@ function PlanResults({
             This plan&apos;s total leaves out {plan.unassigned.map((u) => u.label.toLowerCase()).join(" and ")} — no vehicle in it can do {plan.unassigned.length > 1 ? "them" : "it"}. It isn&apos;t a real option as-is.
           </p>
         )}
+        <div className="rounded-xl bg-white/70 ring-1 ring-emerald-200 p-3 space-y-2">
+          <p className="text-sm font-semibold text-ink">
+            {cand.model} vs. {otherLabel} — it depends on <Term id="resale">resale value</Term>
+          </p>
+          <ul className="grid grid-cols-3 gap-2 text-center">
+            {scenarios.map((sc) => (
+              <li key={sc.key} className={`rounded-lg p-2 ${sc.key === "mid" ? "bg-brand-bg ring-1 ring-brand/40" : "bg-slate-50"}`}>
+                <div className="text-[11px] text-ink-soft">{sc.label}</div>
+                <div className={`text-sm font-bold ${sc.d == null ? "text-ink-soft" : sc.d <= 0 ? "text-emerald-800" : "text-amber-800"}`}>
+                  {sc.d == null ? "—" : sc.d <= 0 ? `EV saves ${usd(-sc.d)}` : `EV costs ${usd(sc.d)} more`}
+                </div>
+              </li>
+            ))}
+          </ul>
+          <p className="text-xs text-ink-muted">
+            Nobody knows what today&apos;s EVs will be worth in {Y} years. Early EVs lost value fast — partly from one-time shocks like
+            Tesla&apos;s 2023 price cuts — while gas cars of the same age were propped up by the pandemic car shortage.{" "}
+            {s.retention5yOverride != null ? "Your resale setting below replaces the middle estimate." : "The middle estimate is our default."}
+          </p>
+          {tips && (tips.retention5 != null || tips.gasPrice != null) && (
+            <ul className="text-xs text-ink list-disc pl-4 space-y-0.5">
+              {tips.retention5 != null && (
+                <li>
+                  The {cand.model} comes out ahead if it keeps at least <strong>{Math.round(tips.retention5 * 100)}%</strong> of its sticker price after 5 years
+                  {" "}(middle estimate: {Math.round(defaultRetention * 100)}%).
+                </li>
+              )}
+              {tips.gasPrice != null && tips.gasPrice > 1.5 && tips.gasPrice < 9 && (
+                <li>
+                  …or if gas averages above <strong>${tips.gasPrice.toFixed(2)}</strong>/gal (forecast ${outlook.mid.toFixed(2)}, today ${outlook.today.toFixed(2)}).
+                </li>
+              )}
+            </ul>
+          )}
+        </div>
+        {plan.charging && (
+          <p className="text-sm text-ink">
+            <strong>Home charging:</strong> {plan.charging.reason}.
+          </p>
+        )}
         <p className="text-sm text-ink">
-          <strong>Cash up front:</strong> {usd(plan.upfrontCash)}{s.replaces ? " after your trade-in" : ""} (price + WV 6% sales tax + title).
+          <strong>Cash up front:</strong> {usd(plan.upfrontCash)}{s.replaces ? " after your trade-in" : ""} (price + WV 6% sales tax + title{plan.charging?.setupUsd ? " + home charger" : ""}).
         </p>
       </Card>
 
@@ -653,11 +727,11 @@ function PlanResults({
         <p className="text-xs text-ink-soft">
           New, it&apos;s {usd(price)}.
           {usedTargets.some((t) => t.p != null && t.p >= price)
-            ? ` A new ${cand.model} already comes out ahead there, so a used one priced below new does too.`
+            ? " “Any price below new” means a used one wins at any fair price — it skips the steepest part of the value drop."
             : ""}
-          {" "}Assumes a used one drives and charges like new and loses value at the same rate as a new one
-          (~{Math.round((1 - Math.pow(retain, 1 / 5)) * 100)}% a year, from the resale setting below), with WV sales tax after trade-in.
-          Check the battery&apos;s health report before you buy — range fades slowly with age, and most EV batteries carry an
+          {" "}Assumes a used one (2–4 years old) drives and charges like new, loses about {Math.round(catalog.own.used_vehicle_annual_depreciation * 100)}% of
+          its value a year from what you pay, costs less to insure, and pays WV sales tax after trade-in.
+          Check the battery&apos;s health report before you buy — range fades about 2% a year, and most EV batteries carry an
           8-year/100,000-mile warranty.
         </p>
       </Card>
@@ -710,7 +784,7 @@ function PlanResults({
               className="accent-emerald-700" aria-label="Resale value after 5 years" />
             <span className="text-xs text-ink-soft">
               {s.retention5yOverride == null
-                ? `Default ${Math.round(defaultRetention * 100)}% from iSeeCars' 2026 study of 5-year-old ${cand.powertrain === "phev" ? "vehicles" : "EVs"}. Used-EV prices firmed in 2026 as gas prices rose (Cox Automotive: up ~8% year over year this summer), so newer EVs may hold value better than early ones did. Slide to your own view.`
+                ? `Middle estimate ${Math.round(defaultRetention * 100)}% of sticker price (range ${Math.round(catalog.own.retention_scenarios_5yr[cand.powertrain === "phev" ? "phev" : "bev"].low * 100)}–${Math.round(catalog.own.retention_scenarios_5yr[cand.powertrain === "phev" ? "phev" : "bev"].high * 100)}%). Built from iSeeCars' resale studies, corrected for one-time shocks on both sides. Used-EV prices firmed in 2026 as gas rose. Slide to your own view.`
                 : <>Your estimate. <button type="button" className="text-brand hover:underline" onClick={() => set({ retention5yOverride: null })}>Reset to {Math.round(defaultRetention * 100)}%</button></>}
             </span>
           </label>
@@ -768,19 +842,26 @@ function PlanResults({
                 </span>
               </div>
               {planUnits.map((u: Unit) => {
-                const f = fit(u, use);
+                const f = fit(u, use, s.years);
                 const assigned = plan.assignment[use.id] === u.key;
                 return (
-                  <div key={u.key} className="flex gap-2">
-                    <FitIcon level={f.level} />
-                    <div className="text-sm">
-                      <span className="font-medium text-ink">{u.short}</span>
-                      {assigned && <span className="text-emerald-800 font-medium"> · taking this trip</span>}
-                      <span className="block text-ink-muted">{f.text}</span>
+                  <div key={u.key} className="space-y-1">
+                    <div className="flex gap-2">
+                      <FitIcon level={f.level} />
+                      <div className="text-sm">
+                        <span className="font-medium text-ink">{u.short}</span>
+                        {assigned && <span className="text-emerald-800 font-medium"> · taking this trip</span>}
+                        <span className="block text-ink-muted">{f.text}</span>
+                      </div>
                     </div>
+                    {f.level !== "no" && <TripStrip unit={u} use={use} years={s.years} />}
                   </div>
                 );
               })}
+              <p className="text-[11px] text-ink-soft">
+                Stops are shown where the battery or tank would need one, not at specific stations — see the{" "}
+                <Link href="/chargers" className="text-brand hover:underline">charger map</Link>.
+              </p>
             </Card>
           ))}
           {cand.powertrain === "bev" && uses.some((u) => u.kind === "trip" && plan.assignment[u.id] === "new" && u.oneWayMi >= 250) && (
@@ -794,13 +875,15 @@ function PlanResults({
       <details className="rounded-2xl bg-surface-sunken ring-1 ring-slate-200 p-4 text-sm text-ink-muted">
         <summary className="cursor-pointer font-semibold text-ink">How this is calculated</summary>
         <ul className="mt-3 list-disc pl-5 space-y-1.5">
-          <li>Everything is over {Y} years: running costs × {Y}, plus lost value — the new vehicle&apos;s price, WV sales tax (6% of price minus trade-in) and title, minus its estimated resale value; and for vehicles you keep, what they lose as they age (~{Math.round(catalog.own.older_vehicle_annual_depreciation * 100)}% a year, Kelley Blue Book).</li>
-          <li>Selling a car you own isn&apos;t free money — it&apos;s value you&apos;d otherwise watch shrink. So &ldquo;today&rdquo; includes what your current cars lose over {Y} years.</li>
-          <li>Charging uses your utility&apos;s marginal rate with WV winter losses; road-trip miles beyond the first charge use public fast chargers at ${catalog.fed.calculation_notes.dcfc_rate_per_kwh?.current.toFixed(2) ?? "0.55"}/kWh. Towing cuts EV range about 45%.</li>
+          <li>Everything is over {Y} years: running costs × {Y}, plus lost value — the new vehicle&apos;s price, WV sales tax (6% of price minus trade-in), title and any home charger, minus its resale value; and for vehicles you keep, what they lose as they age (~{Math.round(catalog.own.older_vehicle_annual_depreciation * 100)}% a year, Kelley Blue Book).</li>
+          <li>Resale is measured against sticker price (a discount you negotiate lowers what you pay, not what it&apos;s worth later), with low / middle / high scenarios for both EVs and gas cars. After 5 years, value loss slows to the older-car rate.</li>
+          <li>Selling a car you own isn&apos;t free money — it&apos;s value you&apos;d otherwise watch shrink. So &ldquo;today&rdquo; includes what your current cars lose over {Y} years, plus repairs that rise with their mileage, and insurance based on what they&apos;re worth now.</li>
+          <li>Winter is counted on both sides: EVs use ~13% more electricity over a WV year, gas cars ~4% more fuel (hybrids ~8%). Electricity prices rise {Math.round((catalog.fed.calculation_notes.electricity_annual_increase ?? 0) * 1000) / 10}% a year; gas uses the forecast price you chose.</li>
+          <li>Charging uses your utility&apos;s marginal rate; road-trip miles beyond the first charge use public fast chargers at ${catalog.fed.calculation_notes.dcfc_rate_per_kwh?.current.toFixed(2) ?? "0.55"}/kWh (Tesla ${catalog.fed.calculation_notes.dcfc_rate_per_kwh?.member_rate?.toFixed(2) ?? "0.43"}). No home charging means public prices for every mile. EV range fades ~2% a year, which is included in trip checks. Towing cuts EV range about 45%.</li>
           <li>Insurance is an estimate for a 35–45-year-old WV driver with a clean record; your quote will differ. Financing isn&apos;t included.</li>
-          <li>Comparing a new EV with keeping an older car usually favors keeping the older car — new vehicles lose value fastest. That&apos;s why we also compare against buying a <em>new gas vehicle</em>: the fairer question when it&apos;s time to replace one. The gas vehicle uses its current EPA mpg, MSRP + destination, and all-vehicle resale value (trucks: truck resale value).</li>
+          <li>Comparing a new EV with keeping an older car usually favors keeping the older car — new vehicles lose value fastest. That&apos;s why we also compare against buying a <em>new gas vehicle</em>: the fairer question when it&apos;s time to replace one.</li>
         </ul>
-        <p className="mt-3">Every source is on <Link href="/state-of-the-data" className="text-brand hover:underline">State of the Data</Link>.</p>
+        <p className="mt-3">Every source is on <Link href="/state-of-the-data" className="text-brand hover:underline">PlanState of the Data</Link>.</p>
       </details>
     </section>
   );
@@ -809,6 +892,57 @@ function PlanResults({
 // Some trim names repeat the model ("Q5 Premium" on an Audi Q5).
 function trimWithoutModel(trim: string, model: string) {
   return trim.toLowerCase().startsWith(`${model.toLowerCase()} `) ? trim.slice(model.length + 1) : trim;
+}
+
+// One trip, one vehicle: a strip from home to the destination (one way) with
+// fast-charging stops (EV), the switch to gas (plug-in hybrid), or a fill-up
+// (gas). Uses the same stop rule as the cost math (dcfcStopMiles).
+function TripStrip({ unit, use, years }: { unit: Unit; use: Use; years: number }) {
+  const L = use.oneWayMi;
+  const pct = (mi: number) => `${Math.min(100, Math.max(0, (mi / L) * 100))}%`;
+  let fill: string = CHART_COLORS.gas;
+  let markers: { at: number; label: string; kind: "stop" | "gas" }[] = [];
+  let electricTo = 0;
+  if (unit.pt === "bev" && unit.ev) {
+    fill = CHART_COLORS.ev;
+    let hwy = (unit.ev.highway_range_mi ?? Math.round((unit.ev.epa_range_mi ?? 200) * 0.8)) * (unit.isNew ? batteryRangeFactor(years) : 1);
+    if (use.towLbs > 0) hwy *= TOW_RANGE_FACTOR;
+    const perStop = Math.round((unit.ev.charging.dcfc_10_to_80_min ?? 30) * 0.8 + 4);
+    markers = dcfcStopMiles(hwy, L).map((at) => ({ at, label: `~${perStop} min`, kind: "stop" as const }));
+  } else if (unit.pt === "phev" && unit.ev) {
+    electricTo = Math.min(L, (unit.ev.epa_range_mi_electric ?? 0) / ANNUAL_WINTER_KWH_MULTIPLIER);
+  } else if (unit.ice) {
+    const tankMi = (unit.ice.tank_gallons ?? 14) * unit.mpg * 0.85;
+    for (let at = tankMi; at < L; at += tankMi) markers.push({ at, label: "fill up", kind: "gas" });
+  }
+  const aria = unit.pt === "bev"
+    ? `${unit.short}: ${markers.length ? `${markers.length} charging stop${markers.length > 1 ? "s" : ""} on the way` : "no charging stops"} over ${L} miles.`
+    : unit.pt === "phev" ? `${unit.short}: electric for about ${Math.round(electricTo)} miles, then gas.`
+    : `${unit.short}: ${markers.length ? `${markers.length} gas stop${markers.length > 1 ? "s" : ""}` : "no gas stops"} over ${L} miles.`;
+  return (
+    <div className="chart ml-7" role="img" aria-label={aria}>
+      <div className="relative h-7">
+        <div className="absolute inset-x-0 top-2.5 h-2 rounded-full" style={{ background: unit.pt === "phev" ? CHART_COLORS.gas : fill, opacity: 0.85 }} />
+        {unit.pt === "phev" && electricTo > 0 && (
+          <div className="absolute left-0 top-2.5 h-2 rounded-l-full" style={{ width: pct(electricTo), background: CHART_COLORS.ev }} />
+        )}
+        {markers.map((m, i) => (
+          <div key={i} className="absolute top-0 -ml-2 flex flex-col items-center motion-safe:transition-[left] motion-safe:duration-500" style={{ left: pct(m.at) }}>
+            <span className={`h-4 w-4 rounded-full border-2 border-white shadow ${m.kind === "stop" ? "bg-amber-600" : "bg-slate-500"}`} />
+          </div>
+        ))}
+      </div>
+      <div className="flex justify-between text-[11px] text-ink-soft -mt-1">
+        <span>Home</span>
+        <span>
+          {unit.pt === "bev" && (markers.length ? `${markers.length} stop${markers.length > 1 ? "s" : ""} · ${markers[0].label} each` : "no stops")}
+          {unit.pt === "phev" && `${Math.round(electricTo)} mi electric, then gas`}
+          {unit.pt === "gas" && (markers.length ? `${markers.length} fill-up${markers.length > 1 ? "s" : ""}` : "no fill-ups")}
+        </span>
+        <span>{L} mi</span>
+      </div>
+    </div>
+  );
 }
 
 function sum(xs: number[]) {

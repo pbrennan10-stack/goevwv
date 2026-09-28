@@ -5,7 +5,7 @@
 // DEFAULT_INPUT in components/Calculator.tsx so the numbers match when a
 // visitor clicks through.
 
-import { calculate } from "./calc";
+import { ANNUAL_WINTER_KWH_MULTIPLIER, calculate } from "./calc";
 import type { CalcInput, FederalData, Utility, Vehicle } from "./types";
 
 export const TYPICAL = {
@@ -28,7 +28,7 @@ export function typicalInput(
     use_tou: false,
     current: {
       mpg: TYPICAL.mpg,
-      gas_price_per_gal: fed.calculation_notes.gas_price_baseline_per_gal.current,
+      gas_price_per_gal: comparisonGasPrice(fed),
     },
     apply_winter_derate: true,
     long_trips_per_year: TYPICAL.long_trips_per_year,
@@ -48,6 +48,16 @@ export function typicalScenario(
   );
 }
 
+// Gas price for comparisons: the forecast average, not today's spike.
+export function comparisonGasPrice(fed: FederalData): number {
+  return fed.calculation_notes.gas_price_outlook_per_gal?.mid ?? fed.calculation_notes.gas_price_baseline_per_gal.current;
+}
+
+// Link into the household planner with this EV picked.
+export function planHref(evId: string): string {
+  return `/plan?ev=${encodeURIComponent(evId)}`;
+}
+
 // Link into the calculator pre-filled with the typical scenario.
 export function calculatorHref(vehicleIds: string[], utilityId = "aep"): string {
   const p = new URLSearchParams({
@@ -63,7 +73,7 @@ export function calculatorHref(vehicleIds: string[], utilityId = "aep"): string 
 // Home-charging cost per 100 miles at a given $/kWh, including the winter
 // penalty averaged over the year (matches the calculator's 12% derate).
 export function costPer100Mi(v: Vehicle, ratePerKwh: number): number {
-  return (v.efficiency_kwh_per_100mi * 1.12) * ratePerKwh;
+  return (v.efficiency_kwh_per_100mi * ANNUAL_WINTER_KWH_MULTIPLIER) * ratePerKwh;
 }
 
 export function vehicleName(v: Vehicle): string {

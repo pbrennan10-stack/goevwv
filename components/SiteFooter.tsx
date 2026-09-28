@@ -22,6 +22,7 @@ export function SiteFooter() {
         <Link href="/utilities" className="hover:text-ink">WV utility EV rates</Link>
         <Link href="/chargers" className="hover:text-ink">Charger map</Link>
         <Link href="/faq" className="hover:text-ink">FAQ</Link>
+        <Link href="/learn/glossary" className="hover:text-ink">EV terms explained</Link>
       </p>
       <p className="mt-3 text-xs">
         &copy; {new Date().getFullYear()} GoEV WV. Built by Patrick Brennan in West Virginia.

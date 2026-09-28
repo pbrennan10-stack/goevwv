@@ -3,6 +3,19 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
+import { Term, type TermId } from "@/components/Term";
+
+// Spec labels that get a tap-to-explain definition.
+const SPEC_TERMS: Record<string, TermId> = {
+  "EPA range": "range",
+  "WV winter estimate": "winter-range",
+  "Realistic 70 mph highway range": "highway-range",
+  "Efficiency": "efficiency",
+  "Battery": "battery",
+  "Fast charge 10→80%": "fast-charger",
+  "Front trunk": "frunk",
+  "Starting MSRP": "msrp",
+};
 import { fmtNum, fmtUSD } from "@/lib/calc";
 import { capabilitySpecs } from "@/lib/capability";
 import { getFederalData, getUtilities, getVehicles } from "@/lib/data";
@@ -10,6 +23,8 @@ import {
   STATUS_LABEL,
   TYPICAL,
   calculatorHref,
+  comparisonGasPrice,
+  planHref,
   costPer100Mi,
   fmtCents,
   powertrainLabel,
@@ -64,7 +79,7 @@ export default async function VehiclePage({ params }: Params) {
   const fed = getFederalData();
   const utilities = getUtilities();
   const name = `${v.year} ${vehicleName(v)}`;
-  const gas = fed.calculation_notes.gas_price_baseline_per_gal;
+  const gasPrice = comparisonGasPrice(fed);
 
   const rows = utilities.map((u) => {
     const s = typicalScenario([v], u, fed);
@@ -164,7 +179,7 @@ export default async function VehiclePage({ params }: Params) {
             {TYPICAL.daily_round_trip_mi} miles a day, {TYPICAL.days_per_week} days a week,
             plus {TYPICAL.long_trips_per_year} round trips of {TYPICAL.long_trip_one_way_mi} miles
             each way — about {fmtNum(s.annual_miles)} miles a year — compared with a{" "}
-            {TYPICAL.mpg} mpg car at {fmtCents(gas.current)}/gal ({gas.retrieved_label ?? "current"} AAA WV average).
+            {TYPICAL.mpg} mpg car at {fmtCents(gasPrice)}/gal (EIA&apos;s forecast average for WV).
             Winter range loss included.
           </p>
           <dl className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -175,21 +190,29 @@ export default async function VehiclePage({ params }: Params) {
             <Stat label="WV EV fee / yr" value={fmtUSD(fee)} />
             <Stat label="Gas car fuel / yr" value={fmtUSD(s.current_annual_gas_cost)} />
             <Stat
-              label={saves >= 0 ? "You'd save / yr" : "You'd pay more / yr"}
+              label={saves >= 0 ? "Fuel & fees: saves / yr" : "Fuel & fees: costs more / yr"}
               value={fmtUSD(Math.abs(saves))}
               highlight
             />
           </dl>
           <p className="mt-3 text-xs text-ink-soft">
-            Fuel and state fees only. Insurance, maintenance, and purchase price
-            are in the full calculator.
+            Fuel and state fees only — not insurance, maintenance, purchase
+            price, or resale. The household planner counts all of those.
           </p>
-          <Link
-            href={calculatorHref([v.id])}
-            className="mt-4 inline-flex items-center justify-center rounded-xl bg-brand hover:bg-brand-dark text-white font-semibold px-5 py-3 text-sm transition shadow-sm"
-          >
-            Run it with your commute →
-          </Link>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <Link
+              href={planHref(v.id)}
+              className="inline-flex items-center justify-center rounded-xl bg-brand-dark hover:bg-brand text-white font-semibold px-5 py-3 text-sm transition shadow-sm"
+            >
+              Is buying one worth it? Plan with your household →
+            </Link>
+            <Link
+              href={calculatorHref([v.id])}
+              className="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white hover:border-brand text-ink font-semibold px-5 py-3 text-sm transition"
+            >
+              Just running costs
+            </Link>
+          </div>
         </section>
 
         {r.warnings.length > 0 && (
@@ -249,7 +272,7 @@ export default async function VehiclePage({ params }: Params) {
           <dl className="mt-3 grid sm:grid-cols-2 gap-x-8">
             {specs.map(([k, val]) => (
               <div key={k} className="flex justify-between gap-4 border-b border-slate-100 py-2 text-sm">
-                <dt className="text-ink-soft">{k}</dt>
+                <dt className="text-ink-soft">{SPEC_TERMS[k] ? <Term id={SPEC_TERMS[k]}>{k}</Term> : k}</dt>
                 <dd className="text-ink font-medium text-right">{val}</dd>
               </div>
             ))}

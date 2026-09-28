@@ -8,30 +8,49 @@
 // include purchase price, WV tax, resale, and the value your current
 // vehicles lose.
 //
-// Per-mile energy math reuses lib/calc.ts so the planner and the single-car
-// calculator agree.
+// Fairness rules (Sept 27 2026 review): winter, speed, resale uncertainty and
+// price trends are applied to BOTH sides; one-time costs of EV ownership (a
+// home charger) and of keeping an old car (repairs rising with miles) are
+// both counted. Per-mile energy math reuses lib/calc.ts so the planner and
+// the single-car calculator agree.
 
 import {
   ANNUAL_WINTER_KWH_MULTIPLIER,
   DCFC_FALLBACK_RATE_PER_KWH,
+  HYBRID_WINTER_FUEL_MULTIPLIER,
+  ICE_WINTER_FUEL_MULTIPLIER,
+  PHEV_MAINTENANCE_EXTRA_USD,
+  WORK_WEEKS_PER_YEAR,
   annualEvMaintenance,
   annualIceMaintenance,
   blendedKwhPer100mi,
+  dcfcRateFor,
   dcfcStopsPerRoundTrip,
   effectiveRatePerKwh,
   evInsuranceEstimate,
+  insuranceAtValue,
+  isHybridTrim,
 } from "./calc";
 import { cargoSeatsUp } from "./capability";
 import type { Capability, FederalData, IceVehicle, Utility, Vehicle } from "./types";
 
 // ---------- Inputs ----------
 
+export type ResaleScenario = "low" | "mid" | "high";
+export type OdometerBand = "under_50k" | "50k_100k" | "over_100k";
+export type HomeCharging = "auto" | "l1" | "l2" | "none";
+
+type Range3 = { low: number; mid: number; high: number };
+
 export interface OwnershipAssumptions {
   ownership_years_default: number;
   wv_purchase_tax: { rate: number; trade_in_reduces_base: boolean; title_fee_usd: number };
-  retention_5yr: { bev: number; phev: number; gas: number; gas_truck: number };
+  retention_scenarios_5yr: { bev: Range3; phev: Range3; gas: Range3; gas_hybrid: Range3; gas_truck: Range3 };
   older_vehicle_annual_depreciation: number;
+  used_vehicle_annual_depreciation: number;
   default_owned_value_usd: number;
+  owned_maintenance_multiplier: { gas: Record<OdometerBand, number>; ev: Record<OdometerBand, number> };
+  home_charging_setup: { level1_usd: number; level2_installed_usd: number; level1_max_daily_mi: number };
 }
 
 export interface OwnedInput {
@@ -39,6 +58,7 @@ export interface OwnedInput {
   ref: string;            // "ice:<id>" or "ev:<id>"
   valueNow: number;       // what it's worth today
   mpgOverride?: number;   // gas only: your real-world mpg
+  odometer?: OdometerBand; // default 50k–100k
 }
 
 export interface CandidateInput {
@@ -77,9 +97,11 @@ export interface HouseholdInput {
   gasPrice: number;
   years: number;
   overrides: Record<string, string>; // useId -> unit key
-  // User's own estimate of the share of price the NEW vehicle keeps after
-  // 5 years (0–1). null = use the sourced segment default.
+  // User's own estimate of the share of LIST price the new EV keeps after
+  // 5 years (0–1). null = use the sourced scenario.
   retention5yOverride: number | null;
+  resaleScenario?: ResaleScenario;   // default "mid"
+  homeCharging?: HomeCharging;       // default "auto"
 }
 
 export interface Catalog {
@@ -100,6 +122,7 @@ export interface Unit {
   short: string;
   pt: Powertrain;
   isNew: boolean;
+  hybrid: boolean;           // conventional (non-plug-in) hybrid
   cap: Capability;
   ev?: Vehicle;
   ice?: IceVehicle;
@@ -113,7 +136,7 @@ export function resolveUnit(ref: string, key: string, cat: Catalog, mpgOverride?
     const v = cat.evs.find((x) => x.id === id);
     if (!v) return null;
     return {
-      key, isNew, ev: v, cap: v, cls: v.class,
+      key, isNew, ev: v, cap: v, cls: v.class, hybrid: false,
       name: `${v.year} ${v.make} ${v.model}${v.trim ? ` ${v.trim}` : ""}`,
       short: `${v.model}`,
       pt: v.powertrain === "phev" ? "phev" : "bev",
@@ -128,7 +151,7 @@ export function resolveUnit(ref: string, key: string, cat: Catalog, mpgOverride?
     const trim = isNew && v.new_trim ? v.new_trim : v.trim;
     const baseMpg = isNew && v.new_mpg_combined ? v.new_mpg_combined : v.mpg_combined;
     return {
-      key, isNew, ice: v, cap, cls: v.class,
+      key, isNew, ice: v, cap, cls: v.class, hybrid: isHybridTrim(trim),
       name: `${year} ${v.make} ${v.model}${trim ? ` ${trim}` : ""}`,
       short: v.model,
       pt: "gas",
@@ -157,7 +180,7 @@ export function buildUses(h: HouseholdInput): Use[] {
   const uses: Use[] = [];
   h.drivers.forEach((d, i) => {
     if (d.commuteOneWayMi <= 0 || d.daysPerWeek <= 0) return;
-    const days = d.daysPerWeek * 50; // two weeks off
+    const days = d.daysPerWeek * WORK_WEEKS_PER_YEAR;
     uses.push({
       id: `commute-${d.id}`, label: `Driver ${i + 1} commute`, kind: "daily",
       miles: d.commuteOneWayMi * 2 * days, roundTripMi: d.commuteOneWayMi * 2,
@@ -188,9 +211,16 @@ export function buildUses(h: HouseholdInput): Use[] {
 export type FitLevel = "ok" | "tight" | "no";
 export interface Fit { level: FitLevel; text: string; dcfcStopsEachWay?: number; addedMin?: number }
 
-const TOW_RANGE_FACTOR = 0.55; // towing near capacity cuts EV range ~40–50%
+export const TOW_RANGE_FACTOR = 0.55; // towing near capacity cuts EV range ~40–50%
 
-export function fit(u: Unit, use: Use): Fit {
+// EV batteries lose ~2% of range a year (Geotab: 1.5%/yr home-charged, 2.3%
+// fleet average; Recurrent similar). Trip and winter fit use the AVERAGE range
+// over the ownership period. Energy per mile is unaffected.
+export function batteryRangeFactor(years: number): number {
+  return Math.max(0.8, 1 - 0.02 * (years / 2));
+}
+
+export function fit(u: Unit, use: Use, years = 0): Fit {
   const c = u.cap;
   if (use.towLbs > 0) {
     if (!c.towing_lbs) return { level: "no", text: c.towing_lbs === 0 ? "Not rated for towing" : "No published tow rating" };
@@ -206,12 +236,13 @@ export function fit(u: Unit, use: Use): Fit {
   }
 
   if (u.pt === "bev" && u.ev) {
-    const winter = u.ev.winter_range_mi ?? (u.ev.epa_range_mi ?? 200) * 0.72;
+    const fade = u.isNew ? batteryRangeFactor(years) : 1;
+    const winter = (u.ev.winter_range_mi ?? (u.ev.epa_range_mi ?? 200) * 0.72) * fade;
     if (use.kind === "daily" && use.roundTripMi > winter * 0.9) {
       return { level: "tight", text: `${Math.round(use.roundTripMi)}-mi day is close to the ${Math.round(winter)}-mi winter range — plan to charge midday in January` };
     }
     if (use.kind === "trip") {
-      let hwy = u.ev.highway_range_mi ?? Math.round((u.ev.epa_range_mi ?? 200) * 0.8);
+      let hwy = (u.ev.highway_range_mi ?? Math.round((u.ev.epa_range_mi ?? 200) * 0.8)) * fade;
       if (use.towLbs > 0) hwy = hwy * TOW_RANGE_FACTOR;
       const { stops } = dcfcStopsPerRoundTrip(hwy, use.oneWayMi);
       const each = stops / 2;
@@ -237,15 +268,40 @@ export function fit(u: Unit, use: Use): Fit {
 
 // ---------- Costs ----------
 
-interface Rates { homeRate: number; meterAnnualUsd: number; dcfcRate: number; gasPrice: number }
+interface Rates {
+  homeRate: number;          // $/kWh at home (or at public chargers if no home charging)
+  meterAnnualUsd: number;
+  elecMult: number;          // average electricity price rise over the period
+  gasPrice: number;
+  noHomeCharging: boolean;
+}
+
+// Average of (1 + r)^y for y = 0..years−1: what a price rising r a year
+// averages over the ownership period.
+export function averageEscalation(rate: number, years: number): number {
+  const n = Math.max(1, Math.round(years));
+  let s = 0;
+  for (let y = 0; y < n; y++) s += Math.pow(1 + rate, y);
+  return s / n;
+}
+
+function gasWinterMult(u: Unit): number {
+  if (u.pt === "phev" || u.hybrid) return HYBRID_WINTER_FUEL_MULTIPLIER;
+  return ICE_WINTER_FUEL_MULTIPLIER;
+}
 
 // Variable (per-use) annual energy cost for a unit.
-export function energyCost(u: Unit, use: Use, r: Rates): number {
-  if (u.pt === "gas") return (use.miles / u.mpg) * r.gasPrice;
+export function energyCost(u: Unit, use: Use, r: Rates, fed: FederalData): number {
+  if (u.pt === "gas") return (use.miles / u.mpg) * gasWinterMult(u) * r.gasPrice;
   const v = u.ev!;
   const winter = ANNUAL_WINTER_KWH_MULTIPLIER;
+  // Road trips use the EPA highway figure; daily driving a city/highway mix.
+  // No extra speed penalty: the EPA label already reflects real-world speeds,
+  // and gas trips aren't penalized for speed either.
   const hwyFrac = use.kind === "trip" ? 0.9 : 0.45;
-  const kwhPerMi = (blendedKwhPer100mi(v, hwyFrac, use.kind === "trip" ? 70 : 55) / 100) * winter;
+  const kwhPerMi = (blendedKwhPer100mi(v, hwyFrac, 55) / 100) * winter;
+  const publicRate = dcfcRateFor(v, fed) * r.elecMult;
+  const home = r.noHomeCharging ? publicRate : r.homeRate;
   if (u.pt === "bev") {
     if (use.kind === "trip") {
       let hwy = v.highway_range_mi ?? Math.round((v.epa_range_mi ?? 200) * 0.8);
@@ -254,32 +310,51 @@ export function energyCost(u: Unit, use: Use, r: Rates): number {
       const { extraMiRoundTrip } = dcfcStopsPerRoundTrip(hwy, use.oneWayMi);
       const dcfcMi = Math.min(use.roundTripMi, extraMiRoundTrip) * use.timesPerYear;
       const homeMi = use.miles - dcfcMi;
-      return (homeMi * r.homeRate + dcfcMi * r.dcfcRate) * kwhPerMi * towMult;
+      return (homeMi * home + dcfcMi * publicRate) * kwhPerMi * towMult;
     }
-    return use.miles * kwhPerMi * r.homeRate;
+    return use.miles * kwhPerMi * home;
   }
-  // PHEV: electric until the battery is empty each day / each trip leg, then gas.
+  // PHEV: electric until the battery is empty each day / each trip, then gas.
+  // One full battery per day or per trip (PHEV owners rarely charge on the road).
   const eRange = (v.epa_range_mi_electric ?? 0) / winter;
-  // One full battery per day or per trip (matches lib/calc.ts: PHEV owners
-  // rarely charge on the road).
   const eMiEach = Math.min(use.roundTripMi, eRange);
   const eMi = Math.min(use.miles, eMiEach * use.timesPerYear);
   const gasMi = use.miles - eMi;
-  return eMi * kwhPerMi * r.homeRate + (gasMi / u.mpg) * r.gasPrice;
+  return eMi * kwhPerMi * home + (gasMi / u.mpg) * gasWinterMult(u) * r.gasPrice;
 }
 
-function maintenanceFor(u: Unit, miles: number): number {
-  if (u.ice) return annualIceMaintenance(u.ice, miles).total_usd;
-  if (u.ev) {
-    const m = annualEvMaintenance(u.ev, miles).total_usd;
-    return u.pt === "phev" ? m + 90 : m; // PHEVs still need occasional oil changes
-  }
+function odometerMult(u: Unit, band: OdometerBand | undefined, own: OwnershipAssumptions): number {
+  if (u.isNew) return 1;
+  const table = u.pt === "gas" ? own.owned_maintenance_multiplier.gas : own.owned_maintenance_multiplier.ev;
+  return table[band ?? "50k_100k"] ?? 1;
+}
+
+function maintenanceFor(u: Unit, miles: number, band: OdometerBand | undefined, own: OwnershipAssumptions): number {
+  let base = 0;
+  if (u.ice) base = annualIceMaintenance(u.ice, miles).total_usd;
+  else if (u.ev) base = annualEvMaintenance(u.ev, miles).total_usd + (u.pt === "phev" ? PHEV_MAINTENANCE_EXTRA_USD : 0);
+  return base * odometerMult(u, band, own);
+}
+
+// List price of the vehicle new (MSRP + destination). Destination fees that
+// weren't found fall back to a typical $1,500 rather than $0, so a missing
+// fee never makes a vehicle look cheaper.
+export const DESTINATION_FALLBACK_USD = 1500;
+export function newVehiclePrice(u: Unit): number {
+  if (u.ev) return u.ev.msrp_usd + (u.ev.destination_usd ?? DESTINATION_FALLBACK_USD);
+  if (u.ice) return (u.ice.new_msrp_usd ?? 0) + (u.ice.new_destination_usd ?? DESTINATION_FALLBACK_USD);
   return 0;
 }
+export function destinationIsEstimated(u: Unit): boolean {
+  return u.ev ? u.ev.destination_usd == null : u.ice ? u.ice.new_destination_usd == null : false;
+}
 
-function insuranceFor(u: Unit): number {
-  if (u.ice) return u.ice.annual_insurance_usd;
-  if (u.ev) return evInsuranceEstimate(u.ev);
+function insuranceFor(u: Unit, value: number | null): number {
+  if (u.ice) {
+    if (value == null) return u.ice.annual_insurance_usd;
+    return insuranceAtValue(u.ice.annual_insurance_usd, newVehiclePrice(u), value);
+  }
+  if (u.ev) return value == null ? evInsuranceEstimate(u.ev) : evInsuranceEstimate(u.ev, value);
   return 0;
 }
 
@@ -288,6 +363,63 @@ function registrationFor(u: Unit, fed: FederalData): number {
   if (u.pt === "bev") return base + fed.wv_state_fees.bev_annual_fee.amount_usd;
   if (u.pt === "phev") return base + fed.wv_state_fees.phev_annual_fee.amount_usd;
   return base;
+}
+
+// ---------- Resale ----------
+
+export function retentionSegment(u: Pick<Unit, "pt" | "cls" | "hybrid">): keyof OwnershipAssumptions["retention_scenarios_5yr"] {
+  if (u.pt === "bev") return "bev";
+  if (u.pt === "phev") return "phev";
+  if (u.cls === "truck") return "gas_truck";
+  if (u.hybrid) return "gas_hybrid";
+  return "gas";
+}
+
+// Share of list price kept after `years`. The 5-year figure follows a
+// geometric curve; after year 5 depreciation flattens to the older-vehicle
+// rate instead of continuing at the steep new-car pace.
+export function retentionAfter(r5: number, years: number, own: OwnershipAssumptions): number {
+  const first = Math.pow(r5, Math.min(years, 5) / 5);
+  const tail = Math.pow(1 - own.older_vehicle_annual_depreciation, Math.max(0, years - 5));
+  return first * tail;
+}
+
+export function retention5(u: Pick<Unit, "pt" | "cls" | "hybrid">, scenario: ResaleScenario, own: OwnershipAssumptions): number {
+  return own.retention_scenarios_5yr[retentionSegment(u)][scenario];
+}
+
+// Backwards-compatible helper: retention after `years` for a powertrain/class.
+export function retention(pt: Powertrain, cls: string, years: number, own: OwnershipAssumptions, scenario: ResaleScenario = "mid", hybrid = false): number {
+  return retentionAfter(retention5({ pt, cls, hybrid }, scenario, own), years, own);
+}
+
+// ---------- Home charging ----------
+
+export interface ChargingPlan {
+  mode: "l1" | "l2" | "none";
+  setupUsd: number;      // one-time, after rebates
+  rebateUsd: number;
+  reason: string;
+}
+
+export function resolveHomeCharging(h: HouseholdInput, uses: Use[], cat: Catalog, ownsPlugIn: boolean): ChargingPlan {
+  const s = cat.own.home_charging_setup;
+  const utility = cat.utilities.find((u) => u.id === h.utilityId);
+  const rebateUsd = Math.min(
+    s.level2_installed_usd,
+    (utility?.rebates ?? []).filter((r) => r.type === "l2_charger").reduce((t, r) => t + (r.amount_usd ?? 0), 0),
+  );
+  const pick = h.homeCharging ?? "auto";
+  if (pick === "none") return { mode: "none", setupUsd: 0, rebateUsd: 0, reason: "No place to charge at home — every mile priced at public charging rates" };
+  const longestDay = Math.max(0, ...uses.filter((u) => u.kind === "daily").map((u) => u.roundTripMi));
+  let mode: "l1" | "l2" = pick === "l1" ? "l1" : pick === "l2" ? "l2" : longestDay <= s.level1_max_daily_mi ? "l1" : "l2";
+  if (h.useTOU) mode = "l2"; // the off-peak EV rate needs a hard-wired circuit
+  if (ownsPlugIn) return { mode, setupUsd: 0, rebateUsd: 0, reason: "You already charge at home" };
+  if (mode === "l1") return { mode, setupUsd: s.level1_usd, rebateUsd: 0, reason: `A regular outlet covers ~${s.level1_max_daily_mi} mi a night` };
+  return {
+    mode, setupUsd: Math.max(0, s.level2_installed_usd - rebateUsd), rebateUsd,
+    reason: `Level 2 charger installed ~$${s.level2_installed_usd.toLocaleString("en-US")}${rebateUsd ? ` − $${rebateUsd} ${utility?.name ?? "utility"} rebate` : ""}`,
+  };
 }
 
 // ---------- Scenario ----------
@@ -314,29 +446,21 @@ export interface ScenarioResult {
   capitalOverPeriod: number;
   totalOverPeriod: number;
   perYear: number;
-  upfrontCash: number;       // new vehicle only: price + tax + title − trade-in
+  upfrontCash: number;       // new vehicle only: price + tax + title + charger − trade-in
+  charging: ChargingPlan | null;
 }
 
-export function retention(pt: Powertrain, cls: string, years: number, own: OwnershipAssumptions): number {
-  const r5 = pt === "bev" ? own.retention_5yr.bev
-    : pt === "phev" ? own.retention_5yr.phev
-    : cls === "truck" ? own.retention_5yr.gas_truck
-    : own.retention_5yr.gas;
-  // Geometric interpolation from the 5-year figure.
-  return Math.pow(r5, years / 5);
-}
-
-function assign(units: Unit[], uses: Use[], rates: Rates, overrides: Record<string, string>) {
+function assign(units: Unit[], uses: Use[], rates: Rates, overrides: Record<string, string>, years: number, fed: FederalData) {
   const out: Record<string, string | null> = {};
   for (const use of uses) {
-    const capable = units.filter((u) => fit(u, use).level !== "no");
+    const capable = units.filter((u) => fit(u, use, years).level !== "no");
     if (!capable.length) { out[use.id] = null; continue; }
     const o = overrides[use.id];
     if (o && capable.some((u) => u.key === o)) { out[use.id] = o; continue; }
     // Cheapest capable. Ties / near-ties prefer a vehicle with "ok" over "tight".
     const scored = capable.map((u) => {
-      const f = fit(u, use);
-      return { u, cost: energyCost(u, use, rates) + (f.level === "tight" ? 150 : 0) };
+      const f = fit(u, use, years);
+      return { u, cost: energyCost(u, use, rates, fed) + (f.level === "tight" ? 150 : 0) };
     });
     scored.sort((a, b) => a.cost - b.cost);
     out[use.id] = scored[0].u.key;
@@ -344,56 +468,65 @@ function assign(units: Unit[], uses: Use[], rates: Rates, overrides: Record<stri
   return out;
 }
 
-export function runScenario(
-  units: Unit[],
-  uses: Use[],
-  h: HouseholdInput,
-  cat: Catalog,
-  opts: { overrides: Record<string, string>; owned: OwnedInput[]; soldKey: string | null; candidatePrice: number | null },
-): ScenarioResult {
+export interface ScenarioOpts {
+  overrides: Record<string, string>;
+  owned: OwnedInput[];
+  soldKey: string | null;
+  candidatePrice: number | null;
+  scenario: ResaleScenario;
+}
+
+export function runScenario(units: Unit[], uses: Use[], h: HouseholdInput, cat: Catalog, opts: ScenarioOpts): ScenarioResult {
   const utility = cat.utilities.find((u) => u.id === h.utilityId) ?? cat.utilities[0];
   const { rate, meterAnnualUsd } = effectiveRatePerKwh(utility, h.useTOU);
-  const rates: Rates = {
-    homeRate: rate, meterAnnualUsd,
-    dcfcRate: cat.fed.calculation_notes.dcfc_rate_per_kwh?.current ?? DCFC_FALLBACK_RATE_PER_KWH,
-    gasPrice: h.gasPrice,
-  };
-  const assignment = assign(units, uses, rates, opts.overrides);
-  const totalMiles = uses.reduce((s, u) => s + u.miles, 0);
   const own = cat.own;
   const Y = h.years;
+  const elecMult = averageEscalation(cat.fed.calculation_notes.electricity_annual_increase ?? 0, Y);
+  const newPlugIn = units.some((u) => u.isNew && u.pt !== "gas");
+  const ownsPlugIn = units.some((u) => !u.isNew && u.pt !== "gas");
+  const charging = newPlugIn || ownsPlugIn ? resolveHomeCharging(h, uses, cat, ownsPlugIn) : null;
+  const rates: Rates = {
+    homeRate: rate * elecMult, meterAnnualUsd, elecMult, gasPrice: h.gasPrice,
+    noHomeCharging: charging?.mode === "none",
+  };
+  const assignment = assign(units, uses, rates, opts.overrides, Y, cat.fed);
+  const totalMiles = uses.reduce((s, u) => s + u.miles, 0);
   let upfrontCash = 0;
   let meterCharged = false;
 
   const unitResults: UnitResult[] = units.map((unit) => {
     const mine = uses.filter((u) => assignment[u.id] === unit.key);
     const miles = mine.reduce((s, u) => s + u.miles, 0);
-    let energy = mine.reduce((s, u) => s + energyCost(unit, u, rates), 0);
+    let energy = mine.reduce((s, u) => s + energyCost(unit, u, rates, cat.fed), 0);
     if (unit.pt !== "gas" && h.useTOU && !meterCharged && rates.meterAnnualUsd) {
       energy += rates.meterAnnualUsd; meterCharged = true;
     }
-    const maintenance = maintenanceFor(unit, miles);
-    const insurance = insuranceFor(unit);
+    const ownedIn = opts.owned.find((x) => x.key === unit.key);
+    const maintenance = maintenanceFor(unit, miles, ownedIn?.odometer, own);
+    const insurance = insuranceFor(unit, unit.isNew ? null : ownedIn?.valueNow ?? own.default_owned_value_usd);
     const registration = registrationFor(unit, cat.fed);
     const runningPerYear = energy + maintenance + insurance + registration;
 
     let capitalOverPeriod = 0;
     let capitalNote = "";
     if (unit.isNew) {
-      const price = opts.candidatePrice ?? newVehiclePrice(unit);
+      const list = newVehiclePrice(unit);
+      const price = opts.candidatePrice ?? list;
       const tradeIn = opts.soldKey ? opts.owned.find((o) => o.key === opts.soldKey)?.valueNow ?? 0 : 0;
       const taxBase = own.wv_purchase_tax.trade_in_reduces_base ? Math.max(0, price - tradeIn) : price;
       const tax = taxBase * own.wv_purchase_tax.rate + own.wv_purchase_tax.title_fee_usd;
-      // The resale slider is the user's view of the EV; a gas alternative
-      // always uses the sourced segment figure.
-      const r5 = unit.pt !== "gas" ? h.retention5yOverride : null;
-      const resale = price * (r5 != null ? Math.pow(r5, Y / 5) : retention(unit.pt, unit.cls, Y, own));
-      capitalOverPeriod = price + tax - resale;
-      upfrontCash = price + tax - tradeIn;
-      capitalNote = `$${Math.round(price).toLocaleString("en-US")} + $${Math.round(tax).toLocaleString("en-US")} tax & title − ~$${Math.round(resale).toLocaleString("en-US")} resale after ${Y} yr`;
+      // Resale is measured against LIST price (that's how retention studies
+      // work) — a discount you negotiate lowers what you pay, not what the car
+      // is worth later. The user's resale slider applies to plug-ins only.
+      const r5 = unit.pt !== "gas" && h.retention5yOverride != null ? h.retention5yOverride : retention5(unit, opts.scenario, own);
+      const resale = list * retentionAfter(r5, Y, own);
+      const setup = unit.pt !== "gas" && charging ? charging.setupUsd : 0;
+      capitalOverPeriod = price + tax + setup - resale;
+      upfrontCash = price + tax + setup - tradeIn;
+      const $ = (n: number) => `$${Math.round(n).toLocaleString("en-US")}`;
+      capitalNote = `${$(price)}${destinationIsEstimated(unit) ? " (destination fee estimated)" : ""} + ${$(tax)} tax & title${setup ? ` + ${$(setup)} home charger` : ""} − ~${$(resale)} resale after ${Y} yr`;
     } else {
-      const o = opts.owned.find((x) => x.key === unit.key);
-      const value = o?.valueNow ?? own.default_owned_value_usd;
+      const value = ownedIn?.valueNow ?? own.default_owned_value_usd;
       const later = value * Math.pow(1 - own.older_vehicle_annual_depreciation, Y);
       capitalOverPeriod = value - later;
       capitalNote = `Loses ~$${Math.round(capitalOverPeriod).toLocaleString("en-US")} of value over ${Y} yr`;
@@ -413,51 +546,42 @@ export function runScenario(
     units: unitResults, assignment,
     unassigned: uses.filter((u) => !assignment[u.id]),
     runningPerYear, capitalOverPeriod, totalOverPeriod, perYear: totalOverPeriod / Y,
-    upfrontCash,
+    upfrontCash, charging,
   };
 }
 
-// "What would a USED one need to cost?" Given a scenario with a new vehicle,
-// solve for the purchase price at which buying that model used makes the
-// scenario's total equal `targetTotal` (e.g. the new-gas or keep-today total).
-// A used vehicle runs the same (efficiency, fees, maintenance) and loses value
-// at the SAME yearly rate as a new one of its type (the retention curve is
-// geometric, so a used EV keeps r5^(Y/5) of its price just like a new one —
-// including the user's resale slider). Using a gentler rate for used than new
-// would let a "used" one priced above new come out ahead, which is nonsense.
-// WV sales tax applies to price minus trade-in. Insurance is left at the
-// new-vehicle estimate (conservative). Returns null when even a free vehicle
-// wouldn't get there.
-export function usedBreakEvenPrice(
-  scenario: ScenarioResult,
-  targetTotal: number,
-  h: HouseholdInput,
-  cat: Catalog,
-): number | null {
-  const unit = scenario.units.find((u) => u.unit.isNew);
-  if (!unit) return null;
-  const fixed = scenario.totalOverPeriod - unit.capitalOverPeriod; // everything except this vehicle's price/resale
-  const r5 = unit.unit.pt !== "gas" && h.retention5yOverride != null
-    ? h.retention5yOverride
-    : retention(unit.unit.pt, unit.unit.cls, 5, cat.own);
-  const keep = Math.pow(r5, h.years / 5); // share of price left at the end
-  const { rate, title_fee_usd: title, trade_in_reduces_base } = cat.own.wv_purchase_tax;
+// "What would a USED one need to cost?" Solve for the purchase price at which
+// buying this model used makes the scenario's total equal `targetTotal`.
+// A used vehicle (typically 2–4 years old) runs the same as new but is past
+// its steepest drop: it loses used_vehicle_annual_depreciation a year from
+// what you pay, and costs less to insure (premium scales with value). The
+// planner caps the answer at the new price ("any price below new"). Returns
+// null when even a free vehicle wouldn't get there.
+export function usedBreakEvenPrice(scenario: ScenarioResult, targetTotal: number, h: HouseholdInput, cat: Catalog): number | null {
+  const ur = scenario.units.find((u) => u.unit.isNew);
+  if (!ur) return null;
+  const Y = h.years;
+  const own = cat.own;
+  const setup = ur.unit.pt !== "gas" && scenario.charging ? scenario.charging.setupUsd : 0;
+  // Everything except this vehicle's price, resale, tax and insurance.
+  const fixed = scenario.totalOverPeriod - ur.capitalOverPeriod - ur.insurance * Y + setup;
+  const keep = Math.pow(1 - own.used_vehicle_annual_depreciation, Y);
+  const { rate, title_fee_usd: title, trade_in_reduces_base } = own.wv_purchase_tax;
   const sold = h.candidate?.replaces;
   const tradeIn = sold ? h.owned.find((o) => o.key === sold)?.valueNow ?? 0 : 0;
-  const budget = targetTotal - fixed - title; // what price + tax − resale may add up to
-  // capital(P) = P + rate·(P − tradeIn) − keep·P   when P ≥ tradeIn (or no trade-in credit)
-  let p = trade_in_reduces_base
-    ? (budget + rate * tradeIn) / (1 + rate - keep)
-    : budget / (1 + rate - keep);
-  if (trade_in_reduces_base && p < tradeIn) p = budget / (1 - keep); // taxable base floors at 0
-  return p > 0 ? p : null;
-}
-
-// Default price of a new vehicle: MSRP + destination when known.
-export function newVehiclePrice(u: Unit): number {
-  if (u.ev) return u.ev.msrp_usd + (u.ev.destination_usd ?? 0);
-  if (u.ice) return (u.ice.new_msrp_usd ?? 0) + (u.ice.new_destination_usd ?? 0);
-  return 0;
+  const total = (p: number) => {
+    const taxBase = trade_in_reduces_base ? Math.max(0, p - tradeIn) : p;
+    const ins = insuranceFor(ur.unit, p);
+    return fixed + ins * Y + p + taxBase * rate + title - keep * p;
+  };
+  if (total(0) > targetTotal) return null;
+  let lo = 0, hi = Math.max(1000, newVehiclePrice(ur.unit) * 3);
+  if (total(hi) <= targetTotal) return hi;
+  for (let i = 0; i < 40; i++) {
+    const mid = (lo + hi) / 2;
+    if (total(mid) <= targetTotal) lo = mid; else hi = mid;
+  }
+  return lo;
 }
 
 export interface PlanResult {
@@ -467,28 +591,67 @@ export interface PlanResult {
   planUnits: Unit[];
   gasAlt: ScenarioResult | null;
   gasAltUnits: Unit[];
+  // Totals under the low and high resale scenarios (paired: EV and gas move together).
+  range: { low: { plan: number | null; gasAlt: number | null }; high: { plan: number | null; gasAlt: number | null } };
 }
 
-export function planHousehold(h: HouseholdInput, cat: Catalog): PlanResult {
-  const uses = buildUses(h);
+function runAll(h: HouseholdInput, cat: Catalog, uses: Use[], scenario: ResaleScenario) {
   const ownedUnits = h.owned
     .map((o) => resolveUnit(o.ref, o.key, cat, o.mpgOverride))
     .filter((u): u is Unit => !!u);
-  const today = runScenario(ownedUnits, uses, h, cat, {
-    overrides: {}, owned: h.owned, soldKey: null, candidatePrice: null,
-  });
+  const base = { owned: h.owned, scenario };
+  const today = runScenario(ownedUnits, uses, h, cat, { ...base, overrides: {}, soldKey: null, candidatePrice: null });
   const sold = h.candidate?.replaces ?? null;
   const withNew = (ref: string, price: number, overrides: Record<string, string>) => {
     const unit = resolveUnit(ref, "new", cat, undefined, true);
     if (!unit) return null;
     const units = [...ownedUnits.filter((u) => u.key !== sold), unit];
-    return { units, result: runScenario(units, uses, h, cat, { overrides, owned: h.owned, soldKey: sold, candidatePrice: price }) };
+    return { units, result: runScenario(units, uses, h, cat, { ...base, overrides, soldKey: sold, candidatePrice: price }) };
   };
   const ev = h.candidate ? withNew(h.candidate.ref, h.candidate.price, h.overrides) : null;
   const gas = h.candidate && h.gasAlternative ? withNew(h.gasAlternative.ref, h.gasAlternative.price, {}) : null;
+  return { ownedUnits, today, ev, gas };
+}
+
+export function planHousehold(h: HouseholdInput, cat: Catalog): PlanResult {
+  const uses = buildUses(h);
+  const main = runAll(h, cat, uses, h.resaleScenario ?? "mid");
+  const lo = runAll(h, cat, uses, "low");
+  const hi = runAll(h, cat, uses, "high");
   return {
-    uses, today,
-    plan: ev?.result ?? null, planUnits: ev?.units ?? ownedUnits,
-    gasAlt: gas?.result ?? null, gasAltUnits: gas?.units ?? [],
+    uses, today: main.today,
+    plan: main.ev?.result ?? null, planUnits: main.ev?.units ?? main.ownedUnits,
+    gasAlt: main.gas?.result ?? null, gasAltUnits: main.gas?.units ?? [],
+    range: {
+      low: { plan: lo.ev?.result.totalOverPeriod ?? null, gasAlt: lo.gas?.result.totalOverPeriod ?? null },
+      high: { plan: hi.ev?.result.totalOverPeriod ?? null, gasAlt: hi.gas?.result.totalOverPeriod ?? null },
+    },
   };
+}
+
+// ---------- Tipping points ----------
+
+function bisect(f: (x: number) => number, lo: number, hi: number): number | null {
+  const flo = f(lo), fhi = f(hi);
+  if (Math.sign(flo) === Math.sign(fhi)) return null;
+  for (let i = 0; i < 40; i++) {
+    const mid = (lo + hi) / 2;
+    if (Math.sign(f(mid)) === Math.sign(flo)) lo = mid; else hi = mid;
+  }
+  return (lo + hi) / 2;
+}
+
+// The EV plan vs the new-gas alternative (or vs keeping what you have when no
+// gas alternative is chosen): the resale share and the gas price at which the
+// two cost the same. null = no crossover in a sensible range.
+export function tippingPoints(h: HouseholdInput, cat: Catalog): { retention5: number | null; gasPrice: number | null } {
+  const diff = (hh: HouseholdInput) => {
+    const r = planHousehold(hh, cat);
+    if (!r.plan) return NaN;
+    const other = r.gasAlt ?? r.today;
+    return r.plan.totalOverPeriod - other.totalOverPeriod; // > 0 = EV costs more
+  };
+  const retention5 = bisect((x) => diff({ ...h, retention5yOverride: x }), 0.2, 0.8);
+  const gasPrice = bisect((x) => diff({ ...h, gasPrice: x }), 1.5, 9);
+  return { retention5, gasPrice };
 }

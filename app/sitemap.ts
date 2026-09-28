@@ -17,6 +17,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     page("/ev", 0.9),
     page("/utilities", 0.9),
     page("/faq", 0.9),
+    page("/learn/glossary", 0.7),
     page("/chargers", 0.8, "weekly"),
     page("/about", 0.8),
     page("/state-of-the-data", 0.7),

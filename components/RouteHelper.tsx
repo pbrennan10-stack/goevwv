@@ -225,7 +225,7 @@ export function RouteHelper({ token, onFill }: Props) {
           type="button"
           onClick={getRoute}
           disabled={!homeCoords || !workCoords || loading}
-          className="rounded-lg bg-brand px-4 py-3 text-sm font-medium text-white disabled:opacity-40 hover:opacity-90 transition"
+          className="rounded-lg bg-brand px-4 py-3 text-sm font-medium text-white disabled:opacity-40 hover:bg-brand-dark transition"
         >
           {loading ? "Looking up route…" : "Get route"}
         </button>

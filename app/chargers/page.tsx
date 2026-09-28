@@ -10,6 +10,7 @@ export const metadata: Metadata = {
   title: "WV Charger Map",
   description:
     "Interactive map of West Virginia public EV charging stations — DCFC and L2 — filtered by connector type. Sourced from OpenChargeMap.",
+  alternates: { canonical: "/chargers" },
 };
 
 // Refresh charger data at most once per day when built in production.

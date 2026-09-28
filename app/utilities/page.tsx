@@ -4,7 +4,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { fmtUSD } from "@/lib/calc";
 import { getFederalData, getUtilities, getVehicles } from "@/lib/data";
-import { costPer100Mi, fmtCents } from "@/lib/scenario";
+import { comparisonGasPrice, costPer100Mi, fmtCents } from "@/lib/scenario";
 
 export const metadata: Metadata = {
   title: "West Virginia electric utility EV charging rates",
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 
 export default function UtilitiesIndexPage() {
   const utilities = getUtilities();
-  const gas = getFederalData().calculation_notes.gas_price_baseline_per_gal.current;
+  const gas = comparisonGasPrice(getFederalData());
   // Reference vehicle for "per 100 miles": a mainstream compact EV SUV.
   const ref = getVehicles().find((v) => v.id === "chevy-equinox-ev-2025");
 

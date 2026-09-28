@@ -50,6 +50,10 @@ goevwv/
 │   ├── Calculator.tsx  # Single-vehicle calculator: form + picker + results
 │   ├── SiteHeader.tsx / SiteFooter.tsx  # Shared nav + footer (add new pages here)
 │   ├── AiDataNotice.tsx # "AI-assisted data, may contain errors" notice
+│   ├── QuickAnswer.tsx # Homepage 4-tap quick answer → hands off to /plan
+│   ├── charts.tsx      # Zero-dependency chart kit (HBars, StackedBars, SavingsRange)
+│   ├── RangeCargoExplorer.tsx # /ev range + luggage explorer
+│   ├── Term.tsx        # Tap-to-explain popover (data/glossary.json)
 │   └── Logo.tsx, FitCheck.tsx, ChargerMap.tsx, RouteHelper.tsx, …
 ├── lib/
 │   ├── types.ts        # TS types (Vehicle, Capability, Utility, FederalData, …)
@@ -57,7 +61,8 @@ goevwv/
 │   ├── calc.ts         # Per-vehicle TCO math + formatters (shared by planner)
 │   ├── household.ts    # Household planner engine (assignment, fit, ownership cost)
 │   ├── capability.ts   # Seats/cargo/towing helpers, cargo-miles index
-│   └── scenario.ts     # "Typical WV driver" defaults for /ev, /utilities, /faq
+│   ├── scenario.ts     # "Typical WV driver" defaults for /ev, /utilities, /faq
+│   └── planState.ts    # Planner state, trip presets, ?h= URL encoding (shared with QuickAnswer)
 ├── data/
 │   ├── vehicles.json   # ~70 EV/PHEV models incl. cargo vans (capability + source per vehicle)
 │   ├── ice_vehicles.json # ~75 gas vehicles people own today (mpg, insurance, maintenance, capability)
@@ -104,7 +109,9 @@ docker compose logs app --tail 50 -f
 
 ## Calculation methodology (important — document in UI if you change)
 
-- **Winter derate:** +12% annual kWh (4 cold months × ~28% range loss, averaged). Toggleable in UI; default ON.
+- **Winter (both sides):** EVs +13% annual kWh (1 + (1/0.72 − 1) × 4/12); gas +4% fuel, hybrids and PHEV gas miles +8% (fueleconomy.gov cold-weather ratio). Toggleable in the calculator; always on in the planner.
+- **Gas price default:** `gas_price_outlook_per_gal.mid` (EIA STEO forecast adjusted to WV), not today's AAA price; electricity rises `electricity_annual_increase` per year in the planner.
+- **Resale:** paired low/mid/high `retention_scenarios_5yr` by segment (bev/phev/gas/gas_hybrid/gas_truck), measured against LIST price; after year 5 loss slows to the older-vehicle rate. See the derivation in `data/ownership.yaml`.
 - **Conservative EPA ratings:** when ≥2 independent tests agree a model beats EPA (Mercedes EQE/EQS/CLA as of Sept 2026), `real_world_range_factor` holds the lowest matching tested/EPA ratio and `winter_range_mi` + efficiency fields in `vehicles.json` are pre-scaled by it (notes record the before values). Highway range is not scaled. Don't apply without test evidence.
 - **TOU rate:** 100% off-peak rate assumed — users who opt into TOU are committed to overnight charging. Any monthly charge on the EV meter (`tou_monthly_meter_charge`) is added to annual energy cost. For AEP/Wheeling Schedule PEV it is $0 — the EV submeter sits behind the house meter with no monthly fee (owner-confirmed Sept 2026; an earlier refresh wrongly used $14.02).
 - **PHEV split:** commute-aware, assuming nightly charging — each commute day uses min(round trip, electric range) electric miles, each long trip gets one battery's worth; winter derate shrinks electric range by the same 1.12 factor. (Replaced a fixed 65/35 split in Sept 2026.)
@@ -180,6 +187,12 @@ The first-time droplet setup is in `docs/REBUILD_RUNBOOK.md`. The bootstrap scri
 ## Household planner (/plan)
 
 Engine in `lib/household.ts` reuses `lib/calc.ts` energy/DCFC/insurance helpers — change per-mile math there, not in the planner. Total over N years = running costs × N + lost value (new vehicle: price + WV 6% sales tax after trade-in + title − resale via `retention_5yr` or the user's slider; kept vehicles: `older_vehicle_annual_depreciation`). The sold vehicle's would-be depreciation stays in the "today" scenario, which keeps the comparison fair. Three scenarios: keep today, new EV, and new gas (default = new version of the replaced vehicle; prices in `ice_vehicles.json` `new_*` fields). `usedBreakEvenPrice()` solves for the used-EV price that ties another scenario (used = same running costs, depreciates at the older-vehicle rate); we deliberately do not track used prices. Each use goes to the cheapest vehicle whose `fit()` isn't "no". `scripts/smoke-household.ts` is a quick sanity run (see its header).
+
+## Newcomer path & visuals
+
+- Homepage: "What 100 miles costs" chart + `QuickAnswer` (4 taps → verdict with low/mid/high range → `/plan?from=quick&h=…`).
+- Tap-to-explain: `<Term id="…">` reads `data/glossary.json` (native Popover API, no library). Explain first use per page only; never inside headings, buttons or select options. `/learn/glossary` lists every term.
+- Charts: use `components/charts.tsx`; no chart libraries. Bars start at zero, values are text, charts print.
 
 ## Principles
 

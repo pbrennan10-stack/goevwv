@@ -541,7 +541,7 @@ export default function StateOfTheDataPage() {
               sourceUrl="https://takechargewv.com/programs/for-your-home/go-electric"
               retrieved="2026-09-23"
               confidence="verified"
-              notes="Replaced the earlier Charge Forward program ($250 charger + $250 licensed-electrician bonus); there is no longer a separate electrician bonus. Limited to residential customers in Appalachian Power's WV territory. No end date posted. Not included in the calculator's numbers (home-charger cost isn't modeled yet)."
+              notes="Replaced the earlier Charge Forward program ($250 charger + $250 licensed-electrician bonus); there is no longer a separate electrician bonus. Limited to residential customers in Appalachian Power's WV territory. No end date posted. The household planner counts a Level 2 charger at ~$1,200 installed and subtracts this rebate for AEP customers; a regular 120V outlet costs nothing. The single-car calculator doesn't include charger costs."
             />
             <SourceRow
               label="Wheeling Power EV rebate"
@@ -583,8 +583,19 @@ export default function StateOfTheDataPage() {
               sourceUrl="https://gasprices.aaa.com/?state=WV"
               retrieved={federal.calculation_notes.gas_price_baseline_per_gal.retrieved ?? "2026-09-23"}
               confidence="verified"
-              notes="AAA's WV average was $4.373 on September 23, 2026 — up from $3.96 a month earlier and $2.97 a year earlier (US average $4.47). Prices were climbing fast at this snapshot, so this default sits near a peak and makes EV savings look larger than in a typical year. Use the gas-price slider in the calculator to test lower prices. Metro spread was $4.27–$4.40."
+              notes="AAA's WV average was $4.373 on September 23, 2026 — up from $3.96 a month earlier and $2.97 a year earlier (US average $4.47). This is near a peak, so it is NOT the default for multi-year comparisons (see the forecast below) — it's offered as the 'Today' option."
             />
+            {federal.calculation_notes.gas_price_outlook_per_gal && (
+              <SourceRow
+                label="Gas price used for comparisons (forecast average) — low / middle / high"
+                value={`$${federal.calculation_notes.gas_price_outlook_per_gal.low.toFixed(2)} / $${federal.calculation_notes.gas_price_outlook_per_gal.mid.toFixed(2)} / $${federal.calculation_notes.gas_price_outlook_per_gal.high.toFixed(2)} per gal`}
+                source="EIA Short-Term Energy Outlook (Sept 2026), Table 2, adjusted to WV"
+                sourceUrl={federal.calculation_notes.gas_price_outlook_per_gal.source_url}
+                retrieved={federal.calculation_notes.gas_price_outlook_per_gal.retrieved ?? "2026-09-27"}
+                confidence="approximate"
+                notes={`Middle = EIA's forecast US average for the next four quarters ($3.59) minus WV's usual ~$0.13 discount; the default everywhere, so results don't hinge on today's spike. Low ≈ WV's 2025 level; high = today's price. Electricity is treated the same way: prices rise ${Math.round((federal.calculation_notes.electricity_annual_increase ?? 0) * 1000) / 10}% a year over the ownership period (EIA STEO +2.1% for 2027; US residential +3.0%/yr 2014–2025). Refresh quarterly.`}
+              />
+            )}
             <SourceRow
               label="WV alternative fuels tax"
               value="$0.205 / gasoline gallon equivalent"
@@ -616,16 +627,16 @@ export default function StateOfTheDataPage() {
               sourceUrl="https://insurify.com/car-insurance/report/electric-vehicle-insurance-costs/"
               retrieved="2026-09-23"
               confidence="approximate"
-              notes="About 40% of a full-coverage premium (liability) doesn't depend on the car; the other 60% (collision/comprehensive) scales with its value. Class bases: sedan/hatchback $1,650 at a $30k price, SUV $1,900 at $36k, minivan $1,800 at $42k, truck $2,000 at $52k; the price factor is limited to 0.85–1.8. Tesla, Rivian, Lucid and Polestar get ×1.25 (ValuePenguin found Tesla/Rivian ~48% above other EVs). Examples: Nissan Leaf ~$1,650, Chevy Equinox EV ~$1,870, Tesla Model Y Standard ~$2,530, Model Y Premium ~$2,930, Lucid Air ~$3,710. Sanity checks: Insurify finds new EVs in WV about 4% cheaper to insure than new gas cars; MoneyGeek puts a WV Model Y at $2,747. Replaced a class-only estimate that ignored price."
+              notes="About 40% of a full-coverage premium (liability) doesn't depend on the car; the other 60% (collision/comprehensive) scales with its value. Class bases: sedan/hatchback $1,650 at a $30k price, SUV $1,900 at $36k, minivan $1,800 at $42k, truck $2,000 at $52k; the price factor is limited to 0.85–1.8. Tesla, Rivian, Lucid and Polestar get ×1.15 (lowered from 1.25 in Sept 2026 to match MoneyGeek's WV Model Y figure and ValuePenguin's R1S-vs-Equinox EV ratio — it's these brands, not EVs in general). Examples: Chevy Equinox EV ~$1,870, Tesla Model Y Premium ~$2,690. A car you already own is insured on the same 40/60 basis at what it's worth now, and a used EV at its used price. Sanity checks: Insurify finds new EVs in WV about 4% cheaper to insure than new gas cars; MoneyGeek puts a WV Model Y at $2,747. Replaced a class-only estimate that ignored price."
             />
             <SourceRow
               label="Maintenance, repair and tires"
-              value="Gas: model-specific · EV: tires $750–$1,250/48k mi, brakes $185–$320/100k mi, $115/yr misc"
+              value="Gas: model-specific, oil every 7,500 mi · EV: tires $750–$1,250/48k mi, brakes $430–$600/100k mi, $215/yr misc"
               source="AAA Your Driving Costs 2026; BLS CPI (maintenance & repair +14% over two years); Argonne (2021)"
               sourceUrl="https://newsroom.aaa.com/2026/09/aaa-new-vehicle-ownership-costs-hit-12863-annually/"
               retrieved="2026-09-23"
               confidence="approximate"
-              notes="Gas-vehicle oil, brakes and misc raised 15% and tires 5% for 2026 prices. EV tire prices raised to reflect EV-rated tires. Argonne found EV scheduled maintenance ~40% cheaper per mile; AAA's 2026 matched pairs show EVs 2–28% cheaper all-in."
+              notes="Sept 27 2026 fairness review, both sides: gas 'misc' raised ×1.5 to include engine air and cabin filters, spark plugs, transmission fluid, coolant, belts, brake fluid and the 12V battery (RepairPal itemization); EV misc raised from $115 to $215 for the cabin filter, 12V battery (EVs wear them out sooner), brake fluid, rotations and caliper cleaning on salt roads; EV brakes set to one axle job per 100k mi (RepairPal $432–489). Oil changes now follow miles (every 7,500, at least once a year) instead of a fixed 2–4 a year. Plug-in hybrids add $160/yr for their engine (Consumer Reports). Vehicles you already own cost more to maintain as miles add up: ×1.0 / ×1.8 / ×2.4 for gas under 50k / 50–100k / over 100k miles, and ×1.0 / ×1.6 / ×2.5 for EVs (Consumer Reports' per-mile maintenance and repair by mileage, 2026 dollars). AAA's 2026 matched pairs show EVs 2–28% cheaper on maintenance, repair and tires (all-in costs, including depreciation, came out between 29% higher and 1% lower for EVs)."
             />
           </Section>
 
@@ -693,12 +704,13 @@ export default function StateOfTheDataPage() {
             summary="Physics and fleet-behavior constants used in the TCO math."
           >
             <SourceRow
-              label="Winter range derate (WV)"
-              value="+12% annual kWh consumption"
-              source="Industry research (AAA, Recurrent, Geotab)"
-              retrieved="Calculation methodology set 2026-04-18"
-              confidence="verified"
-              notes="Derived from ~4 cold WV months experiencing ~28% range loss, averaged into an annual multiplier. Toggleable in the UI; default on. Recurrent's November 2025 study of 30,000+ vehicles found ~22% range loss at 32°F and ~30% at 20°F (heat pumps help ~10%); WV winter days cluster around freezing, so 28% remains slightly conservative. Re-checked 2026-09-23."
+              label="Winter (WV) — applied to both EVs and gas cars"
+              value="EVs +13% annual electricity · gas +4% fuel · hybrids/plug-in hybrid gas miles +8%"
+              source="fueleconomy.gov cold-weather testing; Recurrent; AAA"
+              sourceUrl="https://www.fueleconomy.gov/feg/coldweather.shtml"
+              retrieved="Revised 2026-09-27"
+              confidence="approximate"
+              notes="EVs: ~4 cold WV months with ~28% range loss means ~39% more kWh per mile in those months, averaged over the year: +13% (previously +12% from a slightly off formula). Gas cars lose efficiency in the cold too — fueleconomy.gov finds conventional cars ~15% worse at 20°F vs ~39% for EVs; scaling our EV figure by that ratio gives +4% fuel a year, and hybrids (30–34% worse) about +8%. Until Sept 2026 only EVs got a winter penalty. Toggleable in the calculator; always on in the planner. Recurrent's November 2025 study of 30,000+ vehicles found ~22% range loss at 32°F and ~30% at 20°F (heat pumps help ~10%); WV winter days cluster around freezing, so 28% remains slightly conservative. Re-checked 2026-09-23."
             />
             <SourceRow
               label="PHEV electric/gas split"
@@ -773,13 +785,13 @@ export default function StateOfTheDataPage() {
               notes="Replaced the old 'privilege tax' in 2008; 6% since July 2017. No county or city add-on on vehicle sales. Trade-in must be titled in WV to the buyer. We treat destination charges as taxable (not stated explicitly). Lien recording ($10) isn't modeled."
             />
             <SourceRow
-              label="Value kept after 5 years (new vehicles)"
-              value={`EVs ${Math.round(own.retention_5yr.bev * 1000) / 10}% · all vehicles ${Math.round(own.retention_5yr.gas * 1000) / 10}% · trucks ${Math.round(own.retention_5yr.gas_truck * 1000) / 10}%`}
-              source="iSeeCars 'Cars That Hold Their Value' study (2026)"
+              label="Value kept after 5 years (new vehicles) — low / middle / high"
+              value={(["bev", "gas", "gas_hybrid", "gas_truck", "phev"] as const).map((k) => `${{ bev: "EVs", gas: "gas", gas_hybrid: "hybrids", gas_truck: "trucks", phev: "plug-in hybrids" }[k]} ${Math.round(own.retention_scenarios_5yr[k].low * 100)}/${Math.round(own.retention_scenarios_5yr[k].mid * 100)}/${Math.round(own.retention_scenarios_5yr[k].high * 100)}%`).join(" · ")}
+              source="iSeeCars 'Cars That Hold Their Value' studies (2019, 2025, 2026), corrected for one-time shocks"
               sourceUrl="https://www.iseecars.com/cars-that-hold-their-value-study"
               retrieved="2026-09-27"
-              confidence="verified"
-              notes="Based on ~950,000 five-year-old vehicles sold Mar 2025–Feb 2026 — i.e., 2020–21 models, when EV prices and tax credits were changing fast. Used-EV values firmed in 2026 as gas prices rose (Cox Automotive: used EV listing prices up ~8% year over year in Jul–Aug 2026; Manheim wholesale EV values ahead of non-EVs, though the gap narrowed from +11% in May to +2% by mid-September). Gains were mostly in cheaper, older EVs. The planner uses the study figure by default and lets you slide your own estimate. No published plug-in hybrid figure exists; we use the all-vehicle average."
+              confidence="approximate"
+              notes="The latest study (EVs kept 42.8%, all vehicles 58.2%) measures 2020–21 models, which had one-time distortions on both sides. Gas cars of that age were propped up by the pandemic production shortfall (all-vehicle retention jumped from 54.4% to 58.2% between the 2025 and 2026 studies while real used-car prices were flat). EVs were hit by Tesla's 2023 price cuts (~20% relative to new-car inflation), the Hertz sell-off and a lease-return wave. Federal credits mostly did NOT apply to this Tesla-heavy cohort, so no credit correction is made. Gas low/mid/high = 2019 / 2025 / 2026 studies; EVs = gas × the 2025 EV-to-gas ratio, adjusted for how much of the price-cut shock repeats; plug-in hybrids = gas × 0.90; hybrids = gas × 1.11. EV and gas scenarios are paired (used prices move together). The planner shows all three and lets you slide your own. Measured against sticker price in constant dollars. Used-EV prices firmed in 2026 as gas rose (Cox, Manheim) — treated as support for the high case. After year 5, value loss slows to ~10%/yr."
             />
             <SourceRow
               label="New gas vehicle prices and mpg (for the new-EV-vs-new-gas comparison)"

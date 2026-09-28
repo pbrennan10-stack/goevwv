@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
+import { RangeCargoExplorer, type ExplorerRow } from "@/components/RangeCargoExplorer";
 import { fmtUSD } from "@/lib/calc";
-import { cargoMilesPerKwh, cargoSeatsUpLabel, medianIndex } from "@/lib/capability";
+import { cargoMilesPerKwh, cargoSeatsUp, cargoSeatsUpLabel, medianIndex } from "@/lib/capability";
 import { getFederalData, getUtilities, getVehicles } from "@/lib/data";
 import { TYPICAL, costPer100Mi, powertrainLabel, typicalScenario, vehicleName, fmtCents } from "@/lib/scenario";
 import type { VehicleClass } from "@/lib/types";
@@ -32,6 +33,19 @@ export default function EvIndexPage() {
   const scenario = typicalScenario(vehicles, aep, fed);
   const byId = new Map(scenario.results.map((r) => [r.vehicle.id, r]));
   const cargoIndex = medianIndex(vehicles.map(cargoMilesPerKwh));
+  const explorerRows: ExplorerRow[] = vehicles.map((v) => ({
+    id: v.id,
+    name: `${v.make} ${v.model}${v.trim ? ` ${v.trim}` : ""}`,
+    cls: v.class,
+    price: v.msrp_usd,
+    powertrain: v.powertrain === "phev" ? "phev" : "bev",
+    winter: v.powertrain === "phev" ? v.winter_range_mi_electric ?? v.epa_range_mi_electric ?? null : v.winter_range_mi ?? null,
+    hwy: v.powertrain === "phev" ? null : v.highway_range_mi ?? null,
+    epa: v.powertrain === "phev" ? v.epa_range_mi_electric ?? null : v.epa_range_mi ?? null,
+    cargo: cargoSeatsUp(v),
+    bedFt: v.bed_length_in ? Math.round((v.bed_length_in / 12) * 10) / 10 : null,
+    status: v.status ?? "current",
+  }));
 
   return (
     <main className="mx-auto max-w-content px-4 sm:px-6 py-8 sm:py-12">
@@ -46,6 +60,12 @@ export default function EvIndexPage() {
         {TYPICAL.daily_round_trip_mi}-mile daily commute. Savings include WV&apos;s
         annual EV fee. Tap any vehicle for the details.
       </p>
+      <RangeCargoExplorer rows={explorerRows} />
+
+      <details className="mt-8 group">
+        <summary className="cursor-pointer list-none rounded-xl bg-white ring-1 ring-slate-200 px-4 py-3 font-semibold text-ink hover:ring-brand">
+          Compare every model in a table: price, charging cost, savings, cargo-miles index <span aria-hidden className="text-brand">▾</span>
+        </summary>
       <p className="mt-3 text-sm text-ink-muted max-w-prose">
         <strong className="text-ink">Cargo-miles index</strong> combines luggage
         room with efficiency: cubic feet of space (every seat full, including
@@ -131,6 +151,7 @@ export default function EvIndexPage() {
           </section>
         );
       })}
+      </details>
 
       <p className="mt-8 text-sm text-ink-soft max-w-prose">
         Fuel and state fees only, for a typical driver. Your commute, utility,

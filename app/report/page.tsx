@@ -11,6 +11,7 @@ export const metadata: Metadata = {
   title: "Your WV EV analysis — GoEV WV",
   description: "Printable summary of your EV comparison for West Virginia.",
   robots: { index: false, follow: false },
+  alternates: { canonical: "/report" },
 };
 
 // Next.js 15 App Router: searchParams arrives as a Promise of a plain record
