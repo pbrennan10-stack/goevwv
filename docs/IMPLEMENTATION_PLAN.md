@@ -354,6 +354,41 @@ the rest are counted, not hidden silently.
 vehicles that tow it); planning a listed model used at its number ties the
 comparison.
 
+### Backup power in an outage — EV 101 page, vehicle pages, shopping list (Sept 29, 2026)
+
+**The idea.** Storm outages are a real WV fear, and an EV's battery is the
+biggest one most households will ever own. The site said nothing about it
+beyond a note in the Lightning's commentary.
+
+**Mindset.** Honest ladder, cheapest rung first, every figure sourced and its
+confidence labeled: (1) a household-style outlet on the vehicle runs a fridge
+and lights with nothing to install (from `features.power_outlet_v2l`); (2) a
+240-volt outlet feeding a generator-style transfer switch backs up essential
+circuits (Ford's GenerLink route for the Lightning, ~$1,400–$2,600 all in;
+Silverado/Sierra EV and Cybertruck outlets noted as approximate); (3) full
+vehicle-to-home hardware powers the whole panel (GM $7,299 + install, Ford
+$3,895 + ~$2,000, Tesla $1,990 + $2,000–$4,000, Kia EV9 not yet in WV). Days
+of backup = battery × usable share (0.8) ÷ daily use (30 kWh typical, EIA and
+the makers' own assumption; ~10 kWh essentials, ours); makers' own "up to N
+days" shown when published. Safety is explicit: licensed electrician, never a
+backfeed cord, Ford's connector only with GenerLink, utility approval
+(Appalachian Power approves meter-collar devices; Mon Power unconfirmed).
+
+**Design.** `data/backup_power.yaml` + `lib/backup.ts`; `/learn/power-outages`
+(hub, homepage strip and sitemap via `LEARN_PAGES`); a "When the power goes
+out" section on `/ev/[id]` for vehicles with any rung; a ⚡ line on the
+planner's used shopping list; a State of the Data section built from the data
+file; the Lightning's `features` gains the outlet fact (other equipment still
+"not confirmed"). The owner's own Lightning setup appears as a first-person
+note on the page.
+
+**Not in scope:** generator comparisons, load calculations, or per-employer or
+per-home electrical advice beyond "ask an electrician."
+
+**Tests:** every id in the data file exists; confidence labeled; the Lightning
+resolves to all three rungs with Ford's 3-day figure; the days math and its
+wording.
+
 ### v2.0 — Business Mode Toggle
 
 - Top-of-page toggle: Residential / Business

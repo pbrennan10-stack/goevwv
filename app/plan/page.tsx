@@ -3,6 +3,7 @@ import { HouseholdPlanner } from "@/components/HouseholdPlanner";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import {
+  getBackupPower,
   getFederalData,
   getIceVehicles,
   getOwnershipAssumptions,
@@ -31,6 +32,7 @@ export default function PlanPage() {
     utilities: getUtilities(),
     fed: getFederalData(),
     own: getOwnershipAssumptions(),
+    backup: getBackupPower(),
   };
 
   return (

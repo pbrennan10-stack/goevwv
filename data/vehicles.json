@@ -244,7 +244,14 @@
       "assembly_country": "US",
       "notes": "Pickup is the top-selling body style in WV. Home-backup power feature is a real selling point.",
       "status": "discontinued",
-      "status_note": "Ford cancelled the battery-electric Lightning in Dec 2025 (an extended-range successor is planned). Leftover/used only; price shown is the last new MSRP."
+      "status_note": "Ford cancelled the battery-electric Lightning in Dec 2025 (an extended-range successor is planned). Leftover/used only; price shown is the last new MSRP.",
+      "features": {
+        "driver_assist_level": "unknown",
+        "power_outlet_v2l": true,
+        "source": "https://www.ford.com/support/how-tos/ownership/ford-pro-charging/what-is-ford-pro-power-onboard",
+        "confidence": "approximate",
+        "note": "Only the power outlets have been checked, against Ford's Pro Power Onboard support page (retrieved 2026-09-29). Pro Power Onboard is standard on every Lightning: 2.4 kW of 120-volt outlets on the fleet Pro trim; the 9.6 kW system (standard on Lariat and Platinum, standard or optional on XLT depending on model year) adds a 240 V / 30 A outlet in the bed that can back up a house through a transfer switch. Other equipment: not confirmed."
+      }
     },
     {
       "id": "ford-f150-lightning-er-2025",
@@ -287,7 +294,14 @@
       "assembly_country": "US",
       "notes": "Extended Range battery (131 kWh) — 320 mi EPA. ~$15k more than Standard Range but real-world WV highway range jumps to ~245 mi. Better fit for long trips.",
       "status": "discontinued",
-      "status_note": "Ford cancelled the battery-electric Lightning in Dec 2025 (an extended-range successor is planned). Leftover/used only; price shown is the last new MSRP."
+      "status_note": "Ford cancelled the battery-electric Lightning in Dec 2025 (an extended-range successor is planned). Leftover/used only; price shown is the last new MSRP.",
+      "features": {
+        "driver_assist_level": "unknown",
+        "power_outlet_v2l": true,
+        "source": "https://www.ford.com/support/how-tos/ownership/ford-pro-charging/what-is-ford-pro-power-onboard",
+        "confidence": "approximate",
+        "note": "Only the power outlets have been checked, against Ford's Pro Power Onboard support page (retrieved 2026-09-29). Pro Power Onboard is standard on every Lightning: 2.4 kW of 120-volt outlets on the fleet Pro trim; the 9.6 kW system (standard on Lariat and Platinum, standard or optional on XLT depending on model year) adds a 240 V / 30 A outlet in the bed that can back up a house through a transfer switch. Other equipment: not confirmed."
+      }
     },
     {
       "id": "chevy-silverado-ev-2025",

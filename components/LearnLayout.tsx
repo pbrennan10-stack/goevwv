@@ -11,6 +11,7 @@ export const LEARN_PAGES = [
   { slug: "road-trips", title: "Road trips and charging stops", blurb: "How fast charging works, how long stops take, and WV's charger coverage." },
   { slug: "what-wears-out", title: "What wears out", blurb: "Five years of maintenance, side by side: gas vs electric." },
   { slug: "myths", title: "EV myths, checked", blurb: "True, partly true, or not true — with the numbers." },
+  { slug: "power-outages", title: "When the power goes out", blurb: "Three ways an EV can keep the lights on — from a fridge on its outlet to backing up the house." },
   { slug: "used-evs", title: "Buying a used EV", blurb: "Battery health, warranties, and what a used one should cost." },
   { slug: "hybrid-plug-in-or-electric", title: "Hybrid, plug-in hybrid, or fully electric?", blurb: "Which one fits how you drive." },
 ] as const;
@@ -34,9 +35,9 @@ export function LearnLayout({ slug, title, intro, children }: { slug: string; ti
       </article>
       <aside className="mt-12 rounded-2xl bg-brand-bg ring-1 ring-emerald-200 p-5">
         <p className="font-semibold text-ink">See what it means for your household</p>
-        <p className="mt-1 text-sm text-ink-muted">Four taps for a quick answer, or plan your whole driveway with purchase price and resale included.</p>
+        <p className="mt-1 text-sm text-ink-muted">Four questions for a quick fit check, or plan your whole driveway with purchase price and resale included.</p>
         <div className="mt-3 flex flex-wrap gap-3">
-          <Link href="/#quick" className="inline-flex rounded-xl bg-brand hover:bg-brand-dark text-white font-semibold px-4 py-2.5 text-sm">Quick answer</Link>
+          <Link href="/#fit-check" className="inline-flex rounded-xl bg-brand hover:bg-brand-dark text-white font-semibold px-4 py-2.5 text-sm">Fit check</Link>
           <Link href="/plan" className="inline-flex rounded-xl border border-slate-300 bg-white hover:border-brand text-ink font-semibold px-4 py-2.5 text-sm">Plan your household</Link>
         </div>
       </aside>

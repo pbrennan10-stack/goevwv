@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Logo } from "@/components/Logo";
 import { SiteHeader } from "@/components/SiteHeader";
 import { cargoSeatsUpLabel } from "@/lib/capability";
-import { getFederalData, getIceVehicles, getOwnershipAssumptions, getUtilities, getVehicles, getWearData } from "@/lib/data";
+import { getBackupPower, getFederalData, getIceVehicles, getOwnershipAssumptions, getUtilities, getVehicles, getWearData } from "@/lib/data";
 
 export const metadata: Metadata = {
   title: "State of the Data",
@@ -128,6 +128,8 @@ export default function StateOfTheDataPage() {
   const evs = getVehicles();
   const own = getOwnershipAssumptions();
   const gasCars = getIceVehicles();
+  const backup = getBackupPower();
+  const backupNames = (ids: string[]) => Array.from(new Set(ids.map((id) => { const v = evs.find((x) => x.id === id); return v ? `${v.make} ${v.model}` : id; }))).join(", ");
   const capCounts = (list: { capability_confidence?: string }[]) => ({
     verified: list.filter((v) => v.capability_confidence === "verified").length,
     approximate: list.filter((v) => v.capability_confidence === "approximate").length,
@@ -945,6 +947,57 @@ export default function StateOfTheDataPage() {
                 vehicle page links its source.
               </p>
             </div>
+          </Section>
+
+          <Section
+            title="Backup power in an outage (EV 101)"
+            summary="Which EVs can run a fridge from an outlet, back up the house through a transfer switch, or power the whole panel — used on /learn/power-outages, the EV pages, and the planner's used shopping list."
+          >
+            <SourceRow
+              label="Household electricity use behind the 'days of backup' math"
+              value={`${backup.typical_home_kwh_per_day} kWh a day typical; ~${backup.essentials_kwh_per_day} kWh a day for essentials`}
+              source={backup.daily_kwh_source}
+              sourceUrl={backup.daily_kwh_source_url}
+              retrieved={backup.retrieved}
+              confidence="approximate"
+              notes={`${backup.daily_kwh_notes ?? ""} We count ${Math.round(backup.usable_share * 100)}% of a battery as usable for backup; the rest is driving range to reach a charger afterward, plus inverter losses. Where a maker publishes its own 'up to N days' figure, the pages show that too.`}
+            />
+            {backup.transfer_switch.map((e) => (
+              <SourceRow
+                key={e.ids.join()}
+                label={`240-volt outlet + transfer switch: ${backupNames(e.ids)}`}
+                value={`${e.outlet}${e.kw_240v ? `, ${e.kw_240v} kW` : ""}${e.kw_total ? ` (${e.kw_total} kW across all outlets)` : ""}`}
+                source={e.source}
+                sourceUrl={e.source_url}
+                retrieved={e.retrieved}
+                confidence={e.confidence}
+                notes={[e.requires, e.hookup, e.cost].filter(Boolean).join(" ")}
+              />
+            ))}
+            {backup.v2h.map((e) => (
+              <SourceRow
+                key={e.ids.join()}
+                label={`Whole-home backup (V2H): ${backupNames(e.ids)}`}
+                value={`${e.system}${e.kw ? `, up to ${e.kw} kW` : ""}`}
+                source={e.source}
+                sourceUrl={e.source_url}
+                retrieved={e.retrieved}
+                confidence={e.confidence}
+                notes={[e.cost, e.availability].filter(Boolean).join(". ")}
+              />
+            ))}
+            {(backup.utility_notes ?? []).map((u) => (
+              <SourceRow
+                key={u.utility}
+                label={`Meter-mounted transfer switch: ${u.utility}`}
+                value={u.confidence === "verified" ? "Approved" : "See note"}
+                source={u.source}
+                sourceUrl={u.source_url}
+                retrieved={backup.retrieved}
+                confidence={u.confidence}
+                notes={u.note}
+              />
+            ))}
           </Section>
 
           <Section

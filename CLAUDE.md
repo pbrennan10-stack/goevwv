@@ -72,7 +72,8 @@ goevwv/
 │   ├── utilities.yaml  # AEP, Mon Power, Potomac Edison, Wheeling Power, co-ops
 │   ├── federal.yaml    # Federal credits, WV state fees, gas & DCFC price baselines
 │   ├── ownership.yaml  # WV sales tax, resale retention, depreciation (planner)
-│   └── charging_corridors.yaml, charger-snapshot.json
+│   ├── backup_power.yaml # Outage power: outlet / 240-V outlet + transfer switch / V2H, per vehicle, sourced
+│   └── charging_corridors.yaml, charger-snapshot.json, wear_items.yaml, glossary.json
 ├── public/             # Static assets (old index.html is dormant — Next.js routes /)
 ├── scripts/
 │   └── bootstrap.sh    # Droplet provisioner (one-shot, runs on fresh Ubuntu)
@@ -196,7 +197,7 @@ Engine in `lib/household.ts` reuses `lib/calc.ts` energy/DCFC/insurance helpers 
 - Homepage: "What 100 miles costs" chart + `FitCheck` (home charging, charging at work, daily miles, long-trip pattern → does an EV fit how you drive, and is a PHEV a better fit → `/calculator?mi=…`). Charging at work without home charging gives a "could work" verdict that names the catch (days off); free work charging gets its own note. The fit check identifies use cases; it is deliberately not a cost verdict — dollars live in /plan and /calculator. (A Sept 2026 cost-only "quick answer" replaced it for a day and was reverted for that reason.)
 - Tap-to-explain: `<Term id="…">` reads `data/glossary.json` (native Popover API, no library). Explain first use per page only; never inside headings, buttons or select options. `/learn/glossary` lists every term.
 - Charts: use `components/charts.tsx`; no chart libraries. Bars start at zero, values are text, charts print.
-- EV 101 (`/learn/*`): short explainers built on `components/LearnLayout.tsx` (`LEARN_PAGES` drives the hub, homepage strip, and sitemap). Every number comes from `data/*` via `lib/typical.ts` (shared per-100-mile, CO₂ figures) or `data/wear_items.yaml` + `lib/wear.ts` (maintenance chart) — never type a number into the copy.
+- EV 101 (`/learn/*`): short explainers built on `components/LearnLayout.tsx` (`LEARN_PAGES` drives the hub, homepage strip, and sitemap). Every number comes from `data/*` via `lib/typical.ts` (shared per-100-mile, CO₂ figures), `data/wear_items.yaml` + `lib/wear.ts` (maintenance chart), or `data/backup_power.yaml` + `lib/backup.ts` (`/learn/power-outages`: three rungs — household outlet, 240-V outlet + transfer switch, V2H — with days-of-backup math; also the "When the power goes out" section on `/ev/[id]` and the ⚡ mark on the planner's shopping list) — never type a number into the copy. Add a vehicle to `backup_power.yaml` only with a source; the outlet rung comes from `features.power_outlet_v2l`.
 - Standard equipment: optional `features` object on each vehicle in `vehicles.json` / `ice_vehicles.json` (schema + labels in `lib/features.ts`, display in `components/Equipment.tsx` on `/ev/[id]` and the planner side-by-side). Facts for the priced trim only, no dollar values; `null` = not confirmed; `power_liftgate: null` = no liftgate. Vehicles without `features` show "not finished checking" — don't fill them with unchecked guesses.
 
 ## Tests

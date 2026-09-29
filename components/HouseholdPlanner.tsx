@@ -11,6 +11,7 @@ import { CHART_COLORS, StackedBars } from "@/components/charts";
 import { EquipmentCompare } from "@/components/Equipment";
 import { Term } from "@/components/Term";
 import { ANNUAL_WINTER_KWH_MULTIPLIER, dcfcStopMiles } from "@/lib/calc";
+import { RUNG_LABEL, backupOptions } from "@/lib/backup";
 import { cargoSeatsUpLabel } from "@/lib/capability";
 import {
   DESTINATION_FALLBACK_USD,
@@ -208,6 +209,10 @@ function UsedShopping({
                   {r.vehicle.powertrain === "phev" && !/plug-in hybrid/i.test(`${r.vehicle.model} ${r.vehicle.trim}`) ? " · plug-in hybrid" : ""}
                   {r.vehicle.status === "discontinued" ? ` · last listed new ${usd(r.newPrice)}` : ` · new ${usd(r.newPrice)}`}
                 </span>
+                {catalog.backup && (() => {
+                  const b = backupOptions(r.vehicle.id, r.vehicle.features, catalog.backup);
+                  return b.best ? <span className="block text-xs font-normal text-emerald-800">⚡ {RUNG_LABEL[b.best]}</span> : null;
+                })()}
               </span>
               <span className="font-bold text-ink whitespace-nowrap text-right">
                 {r.maxUsedPrice == null

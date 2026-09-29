@@ -31,6 +31,7 @@ import {
   insuranceAtValue,
   isHybridTrim,
 } from "./calc";
+import type { BackupPowerData } from "./backup";
 import { cargoSeatsUp } from "./capability";
 import type { Capability, FederalData, IceVehicle, Utility, Vehicle } from "./types";
 
@@ -122,6 +123,7 @@ export interface Catalog {
   utilities: Utility[];
   fed: FederalData;
   own: OwnershipAssumptions;
+  backup?: BackupPowerData; // data/backup_power.yaml — the shopping list's backup-power mark
 }
 
 // ---------- Units (vehicles in a scenario) ----------

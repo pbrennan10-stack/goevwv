@@ -10,13 +10,19 @@ function Mark({ v }: { v: boolean | null | undefined }) {
 }
 
 function Confidence({ f }: { f: Features }) {
+  // `source` is a URL for some vehicles and a description ("kiamedia.com
+  // features-by-trim page") for others; only a URL gets a link.
+  const first = f.source?.split(/\s*;\s*/)[0];
+  const url = first && /^https?:\/\//.test(first) ? first : null;
   return (
     <p className="mt-3 text-xs text-ink-soft">
       {f.confidence === "verified" ? "Checked against the maker's spec sheet" : "Checked against dealer and review trim guides"}
-      {f.source ? (
+      {url ? (
         <>
-          {" "}(<a href={f.source.split(/\s*;\s*/)[0]} className="text-brand hover:underline" rel="noopener">source</a>)
+          {" "}(<a href={url} className="text-brand hover:underline" rel="noopener">source</a>)
         </>
+      ) : f.source ? (
+        <> (source: {f.source})</>
       ) : null}
       . Gathered with AI help and may contain errors — confirm with the dealer. &ldquo;Not standard&rdquo; usually means
       it&apos;s available at extra cost or on a higher trim.

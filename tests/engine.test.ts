@@ -2,7 +2,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { calculate } from "../lib/calc";
-import { getFederalData, getIceVehicles, getOwnershipAssumptions, getUtilities, getVehicles } from "../lib/data";
+import { getBackupPower, getFederalData, getIceVehicles, getOwnershipAssumptions, getUtilities, getVehicles } from "../lib/data";
+import { backupDays, backupOptions, fmtDays, makerDays } from "../lib/backup";
 import { planHousehold, shoppingModels, shortName, tippingPoints, usedBreakEvenPrice, usedShoppingList, type Catalog, type HouseholdInput } from "../lib/household";
 import { TRIP_PRESETS, decodeState, encodeState, sanitizeLoaded } from "../lib/planState";
 import { ASSIST_LABEL, FEATURE_GROUPS } from "../lib/features";
@@ -217,6 +218,29 @@ test("used shopping list only lists models that can do every drive (a 5,000-lb t
   const { rows, cantFit } = usedShoppingList(h, cat, shoppingModels(cat, h.candidate!.ref));
   assert.ok(rows.length > 0 && cantFit > 0, `${rows.length} listed, ${cantFit} can't`);
   for (const r of rows) assert.ok((r.vehicle.towing_lbs ?? 0) >= 5000, `${r.vehicle.id} tows ${r.vehicle.towing_lbs}`);
+});
+
+test("data: backup power entries name real vehicles, label confidence, and the math reads right", () => {
+  const backup = getBackupPower();
+  const ids = new Set(cat.evs.map((v) => v.id));
+  for (const e of [...backup.transfer_switch, ...backup.v2h]) {
+    for (const id of e.ids) assert.ok(ids.has(id), `backup_power: unknown vehicle ${id}`);
+    assert.ok(e.confidence === "verified" || e.confidence === "approximate", `${e.ids[0]} confidence`);
+    assert.ok(e.cost && e.source && e.retrieved, `${e.ids[0]} cost/source/retrieved`);
+    for (const id of Object.keys(e.maker_runtime_days ?? {})) assert.ok(e.ids.includes(id), `runtime for ${id} not in ids`);
+  }
+  assert.ok(backup.usable_share > 0.5 && backup.usable_share <= 1 && backup.essentials_kwh_per_day < backup.typical_home_kwh_per_day);
+  const er = cat.evs.find((v) => v.id === "ford-f150-lightning-er-2025")!;
+  const lightning = backupOptions(er.id, er.features, backup);
+  assert.equal(lightning.best, "v2h");
+  assert.ok(lightning.outlet === true && lightning.transferSwitch && lightning.v2h);
+  assert.equal(makerDays(er.id, backup), 3);
+  assert.equal(fmtDays(backupDays(er.battery_kwh!, backup.typical_home_kwh_per_day, backup)), "about 3½ days");
+  for (const e of [...backup.transfer_switch, ...backup.v2h]) for (const id of e.ids) assert.ok(cat.evs.find((v) => v.id === id)!.battery_kwh, `${id} needs battery_kwh for the days math`);
+  const ioniq9 = cat.evs.find((v) => v.id === "hyundai-ioniq-9-2026")!;
+  assert.equal(backupOptions(ioniq9.id, ioniq9.features, backup).best, null, "no outlet, no hardware: no rung");
+  assert.equal(fmtDays(0.5), "under a day");
+  assert.equal(fmtDays(1.1), "about a day");
 });
 
 test("no home charging costs more than charging at home", () => {
