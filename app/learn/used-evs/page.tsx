@@ -65,6 +65,10 @@ export default function Page() {
           your driving. It assumes a used car loses about {usedDep}% of its value a year and costs the same to run as a new
           one.
         </p>
+        <p>
+          Found one for sale? Choose <strong>Used</strong> in the planner and enter its price and rough mileage — it plans
+          your household with that car. You can price the gas vehicle you&apos;d compare it with the same way.
+        </p>
       </section>
     </LearnLayout>
   );
