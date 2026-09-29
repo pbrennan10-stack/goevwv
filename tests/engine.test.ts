@@ -162,15 +162,18 @@ test("short names keep the make when the model is only a number", () => {
   assert.equal(shortName({ make: "Chevrolet", model: "Equinox EV" }), "Equinox EV");
 });
 
-test("charging at work: free lowers the EV's energy cost, paid matches home, gas-only 'today' is unchanged", () => {
-  const at = (workCharging: "none" | "free" | "paid") =>
-    planHousehold(household({ drivers: [{ id: 1, commuteOneWayMi: 21, daysPerWeek: 5, workCharging }] }), cat);
-  const none = at("none"), free = at("free"), paid = at("paid");
-  const ev = (r: ReturnType<typeof planHousehold>) => r.plan!.units.find((u) => u.unit.isNew)!;
-  assert.ok(ev(free).energy < ev(none).energy - 100, `${ev(free).energy} vs ${ev(none).energy}`);
-  assert.ok(close(ev(paid).energy, ev(none).energy, 0.0001), "paid at work = the same standard rate as home");
+test("charging at work: free is cheapest, paid starts at the business rate, gas-only 'today' is unchanged", () => {
+  const at = (workCharging: "none" | "free" | "paid", workCentsPerKwh?: number) =>
+    planHousehold(household({ drivers: [{ id: 1, commuteOneWayMi: 21, daysPerWeek: 5, workCharging, ...(workCentsPerKwh != null ? { workCentsPerKwh } : {}) }] }), cat);
+  const none = at("none"), free = at("free"), paid = at("paid"), pricey = at("paid", 30);
+  const ev = (r: ReturnType<typeof planHousehold>) => r.plan!.units.find((u) => u.unit.isNew)!.energy;
+  const biz = cat.fed.calculation_notes.commercial_rate_per_kwh!;
+  assert.ok(biz.current < cat.utilities.find((u) => u.id === "aep")!.residential.flat_rate_per_kwh, "WV business rate is below AEP's home rate");
+  assert.ok(ev(free) < ev(paid) && ev(paid) < ev(none), `free ${ev(free)} < paid ${ev(paid)} < none ${ev(none)}`);
+  assert.ok(close(ev(pricey), ev(none), 0.0001), "a work price above the home rate: you'd charge at home");
   assert.ok(close(free.today.totalOverPeriod, none.today.totalOverPeriod, 0.0001), "a gas-only household doesn't change");
-  assert.ok(free.plan!.totalOverPeriod < none.plan!.totalOverPeriod);
+  const back = sanitizeLoaded(decodeState(encodeState({ drivers: [{ id: 1, commuteOneWayMi: 21, daysPerWeek: 5, workCharging: "paid", workCentsPerKwh: 9.5 }] })), cat)!;
+  assert.equal(back.drivers![0].workCentsPerKwh, 9.5, "an entered employer price survives a share link");
 });
 
 test("without home charging, paying to charge at work beats public chargers", () => {

@@ -39,8 +39,8 @@ import type { Capability, FederalData, IceVehicle, Utility, Vehicle } from "./ty
 export type ResaleScenario = "low" | "mid" | "high";
 export type OdometerBand = "under_50k" | "50k_100k" | "over_100k";
 export type HomeCharging = "auto" | "l1" | "l2" | "none";
-// Charging at work, per commuting driver: free, or paid at about the utility's
-// standard rate. We don't guess employer prices.
+// Charging at work, per commuting driver: free, or paid — at the price the
+// user enters, else the average WV business (commercial) rate.
 export type WorkCharging = "none" | "free" | "paid";
 
 type Range3 = { low: number; mid: number; high: number };
@@ -82,6 +82,7 @@ export interface DriverInput {
   commuteOneWayMi: number; // 0 = no commute
   daysPerWeek: number;
   workCharging?: WorkCharging; // default "none"
+  workCentsPerKwh?: number;    // paid: what the employer charges today; default = WV business average
 }
 
 export interface TripInput {
@@ -196,6 +197,7 @@ export interface Use {
   luggageCuFt: number;
   towLbs: number;
   workCharging?: WorkCharging; // commutes only
+  workRatePerKwh?: number;     // commutes only: the employer's price today ($/kWh), if entered
 }
 
 export function buildUses(h: HouseholdInput): Use[] {
@@ -208,6 +210,7 @@ export function buildUses(h: HouseholdInput): Use[] {
       miles: d.commuteOneWayMi * 2 * days, roundTripMi: d.commuteOneWayMi * 2,
       timesPerYear: days, oneWayMi: d.commuteOneWayMi, people: 1, luggageCuFt: 0, towLbs: 0,
       workCharging: d.workCharging ?? "none",
+      ...(d.workCentsPerKwh != null ? { workRatePerKwh: d.workCentsPerKwh / 100 } : {}),
     });
   });
   if (h.errandsMiPerWeek > 0) {
@@ -293,7 +296,7 @@ export function fit(u: Unit, use: Use, years = 0): Fit {
 
 interface Rates {
   homeRate: number;          // $/kWh at home (or at public chargers if no home charging)
-  workRate: number;          // $/kWh when paying to charge at work: the utility's standard rate
+  workRate: number;          // $/kWh when paying to charge at work: the WV business average
   meterAnnualUsd: number;
   elecMult: number;          // average electricity price rise over the period
   gasPrice: number;
@@ -326,10 +329,13 @@ export function energyCost(u: Unit, use: Use, r: Rates, fed: FederalData): numbe
   const kwhPerMi = (blendedKwhPer100mi(v, hwyFrac, 55) / 100) * winter;
   const publicRate = dcfcRateFor(v, fed) * r.elecMult;
   const home = r.noHomeCharging ? publicRate : r.homeRate;
-  // A commute you can charge at work: free, or the standard rate — a Level 2
-  // session over a workday covers the round trip. Where charging at home is
-  // cheaper (an off-peak rate), that's what you'd use.
-  const atWork = use.workCharging === "free" ? 0 : use.workCharging === "paid" ? r.workRate : null;
+  // A commute you can charge at work: free, or paid — the employer's price if
+  // entered, else the WV business average (employers usually pass on their
+  // commercial rate). A Level 2 session over a workday covers the round trip.
+  // Where charging at home is cheaper, that's what you'd use.
+  const atWork = use.workCharging === "free" ? 0
+    : use.workCharging === "paid" ? (use.workRatePerKwh != null ? use.workRatePerKwh * r.elecMult : r.workRate)
+    : null;
   if (u.pt === "bev") {
     if (use.kind === "trip") {
       let hwy = v.highway_range_mi ?? Math.round((v.epa_range_mi ?? 200) * 0.8);
@@ -534,7 +540,8 @@ export function runScenario(units: Unit[], uses: Use[], h: HouseholdInput, cat: 
   const ownsPlugIn = units.some((u) => !u.isNew && u.pt !== "gas");
   const charging = newPlugIn || ownsPlugIn ? resolveHomeCharging(h, uses, cat, ownsPlugIn) : null;
   const rates: Rates = {
-    homeRate: rate * elecMult, workRate: utility.residential.flat_rate_per_kwh * elecMult,
+    homeRate: rate * elecMult,
+    workRate: (cat.fed.calculation_notes.commercial_rate_per_kwh?.current ?? utility.residential.flat_rate_per_kwh) * elecMult,
     meterAnnualUsd, elecMult, gasPrice: h.gasPrice,
     noHomeCharging: charging?.mode === "none",
   };

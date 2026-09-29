@@ -45,6 +45,7 @@ import {
   gasOutlook,
   initialState,
   sanitizeLoaded,
+  workDefaultCents,
   type PlanState,
 } from "@/lib/planState";
 
@@ -506,6 +507,17 @@ export function HouseholdPlanner({ catalog }: Props) {
                   </select>
                   <span className="text-xs text-ink-soft">Some employers let staff plug in free — worth asking HR or facilities. It counts when a plug-in does this commute.</span>
                 </label>
+              )}
+              {d.commuteOneWayMi > 0 && d.workCharging === "paid" && (
+                <div className="space-y-1">
+                  <Num label="Price at work" suffix="¢ per kWh" step={0.1} max={100} value={d.workCentsPerKwh ?? workDefaultCents(catalog)}
+                    onChange={(n) => set({ drivers: s.drivers.map((x) => (x.id === d.id ? { ...x, workCentsPerKwh: n } : x)) })} />
+                  <p className="text-xs text-ink-soft">
+                    Starts at what West Virginia businesses pay on average — {workDefaultCents(catalog)}¢, vs about{" "}
+                    {Math.round((catalog.fed.calculation_notes.commercial_rate_per_kwh?.residential_for_comparison ?? 0.1547) * 1000) / 10}¢
+                    for homes (EIA). Enter your employer&apos;s price if you know it; a charging network may add a fee.
+                  </p>
+                </div>
               )}
               {d.commuteOneWayMi === 0 && <p className="text-sm text-ink-soft">No commute — retired, remote, or at home.</p>}
             </Card>
@@ -981,8 +993,9 @@ function PlanResults({
         {workCharged.length > 0 && (
           <p className="text-sm text-ink">
             <strong>Charging at work:</strong>{" "}
-            {workCharged.map((u) => `${u.label} — ${u.workCharging === "free" ? "free" : "about your home rate"}`).join("; ")}.
-            {" "}Days off, errands and trips charge {plan.charging?.mode === "none" ? "at public chargers" : "at home"}.
+            {workCharged.map((u) => `${u.label} — ${u.workCharging === "free" ? "free" : u.workRatePerKwh != null ? `${Math.round(u.workRatePerKwh * 1000) / 10}¢ per kWh` : `${workDefaultCents(catalog)}¢ per kWh, the WV business average`}`).join("; ")}.
+            {" "}Days off, errands and trips charge {plan.charging?.mode === "none" ? "at public chargers" : "at home"}
+            {workCharged.some((u) => u.workCharging === "paid") && plan.charging?.mode !== "none" ? "; if home is cheaper than work, the plan charges there" : ""}.
           </p>
         )}
         <p className="text-sm text-ink">
@@ -1204,7 +1217,7 @@ function PlanResults({
           <li>Selling a car you own isn&apos;t free money — it&apos;s value you&apos;d otherwise watch shrink. So &ldquo;today&rdquo; includes what your current cars lose over {Y} years, plus repairs that rise with their mileage, and insurance based on what they&apos;re worth now.</li>
           <li>Winter is counted on both sides: EVs use ~13% more electricity over a WV year, gas cars ~4% more fuel (hybrids ~8%). Electricity prices rise {Math.round((catalog.fed.calculation_notes.electricity_annual_increase ?? 0) * 1000) / 10}% a year; gas uses the forecast price you chose.</li>
           <li>Charging uses your utility&apos;s marginal rate; road-trip miles beyond the first charge use public fast chargers at ${catalog.fed.calculation_notes.dcfc_rate_per_kwh?.current.toFixed(2) ?? "0.55"}/kWh (Tesla ${catalog.fed.calculation_notes.dcfc_rate_per_kwh?.member_rate?.toFixed(2) ?? "0.43"}). No home charging means public prices for every mile. EV range fades ~2% a year, which is included in trip checks. Towing cuts EV range about 45%.</li>
-          <li>Charging at work, if you set it for a driver: that commute charges there — free, or at your utility&apos;s standard rate — with one Level 2 session per workday covering the round trip. A plug-in hybrid charged at home and at work can run on electricity for up to two batteries&apos; worth a day.</li>
+          <li>Charging at work, if you set it for a driver: that commute charges there — free, or at the price you enter (it starts at the average West Virginia business rate, {workDefaultCents(catalog)}¢ per kWh from EIA; businesses pay less per kWh than homes) — with one Level 2 session per workday covering the round trip. A plug-in hybrid charged at home and at work can run on electricity for up to two batteries&apos; worth a day.</li>
           <li>Insurance is an estimate for a 35–45-year-old WV driver with a clean record; your quote will differ. Financing isn&apos;t included.</li>
           <li>Comparing a new EV with keeping an older car usually favors keeping the older car — new vehicles lose value fastest. That&apos;s why we also compare against buying a <em>new gas vehicle</em>: the fairer question when it&apos;s time to replace one.</li>
         </ul>

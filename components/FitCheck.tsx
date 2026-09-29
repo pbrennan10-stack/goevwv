@@ -206,7 +206,7 @@ function VerdictDetail({
       <div className="text-sm text-ink-muted space-y-2">
         <p>
           Charging at work can stand in for charging at home: plug in on workdays and your commute is
-          covered{work === "free" ? " — and fueled for free" : ""}. The catch is days off. Weekends,
+          covered{work === "free" ? " — and fueled for free" : " — and since businesses pay lower rates per kWh than homes, it can cost less than charging at home"}. The catch is days off. Weekends,
           vacations, and snow days mean topping up at a public charger now and then, or at any regular
           outlet you can use (it adds 3–5 miles an hour).
         </p>

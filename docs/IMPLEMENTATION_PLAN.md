@@ -288,7 +288,10 @@ weekday miles cost nothing to fuel.
 
 **Mindset.** It's a use case first (can you keep the car charged?), so it
 belongs in the fit check; the dollars belong in the planner. We don't guess
-what an employer charges: it's free, or "about what you'd pay at home."
+what a particular employer charges: it's free, or the price the visitor
+enters, starting from a sourced default — the average West Virginia business
+(commercial) rate from EIA, since employers usually pass on their own cost and
+businesses pay less per kWh than homes (11.64¢ vs 15.47¢, Jan–Jul 2026).
 
 **Design.**
 
@@ -300,9 +303,10 @@ what an employer charges: it's free, or "about what you'd pay at home."
   the low-mileage economics note (it no longer applies). "Not yet" now suggests
   asking an employer. Links to the planner, which counts it.
 - **Planner:** each driver who commutes gets "Can you charge at work?" (no /
-  free / paid). A commute charged at work is priced at $0 (free) or the
-  utility's standard residential rate (paid); a Level 2 session over a workday
-  covers the round trip. A plug-in hybrid charged at work gets one battery's
+  free / paid). A commute charged at work is priced at $0 (free) or, when paid,
+  at the price entered for that driver — starting at the WV business average
+  (`commercial_rate_per_kwh` in `data/federal.yaml`). Whichever of work or home
+  is cheaper is used; a Level 2 session over a workday covers the round trip. A plug-in hybrid charged at work gets one battery's
   worth per workday from work, plus a second from home when it can charge
   there. Errands and trips still charge at home (or public chargers without
   home charging). Applies to EVs you already own too, so both sides stay fair.

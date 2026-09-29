@@ -204,6 +204,22 @@ calculation_notes:
   # home and public charging prices by this much per year.
   electricity_annual_increase: 0.025
 
+  # What West Virginia businesses pay per kWh on average (all-in: energy,
+  # demand and customer charges divided by kWh). The planner uses it as the
+  # default price for "paid" charging at work — an employer passing on its own
+  # cost — unless the user enters what their employer actually charges.
+  commercial_rate_per_kwh:
+    current: 0.1164
+    residential_for_comparison: 0.1547
+    source: "EIA Electric Power Monthly, Table 5.6.B (West Virginia, year to date through July 2026)"
+    source_url: "https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_5_6_b"
+    retrieved: "2026-09-29"
+    notes: >
+      Commercial 11.64 cents vs residential 15.47 cents per kWh, January-July
+      2026 (July alone: 11.44 vs 15.78; Table 5.6.A). An average across all WV
+      businesses: a given employer's price depends on its tariff and demand
+      charges, and a charging network may add a fee.
+
   # Public DC fast charging rate applied to long-trip stops. Home charging
   # stays at the user's utility rate; this only applies to road-trip kWh.
   dcfc_rate_per_kwh:

@@ -829,11 +829,12 @@ export default function StateOfTheDataPage() {
             />
             <SourceRow
               label="Charging at work"
-              value="Free = $0; paid = your utility's standard residential rate"
-              source="Assumption — you tell the planner whether you can charge at work and whether it's free; we don't track employer prices"
-              retrieved="2026-09-29"
+              value={`Free = $0; paid = the price you enter, starting at the WV business average (${Math.round((federal.calculation_notes.commercial_rate_per_kwh?.current ?? 0) * 1000) / 10}¢ per kWh, vs ${Math.round((federal.calculation_notes.commercial_rate_per_kwh?.residential_for_comparison ?? 0) * 1000) / 10}¢ for homes)`}
+              source={federal.calculation_notes.commercial_rate_per_kwh?.source ?? "EIA Electric Power Monthly"}
+              sourceUrl={federal.calculation_notes.commercial_rate_per_kwh?.source_url}
+              retrieved={federal.calculation_notes.commercial_rate_per_kwh?.retrieved ?? "2026-09-29"}
               confidence="approximate"
-              notes="Applies to each driver's commute when you set it in the planner. One Level 2 session over a workday (about 20–30 miles of range an hour) covers the round trip, so the commute's electricity is priced at work; if an off-peak home rate is cheaper, we use that instead. A plug-in hybrid charged at work gets one battery's worth a workday there, plus a second from home when it can charge there too. Errands, road trips, and days off still charge at home (or at public chargers without home charging). Employers that charge usually charge about cost; a regular 120V outlet at work adds only 3–5 miles an hour and isn't modeled."
+              notes="The business average is verified EIA data; using it as an employer's price is our assumption: employers usually pass on their own commercial rate, which is lower per kWh than a home rate, but a given employer's tariff differs and a charging network may add a fee. Enter the real price if you know it. Applies to each driver's commute when you set it in the planner. One Level 2 session over a workday (about 20–30 miles of range an hour) covers the round trip; if charging at home is cheaper, we use that instead. A plug-in hybrid charged at work gets one battery's worth a workday there, plus a second from home when it can charge there too. Errands, road trips, and days off still charge at home (or at public chargers without home charging). A regular 120V outlet at work adds only 3–5 miles an hour and isn't modeled."
             />
           </Section>
 
