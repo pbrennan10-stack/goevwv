@@ -279,6 +279,77 @@ financing.
 **Tests:** a used purchase at the break-even price ties the target; used-purchase
 tax, resale, insurance and mileage-based upkeep; share-link round trip.
 
+### Charging at work — fit check and planner (Sept 2026)
+
+**The idea.** Some employers let staff plug in at work, often free — the cost
+of the electricity is small to them. For someone who can't charge at home, that
+can turn "not yet" into "this works"; for everyone, free charging makes most
+weekday miles cost nothing to fuel.
+
+**Mindset.** It's a use case first (can you keep the car charged?), so it
+belongs in the fit check; the dollars belong in the planner. We don't guess
+what an employer charges: it's free, or "about what you'd pay at home."
+
+**Design.**
+
+- **Fit check:** a new question 2, "Could you plug in at work?" — free / paid /
+  no or not sure. With no home charging, charging at work gives a new "Could
+  work" verdict that explains the catch (days off, snow days, vacations mean a
+  public charger or a regular outlet now and then), with the plug-in hybrid
+  note for varied long trips. Free charging at work gets its own note and skips
+  the low-mileage economics note (it no longer applies). "Not yet" now suggests
+  asking an employer. Links to the planner, which counts it.
+- **Planner:** each driver who commutes gets "Can you charge at work?" (no /
+  free / paid). A commute charged at work is priced at $0 (free) or the
+  utility's standard residential rate (paid); a Level 2 session over a workday
+  covers the round trip. A plug-in hybrid charged at work gets one battery's
+  worth per workday from work, plus a second from home when it can charge
+  there. Errands and trips still charge at home (or public chargers without
+  home charging). Applies to EVs you already own too, so both sides stay fair.
+- Results show which commutes charge at work; `/state-of-the-data` documents
+  the assumption; the share link carries it.
+
+**Not in scope:** employer-specific prices, Level 1-only workplace outlets,
+charging at work in the single-car calculator.
+
+**Tests:** free work charging lowers the EV's energy cost and leaves a gas-only
+household unchanged; paid work charging beats public charging for a household
+without home charging; a plug-in hybrid charged at home and work burns less
+gas; share-link round trip.
+
+### Household planner — used-EV shopping list (Sept 2026)
+
+**The idea.** The planner answers "what could a used one of THIS model cost?"
+Shoppers want the same answer for every EV that would work for them, to hold up
+against listings.
+
+**Mindset.** Still no used prices: we list the most each used model could cost
+and still come out ahead for this household's driving. Same break-even math as
+the plan (`usedBreakEvenPrice`), so planning a listed model at its number
+produces a tie (tested). Only models that can do every drive make the list;
+the rest are counted, not hidden silently.
+
+**Design.**
+
+- Engine: `usedShoppingList(h, cat, models)` runs each model in place of the
+  EV you're trying (same replaced vehicle, same kept vehicles and drives,
+  bought used with under 50,000 miles) and returns its break-even against the
+  plan's comparison (the gas vehicle if chosen, else keeping what you have),
+  plus the one fit caveat worth knowing (tight luggage, winter range, charging
+  stops on the longest trip).
+- Results card "Shopping used? These fit your household": filter chips by body
+  style (defaulting to the style you're trying); rows best-first — models that
+  win at any price below new (cheapest first), then the highest "up to $X" —
+  each with its new price for reference; and "Plan with a used one" — which switches
+  step 3 to that model, used, waiting for the listing price. One model per
+  trim family; cargo vans and the model you're already trying are left out.
+
+**Not in scope:** used prices, listings, or model years.
+
+**Tests:** every listed model fits (e.g. a 5,000-lb tow trip only lists
+vehicles that tow it); planning a listed model used at its number ties the
+comparison.
+
 ### v2.0 — Business Mode Toggle
 
 - Top-of-page toggle: Residential / Business

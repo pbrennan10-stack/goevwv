@@ -13,18 +13,20 @@ const MILES_PREFILL: Record<MilesAnswer, number> = {
 
 export type FitCheckResult = {
   charging: "yes" | "no" | "unsure";
+  work: "free" | "paid" | "no";
   miles: "under40" | "40-80" | "over80";
   trips: "rarely" | "routine" | "varied";
-  verdict: "fit" | "likely" | "maybe" | "notyet";
+  verdict: "fit" | "likely" | "work" | "maybe" | "notyet";
   hasHomeCharging: boolean;
 };
 
 type ChargingAnswer = "yes" | "no" | "unsure";
+type WorkAnswer = "free" | "paid" | "no";
 type MilesAnswer = "under40" | "40-80" | "over80";
 type TripsAnswer = "rarely" | "routine" | "varied";
-type Verdict = "fit" | "likely" | "maybe" | "notyet";
+type Verdict = "fit" | "likely" | "work" | "maybe" | "notyet";
 
-function computeVerdict(charging: ChargingAnswer, miles: MilesAnswer, trips: TripsAnswer): Verdict {
+function computeVerdict(charging: ChargingAnswer, work: WorkAnswer, miles: MilesAnswer, trips: TripsAnswer): Verdict {
   if (charging === "yes") {
     if (miles === "under40") return "fit";
     if (miles === "40-80") {
@@ -40,6 +42,9 @@ function computeVerdict(charging: ChargingAnswer, miles: MilesAnswer, trips: Tri
     if (trips === "varied") return "maybe";
     return "likely";
   }
+  // No home charging, but you could plug in at work: workdays are covered;
+  // days off are the catch. The detail explains it.
+  if (work !== "no") return "work";
   // no or unsure — treat both conservatively
   if (miles === "under40" && trips === "rarely") return "maybe";
   return "notyet";
@@ -55,6 +60,11 @@ const VERDICT_UI: Record<Verdict, { icon: string; heading: string; color: string
     icon: "✅",
     heading: "Good fit — check winter range",
     color: "bg-green-50 ring-1 ring-green-200",
+  },
+  work: {
+    icon: "⚠️",
+    heading: "Could work — charging at work stands in for home",
+    color: "bg-amber-50 ring-1 ring-amber-200",
   },
   maybe: {
     icon: "⚠️",
@@ -122,14 +132,36 @@ function LowMileageNote() {
   );
 }
 
+// Free charging at work changes the money side more than anything else we ask
+// about, so it gets its own note (and replaces the low-mileage economics note).
+function FreeWorkChargingNote() {
+  return (
+    <div className="rounded-lg bg-brand-bg ring-1 ring-brand/30 p-3 text-sm text-ink">
+      <p>
+        <strong className="text-brand-dark">Free charging at work is a big deal:</strong> most of your weekday
+        miles would cost nothing to fuel. Perks can change, so it&rsquo;s worth asking how long your employer
+        plans to offer it. The{" "}
+        <Link href="/plan" className="font-semibold underline hover:text-brand-dark">
+          household planner
+        </Link>{" "}
+        counts it — set &ldquo;Can you charge at work?&rdquo; for your commute.
+      </p>
+    </div>
+  );
+}
+
 function VerdictDetail({
   verdict,
   charging,
+  work,
+  miles,
   trips,
   level2InstalledUsd,
 }: {
   verdict: Verdict;
   charging: ChargingAnswer;
+  work: WorkAnswer;
+  miles: MilesAnswer;
   trips: TripsAnswer;
   level2InstalledUsd: number;
 }) {
@@ -169,6 +201,28 @@ function VerdictDetail({
       </p>
     );
   }
+  if (verdict === "work") {
+    return (
+      <div className="text-sm text-ink-muted space-y-2">
+        <p>
+          Charging at work can stand in for charging at home: plug in on workdays and your commute is
+          covered{work === "free" ? " — and fueled for free" : ""}. The catch is days off. Weekends,
+          vacations, and snow days mean topping up at a public charger now and then, or at any regular
+          outlet you can use (it adds 3–5 miles an hour).
+        </p>
+        {trips === "varied" && (
+          <p>
+            Long trips to new places add public fast-charging stops on top of that
+            {miles === "over80" ? " — a plug-in hybrid avoids both problems: electric on workdays, gas for the rest." : "."}
+          </p>
+        )}
+        <p>
+          Ask exactly what your employer offers: a Level 2 charger adds about 20–30 miles an hour, enough
+          to cover a long commute over a workday; a regular outlet adds only 3–5.
+        </p>
+      </div>
+    );
+  }
   if (verdict === "maybe" && charging === "yes") {
     return (
       <p className="text-sm text-ink-muted">
@@ -196,6 +250,10 @@ function VerdictDetail({
           ~20 miles of range per hour and changes the picture significantly. Even a standard
           120V outlet adds 3–5 mi/hr overnight and is enough for a short daily drive.
         </p>
+        <p>
+          <strong>Ask about charging at work, too.</strong> Some employers let staff plug in, often
+          free, and that can stand in for charging at home on workdays.
+        </p>
       </div>
     );
   }
@@ -212,6 +270,11 @@ function VerdictDetail({
         The federal NEVI program allocated $45.7M to WV for new highway fast-charging stations,
         with the first estimated for 2027–2028. Until then, plan around today&rsquo;s network —
         check back as infrastructure improves.
+      </p>
+      <p>
+        <strong className="text-ink">Ask about charging at work.</strong> Some employers let staff plug in —
+        often free, since the electricity costs them little. Plugging in on workdays can stand in for
+        charging at home.
       </p>
       <div className="space-y-1">
         <p className="font-medium text-ink">Three home-charging tiers, cheapest first:</p>
@@ -245,15 +308,17 @@ function VerdictDetail({
 export function FitCheck({ level2InstalledUsd }: { level2InstalledUsd: number }) {
   const [step, setStep] = useState(0);
   const [charging, setCharging] = useState<ChargingAnswer | null>(null);
+  const [work, setWork] = useState<WorkAnswer | null>(null);
   const [miles, setMiles] = useState<MilesAnswer | null>(null);
   const [trips, setTrips] = useState<TripsAnswer | null>(null);
 
-  const verdict = charging && miles && trips ? computeVerdict(charging, miles, trips) : null;
+  const verdict = charging && work && miles && trips ? computeVerdict(charging, work, miles, trips) : null;
   const ui = verdict ? VERDICT_UI[verdict] : null;
 
   function reset() {
     setStep(0);
     setCharging(null);
+    setWork(null);
     setMiles(null);
     setTrips(null);
   }
@@ -261,7 +326,7 @@ export function FitCheck({ level2InstalledUsd }: { level2InstalledUsd: number })
   return (
     <section id="fit-check" aria-labelledby="fit-check-title" className="rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 p-5 sm:p-7 mb-8">
       <h2 id="fit-check-title" className="text-lg font-semibold text-ink mb-1">Does an EV fit your life?</h2>
-      <p className="text-sm text-ink-soft mb-5">3 questions. Honest, WV-specific answer.</p>
+      <p className="text-sm text-ink-soft mb-5">4 questions. Honest, WV-specific answer.</p>
 
       {step === 0 && (
         <div>
@@ -294,9 +359,41 @@ export function FitCheck({ level2InstalledUsd }: { level2InstalledUsd: number })
 
       {step === 1 && (
         <div>
-          <p className="text-xs text-ink-soft mb-3">Question 1 of 3 answered</p>
+          <p className="text-xs text-ink-soft mb-3">Question 1 of 4 answered</p>
+          <p className="text-sm font-medium text-ink mb-3">2. Could you plug in at work?</p>
+          <p className="text-xs text-ink-soft mb-3">
+            Some employers let staff charge, often free — the electricity costs them little. Not sure?
+            Ask HR or facilities.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-2">
+            {(
+              [
+                ["free", "Yes — and it's free"],
+                ["paid", "Yes — I'd pay for it"],
+                ["no", "No, or not sure"],
+              ] as const
+            ).map(([val, label]) => (
+              <button
+                key={val}
+                type="button"
+                onClick={() => {
+                  setWork(val);
+                  setStep(2);
+                }}
+                className="flex-1 rounded-xl border border-slate-200 bg-white hover:border-brand hover:bg-brand-bg px-4 py-3 text-sm text-ink text-left transition"
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {step === 2 && (
+        <div>
+          <p className="text-xs text-ink-soft mb-3">Questions 1–2 of 4 answered</p>
           <p className="text-sm font-medium text-ink mb-3">
-            2. What&rsquo;s your typical daily round-trip? (home to wherever you go most days, and
+            3. What&rsquo;s your typical daily round-trip? (home to wherever you go most days, and
             back)
           </p>
           <div className="flex flex-col sm:flex-row gap-2">
@@ -312,7 +409,7 @@ export function FitCheck({ level2InstalledUsd }: { level2InstalledUsd: number })
                 type="button"
                 onClick={() => {
                   setMiles(val);
-                  setStep(2);
+                  setStep(3);
                 }}
                 className="flex-1 rounded-xl border border-slate-200 bg-white hover:border-brand hover:bg-brand-bg px-4 py-3 text-sm text-ink text-left transition"
               >
@@ -323,11 +420,11 @@ export function FitCheck({ level2InstalledUsd }: { level2InstalledUsd: number })
         </div>
       )}
 
-      {step === 2 && (
+      {step === 3 && (
         <div>
-          <p className="text-xs text-ink-soft mb-3">Questions 1–2 of 3 answered</p>
+          <p className="text-xs text-ink-soft mb-3">Questions 1–3 of 4 answered</p>
           <p className="text-sm font-medium text-ink mb-3">
-            3. When you take long drives (150+ mi one-way — WV → Pittsburgh, DC, Charlotte,
+            4. When you take long drives (150+ mi one-way — WV → Pittsburgh, DC, Charlotte,
             Columbus), what&rsquo;s the pattern?
           </p>
           <p className="text-xs text-ink-soft mb-3">
@@ -347,7 +444,7 @@ export function FitCheck({ level2InstalledUsd }: { level2InstalledUsd: number })
                 type="button"
                 onClick={() => {
                   setTrips(val);
-                  setStep(3);
+                  setStep(4);
                 }}
                 className="flex-1 rounded-xl border border-slate-200 bg-white hover:border-brand hover:bg-brand-bg px-4 py-3 text-sm text-ink text-left transition"
               >
@@ -358,7 +455,7 @@ export function FitCheck({ level2InstalledUsd }: { level2InstalledUsd: number })
         </div>
       )}
 
-      {step === 3 && verdict && ui && charging && miles && trips && (
+      {step === 4 && verdict && ui && charging && work && miles && trips && (
         <div className={`rounded-xl p-4 ${ui.color}`}>
           <div className="flex items-center gap-2 mb-3">
             <span className="text-xl" aria-hidden="true">
@@ -367,8 +464,9 @@ export function FitCheck({ level2InstalledUsd }: { level2InstalledUsd: number })
             <span className="font-semibold text-ink text-base">{ui.heading}</span>
           </div>
           <div className="mb-4 space-y-3">
-            <VerdictDetail verdict={verdict} charging={charging} trips={trips} level2InstalledUsd={level2InstalledUsd} />
-            {miles === "under40" && verdict !== "notyet" && <LowMileageNote />}
+            <VerdictDetail verdict={verdict} charging={charging} work={work} miles={miles} trips={trips} level2InstalledUsd={level2InstalledUsd} />
+            {work === "free" && <FreeWorkChargingNote />}
+            {miles === "under40" && verdict !== "notyet" && work !== "free" && <LowMileageNote />}
             {verdict !== "notyet" &&
               ((miles === "under40" && (trips === "routine" || trips === "varied")) ||
                 (miles === "40-80" && trips === "varied")) && <PhevSuggestionNote />}
@@ -386,10 +484,17 @@ export function FitCheck({ level2InstalledUsd }: { level2InstalledUsd: number })
               savings, and 5-year running costs.
             </span>
           </div>
+          {work !== "no" && (
+            <p className="mt-3 text-sm">
+              <Link href="/plan" className="font-semibold text-brand-dark hover:underline">
+                Count charging at work in the household planner →
+              </Link>
+            </p>
+          )}
 
           <div className="text-xs text-ink-muted border-t border-slate-200 pt-3 mt-4">
             <span className="font-medium">Your answers:</span> Home charging:{" "}
-            <strong>{charging}</strong> · Daily miles: <strong>{miles}</strong> · Long trips:{" "}
+            <strong>{charging}</strong> · At work: <strong>{work}</strong> · Daily miles: <strong>{miles}</strong> · Long trips:{" "}
             <strong>{trips}</strong>
             <button
               type="button"

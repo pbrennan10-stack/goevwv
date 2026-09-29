@@ -50,7 +50,7 @@ export default function HomePage() {
           </div>
           <div className="flex flex-col gap-3">
             <a href="#fit-check" className="inline-flex items-center justify-center rounded-xl bg-brand hover:bg-brand-dark text-white font-semibold px-5 py-3 transition shadow-sm">
-              Take the 3-question fit check ↓
+              Take the 4-question fit check ↓
             </a>
             <Link href="/plan" className="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white hover:border-brand text-ink font-semibold px-5 py-3 transition">
               Plan your whole household →

@@ -827,6 +827,14 @@ export default function StateOfTheDataPage() {
               confidence="approximate"
               notes="A used vehicle (typically 2–4 years old) is past the steepest part of the drop. Used when you plan with the price of a used vehicle you found — the EV to try or the gas vehicle to compare — and for the 'what would a used one need to cost?' answer. Both use the same math, so the two agree. We don't track or guess used prices: you enter the price. A used vehicle is insured at its price, and its upkeep uses the same mileage multipliers as the vehicles you own. This is a single estimate, not a low/middle/high range."
             />
+            <SourceRow
+              label="Charging at work"
+              value="Free = $0; paid = your utility's standard residential rate"
+              source="Assumption — you tell the planner whether you can charge at work and whether it's free; we don't track employer prices"
+              retrieved="2026-09-29"
+              confidence="approximate"
+              notes="Applies to each driver's commute when you set it in the planner. One Level 2 session over a workday (about 20–30 miles of range an hour) covers the round trip, so the commute's electricity is priced at work; if an off-peak home rate is cheaper, we use that instead. A plug-in hybrid charged at work gets one battery's worth a workday there, plus a second from home when it can charge there too. Errands, road trips, and days off still charge at home (or at public chargers without home charging). Employers that charge usually charge about cost; a regular 120V outlet at work adds only 3–5 miles an hour and isn't modeled."
+            />
           </Section>
 
           <Section

@@ -39,6 +39,9 @@ import type { Capability, FederalData, IceVehicle, Utility, Vehicle } from "./ty
 export type ResaleScenario = "low" | "mid" | "high";
 export type OdometerBand = "under_50k" | "50k_100k" | "over_100k";
 export type HomeCharging = "auto" | "l1" | "l2" | "none";
+// Charging at work, per commuting driver: free, or paid at about the utility's
+// standard rate. We don't guess employer prices.
+export type WorkCharging = "none" | "free" | "paid";
 
 type Range3 = { low: number; mid: number; high: number };
 
@@ -78,6 +81,7 @@ export interface DriverInput {
   id: number;
   commuteOneWayMi: number; // 0 = no commute
   daysPerWeek: number;
+  workCharging?: WorkCharging; // default "none"
 }
 
 export interface TripInput {
@@ -191,6 +195,7 @@ export interface Use {
   people: number;
   luggageCuFt: number;
   towLbs: number;
+  workCharging?: WorkCharging; // commutes only
 }
 
 export function buildUses(h: HouseholdInput): Use[] {
@@ -202,6 +207,7 @@ export function buildUses(h: HouseholdInput): Use[] {
       id: `commute-${d.id}`, label: `Driver ${i + 1} commute`, kind: "daily",
       miles: d.commuteOneWayMi * 2 * days, roundTripMi: d.commuteOneWayMi * 2,
       timesPerYear: days, oneWayMi: d.commuteOneWayMi, people: 1, luggageCuFt: 0, towLbs: 0,
+      workCharging: d.workCharging ?? "none",
     });
   });
   if (h.errandsMiPerWeek > 0) {
@@ -287,6 +293,7 @@ export function fit(u: Unit, use: Use, years = 0): Fit {
 
 interface Rates {
   homeRate: number;          // $/kWh at home (or at public chargers if no home charging)
+  workRate: number;          // $/kWh when paying to charge at work: the utility's standard rate
   meterAnnualUsd: number;
   elecMult: number;          // average electricity price rise over the period
   gasPrice: number;
@@ -319,6 +326,10 @@ export function energyCost(u: Unit, use: Use, r: Rates, fed: FederalData): numbe
   const kwhPerMi = (blendedKwhPer100mi(v, hwyFrac, 55) / 100) * winter;
   const publicRate = dcfcRateFor(v, fed) * r.elecMult;
   const home = r.noHomeCharging ? publicRate : r.homeRate;
+  // A commute you can charge at work: free, or the standard rate — a Level 2
+  // session over a workday covers the round trip. Where charging at home is
+  // cheaper (an off-peak rate), that's what you'd use.
+  const atWork = use.workCharging === "free" ? 0 : use.workCharging === "paid" ? r.workRate : null;
   if (u.pt === "bev") {
     if (use.kind === "trip") {
       let hwy = v.highway_range_mi ?? Math.round((v.epa_range_mi ?? 200) * 0.8);
@@ -329,11 +340,23 @@ export function energyCost(u: Unit, use: Use, r: Rates, fed: FederalData): numbe
       const homeMi = use.miles - dcfcMi;
       return (homeMi * home + dcfcMi * publicRate) * kwhPerMi * towMult;
     }
-    return use.miles * kwhPerMi * home;
+    return use.miles * kwhPerMi * (atWork == null ? home : Math.min(atWork, home));
   }
   // PHEV: electric until the battery is empty each day / each trip, then gas.
   // One full battery per day or per trip (PHEV owners rarely charge on the road).
   const eRange = (v.epa_range_mi_electric ?? 0) / winter;
+  if (atWork != null) {
+    // Charging at work adds a battery's worth each workday — a second one on
+    // top of home charging, or the only one without it. The cheaper place
+    // fills the first battery.
+    const both = !r.noHomeCharging;
+    const cheap = both ? Math.min(atWork, home) : atWork;
+    const firstMi = Math.min(use.miles, Math.min(use.roundTripMi, eRange) * use.timesPerYear);
+    const secondEach = both ? Math.min(Math.max(0, use.roundTripMi - eRange), eRange) : 0;
+    const secondMi = Math.min(use.miles - firstMi, secondEach * use.timesPerYear);
+    const gasMi = use.miles - firstMi - secondMi;
+    return (firstMi * cheap + secondMi * Math.max(atWork, home)) * kwhPerMi + (gasMi / u.mpg) * gasWinterMult(u) * r.gasPrice;
+  }
   const eMiEach = Math.min(use.roundTripMi, eRange);
   const eMi = Math.min(use.miles, eMiEach * use.timesPerYear);
   const gasMi = use.miles - eMi;
@@ -511,7 +534,8 @@ export function runScenario(units: Unit[], uses: Use[], h: HouseholdInput, cat: 
   const ownsPlugIn = units.some((u) => !u.isNew && u.pt !== "gas");
   const charging = newPlugIn || ownsPlugIn ? resolveHomeCharging(h, uses, cat, ownsPlugIn) : null;
   const rates: Rates = {
-    homeRate: rate * elecMult, meterAnnualUsd, elecMult, gasPrice: h.gasPrice,
+    homeRate: rate * elecMult, workRate: utility.residential.flat_rate_per_kwh * elecMult,
+    meterAnnualUsd, elecMult, gasPrice: h.gasPrice,
     noHomeCharging: charging?.mode === "none",
   };
   const assignment = assign(units, uses, rates, opts.overrides, Y, cat.fed);
@@ -666,6 +690,76 @@ export function planHousehold(h: HouseholdInput, cat: Catalog): PlanResult {
       high: { plan: hi.ev?.result.totalOverPeriod ?? null, gasAlt: hi.gas?.result.totalOverPeriod ?? null },
     },
   };
+}
+
+// ---------- Used shopping list ----------
+
+export interface UsedShoppingRow {
+  vehicle: Vehicle;
+  newPrice: number;            // list price new (last listed, if it's no longer sold new)
+  maxUsedPrice: number | null; // most a used one could cost and still tie; null = not even free
+  note: string | null;         // the one fit caveat worth knowing, if any
+}
+
+// One model per trim family (its primary trim), no cargo vans, and not the
+// EV already being tried.
+export function shoppingModels(cat: Catalog, tryingRef: string | null): Vehicle[] {
+  const trying = cat.evs.find((v) => `ev:${v.id}` === tryingRef);
+  const seen = new Set<string>();
+  const primaryFirst = [...cat.evs].sort((a, b) => Number(!!b.variant_primary) - Number(!!a.variant_primary));
+  const out: Vehicle[] = [];
+  for (const v of primaryFirst) {
+    if (v.class === "van") continue;
+    if (trying && (v.id === trying.id || (!!v.variant_group && v.variant_group === trying.variant_group))) continue;
+    if (v.variant_group) {
+      if (seen.has(v.variant_group)) continue;
+      seen.add(v.variant_group);
+    }
+    out.push(v);
+  }
+  return out;
+}
+
+// The caveat to show next to a model: a tight fit first, else the charging
+// stops on the longest trip it would take.
+function fitNote(unit: Unit, r: ScenarioResult, uses: Use[], years: number): string | null {
+  const mine = uses.filter((u) => r.assignment[u.id] === unit.key).map((u) => ({ u, f: fit(unit, u, years) }));
+  const tight = mine.find((x) => x.f.level === "tight");
+  if (tight) return `${tight.u.label}: ${tight.f.text}`;
+  const longest = mine.filter((x) => (x.f.dcfcStopsEachWay ?? 0) > 0).sort((a, b) => b.u.oneWayMi - a.u.oneWayMi)[0];
+  if (!longest) return null;
+  const n = longest.f.dcfcStopsEachWay ?? 0;
+  return `${longest.u.label}: ${n} fast-charging stop${n > 1 ? "s" : ""} each way`;
+}
+
+// "Which used EVs would work for us, and what could we pay?" Each model takes
+// the place of the EV being tried (same replaced vehicle, same drives), bought
+// used with under 50,000 miles. Models that can't do every drive are counted,
+// not listed. For the rest: the most a used one could cost and still come out
+// ahead of the plan's comparison (the gas vehicle if chosen, else keeping what
+// you have) — usedBreakEvenPrice, so planning a model at its number is a tie.
+// No used prices are tracked; the visitor holds these up against listings.
+export function usedShoppingList(h: HouseholdInput, cat: Catalog, models: Vehicle[]): { rows: UsedShoppingRow[]; cantFit: number } {
+  if (!h.candidate) return { rows: [], cantFit: 0 };
+  const uses = buildUses(h);
+  const scenario = h.resaleScenario ?? "mid";
+  const main = runAll(h, cat, uses, scenario);
+  const target = (main.gas?.result ?? main.today).totalOverPeriod;
+  const sold = h.candidate.replaces;
+  const kept = main.ownedUnits.filter((u) => u.key !== sold);
+  const rows: UsedShoppingRow[] = [];
+  let cantFit = 0;
+  for (const v of models) {
+    const ref = `ev:${v.id}`;
+    const unit = resolveUnit(ref, "new", cat, undefined, true, "under_50k");
+    if (!unit) continue;
+    const newPrice = newVehiclePrice(unit);
+    const hh: HouseholdInput = { ...h, candidate: { ref, price: newPrice, replaces: sold, used: { odometer: "under_50k" } }, overrides: {} };
+    const r = runScenario([...kept, unit], uses, hh, cat, { owned: h.owned, scenario, overrides: {}, soldKey: sold, candidatePrice: newPrice });
+    if (r.unassigned.length) { cantFit++; continue; }
+    rows.push({ vehicle: v, newPrice, maxUsedPrice: usedBreakEvenPrice(r, target, hh, cat), note: fitNote(unit, r, uses, h.years) });
+  }
+  return { rows, cantFit };
 }
 
 // ---------- Tipping points ----------

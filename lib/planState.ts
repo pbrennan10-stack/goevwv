@@ -1,7 +1,7 @@
 // Shared shape of a household plan, its presets, and how it's encoded in a
 // shareable URL (?h=…). Used by the planner (components/HouseholdPlanner.tsx).
 
-import type { Catalog, HomeCharging, OdometerBand, TripInput } from "./household";
+import type { Catalog, HomeCharging, OdometerBand, TripInput, WorkCharging } from "./household";
 
 // ---------- Presets ----------
 
@@ -28,7 +28,7 @@ export interface PlanState {
   candRef: string;
   priceOverride: number | null;
   replaces: string | null;
-  drivers: { id: number; commuteOneWayMi: number; daysPerWeek: number }[];
+  drivers: { id: number; commuteOneWayMi: number; daysPerWeek: number; workCharging?: WorkCharging }[];
   errandsMiPerWeek: number;
   errandsPeople: number;
   trips: TripPreset[];
@@ -61,6 +61,13 @@ export const ODOMETER_OPTIONS: { v: OdometerBand; label: string }[] = [
   { v: "under_50k", label: "Under 50,000" },
   { v: "50k_100k", label: "50,000–100,000" },
   { v: "over_100k", label: "Over 100,000" },
+];
+
+// Free, or about what you'd pay at home — we don't guess employer prices.
+export const WORK_CHARGING_OPTIONS: { v: WorkCharging; label: string }[] = [
+  { v: "none", label: "No, or not sure" },
+  { v: "free", label: "Yes — free" },
+  { v: "paid", label: "Yes — I'd pay about my home rate" },
 ];
 
 export const CHARGING_OPTIONS: { v: HomeCharging; label: string }[] = [
@@ -145,7 +152,13 @@ export function sanitizeLoaded(raw: Partial<PlanState> | null, cat: Catalog): Pa
   }
   if (refOk(raw.candRef) && String(raw.candRef).startsWith("ev:")) out.candRef = raw.candRef;
   if (Array.isArray(raw.drivers)) {
-    const drivers = raw.drivers.filter((d) => d && num(d.id, 0, 1e6) && num(d.commuteOneWayMi, 0, 500) && num(d.daysPerWeek, 0, 7)).slice(0, 4);
+    const drivers = raw.drivers
+      .filter((d) => d && num(d.id, 0, 1e6) && num(d.commuteOneWayMi, 0, 500) && num(d.daysPerWeek, 0, 7))
+      .slice(0, 4)
+      .map((d) => ({
+        id: d.id, commuteOneWayMi: d.commuteOneWayMi, daysPerWeek: d.daysPerWeek,
+        ...(WORK_CHARGING_OPTIONS.some((o) => o.v === d.workCharging) ? { workCharging: d.workCharging } : {}),
+      }));
     if (drivers.length) out.drivers = drivers;
   }
   if (Array.isArray(raw.trips)) {
