@@ -43,7 +43,19 @@ export interface PlanState {
   gasRef: string | null;
   gasPriceOverride: number | null;
   homeCharging: HomeCharging;
+  // Buying used instead of new (null = new). The price is the one you found —
+  // null until you type it, because we never guess used prices.
+  candUsed: UsedPick | null;
+  gasUsed: UsedPick | null;
 }
+
+export interface UsedPick {
+  price: number | null;
+  odometer: OdometerBand;
+}
+
+// A used vehicle is typically 2–4 years old, so the mileage starts low.
+export const DEFAULT_USED_PICK: UsedPick = { price: null, odometer: "under_50k" };
 
 export const ODOMETER_OPTIONS: { v: OdometerBand; label: string }[] = [
   { v: "under_50k", label: "Under 50,000" },
@@ -84,6 +96,8 @@ export function initialState(cat: Catalog): PlanState {
     gasRef: "auto",
     gasPriceOverride: null,
     homeCharging: "auto",
+    candUsed: null,
+    gasUsed: null,
   };
 }
 
@@ -149,6 +163,13 @@ export function sanitizeLoaded(raw: Partial<PlanState> | null, cat: Catalog): Pa
   if (raw.replaces === null || (typeof raw.replaces === "string" && (out.owned ?? []).some((o) => o.key === raw.replaces))) out.replaces = raw.replaces;
   if (raw.gasRef === null || raw.gasRef === "auto" || refOk(raw.gasRef)) out.gasRef = raw.gasRef;
   if (raw.homeCharging && ["auto", "l1", "l2", "none"].includes(raw.homeCharging)) out.homeCharging = raw.homeCharging;
+  for (const k of ["candUsed", "gasUsed"] as const) {
+    const u = raw[k];
+    if (u === null) out[k] = null;
+    else if (u && typeof u === "object" && ODOMETER_OPTIONS.some((o) => o.v === u.odometer) && (u.price === null || num(u.price, 1, 1e6))) {
+      out[k] = { price: u.price, odometer: u.odometer };
+    }
+  }
   if (raw.overrides && typeof raw.overrides === "object") out.overrides = Object.fromEntries(Object.entries(raw.overrides).filter(([a, b]) => typeof a === "string" && typeof b === "string"));
   return Object.keys(out).length ? out : null;
 }

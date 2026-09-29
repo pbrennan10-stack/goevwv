@@ -228,6 +228,57 @@ scope:
 - **Optional Decap CMS admin** at `/admin` for YAML-averse editing (still a good
   idea, deferred but tracked)
 
+### Household planner — plan with a used vehicle's real price (shipped Sept 29, 2026)
+
+**The ask.** A visitor wanted to type in the price of a used vehicle they found
+and have `/plan` use it. Until now the planner only worked backward ("a used one
+would need to cost $X or less") and always planned a new purchase.
+
+**Mindset.**
+
+- Used-EV shoppers get the same math and transparency as new buyers (goal 4,
+  the Marcus persona).
+- We still don't track or guess used prices — they vary too much by year,
+  miles, and battery health. The visitor brings the price of the one they
+  found; until they enter it, the planner doesn't pretend to know.
+- Same rules on both sides (Sept 27 fairness review): if the EV can be bought
+  used, so can the gas vehicle it's compared with. A used EV against a new gas
+  car is allowed, but the page points out the mismatch.
+- One source of truth: buying used uses exactly the assumptions of the
+  existing used break-even, so entering the break-even price produces a tie
+  (tested). No new data, constants, or dependencies.
+
+**Design.**
+
+- Step 3 gets a **New / Used** choice for the vehicle you'd try and for the gas
+  vehicle you compare with. Used asks for the price you'd pay (blank until you
+  type it) and about how many miles are on it (the same bands as the vehicles
+  you own). Models no longer sold new (Polestar 2, Nissan Ariya, …) appear in
+  the list when Used is picked. Changing the model clears the used price.
+- Until a used price is entered, the plan waits for it instead of showing a
+  new-car answer.
+- Results say "used" wherever it applies. The "Buying a used … instead?" card
+  keeps the break-even prices and adds **"Found one for sale?"** — entering a
+  price there switches the plan to that used vehicle. In used mode the card
+  shows the same thresholds next to your price, plus a way back to new.
+- Math for a vehicle bought used (`lib/household.ts`): the price you pay + WV
+  6% sales tax after trade-in + title + home charger (plug-ins) − resale, where
+  resale = price × (1 − `used_vehicle_annual_depreciation`)^years (12% a year,
+  `data/ownership.yaml`). Insurance is based on its price; maintenance uses the
+  mileage multipliers already applied to vehicles you own; energy and trip fit
+  are the same as new (battery fade included).
+- Our used-vehicle depreciation is a single estimate, so in used mode the
+  three-way resale box and the new-car resale slider give way to a plain note
+  about that assumption. The gas-price tipping point still shows.
+- State lives in the `?h=` share link (validated like every other field).
+
+**Not in scope:** used-price lookups or defaults, model-year input,
+battery-health adjustments (the page tells you to get a battery report), and
+financing.
+
+**Tests:** a used purchase at the break-even price ties the target; used-purchase
+tax, resale, insurance and mileage-based upkeep; share-link round trip.
+
 ### v2.0 — Business Mode Toggle
 
 - Top-of-page toggle: Residential / Business

@@ -780,7 +780,7 @@ export default function StateOfTheDataPage() {
 
           <Section
             title="Household planner: purchase price and resale"
-            summary="WV sales tax, how much new vehicles keep of their value, and what your current vehicles lose — used by the /plan household planner."
+            summary="WV sales tax, how much new vehicles keep of their value, and what your current vehicles and a used one you'd buy lose — used by the /plan household planner."
           >
             <SourceRow
               label="WV motor vehicle sales tax"
@@ -817,6 +817,15 @@ export default function StateOfTheDataPage() {
               retrieved="2026-09-27"
               confidence="approximate"
               notes="Midpoint of KBB's range; older, high-mileage cars lose value more slowly. The planner asks you what your car is worth today — your own number beats any estimate."
+            />
+            <SourceRow
+              label="What a used vehicle you'd buy loses per year"
+              value={`~${Math.round(own.used_vehicle_annual_depreciation * 100)}% of what you pay, each year`}
+              source="Our estimate: between Kelley Blue Book's 8–12% for older cars and the ~16% a year implied by new-EV 5-year resale"
+              sourceUrl="https://www.kbb.com/car-advice/how-to-beat-car-depreciation/"
+              retrieved="2026-09-27"
+              confidence="approximate"
+              notes="A used vehicle (typically 2–4 years old) is past the steepest part of the drop. Used when you plan with the price of a used vehicle you found — the EV to try or the gas vehicle to compare — and for the 'what would a used one need to cost?' answer. Both use the same math, so the two agree. We don't track or guess used prices: you enter the price. A used vehicle is insured at its price, and its upkeep uses the same mileage multipliers as the vehicles you own. This is a single estimate, not a low/middle/high range."
             />
           </Section>
 

@@ -61,10 +61,17 @@ export interface OwnedInput {
   odometer?: OdometerBand; // default 50k–100k
 }
 
+// Buying used instead of new. The price is the one the user found — we never
+// guess used prices — so it arrives as the purchase `price`.
+export interface UsedPurchase {
+  odometer: OdometerBand;
+}
+
 export interface CandidateInput {
   ref: string;            // "ev:<id>" (or "ice:<id>" for a new gas alternative)
   price: number;          // what you'd pay before tax (MSRP + destination by default)
   replaces: string | null; // owned key it replaces, or null = add as another vehicle
+  used?: UsedPurchase | null; // null/absent = bought new
 }
 
 export interface DriverInput {
@@ -86,8 +93,8 @@ export interface TripInput {
 export interface HouseholdInput {
   owned: OwnedInput[];
   candidate: CandidateInput | null;
-  // Optional: the NEW gas vehicle you'd otherwise buy (same "replaces").
-  gasAlternative: { ref: string; price: number } | null;
+  // Optional: the gas vehicle you'd otherwise buy (same "replaces"), new or used.
+  gasAlternative: { ref: string; price: number; used?: UsedPurchase | null } | null;
   drivers: DriverInput[];
   errandsMiPerWeek: number;
   errandsPeople: number;
@@ -121,7 +128,8 @@ export interface Unit {
   name: string;
   short: string;
   pt: Powertrain;
-  isNew: boolean;
+  isNew: boolean;            // bought in this plan (new, or used when usedOdometer is set)
+  usedOdometer?: OdometerBand; // bought used, with about this many miles on it
   hybrid: boolean;           // conventional (non-plug-in) hybrid
   cap: Capability;
   ev?: Vehicle;
@@ -130,15 +138,24 @@ export interface Unit {
   cls: string;
 }
 
-export function resolveUnit(ref: string, key: string, cat: Catalog, mpgOverride?: number, isNew = false): Unit | null {
+// Short display name: the model, or make + model when the model is only a
+// number ("Polestar 2" and "Ram 1500", not "2" and "1500").
+export function shortName(v: { make: string; model: string }): string {
+  return /^\d+$/.test(v.model.trim()) ? `${v.make} ${v.model}` : v.model;
+}
+
+export function resolveUnit(ref: string, key: string, cat: Catalog, mpgOverride?: number, isNew = false, usedOdometer?: OdometerBand): Unit | null {
   const [kind, id] = ref.split(":");
+  // A used one's model year isn't known, so its name leaves the year off.
+  const usedBand = isNew ? usedOdometer : undefined;
+  const used = usedBand ? { usedOdometer: usedBand } : {};
   if (kind === "ev") {
     const v = cat.evs.find((x) => x.id === id);
     if (!v) return null;
     return {
-      key, isNew, ev: v, cap: v, cls: v.class, hybrid: false,
-      name: `${v.year} ${v.make} ${v.model}${v.trim ? ` ${v.trim}` : ""}`,
-      short: `${v.model}`,
+      key, isNew, ...used, ev: v, cap: v, cls: v.class, hybrid: false,
+      name: `${usedBand ? "" : `${v.year} `}${v.make} ${v.model}${v.trim ? ` ${v.trim}` : ""}`,
+      short: shortName(v),
       pt: v.powertrain === "phev" ? "phev" : "bev",
       mpg: v.efficiency_mpg_hybrid ?? 35,
     };
@@ -151,9 +168,9 @@ export function resolveUnit(ref: string, key: string, cat: Catalog, mpgOverride?
     const trim = isNew && v.new_trim ? v.new_trim : v.trim;
     const baseMpg = isNew && v.new_mpg_combined ? v.new_mpg_combined : v.mpg_combined;
     return {
-      key, isNew, ice: v, cap, cls: v.class, hybrid: isHybridTrim(trim),
-      name: `${year} ${v.make} ${v.model}${trim ? ` ${trim}` : ""}`,
-      short: v.model,
+      key, isNew, ...used, ice: v, cap, cls: v.class, hybrid: isHybridTrim(trim),
+      name: `${usedBand ? "" : `${year} `}${v.make} ${v.model}${trim ? ` ${trim}` : ""}`,
+      short: shortName(v),
       pt: "gas",
       mpg: mpgOverride && mpgOverride > 0 ? mpgOverride : baseMpg,
     };
@@ -323,10 +340,11 @@ export function energyCost(u: Unit, use: Use, r: Rates, fed: FederalData): numbe
   return eMi * kwhPerMi * home + (gasMi / u.mpg) * gasWinterMult(u) * r.gasPrice;
 }
 
+// Upkeep rises with mileage for vehicles you own and ones you'd buy used.
 function odometerMult(u: Unit, band: OdometerBand | undefined, own: OwnershipAssumptions): number {
-  if (u.isNew) return 1;
+  if (u.isNew && !u.usedOdometer) return 1;
   const table = u.pt === "gas" ? own.owned_maintenance_multiplier.gas : own.owned_maintenance_multiplier.ev;
-  return table[band ?? "50k_100k"] ?? 1;
+  return table[u.usedOdometer ?? band ?? "50k_100k"] ?? 1;
 }
 
 function maintenanceFor(u: Unit, miles: number, band: OdometerBand | undefined, own: OwnershipAssumptions): number {
@@ -382,6 +400,13 @@ export function retentionAfter(r5: number, years: number, own: OwnershipAssumpti
   const first = Math.pow(r5, Math.min(years, 5) / 5);
   const tail = Math.pow(1 - own.older_vehicle_annual_depreciation, Math.max(0, years - 5));
   return first * tail;
+}
+
+// A vehicle bought USED (typically 2–4 years old) is past its steepest drop:
+// it keeps this share of what you paid after `years`. Shared by the used
+// purchase math and usedBreakEvenPrice so the two answers always agree.
+export function usedRetentionAfter(years: number, own: OwnershipAssumptions): number {
+  return Math.pow(1 - own.used_vehicle_annual_depreciation, years);
 }
 
 export function retention5(u: Pick<Unit, "pt" | "cls" | "hybrid">, scenario: ResaleScenario, own: OwnershipAssumptions): number {
@@ -503,7 +528,12 @@ export function runScenario(units: Unit[], uses: Use[], h: HouseholdInput, cat: 
     }
     const ownedIn = opts.owned.find((x) => x.key === unit.key);
     const maintenance = maintenanceFor(unit, miles, ownedIn?.odometer, own);
-    const insurance = insuranceFor(unit, unit.isNew ? null : ownedIn?.valueNow ?? own.default_owned_value_usd);
+    // Premiums scale with value: a new one at list price, a used one at what
+    // you pay for it, one you own at what it's worth.
+    const insuredValue = unit.isNew
+      ? (unit.usedOdometer ? opts.candidatePrice : null)
+      : ownedIn?.valueNow ?? own.default_owned_value_usd;
+    const insurance = insuranceFor(unit, insuredValue);
     const registration = registrationFor(unit, cat.fed);
     const runningPerYear = energy + maintenance + insurance + registration;
 
@@ -515,16 +545,23 @@ export function runScenario(units: Unit[], uses: Use[], h: HouseholdInput, cat: 
       const tradeIn = opts.soldKey ? opts.owned.find((o) => o.key === opts.soldKey)?.valueNow ?? 0 : 0;
       const taxBase = own.wv_purchase_tax.trade_in_reduces_base ? Math.max(0, price - tradeIn) : price;
       const tax = taxBase * own.wv_purchase_tax.rate + own.wv_purchase_tax.title_fee_usd;
-      // Resale is measured against LIST price (that's how retention studies
-      // work) — a discount you negotiate lowers what you pay, not what the car
-      // is worth later. The user's resale slider applies to plug-ins only.
-      const r5 = unit.pt !== "gas" && h.retention5yOverride != null ? h.retention5yOverride : retention5(unit, opts.scenario, own);
-      const resale = list * retentionAfter(r5, Y, own);
+      // New: resale is measured against LIST price (that's how retention
+      // studies work) — a discount you negotiate lowers what you pay, not what
+      // the car is worth later. The user's resale slider applies to new
+      // plug-ins only. Used: it loses the used rate from what you pay.
+      let resale: number;
+      if (unit.usedOdometer) {
+        resale = price * usedRetentionAfter(Y, own);
+      } else {
+        const r5 = unit.pt !== "gas" && h.retention5yOverride != null ? h.retention5yOverride : retention5(unit, opts.scenario, own);
+        resale = list * retentionAfter(r5, Y, own);
+      }
       const setup = unit.pt !== "gas" && charging ? charging.setupUsd : 0;
       capitalOverPeriod = price + tax + setup - resale;
       upfrontCash = price + tax + setup - tradeIn;
       const $ = (n: number) => `$${Math.round(n).toLocaleString("en-US")}`;
-      capitalNote = `${$(price)}${destinationIsEstimated(unit) ? " (destination fee estimated)" : ""} + ${$(tax)} tax & title${setup ? ` + ${$(setup)} home charger` : ""} − ~${$(resale)} resale after ${Y} yr`;
+      const priceNote = unit.usedOdometer ? " used" : destinationIsEstimated(unit) ? " (destination fee estimated)" : "";
+      capitalNote = `${$(price)}${priceNote} + ${$(tax)} tax & title${setup ? ` + ${$(setup)} home charger` : ""} − ~${$(resale)} resale after ${Y} yr`;
     } else {
       const value = ownedIn?.valueNow ?? own.default_owned_value_usd;
       const later = value * Math.pow(1 - own.older_vehicle_annual_depreciation, Y);
@@ -554,9 +591,11 @@ export function runScenario(units: Unit[], uses: Use[], h: HouseholdInput, cat: 
 // buying this model used makes the scenario's total equal `targetTotal`.
 // A used vehicle (typically 2–4 years old) runs the same as new but is past
 // its steepest drop: it loses used_vehicle_annual_depreciation a year from
-// what you pay, and costs less to insure (premium scales with value). The
-// planner caps the answer at the new price ("any price below new"). Returns
-// null when even a free vehicle wouldn't get there.
+// what you pay, and costs less to insure (premium scales with value) — the
+// same math runScenario uses when you enter a used price, so planning with
+// this price produces a tie. The planner caps the answer at the new price
+// ("any price below new"). Returns null when even a free vehicle wouldn't
+// get there.
 export function usedBreakEvenPrice(scenario: ScenarioResult, targetTotal: number, h: HouseholdInput, cat: Catalog): number | null {
   const ur = scenario.units.find((u) => u.unit.isNew);
   if (!ur) return null;
@@ -565,7 +604,7 @@ export function usedBreakEvenPrice(scenario: ScenarioResult, targetTotal: number
   const setup = ur.unit.pt !== "gas" && scenario.charging ? scenario.charging.setupUsd : 0;
   // Everything except this vehicle's price, resale, tax and insurance.
   const fixed = scenario.totalOverPeriod - ur.capitalOverPeriod - ur.insurance * Y + setup;
-  const keep = Math.pow(1 - own.used_vehicle_annual_depreciation, Y);
+  const keep = usedRetentionAfter(Y, own);
   const { rate, title_fee_usd: title, trade_in_reduces_base } = own.wv_purchase_tax;
   const sold = h.candidate?.replaces;
   const tradeIn = sold ? h.owned.find((o) => o.key === sold)?.valueNow ?? 0 : 0;
@@ -602,14 +641,14 @@ function runAll(h: HouseholdInput, cat: Catalog, uses: Use[], scenario: ResaleSc
   const base = { owned: h.owned, scenario };
   const today = runScenario(ownedUnits, uses, h, cat, { ...base, overrides: {}, soldKey: null, candidatePrice: null });
   const sold = h.candidate?.replaces ?? null;
-  const withNew = (ref: string, price: number, overrides: Record<string, string>) => {
-    const unit = resolveUnit(ref, "new", cat, undefined, true);
+  const withNew = (ref: string, price: number, overrides: Record<string, string>, used?: UsedPurchase | null) => {
+    const unit = resolveUnit(ref, "new", cat, undefined, true, used?.odometer);
     if (!unit) return null;
     const units = [...ownedUnits.filter((u) => u.key !== sold), unit];
     return { units, result: runScenario(units, uses, h, cat, { ...base, overrides, soldKey: sold, candidatePrice: price }) };
   };
-  const ev = h.candidate ? withNew(h.candidate.ref, h.candidate.price, h.overrides) : null;
-  const gas = h.candidate && h.gasAlternative ? withNew(h.gasAlternative.ref, h.gasAlternative.price, {}) : null;
+  const ev = h.candidate ? withNew(h.candidate.ref, h.candidate.price, h.overrides, h.candidate.used) : null;
+  const gas = h.candidate && h.gasAlternative ? withNew(h.gasAlternative.ref, h.gasAlternative.price, {}, h.gasAlternative.used) : null;
   return { ownedUnits, today, ev, gas };
 }
 

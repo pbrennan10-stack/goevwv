@@ -3,8 +3,8 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { calculate } from "../lib/calc";
 import { getFederalData, getIceVehicles, getOwnershipAssumptions, getUtilities, getVehicles } from "../lib/data";
-import { planHousehold, tippingPoints, usedBreakEvenPrice, type Catalog, type HouseholdInput } from "../lib/household";
-import { TRIP_PRESETS, decodeState, encodeState } from "../lib/planState";
+import { planHousehold, shortName, tippingPoints, usedBreakEvenPrice, type Catalog, type HouseholdInput } from "../lib/household";
+import { TRIP_PRESETS, decodeState, encodeState, sanitizeLoaded } from "../lib/planState";
 import { ASSIST_LABEL, FEATURE_GROUPS } from "../lib/features";
 
 const cat: Catalog = { evs: getVehicles(), ice: getIceVehicles(), utilities: getUtilities(), fed: getFederalData(), own: getOwnershipAssumptions() };
@@ -104,6 +104,62 @@ test("used break-even price is positive and ties the target", () => {
   const r = planHousehold(h, cat);
   const p = usedBreakEvenPrice(r.plan!, r.today.totalOverPeriod, h, cat);
   assert.ok(p != null && p > 0 && p < 36795 * 3);
+});
+
+test("buying used at the break-even price ties the target (the two used answers agree)", () => {
+  const h = household();
+  const r = planHousehold(h, cat);
+  for (const target of [r.today.totalOverPeriod, r.gasAlt!.totalOverPeriod]) {
+    const p = usedBreakEvenPrice(r.plan!, target, h, cat);
+    assert.ok(p != null && p > 0 && p < 36795 * 3, `break-even ${p}`);
+    const used = planHousehold(household({ candidate: { ...h.candidate!, price: p, used: { odometer: "under_50k" } } }), cat);
+    assert.ok(close(used.plan!.totalOverPeriod, target, 0.001), `${used.plan!.totalOverPeriod} vs ${target}`);
+  }
+});
+
+test("a used EV: tax after trade-in, resale from what you pay, insured at its price, upkeep by miles", () => {
+  const h = household();
+  const price = 25000;
+  const at = (odometer: "under_50k" | "over_100k") =>
+    planHousehold(household({ candidate: { ...h.candidate!, price, used: { odometer } } }), cat).plan!;
+  const low = at("under_50k"), high = at("over_100k");
+  const u = low.units.find((x) => x.unit.isNew)!;
+  const own = cat.own;
+  const tax = (price - 15000) * own.wv_purchase_tax.rate + own.wv_purchase_tax.title_fee_usd; // $15k trade-in
+  const resale = price * Math.pow(1 - own.used_vehicle_annual_depreciation, h.years);
+  assert.equal(u.unit.usedOdometer, "under_50k");
+  assert.ok(close(u.capitalOverPeriod, price + tax + (low.charging?.setupUsd ?? 0) - resale, 0.0001), u.capitalNote);
+  assert.ok(close(low.upfrontCash, price + tax + (low.charging?.setupUsd ?? 0) - 15000, 0.0001));
+  const newUnit = planHousehold(h, cat).plan!.units.find((x) => x.unit.isNew)!;
+  assert.ok(u.insurance < newUnit.insurance, "insured at its lower value");
+  assert.ok(high.units.find((x) => x.unit.isNew)!.maintenance > u.maintenance, "more miles, more upkeep");
+  assert.ok(!u.unit.name.startsWith("2"), "a used one's model year isn't known, so the name leaves it off");
+});
+
+test("the gas alternative can be bought used, by the same rules", () => {
+  const h = household();
+  const price = 22000;
+  const r = planHousehold(household({ gasAlternative: { ...h.gasAlternative!, price, used: { odometer: "under_50k" } } }), cat);
+  const g = r.gasAlt!.units.find((x) => x.unit.isNew)!;
+  const own = cat.own;
+  const tax = (price - 15000) * own.wv_purchase_tax.rate + own.wv_purchase_tax.title_fee_usd;
+  assert.ok(close(g.capitalOverPeriod, price + tax - price * Math.pow(1 - own.used_vehicle_annual_depreciation, h.years), 0.0001), g.capitalNote);
+  assert.ok(r.gasAlt!.totalOverPeriod < planHousehold(h, cat).gasAlt!.totalOverPeriod, "skips the steepest part of the value drop");
+});
+
+test("used picks survive a share link; malformed ones are dropped", () => {
+  const good = { candUsed: { price: 24000, odometer: "50k_100k" as const }, gasUsed: { price: null, odometer: "under_50k" as const } };
+  const back = sanitizeLoaded(decodeState(encodeState(good)), cat)!;
+  assert.deepEqual(back.candUsed, good.candUsed);
+  assert.deepEqual(back.gasUsed, good.gasUsed);
+  const bad = { candUsed: { price: -5, odometer: "under_50k" }, gasUsed: { price: 1000, odometer: "lots" } };
+  assert.equal(sanitizeLoaded(bad as unknown as Parameters<typeof sanitizeLoaded>[0], cat), null);
+});
+
+test("short names keep the make when the model is only a number", () => {
+  assert.equal(shortName({ make: "Polestar", model: "2" }), "Polestar 2");
+  assert.equal(shortName({ make: "Ram", model: "1500" }), "Ram 1500");
+  assert.equal(shortName({ make: "Chevrolet", model: "Equinox EV" }), "Equinox EV");
 });
 
 test("no home charging costs more than charging at home", () => {
