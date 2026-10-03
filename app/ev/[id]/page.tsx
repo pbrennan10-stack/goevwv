@@ -69,6 +69,9 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
       range +
       " Includes WV's EV fee and every utility's rates.",
     alternates: { canonical: `/ev/${v.id}` },
+    // The link preview: the page's headline figures, drawn by share-image/route.tsx.
+    openGraph: { title: `${name} in West Virginia`, siteName: "GoEV WV", type: "website", locale: "en_US", url: `/ev/${v.id}`, images: [{ url: `/ev/${v.id}/share-image`, width: 1200, height: 630, alt: `${name}: West Virginia range and charging cost` }] },
+    twitter: { card: "summary_large_image", title: `${name} in West Virginia`, images: [`/ev/${v.id}/share-image`] },
   };
 }
 
