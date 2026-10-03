@@ -38,7 +38,7 @@ export function Tile({ label, value, sub }: { label: string; value: string; sub:
     <div style={{ flex: 1, display: "flex", flexDirection: "column", backgroundColor: "#f8fafc", borderRadius: 16, padding: "18px 22px" }}>
       <div style={{ fontSize: 21, color: SOFT }}>{label}</div>
       <div style={{ fontSize: value.length > 18 ? 27 : 38, fontWeight: 800, lineHeight: 1.15, marginTop: 6 }}>{value}</div>
-      <div style={{ fontSize: sub.length > 26 ? 18 : 20, color: SOFT, marginTop: 6, lineHeight: 1.25 }}>{sub}</div>
+      <div style={{ fontSize: sub.length > 28 ? 16 : sub.length > 26 ? 18 : 20, color: SOFT, marginTop: 6, lineHeight: 1.25 }}>{sub}</div>
     </div>
   );
 }

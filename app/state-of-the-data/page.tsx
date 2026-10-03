@@ -821,6 +821,15 @@ export default function StateOfTheDataPage() {
               notes="Midpoint of KBB's range; older, high-mileage cars lose value more slowly. The planner asks you what your car is worth today — your own number beats any estimate."
             />
             <SourceRow
+              label="Auto loan rates (the planner's 'monthly payments' option)"
+              value={`${Math.round(own.apr_reference.new_60mo * 1000) / 10}% new (${own.apr_reference.term_months}-month) · ${Math.round(own.apr_reference.used * 1000) / 10}% used`}
+              source="Bankrate weekly auto-loan rate survey (new); Edmunds (used)"
+              sourceUrl={own.apr_reference.source}
+              retrieved="2026-09-23"
+              confidence="approximate"
+              notes="National averages for a typical borrower; your rate depends on your credit and lender, so the planner lets you type your own, which then applies to both the EV and the gas vehicle. The loan covers price and tax after the trade-in and cash down (the home charger is paid in cash), with standard amortization. Interest paid during the ownership period is added to the total; a loan longer than the period is paid off from the sale. Vehicles you already own are assumed paid off."
+            />
+            <SourceRow
               label="What a used vehicle you'd buy loses per year"
               value={`~${Math.round(own.used_vehicle_annual_depreciation * 100)}% of what you pay, each year`}
               source="Our estimate: between Kelley Blue Book's 8–12% for older cars and the ~16% a year implied by new-EV 5-year resale"

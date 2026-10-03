@@ -12,7 +12,7 @@ import {
   type HouseholdInput,
   type PlanResult,
 } from "./household";
-import { decodeState, initialState, sanitizeLoaded, type PlanState } from "./planState";
+import { decodeState, financingFor, initialState, sanitizeLoaded, type PlanState } from "./planState";
 import type { IceVehicle, Vehicle } from "./types";
 
 export const usd = (n: number) => `$${Math.round(n).toLocaleString("en-US")}`;
@@ -77,6 +77,7 @@ export function derivePlan(s: PlanState, catalog: Catalog): DerivedPlan {
     overrides: s.overrides,
     retention5yOverride: s.retention5yOverride,
     homeCharging: s.homeCharging ?? "auto",
+    financing: financingFor(s.finance, catalog.own),
   };
   const defaultRetention = cand
     ? retention(cand.powertrain === "phev" ? "phev" : "bev", cand.class, 5, catalog.own)
@@ -102,6 +103,20 @@ export interface Verdict {
   vsToday: { saving: number; monthlyRunSaving: number } | null;  // also vs keeping, when a gas vehicle is the main comparison
   tradesIn: boolean;         // an owned vehicle is sold toward the EV
   unassigned: string[];      // uses nothing in the plan can do
+  loan: VerdictLoan | null;  // paying monthly
+}
+
+export interface VerdictLoan {
+  payment: number;            // the EV's monthly payment
+  months: number;
+  aprPct: number;             // e.g. 7
+  amount: number;             // financed
+  cashAtSigning: number;
+  interest: number;           // inside the period, the EV plan
+  otherPayment: number | null;  // the gas vehicle's payment (null without one)
+  allIn: number;              // payment + running costs, per month
+  otherAllIn: number;         // the comparison's payment (if any) + its running costs, per month
+  todayAllIn: number;         // keeping what you have: running costs only (assumed paid off)
 }
 
 export function verdict(s: PlanState, d: Pick<DerivedPlan, "cand" | "candName" | "gasVehicle">, result: PlanResult): Verdict | null {
@@ -137,7 +152,34 @@ export function verdict(s: PlanState, d: Pick<DerivedPlan, "cand" | "candName" |
       : null,
     tradesIn: s.replaces != null,
     unassigned: plan.unassigned.map((u) => u.label),
+    loan: plan.loan
+      ? {
+          payment: plan.loan.payment, months: plan.loan.months, aprPct: Math.round(plan.loan.apr * 1000) / 10,
+          amount: plan.loan.amount, cashAtSigning: plan.loan.cashAtSigning, interest: plan.interestOverPeriod,
+          otherPayment: vsGas ? other.loan?.payment ?? 0 : null,
+          allIn: plan.loan.payment + plan.runningPerYear / 12,
+          otherAllIn: (vsGas ? other.loan?.payment ?? 0 : 0) + other.runningPerYear / 12,
+          todayAllIn: today.runningPerYear / 12,
+        }
+      : null,
   };
+}
+
+// The payment tile's second line: the gap to the gas vehicle's payment, or the terms.
+export function paymentWords(v: Verdict): string {
+  const l = v.loan!;
+  if (l.otherPayment != null) {
+    const d = l.payment - l.otherPayment;
+    return Math.abs(d) < 0.5 ? `same payment as ${v.otherLabel}` : `${usd(Math.abs(d))} ${d > 0 ? "more" : "less"} a month than ${v.otherLabel}`;
+  }
+  return `${l.months} months at ${l.aprPct}%`;
+}
+
+// Paying monthly, in one sentence: what the month costs all in.
+export function allInSentence(v: Verdict): string {
+  const l = v.loan!;
+  const vs = v.vsGas ? `${usd(l.otherAllIn)} for ${v.otherLabel} and ${usd(l.todayAllIn)} keeping what you have` : `${usd(l.todayAllIn)} keeping what you have`;
+  return `All in, about ${usd(l.allIn)} a month — the payment plus running costs — vs ${vs} (assumed paid off). ${usd(l.cashAtSigning)} due at signing.`;
 }
 
 // The up-front tile's second line: the gap to the gas vehicle, or what the figure covers.

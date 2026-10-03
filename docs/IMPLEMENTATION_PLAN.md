@@ -449,6 +449,27 @@ helpers; the card is drawn on request and cached for a day, so a Windows
 `next build` never has to render it. Both cards share one frame
 (`components/ShareCard.tsx`).
 
+### Financing (Oct 2026)
+
+**The problem.** The scariest number on the verdict card was "Up front
+$24,018," and most buyers finance. The plan's TODO list had carried
+"financing (APR reference in ownership.yaml)" since the planner shipped.
+
+**Design.** Step 3 ends with "How would you pay?": cash (the default) or
+monthly payments, with APR (starting at the national averages already in
+`ownership.yaml` — Bankrate for new, Edmunds for used — and editable), loan
+length (36–84 months) and cash down. The loan covers price and tax after the
+trade-in and cash down; the home charger is paid in cash; the gas vehicle you
+compare is financed the same way. Interest paid inside the ownership period
+joins the total (a loan longer than the period is paid off from the sale), so
+the verdict, the resale range, the used break-even, the shopping list and the
+tipping points all include it — the used-price tie is tested with financing
+on, and a 0% loan ties cash exactly. The verdict card swaps "Up front" for the
+monthly payment with the gap to the gas vehicle's payment, and adds the all-in
+line people actually compare: payment plus running costs per month, against
+the gas vehicle and against keeping what you have (assumed paid off). The
+chart and table show interest as its own slice; the share card follows.
+
 ### v2.0 — Business Mode Toggle
 
 - Top-of-page toggle: Residential / Business
