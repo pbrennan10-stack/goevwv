@@ -38,7 +38,7 @@ goevwv/
 ├── app/                # Next.js App Router
 │   ├── layout.tsx      # Root layout, metadata, viewport
 │   ├── page.tsx        # Landing + fit check
-│   ├── plan/           # Household planner (whole driveway, purchase price, trips)
+│   ├── plan/           # Household planner (whole driveway, purchase price, trips); share-image/ draws the preview card for shared links
 │   ├── calculator/     # Single-vehicle calculator
 │   ├── ev/             # /ev index + /ev/[id] static guide page per vehicle (SEO)
 │   ├── utilities/      # /utilities index + /utilities/[id] EV rate page per utility
@@ -65,7 +65,9 @@ goevwv/
 │   ├── typical.ts      # Shared "typical WV" figures for prose (per-100-mile cost, CO₂)
 │   ├── features.ts     # Standard-equipment schema + labels
 │   ├── wear.ts         # Maintenance-over-time math for /learn/what-wears-out
-│   └── planState.ts    # Planner state, trip presets, ?h= URL encoding
+│   ├── planState.ts    # Planner state, trip presets, ?h= URL encoding
+│   ├── planVerdict.ts  # Plan link → engine input + verdict (results card, share text, preview image)
+│   └── planCatalog.ts  # Server-only: the slimmed catalog the planner and its share image run on
 ├── data/
 │   ├── vehicles.json   # ~70 EV/PHEV models incl. cargo vans (capability + source per vehicle)
 │   ├── ice_vehicles.json # ~75 gas vehicles people own today (mpg, insurance, maintenance, capability)
@@ -194,6 +196,8 @@ The first-time droplet setup is in `docs/REBUILD_RUNBOOK.md`. The bootstrap scri
 Results open with the answer: a verdict card (vs the gas alternative if chosen, else vs keeping what you have) with three tiles — monthly running-cost difference, cash up front, and the 5-year range across weak/strong resale — and one line naming the biggest unknown; the where-the-money-goes chart and the detail follow. Keep new results content below that card.
 
 Engine in `lib/household.ts` reuses `lib/calc.ts` energy/DCFC/insurance helpers — change per-mile math there, not in the planner. Total over N years = running costs × N + lost value (new vehicle: price + WV 6% sales tax after trade-in + title − resale via `retention_5yr` or the user's slider; kept vehicles: `older_vehicle_annual_depreciation`). The sold vehicle's would-be depreciation stays in the "today" scenario, which keeps the comparison fair. Three scenarios: keep today, new EV, and new gas (default = new version of the replaced vehicle; prices in `ice_vehicles.json` `new_*` fields). `usedBreakEvenPrice()` solves for the used-EV price that ties another scenario (used = same running costs, loses `used_vehicle_annual_depreciation` a year from the price paid, insured at that price); we deliberately do not track used prices. The EV to try and the gas alternative can each be bought used (`candUsed` / `gasUsed` in `lib/planState.ts`): the user enters the price of the one they found — never default or guess one; the plan waits until it's entered — and the purchase uses the same used math (via `usedRetentionAfter()`) plus the owned-vehicle mileage multipliers, so entering the break-even price reproduces a tie (tested). Used mode swaps the three-way resale box and resale slider for a note, since used depreciation is a single estimate. `usedShoppingList()` runs every other EV (primary trims, no cargo vans) in place of the one being tried and lists those that can do every drive with their used break-even — the same function, so planning one at its number ties (tested). Each commuting driver can charge at work (`workCharging`: free, or paid at the price they enter — default the WV business average, `commercial_rate_per_kwh` in `federal.yaml` from EIA; home is used if cheaper): that commute's kWh are priced there (a PHEV gets one battery at work plus one at home); errands, trips and days off still charge at home or public chargers. Each use goes to the cheapest vehicle whose `fit()` isn't "no". `scripts/smoke-household.ts` is a quick sanity run (see its header).
+
+Shared links (`/plan?h=…`) carry their own title, description and preview image: `generateMetadata` in `app/plan/page.tsx` reads the link (so `/plan` renders per request, not at build) and `app/plan/share-image/route.tsx` draws the verdict card with `next/og` in the Node runtime (it needs the data files). Everything the card says comes from `lib/planVerdict.ts` — `derivePlan` (state → engine input), `verdict`, `verdictSentence`, `rangeWords`, `shareText` — which the results page and the share button use too, so a preview always matches the page (tested: a link round-trips to the page's verdict). Change verdict wording or math there, never in the component. The canonical stays `/plan`; a link without a finished plan (bad link, no used price entered yet) gets the general planner card.
 
 ## Newcomer path & visuals
 

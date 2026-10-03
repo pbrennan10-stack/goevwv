@@ -420,6 +420,25 @@ vs EPA, charge port and adapter, heat pump, cords and key cards, recalls,
 warranty transfer, WV fee and tax). Numbers come from data files; the few
 electrical constants live in `data/checklists.yaml` with sources.
 
+### Share cards (Oct 2026)
+
+**The idea.** A shared plan link (`/plan?h=…`) previewed as the site's generic
+card, so the person receiving it saw a logo, not the answer. The link now
+carries its own title ("An Equinox EV saves about $340 vs a new CR-V over 5
+years"), description, and a 1200×630 preview image with the verdict sentence
+and the three numbers from the results card, plus the caveat that it is
+someone else's driveway. A spouse or friend sees the answer in iMessage, Slack
+or Facebook before tapping.
+
+**Design.** `lib/planVerdict.ts` turns a link into the engine's input and the
+verdict; the results card, the share button's text, the page metadata and the
+image all read from it, so they cannot disagree (tested: a link round-trips to
+the same verdict as the page). `/plan` renders per request so its metadata can
+read the link; the canonical stays `/plan`. The image route runs in the Node
+runtime (it reads `data/*`), renders in about 80 ms, and caches for a day; a
+link without a finished plan gets the general planner card. No new
+dependencies — `next/og` ships with Next.
+
 ### v2.0 — Business Mode Toggle
 
 - Top-of-page toggle: Residential / Business
