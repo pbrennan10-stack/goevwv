@@ -11,6 +11,7 @@ import { CHART_COLORS, StackedBars } from "@/components/charts";
 import { EquipmentCompare } from "@/components/Equipment";
 import { Term } from "@/components/Term";
 import { ANNUAL_WINTER_KWH_MULTIPLIER, dcfcStopMiles } from "@/lib/calc";
+import { RUNG_LABEL, backupOptions } from "@/lib/backup";
 import { cargoSeatsUpLabel } from "@/lib/capability";
 import {
   DESTINATION_FALLBACK_USD,
@@ -19,15 +20,19 @@ import {
   fit,
   planHousehold,
   retention,
+  shoppingModels,
   shortName,
   tippingPoints,
   usedBreakEvenPrice,
+  usedShoppingList,
   type Catalog,
   type HomeCharging,
   type HouseholdInput,
   type OdometerBand,
   type Unit,
   type Use,
+  type UsedShoppingRow,
+  type WorkCharging,
 } from "@/lib/household";
 import type { IceVehicle, Vehicle } from "@/lib/types";
 import {
@@ -35,11 +40,13 @@ import {
   DEFAULT_USED_PICK,
   LUGGAGE,
   ODOMETER_OPTIONS,
+  WORK_CHARGING_OPTIONS,
   decodeState,
   encodeState,
   gasOutlook,
   initialState,
   sanitizeLoaded,
+  workDefaultCents,
   type PlanState,
 } from "@/lib/planState";
 
@@ -143,6 +150,97 @@ function FoundOne({ model, onUse }: { model: string; onUse: (price: number) => v
         Plan with it
       </button>
     </form>
+  );
+}
+
+const CLASS_NAMES: Record<string, string> = { suv: "SUVs", truck: "Pickups", sedan: "Sedans", hatchback: "Hatchbacks", minivan: "Minivans" };
+
+// "Shopping used?" — every EV that can do all of this household's drives, with
+// the most a used one could cost and still come out ahead. No prices tracked.
+function UsedShopping({
+  input, catalog, cand, otherLabel, years, onPick,
+}: {
+  input: HouseholdInput; catalog: Catalog; cand: Vehicle; otherLabel: string; years: number; onPick: (id: string) => void;
+}) {
+  const inputKey = JSON.stringify(input);
+  const list = useMemo(
+    () => usedShoppingList(input, catalog, shoppingModels(catalog, input.candidate?.ref ?? null)),
+    [inputKey], // eslint-disable-line react-hooks/exhaustive-deps
+  );
+  const counts = list.rows.reduce<Record<string, number>>((m, r) => ({ ...m, [r.vehicle.class]: (m[r.vehicle.class] ?? 0) + 1 }), {});
+  const [cls, setCls] = useState<string>(cand.class);
+  const [showAll, setShowAll] = useState(false);
+  const active = cls !== "all" && !counts[cls] ? "all" : cls;
+  // Best first: models where even a new one beats the comparison (cheapest
+  // first), then the highest ceilings, then any that no price would make work.
+  const rank = (r: UsedShoppingRow) => (r.maxUsedPrice == null ? 2 : r.maxUsedPrice >= r.newPrice ? 0 : 1);
+  const shown = list.rows
+    .filter((r) => active === "all" || r.vehicle.class === active)
+    .sort((a, b) => rank(a) - rank(b) || (rank(a) === 0 ? a.newPrice - b.newPrice : (b.maxUsedPrice ?? 0) - (a.maxUsedPrice ?? 0)));
+  const LIMIT = 8;
+  const visible = showAll ? shown : shown.slice(0, LIMIT);
+  if (!list.rows.length) return null;
+  const chip = (key: string, label: string) => (
+    <button key={key} type="button" aria-pressed={active === key} onClick={() => { setCls(key); setShowAll(false); }}
+      className={`min-h-10 px-3 rounded-full text-sm font-semibold border ${active === key ? "bg-brand text-white border-brand" : "bg-white text-ink border-slate-300 hover:border-brand"}`}>
+      {label}
+    </button>
+  );
+  return (
+    <Card className="space-y-3">
+      <h3 className="font-bold text-ink">Shopping used? These fit your household</h3>
+      <p className="text-sm text-ink-muted">
+        Each can handle every drive you entered, alongside the vehicles you keep. Next to it: the most a used one (a few
+        years old, under 50,000 miles) could cost and still come out ahead of {otherLabel} over {years} years. We don&apos;t
+        track used prices — hold these up against real listings.
+      </p>
+      <div className="flex flex-wrap gap-2" role="group" aria-label="Body style">
+        {chip("all", `All ${list.rows.length}`)}
+        {Object.keys(CLASS_NAMES).filter((c) => counts[c]).map((c) => chip(c, `${CLASS_NAMES[c]} ${counts[c]}`))}
+      </div>
+      <ul className="divide-y divide-slate-100">
+        {visible.map((r) => (
+          <li key={r.vehicle.id} className="py-2.5">
+            <div className="flex items-baseline justify-between gap-3">
+              <span className="font-semibold text-ink min-w-0">
+                {r.vehicle.make} {r.vehicle.model}
+                <span className="block text-xs font-normal text-ink-soft">
+                  {r.vehicle.trim}
+                  {r.vehicle.powertrain === "phev" && !/plug-in hybrid/i.test(`${r.vehicle.model} ${r.vehicle.trim}`) ? " · plug-in hybrid" : ""}
+                  {r.vehicle.status === "discontinued" ? ` · last listed new ${usd(r.newPrice)}` : ` · new ${usd(r.newPrice)}`}
+                </span>
+                {catalog.backup && (() => {
+                  const b = backupOptions(r.vehicle.id, r.vehicle.features, catalog.backup);
+                  return b.best ? <span className="block text-xs font-normal text-emerald-800">⚡ {RUNG_LABEL[b.best]}</span> : null;
+                })()}
+              </span>
+              <span className="font-bold text-ink whitespace-nowrap text-right">
+                {r.maxUsedPrice == null
+                  ? "not at any price"
+                  : r.maxUsedPrice >= r.newPrice
+                    ? "any price below new"
+                    : `up to ${usd(Math.floor(r.maxUsedPrice / 500) * 500)}`}
+              </span>
+            </div>
+            {r.note && <p className="mt-0.5 text-xs text-ink-muted">{r.note}</p>}
+            <button type="button" onClick={() => onPick(r.vehicle.id)} className="min-h-10 text-sm font-semibold text-brand-dark hover:underline">
+              Plan with a used one →
+            </button>
+          </li>
+        ))}
+      </ul>
+      {shown.length > LIMIT && !showAll && (
+        <button type="button" onClick={() => setShowAll(true)}
+          className="w-full min-h-11 rounded-xl border border-slate-300 bg-white font-semibold text-ink hover:border-brand">
+          Show all {shown.length}
+        </button>
+      )}
+      <p className="text-xs text-ink-soft">
+        {list.cantFit > 0 ? `${list.cantFit} other model${list.cantFit > 1 ? "s" : ""} can't do all your drives — seats, luggage, towing, or range. ` : ""}
+        Cargo vans aren&apos;t listed. Assumes a used one drives and charges like new and loses about{" "}
+        {Math.round(catalog.own.used_vehicle_annual_depreciation * 100)}% a year; check its battery health report before you buy.
+      </p>
+    </Card>
   );
 }
 
@@ -404,6 +502,28 @@ export function HouseholdPlanner({ catalog }: Props) {
                 <Num label="Days a week" max={7} value={d.daysPerWeek}
                   onChange={(n) => set({ drivers: s.drivers.map((x) => (x.id === d.id ? { ...x, daysPerWeek: n } : x)) })} />
               </div>
+              {d.commuteOneWayMi > 0 && (
+                <label className="flex flex-col gap-1">
+                  <span className="text-sm font-medium text-ink">Can you charge at work?</span>
+                  <select value={d.workCharging ?? "none"}
+                    onChange={(e) => set({ drivers: s.drivers.map((x) => (x.id === d.id ? { ...x, workCharging: e.target.value as WorkCharging } : x)) })}
+                    className="w-full rounded-lg border border-slate-300 px-3 py-2.5 bg-white">
+                    {WORK_CHARGING_OPTIONS.map((o) => <option key={o.v} value={o.v}>{o.label}</option>)}
+                  </select>
+                  <span className="text-xs text-ink-soft">Some employers let staff plug in free — worth asking HR or facilities. It counts when a plug-in does this commute.</span>
+                </label>
+              )}
+              {d.commuteOneWayMi > 0 && d.workCharging === "paid" && (
+                <div className="space-y-1">
+                  <Num label="Price at work" suffix="¢ per kWh" step={0.1} max={100} value={d.workCentsPerKwh ?? workDefaultCents(catalog)}
+                    onChange={(n) => set({ drivers: s.drivers.map((x) => (x.id === d.id ? { ...x, workCentsPerKwh: n } : x)) })} />
+                  <p className="text-xs text-ink-soft">
+                    Starts at what West Virginia businesses pay on average — {workDefaultCents(catalog)}¢, vs about{" "}
+                    {Math.round((catalog.fed.calculation_notes.commercial_rate_per_kwh?.residential_for_comparison ?? 0.1547) * 1000) / 10}¢
+                    for homes (EIA). Enter your employer&apos;s price if you know it; a charging network may add a fee.
+                  </p>
+                </div>
+              )}
               {d.commuteOneWayMi === 0 && <p className="text-sm text-ink-soft">No commute — retired, remote, or at home.</p>}
             </Card>
           ))}
@@ -694,6 +814,9 @@ function PlanResults({
   if (!plan || !cand) return <p className="text-ink-muted">Pick a vehicle to try in step 3.</p>;
   const isUsed = !!s.candUsed;
   const gasIsUsed = !!(gasAlt && s.gasUsed);
+  // Commutes a plug-in in this plan charges at work.
+  const workCharged = plan.units.filter((u) => u.unit.pt !== "gas").flatMap((u) => u.uses)
+    .filter((u) => u.workCharging === "free" || u.workCharging === "paid");
   const evName = isUsed ? `used ${candName}` : candName;
   const aGas = gasVehicle ? `a ${gasIsUsed ? "used" : "new"} ${gasName}` : "";
   const diff = today.totalOverPeriod - plan.totalOverPeriod;
@@ -872,6 +995,14 @@ function PlanResults({
             <strong>Home charging:</strong> {plan.charging.reason}.
           </p>
         )}
+        {workCharged.length > 0 && (
+          <p className="text-sm text-ink">
+            <strong>Charging at work:</strong>{" "}
+            {workCharged.map((u) => `${u.label} — ${u.workCharging === "free" ? "free" : u.workRatePerKwh != null ? `${Math.round(u.workRatePerKwh * 1000) / 10}¢ per kWh` : `${workDefaultCents(catalog)}¢ per kWh, the WV business average`}`).join("; ")}.
+            {" "}Days off, errands and trips charge {plan.charging?.mode === "none" ? "at public chargers" : "at home"}
+            {workCharged.some((u) => u.workCharging === "paid") && plan.charging?.mode !== "none" ? "; if home is cheaper than work, the plan charges there" : ""}.
+          </p>
+        )}
         <p className="text-sm text-ink">
           <strong>Cash up front:</strong> {usd(plan.upfrontCash)}{s.replaces ? " after your trade-in" : ""} (price + WV 6% sales tax + title{plan.charging?.setupUsd ? " + home charger" : ""}).
         </p>
@@ -925,6 +1056,9 @@ function PlanResults({
           </button>
         )}
       </Card>
+
+      <UsedShopping input={input} catalog={catalog} cand={cand} otherLabel={otherLabel} years={Y}
+        onPick={(id) => { set({ candRef: `ev:${id}`, candUsed: DEFAULT_USED_PICK, priceOverride: null, overrides: {}, step: 2 }); window.scrollTo({ top: 0 }); }} />
 
       {gasVehicle && (cand.features || gasVehicle.features) && (
         <Card>
@@ -1088,6 +1222,7 @@ function PlanResults({
           <li>Selling a car you own isn&apos;t free money — it&apos;s value you&apos;d otherwise watch shrink. So &ldquo;today&rdquo; includes what your current cars lose over {Y} years, plus repairs that rise with their mileage, and insurance based on what they&apos;re worth now.</li>
           <li>Winter is counted on both sides: EVs use ~13% more electricity over a WV year, gas cars ~4% more fuel (hybrids ~8%). Electricity prices rise {Math.round((catalog.fed.calculation_notes.electricity_annual_increase ?? 0) * 1000) / 10}% a year; gas uses the forecast price you chose.</li>
           <li>Charging uses your utility&apos;s marginal rate; road-trip miles beyond the first charge use public fast chargers at ${catalog.fed.calculation_notes.dcfc_rate_per_kwh?.current.toFixed(2) ?? "0.55"}/kWh (Tesla ${catalog.fed.calculation_notes.dcfc_rate_per_kwh?.member_rate?.toFixed(2) ?? "0.43"}). No home charging means public prices for every mile. EV range fades ~2% a year, which is included in trip checks. Towing cuts EV range about 45%.</li>
+          <li>Charging at work, if you set it for a driver: that commute charges there — free, or at the price you enter (it starts at the average West Virginia business rate, {workDefaultCents(catalog)}¢ per kWh from EIA; businesses pay less per kWh than homes) — with one Level 2 session per workday covering the round trip. A plug-in hybrid charged at home and at work can run on electricity for up to two batteries&apos; worth a day.</li>
           <li>Insurance is an estimate for a 35–45-year-old WV driver with a clean record; your quote will differ. Financing isn&apos;t included.</li>
           <li>Comparing a new EV with keeping an older car usually favors keeping the older car — new vehicles lose value fastest. That&apos;s why we also compare against buying a <em>new gas vehicle</em>: the fairer question when it&apos;s time to replace one.</li>
         </ul>

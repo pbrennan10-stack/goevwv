@@ -1,0 +1,110 @@
+# Backup power from an EV when the grid goes down — three rungs, cheapest first.
+# Read by lib/backup.ts for /learn/power-outages, /ev/[id], and the planner's
+# used shopping list. Researched 2026-09-29 (AI-assisted; a source per entry;
+# summarized on /state-of-the-data). Only vehicles in vehicles.json appear here.
+retrieved: "2026-09-29"
+
+# Daily use behind the "days of backup" math. 30 kWh a day is what Ford and
+# Tesla assume in their own backup claims and matches EIA's US average
+# (899 kWh a month). "Essentials" — fridge, freezer, furnace blower, well or
+# sump pump, lights, phones — is our approximate figure.
+typical_home_kwh_per_day: 30
+essentials_kwh_per_day: 10
+# Share of the battery we count: leaves range to reach a charger afterward
+# and covers inverter losses.
+usable_share: 0.8
+daily_kwh_source: "EIA: the average US residential customer used 10,791 kWh in 2022, about 899 kWh a month"
+daily_kwh_source_url: "https://www.eia.gov/tools/faqs/faq.php?id=97&t=3"
+daily_kwh_notes: >
+  Ford and Tesla both quote days of backup at 30 kWh a day. The essentials-only
+  figure is ours and approximate: a fridge and freezer run about 3 kWh a day, a
+  gas furnace blower 3–5 kWh in winter, a well pump 1–2, lights and phones about
+  1. Electric heat, an electric water heater, or central air would use far more.
+
+# Rung 2: a 240-volt outlet on the vehicle feeding a generator-style transfer
+# switch or interlock — the same hookup as a portable generator, covering the
+# circuits you choose. A licensed electrician installs it; never backfeed
+# through a dryer outlet.
+transfer_switch:
+  - ids: [ford-f150-lightning-2025, ford-f150-lightning-er-2025]
+    outlet: "240 V / 30 A (L14-30) in the bed"
+    kw_240v: 7.2
+    kw_total: 9.6
+    requires: "Needs the 9.6 kW Pro Power Onboard system — standard on Lariat and Platinum, standard or optional on XLT depending on model year. The fleet Pro trim's 2.4 kW system has 120-volt outlets only."
+    hookup: "Ford's route (July 2026): a GenerLink transfer switch at the meter plus Ford's 12-inch Vehicle Connector, which keeps the truck's built-in ground-fault protection from cutting the power. The connector is approved only for that use."
+    cost: "About $1,100 for the switch, cord and connector, plus $250–$450 when the utility installs it on the meter, or $1,000–$1,500 for the beside-the-meter version"
+    maker_runtime_days:
+      ford-f150-lightning-2025: 2
+      ford-f150-lightning-er-2025: 3
+    source: "Ford Pro Power Onboard support page; Ford's announcement as reported by Electrek, July 22, 2026"
+    source_url: "https://electrek.co/2026/07/22/ford-f-150-electric-trucks-can-now-power-home-electrical-panel/"
+    retrieved: "2026-09-29"
+    confidence: verified
+  - ids: [chevy-silverado-ev-2025, chevy-silverado-ev-wt-2027, gmc-sierra-ev-denali-2025]
+    outlet: "240 V / 30 A in the bed (PowerBase)"
+    kw_240v: 7.2
+    kw_total: 10.2
+    hookup: "A transfer switch or interlock installed by a licensed electrician. GM's supported route is its V2H bundle (below)."
+    cost: "A transfer switch or interlock plus an electrician — typically several hundred dollars to about $1,500"
+    source: "Owner documentation (Silverado EV forum); Chevrolet's PowerBase guide could not be read"
+    source_url: "https://www.silveradoevforum.com/threads/power-base-240v-outlet.2035/"
+    retrieved: "2026-09-29"
+    confidence: approximate
+  - ids: [tesla-cybertruck-2025]
+    outlet: "240 V / 40 A in the bed"
+    kw_total: 9.6
+    hookup: "Tesla's supported route is Powershare Home Backup through the charge port (below); a transfer switch on the bed outlet isn't Tesla's documented path."
+    cost: "A transfer switch or interlock plus an electrician"
+    source: "Green Car Reports"
+    source_url: "https://www.greencarreports.com/news/1141606_powershare-in-tesla-cybertruck-can-power-home-charge-other-evs"
+    retrieved: "2026-09-29"
+    confidence: approximate
+
+# Rung 3: vehicle-to-home hardware — the whole panel, and it switches over on
+# its own.
+v2h:
+  - ids: [chevy-equinox-ev-2025, chevy-blazer-ev-2025, chevy-silverado-ev-2025, chevy-silverado-ev-wt-2027, gmc-sierra-ev-denali-2025, cadillac-lyriq-2025, cadillac-escalade-iq-2025]
+    system: "GM Energy V2H bundle: the PowerShift bidirectional charger plus the V2H enablement kit"
+    cost: "$7,299 before installation; installations ran $1,700–$6,900 in one test. The kit alone is $5,600 if you already have the charger."
+    availability: "2024–2026 model years; some 2024s need a dealer or over-the-air update"
+    source: "GM Energy's V2H-capable vehicle list; pricing from InsideEVs and Cars.com"
+    source_url: "https://gmenergy.gm.com/V2H-Capable"
+    retrieved: "2026-09-29"
+    confidence: approximate
+  - ids: [ford-f150-lightning-2025, ford-f150-lightning-er-2025]
+    system: "Ford Charge Station Pro plus the Home Integration System (sold through Sunrun)"
+    kw: 9.6
+    cost: "$3,895 for the system plus about $2,000 to install; Standard Range trucks add $1,310 for the charger (2022 prices)"
+    source: "The Drive and InsideEVs, 2022"
+    source_url: "https://www.thedrive.com/news/ford-f-150-lightning-backup-power-home-integration-system-will-cost-3895"
+    retrieved: "2026-09-29"
+    confidence: approximate
+  - ids: [tesla-cybertruck-2025]
+    system: "Tesla Powershare Home Backup: Universal Wall Connector plus the Powershare Gateway"
+    kw: 11.5
+    cost: "$1,990 for the hardware plus $2,000–$4,000 to install"
+    source: "Tesla support (Powershare cost); Green Car Reports"
+    source_url: "https://www.tesla.com/support/powershare/how-much-does-powershare-cost"
+    retrieved: "2026-09-29"
+    confidence: approximate
+  - ids: [kia-ev9-2025]
+    system: "Wallbox Quasar 2 bidirectional charger (2024–25 EV9)"
+    cost: "Charger and installation priced by Wallbox installers"
+    availability: "Rolling out state by state, starting with California and Connecticut — not offered in West Virginia as of September 2026"
+    source: "Kia press release; Wallbox; Recharged setup guide"
+    source_url: "https://www.kiamedia.com/us/en/media/pressreleases/23033/vehicle-to-home-v2h-charging-technology-arrives-for-eligible-kia-ev9-drivers"
+    retrieved: "2026-09-29"
+    confidence: approximate
+
+# Whether WV utilities allow a meter-mounted transfer switch (the cheaper
+# GenerLink install).
+utility_notes:
+  - utility: "Appalachian Power (WV, VA, TN)"
+    note: "Meter-collar transfer switches such as GenerLink are approved: you buy the device, Appalachian Power installs it, and you sign a liability waiver and pay a $100 trip charge."
+    source: "Appalachian Power's meter-collar devices page, as indexed; the page has since moved"
+    source_url: "https://www.appalachianpower.com/business/builders/meter-collar-devices"
+    confidence: approximate
+  - utility: "Mon Power and Potomac Edison (FirstEnergy)"
+    note: "Approval not confirmed. GenerLink's utility lookup or the utility can say; if not approved, the beside-the-meter version works."
+    source: "Not found in FirstEnergy's public pages, September 2026"
+    confidence: approximate

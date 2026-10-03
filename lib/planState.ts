@@ -1,7 +1,7 @@
 // Shared shape of a household plan, its presets, and how it's encoded in a
 // shareable URL (?h=…). Used by the planner (components/HouseholdPlanner.tsx).
 
-import type { Catalog, HomeCharging, OdometerBand, TripInput } from "./household";
+import type { Catalog, HomeCharging, OdometerBand, TripInput, WorkCharging } from "./household";
 
 // ---------- Presets ----------
 
@@ -28,7 +28,7 @@ export interface PlanState {
   candRef: string;
   priceOverride: number | null;
   replaces: string | null;
-  drivers: { id: number; commuteOneWayMi: number; daysPerWeek: number }[];
+  drivers: { id: number; commuteOneWayMi: number; daysPerWeek: number; workCharging?: WorkCharging; workCentsPerKwh?: number }[];
   errandsMiPerWeek: number;
   errandsPeople: number;
   trips: TripPreset[];
@@ -62,6 +62,20 @@ export const ODOMETER_OPTIONS: { v: OdometerBand; label: string }[] = [
   { v: "50k_100k", label: "50,000–100,000" },
   { v: "over_100k", label: "Over 100,000" },
 ];
+
+// Paid starts at the average WV business rate; the user can enter their
+// employer's actual price.
+export const WORK_CHARGING_OPTIONS: { v: WorkCharging; label: string }[] = [
+  { v: "none", label: "No, or not sure" },
+  { v: "free", label: "Yes — free" },
+  { v: "paid", label: "Yes — I'd pay for it" },
+];
+
+// The default price for paid charging at work, in cents per kWh.
+export function workDefaultCents(cat: Catalog): number {
+  const c = cat.fed.calculation_notes.commercial_rate_per_kwh?.current;
+  return Math.round((c ?? 0.1164) * 1000) / 10;
+}
 
 export const CHARGING_OPTIONS: { v: HomeCharging; label: string }[] = [
   { v: "auto", label: "Not sure — pick for me" },
@@ -145,7 +159,14 @@ export function sanitizeLoaded(raw: Partial<PlanState> | null, cat: Catalog): Pa
   }
   if (refOk(raw.candRef) && String(raw.candRef).startsWith("ev:")) out.candRef = raw.candRef;
   if (Array.isArray(raw.drivers)) {
-    const drivers = raw.drivers.filter((d) => d && num(d.id, 0, 1e6) && num(d.commuteOneWayMi, 0, 500) && num(d.daysPerWeek, 0, 7)).slice(0, 4);
+    const drivers = raw.drivers
+      .filter((d) => d && num(d.id, 0, 1e6) && num(d.commuteOneWayMi, 0, 500) && num(d.daysPerWeek, 0, 7))
+      .slice(0, 4)
+      .map((d) => ({
+        id: d.id, commuteOneWayMi: d.commuteOneWayMi, daysPerWeek: d.daysPerWeek,
+        ...(WORK_CHARGING_OPTIONS.some((o) => o.v === d.workCharging) ? { workCharging: d.workCharging } : {}),
+        ...(num(d.workCentsPerKwh, 0, 100) ? { workCentsPerKwh: d.workCentsPerKwh } : {}),
+      }));
     if (drivers.length) out.drivers = drivers;
   }
   if (Array.isArray(raw.trips)) {

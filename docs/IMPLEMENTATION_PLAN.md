@@ -279,6 +279,116 @@ financing.
 **Tests:** a used purchase at the break-even price ties the target; used-purchase
 tax, resale, insurance and mileage-based upkeep; share-link round trip.
 
+### Charging at work — fit check and planner (Sept 2026)
+
+**The idea.** Some employers let staff plug in at work, often free — the cost
+of the electricity is small to them. For someone who can't charge at home, that
+can turn "not yet" into "this works"; for everyone, free charging makes most
+weekday miles cost nothing to fuel.
+
+**Mindset.** It's a use case first (can you keep the car charged?), so it
+belongs in the fit check; the dollars belong in the planner. We don't guess
+what a particular employer charges: it's free, or the price the visitor
+enters, starting from a sourced default — the average West Virginia business
+(commercial) rate from EIA, since employers usually pass on their own cost and
+businesses pay less per kWh than homes (11.64¢ vs 15.47¢, Jan–Jul 2026).
+
+**Design.**
+
+- **Fit check:** a new question 2, "Could you plug in at work?" — free / paid /
+  no or not sure. With no home charging, charging at work gives a new "Could
+  work" verdict that explains the catch (days off, snow days, vacations mean a
+  public charger or a regular outlet now and then), with the plug-in hybrid
+  note for varied long trips. Free charging at work gets its own note and skips
+  the low-mileage economics note (it no longer applies). "Not yet" now suggests
+  asking an employer. Links to the planner, which counts it.
+- **Planner:** each driver who commutes gets "Can you charge at work?" (no /
+  free / paid). A commute charged at work is priced at $0 (free) or, when paid,
+  at the price entered for that driver — starting at the WV business average
+  (`commercial_rate_per_kwh` in `data/federal.yaml`). Whichever of work or home
+  is cheaper is used; a Level 2 session over a workday covers the round trip. A plug-in hybrid charged at work gets one battery's
+  worth per workday from work, plus a second from home when it can charge
+  there. Errands and trips still charge at home (or public chargers without
+  home charging). Applies to EVs you already own too, so both sides stay fair.
+- Results show which commutes charge at work; `/state-of-the-data` documents
+  the assumption; the share link carries it.
+
+**Not in scope:** employer-specific prices, Level 1-only workplace outlets,
+charging at work in the single-car calculator.
+
+**Tests:** free work charging lowers the EV's energy cost and leaves a gas-only
+household unchanged; paid work charging beats public charging for a household
+without home charging; a plug-in hybrid charged at home and work burns less
+gas; share-link round trip.
+
+### Household planner — used-EV shopping list (Sept 2026)
+
+**The idea.** The planner answers "what could a used one of THIS model cost?"
+Shoppers want the same answer for every EV that would work for them, to hold up
+against listings.
+
+**Mindset.** Still no used prices: we list the most each used model could cost
+and still come out ahead for this household's driving. Same break-even math as
+the plan (`usedBreakEvenPrice`), so planning a listed model at its number
+produces a tie (tested). Only models that can do every drive make the list;
+the rest are counted, not hidden silently.
+
+**Design.**
+
+- Engine: `usedShoppingList(h, cat, models)` runs each model in place of the
+  EV you're trying (same replaced vehicle, same kept vehicles and drives,
+  bought used with under 50,000 miles) and returns its break-even against the
+  plan's comparison (the gas vehicle if chosen, else keeping what you have),
+  plus the one fit caveat worth knowing (tight luggage, winter range, charging
+  stops on the longest trip).
+- Results card "Shopping used? These fit your household": filter chips by body
+  style (defaulting to the style you're trying); rows best-first — models that
+  win at any price below new (cheapest first), then the highest "up to $X" —
+  each with its new price for reference; and "Plan with a used one" — which switches
+  step 3 to that model, used, waiting for the listing price. One model per
+  trim family; cargo vans and the model you're already trying are left out.
+
+**Not in scope:** used prices, listings, or model years.
+
+**Tests:** every listed model fits (e.g. a 5,000-lb tow trip only lists
+vehicles that tow it); planning a listed model used at its number ties the
+comparison.
+
+### Backup power in an outage — EV 101 page, vehicle pages, shopping list (Sept 29, 2026)
+
+**The idea.** Storm outages are a real WV fear, and an EV's battery is the
+biggest one most households will ever own. The site said nothing about it
+beyond a note in the Lightning's commentary.
+
+**Mindset.** Honest ladder, cheapest rung first, every figure sourced and its
+confidence labeled: (1) a household-style outlet on the vehicle runs a fridge
+and lights with nothing to install (from `features.power_outlet_v2l`); (2) a
+240-volt outlet feeding a generator-style transfer switch backs up essential
+circuits (Ford's GenerLink route for the Lightning, ~$1,400–$2,600 all in;
+Silverado/Sierra EV and Cybertruck outlets noted as approximate); (3) full
+vehicle-to-home hardware powers the whole panel (GM $7,299 + install, Ford
+$3,895 + ~$2,000, Tesla $1,990 + $2,000–$4,000, Kia EV9 not yet in WV). Days
+of backup = battery × usable share (0.8) ÷ daily use (30 kWh typical, EIA and
+the makers' own assumption; ~10 kWh essentials, ours); makers' own "up to N
+days" shown when published. Safety is explicit: licensed electrician, never a
+backfeed cord, Ford's connector only with GenerLink, utility approval
+(Appalachian Power approves meter-collar devices; Mon Power unconfirmed).
+
+**Design.** `data/backup_power.yaml` + `lib/backup.ts`; `/learn/power-outages`
+(hub, homepage strip and sitemap via `LEARN_PAGES`); a "When the power goes
+out" section on `/ev/[id]` for vehicles with any rung; a ⚡ line on the
+planner's used shopping list; a State of the Data section built from the data
+file; the Lightning's `features` gains the outlet fact (other equipment still
+"not confirmed"). The owner's own Lightning setup appears as a first-person
+note on the page.
+
+**Not in scope:** generator comparisons, load calculations, or per-employer or
+per-home electrical advice beyond "ask an electrician."
+
+**Tests:** every id in the data file exists; confidence labeled; the Lightning
+resolves to all three rungs with Ford's 3-day figure; the days math and its
+wording.
+
 ### v2.0 — Business Mode Toggle
 
 - Top-of-page toggle: Residential / Business

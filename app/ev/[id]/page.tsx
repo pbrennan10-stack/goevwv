@@ -19,7 +19,8 @@ const SPEC_TERMS: Record<string, TermId> = {
 };
 import { fmtNum, fmtUSD } from "@/lib/calc";
 import { capabilitySpecs } from "@/lib/capability";
-import { getFederalData, getUtilities, getVehicles } from "@/lib/data";
+import { getBackupPower, getFederalData, getUtilities, getVehicles } from "@/lib/data";
+import { backupDays, backupOptions, fmtDays, makerDays } from "@/lib/backup";
 import {
   STATUS_LABEL,
   TYPICAL,
@@ -78,6 +79,9 @@ export default async function VehiclePage({ params }: Params) {
   if (!v) notFound();
 
   const fed = getFederalData();
+  const backup = getBackupPower();
+  const power = backupOptions(v.id, v.features, backup);
+  const madeDays = makerDays(v.id, backup);
   const utilities = getUtilities();
   const name = `${v.year} ${vehicleName(v)}`;
   const gasPrice = comparisonGasPrice(fed);
@@ -324,6 +328,36 @@ export default async function VehiclePage({ params }: Params) {
             </p>
           )}
         </section>
+
+        {power.best && (
+          <section className="mt-10">
+            <h2 className="text-xl font-bold text-ink">When the power goes out</h2>
+            <ul className="mt-2 text-sm text-ink space-y-1.5">
+              {power.outlet && (
+                <li><strong>Household outlet:</strong> runs a fridge, lights and phones straight from the vehicle — nothing to install.</li>
+              )}
+              {power.transferSwitch && (
+                <li>
+                  <strong>{power.transferSwitch.outlet}:</strong> can back up essential circuits through a generator-style transfer switch
+                  ({power.transferSwitch.cost}). {power.transferSwitch.requires ?? ""}
+                </li>
+              )}
+              {power.v2h && (
+                <li>
+                  <strong>Whole-home backup:</strong> {power.v2h.system} — {power.v2h.cost}.{power.v2h.availability ? ` ${power.v2h.availability}.` : ""}
+                </li>
+              )}
+              {v.battery_kwh != null && (
+                <li className="text-ink-muted">
+                  A full {v.battery_kwh} kWh battery is {fmtDays(backupDays(v.battery_kwh, backup.typical_home_kwh_per_day, backup))} of a typical
+                  home&apos;s electricity, or {fmtDays(backupDays(v.battery_kwh, backup.essentials_kwh_per_day, backup))} running essentials
+                  {madeDays != null ? ` (${v.make} says up to ${madeDays} days at typical use)` : ""}.{" "}
+                  <Link href="/learn/power-outages" className="text-brand hover:underline">How each option works</Link>.
+                </li>
+              )}
+            </ul>
+          </section>
+        )}
 
         {siblings.length > 0 && (
           <section className="mt-10">

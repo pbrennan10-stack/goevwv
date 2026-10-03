@@ -2,8 +2,9 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { calculate } from "../lib/calc";
-import { getFederalData, getIceVehicles, getOwnershipAssumptions, getUtilities, getVehicles } from "../lib/data";
-import { planHousehold, shortName, tippingPoints, usedBreakEvenPrice, type Catalog, type HouseholdInput } from "../lib/household";
+import { getBackupPower, getFederalData, getIceVehicles, getOwnershipAssumptions, getUtilities, getVehicles } from "../lib/data";
+import { backupDays, backupOptions, fmtDays, makerDays } from "../lib/backup";
+import { planHousehold, shoppingModels, shortName, tippingPoints, usedBreakEvenPrice, usedShoppingList, type Catalog, type HouseholdInput } from "../lib/household";
 import { TRIP_PRESETS, decodeState, encodeState, sanitizeLoaded } from "../lib/planState";
 import { ASSIST_LABEL, FEATURE_GROUPS } from "../lib/features";
 
@@ -160,6 +161,86 @@ test("short names keep the make when the model is only a number", () => {
   assert.equal(shortName({ make: "Polestar", model: "2" }), "Polestar 2");
   assert.equal(shortName({ make: "Ram", model: "1500" }), "Ram 1500");
   assert.equal(shortName({ make: "Chevrolet", model: "Equinox EV" }), "Equinox EV");
+});
+
+test("charging at work: free is cheapest, paid starts at the business rate, gas-only 'today' is unchanged", () => {
+  const at = (workCharging: "none" | "free" | "paid", workCentsPerKwh?: number) =>
+    planHousehold(household({ drivers: [{ id: 1, commuteOneWayMi: 21, daysPerWeek: 5, workCharging, ...(workCentsPerKwh != null ? { workCentsPerKwh } : {}) }] }), cat);
+  const none = at("none"), free = at("free"), paid = at("paid"), pricey = at("paid", 30);
+  const ev = (r: ReturnType<typeof planHousehold>) => r.plan!.units.find((u) => u.unit.isNew)!.energy;
+  const biz = cat.fed.calculation_notes.commercial_rate_per_kwh!;
+  assert.ok(biz.current < cat.utilities.find((u) => u.id === "aep")!.residential.flat_rate_per_kwh, "WV business rate is below AEP's home rate");
+  assert.ok(ev(free) < ev(paid) && ev(paid) < ev(none), `free ${ev(free)} < paid ${ev(paid)} < none ${ev(none)}`);
+  assert.ok(close(ev(pricey), ev(none), 0.0001), "a work price above the home rate: you'd charge at home");
+  assert.ok(close(free.today.totalOverPeriod, none.today.totalOverPeriod, 0.0001), "a gas-only household doesn't change");
+  const back = sanitizeLoaded(decodeState(encodeState({ drivers: [{ id: 1, commuteOneWayMi: 21, daysPerWeek: 5, workCharging: "paid", workCentsPerKwh: 9.5 }] })), cat)!;
+  assert.equal(back.drivers![0].workCentsPerKwh, 9.5, "an entered employer price survives a share link");
+});
+
+test("without home charging, paying to charge at work beats public chargers", () => {
+  const at = (workCharging: "none" | "paid") =>
+    planHousehold(household({ homeCharging: "none", drivers: [{ id: 1, commuteOneWayMi: 21, daysPerWeek: 5, workCharging }] }), cat).plan!;
+  assert.ok(at("paid").runningPerYear < at("none").runningPerYear);
+});
+
+test("a plug-in hybrid charged at home and at work burns less gas", () => {
+  const phev = cat.evs.find((v) => v.powertrain === "phev" && v.status === "current" && (v.epa_range_mi_electric ?? 0) > 0)!;
+  const at = (workCharging: "none" | "paid") => planHousehold(household({
+    candidate: { ref: `ev:${phev.id}`, price: 40000, replaces: "a" },
+    drivers: [{ id: 1, commuteOneWayMi: 40, daysPerWeek: 5, workCharging }],
+  }), cat).plan!.units.find((u) => u.unit.isNew)!;
+  assert.ok(at("paid").energy < at("none").energy, `${phev.id}: a second battery a day replaces gas miles`);
+});
+
+test("charging at work survives a share link; unknown values are dropped", () => {
+  const drivers = [{ id: 1, commuteOneWayMi: 20, daysPerWeek: 5, workCharging: "free" as const }, { id: 2, commuteOneWayMi: 10, daysPerWeek: 3 }];
+  assert.deepEqual(sanitizeLoaded(decodeState(encodeState({ drivers })), cat)!.drivers, drivers);
+  const bad = { drivers: [{ id: 1, commuteOneWayMi: 20, daysPerWeek: 5, workCharging: "sometimes" }] };
+  assert.deepEqual(sanitizeLoaded(bad as unknown as Parameters<typeof sanitizeLoaded>[0], cat)!.drivers, [{ id: 1, commuteOneWayMi: 20, daysPerWeek: 5 }]);
+});
+
+test("used shopping list: planning a listed model used at its number ties the comparison", () => {
+  const h = household();
+  const models = shoppingModels(cat, h.candidate!.ref);
+  assert.ok(!models.some((v) => v.class === "van"), "no cargo vans");
+  assert.ok(!models.some((v) => `ev:${v.id}` === h.candidate!.ref), "not the EV already being tried");
+  const { rows } = usedShoppingList(h, cat, models);
+  assert.ok(rows.length > 5, `${rows.length} rows`);
+  const target = planHousehold(h, cat).gasAlt!.totalOverPeriod;
+  const row = rows.find((r) => r.maxUsedPrice != null && r.maxUsedPrice < r.newPrice * 3 - 1)!;
+  const used = planHousehold(household({ candidate: { ref: `ev:${row.vehicle.id}`, price: row.maxUsedPrice!, replaces: "a", used: { odometer: "under_50k" } } }), cat);
+  assert.equal(used.plan!.unassigned.length, 0, "a listed model can do every drive");
+  assert.ok(close(used.plan!.totalOverPeriod, target, 0.001), `${row.vehicle.id}: ${used.plan!.totalOverPeriod} vs ${target}`);
+});
+
+test("used shopping list only lists models that can do every drive (a 5,000-lb tow)", () => {
+  const h = household({ trips: TRIP_PRESETS.filter((t) => t.id === "tow").map((t) => ({ ...t, on: true })) });
+  const { rows, cantFit } = usedShoppingList(h, cat, shoppingModels(cat, h.candidate!.ref));
+  assert.ok(rows.length > 0 && cantFit > 0, `${rows.length} listed, ${cantFit} can't`);
+  for (const r of rows) assert.ok((r.vehicle.towing_lbs ?? 0) >= 5000, `${r.vehicle.id} tows ${r.vehicle.towing_lbs}`);
+});
+
+test("data: backup power entries name real vehicles, label confidence, and the math reads right", () => {
+  const backup = getBackupPower();
+  const ids = new Set(cat.evs.map((v) => v.id));
+  for (const e of [...backup.transfer_switch, ...backup.v2h]) {
+    for (const id of e.ids) assert.ok(ids.has(id), `backup_power: unknown vehicle ${id}`);
+    assert.ok(e.confidence === "verified" || e.confidence === "approximate", `${e.ids[0]} confidence`);
+    assert.ok(e.cost && e.source && e.retrieved, `${e.ids[0]} cost/source/retrieved`);
+    for (const id of Object.keys(e.maker_runtime_days ?? {})) assert.ok(e.ids.includes(id), `runtime for ${id} not in ids`);
+  }
+  assert.ok(backup.usable_share > 0.5 && backup.usable_share <= 1 && backup.essentials_kwh_per_day < backup.typical_home_kwh_per_day);
+  const er = cat.evs.find((v) => v.id === "ford-f150-lightning-er-2025")!;
+  const lightning = backupOptions(er.id, er.features, backup);
+  assert.equal(lightning.best, "v2h");
+  assert.ok(lightning.outlet === true && lightning.transferSwitch && lightning.v2h);
+  assert.equal(makerDays(er.id, backup), 3);
+  assert.equal(fmtDays(backupDays(er.battery_kwh!, backup.typical_home_kwh_per_day, backup)), "about 3½ days");
+  for (const e of [...backup.transfer_switch, ...backup.v2h]) for (const id of e.ids) assert.ok(cat.evs.find((v) => v.id === id)!.battery_kwh, `${id} needs battery_kwh for the days math`);
+  const ioniq9 = cat.evs.find((v) => v.id === "hyundai-ioniq-9-2026")!;
+  assert.equal(backupOptions(ioniq9.id, ioniq9.features, backup).best, null, "no outlet, no hardware: no rung");
+  assert.equal(fmtDays(0.5), "under a day");
+  assert.equal(fmtDays(1.1), "about a day");
 });
 
 test("no home charging costs more than charging at home", () => {

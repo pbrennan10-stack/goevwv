@@ -196,6 +196,15 @@ export interface FederalData {
       notes?: string;
     };
     electricity_annual_increase?: number;
+    // Average WV business (commercial) price — default for paid charging at work.
+    commercial_rate_per_kwh?: {
+      current: number;
+      residential_for_comparison?: number;
+      source: string;
+      source_url?: string;
+      retrieved?: string;
+      notes?: string;
+    };
     dcfc_rate_per_kwh?: {
       current: number;
       member_rate?: number;
