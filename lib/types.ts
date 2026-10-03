@@ -394,3 +394,20 @@ export interface CalcInput {
   long_trip_one_way_mi?: number; // default 200; user can override for route-specific analysis
   ownership_plan?: "replace" | "keep"; // default "replace"; "keep" = two-car household scenario
 }
+
+// data/household_budget.yaml — what transportation costs a household, the
+// cheapest EV in the world, and why it isn't sold here.
+export interface HouseholdBudgetData {
+  retrieved: string;
+  bls_consumer_expenditures: {
+    year: number;
+    transportation_per_year: number;
+    transportation_share: number;
+    vehicle_purchases_per_year: number;
+    source: string;
+    source_url: string;
+  };
+  wv_median_household_income: { amount_usd: number; year: number; note?: string; source: string; source_url: string };
+  cheapest_ev_abroad: { name: string; market: string; price_yuan: number; price_usd_approx: number; note?: string; source: string; source_url: string };
+  import_barriers: { what: string; since: string; source: string; source_url: string }[];
+}

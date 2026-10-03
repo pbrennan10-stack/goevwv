@@ -1,0 +1,42 @@
+# What transportation costs an American household, what the cheapest electric
+# car in the world costs, and why it isn't sold here. Quoted on
+# /learn/ten-thousand-dollar-car and in the Why EVs Matter essay (/about).
+retrieved: "2026-10-03"
+
+bls_consumer_expenditures:
+  year: 2024
+  transportation_per_year: 13318     # average annual household spending on transportation
+  transportation_share: 0.17         # of all spending; the second-largest category after housing
+  vehicle_purchases_per_year: 5337   # net outlay on vehicle purchases, the biggest piece
+  source: "BLS Consumer Expenditure Survey, 2024 annual tables"
+  source_url: "https://www.bls.gov/cex/"
+
+wv_median_household_income:
+  amount_usd: 60798
+  year: 2024
+  note: "50th of the 50 states and D.C.; the national figure was $81,604."
+  source: "U.S. Census Bureau, American Community Survey 2024 1-year estimates (QuickFacts)"
+  source_url: "https://www.census.gov/quickfacts/fact/table/WV/INC110224"
+
+cheapest_ev_abroad:
+  name: "BYD Seagull"
+  market: "China"
+  price_yuan: 69900
+  price_usd_approx: 10300
+  note: >
+    Starting price in China in 2026, before any tariff or shipping. A small
+    hatchback rated at about 190 miles on China's CLTC test, which is more
+    generous than the EPA's.
+  source: "Electrek, May 2026"
+  source_url: "https://electrek.co/2026/05/11/byd-upgrades-cheapest-ev-with-lidar-still-starts-at-13k/"
+
+# Why that car can't be bought in the United States.
+import_barriers:
+  - what: "A 100% Section 301 tariff on Chinese-made EVs, on top of the regular duties"
+    since: "2024"
+    source: "CBT News"
+    source_url: "https://www.cbtnews.com/trump-open-to-chinese-autos/"
+  - what: "A Commerce Department rule barring connected vehicles from Chinese-owned makers — software from model year 2027, hardware from 2030 — wherever they're assembled"
+    since: "proposed September 2024, final January 2025"
+    source: "CnEVPost"
+    source_url: "https://cnevpost.com/2024/09/24/us-to-ban-connected-cars-chinese-software-hardware/"

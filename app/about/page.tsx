@@ -3,6 +3,8 @@ import { AiDataNotice } from "@/components/AiDataNotice";
 import Link from "next/link";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Logo } from "@/components/Logo";
+import { getHouseholdBudget } from "@/lib/data";
+import { $0 } from "@/lib/typical";
 
 export const metadata: Metadata = {
   title: "Why EVs Matter",
@@ -16,11 +18,17 @@ const SOURCES = [
   { claim: "China's share of lithium-ion cell production, about 80%:", label: "TechInsights, 2025", url: "https://www.techinsights.com/ko/node/61132" },
   { claim: "About 20 moving parts in an electric drivetrain versus roughly 200 in a conventional one:", label: "Interplex", url: "https://interplex.com/?p=21228" },
   { claim: "BYD Seagull from 69,900 yuan in China:", label: "Electrek, May 2026", url: "https://electrek.co/2026/05/11/byd-upgrades-cheapest-ev-with-lidar-still-starts-at-13k/" },
+  { claim: "Household transportation spending, $13,318 and 17% of spending in 2024:", label: "BLS Consumer Expenditure Survey", url: "https://www.bls.gov/cex/" },
+  { claim: "The 100% tariff on Chinese-made EVs:", label: "CBT News", url: "https://www.cbtnews.com/trump-open-to-chinese-autos/" },
+  { claim: "The Commerce rule on connected vehicles from Chinese-owned makers:", label: "CnEVPost", url: "https://cnevpost.com/2024/09/24/us-to-ban-connected-cars-chinese-software-hardware/" },
   { claim: "Oil and gas lobbying, about $137 million and fifth among industries in 2023 (OpenSecrets data):", label: "Planet Detroit", url: "https://planetdetroit.org/?p=15870" },
   { claim: "The federal EV credit's end for vehicles bought after September 30, 2025 (P.L. 119-21):", label: "State of the Data", url: "/state-of-the-data" },
 ];
 
 export default function AboutPage() {
+  const budget = getHouseholdBudget();
+  const bls = budget.bls_consumer_expenditures;
+  const abroad = budget.cheapest_ev_abroad;
   return (
     <main className="mx-auto max-w-content px-4 sm:px-6 py-8 sm:py-12">
       <SiteHeader active="/about" />
@@ -129,14 +137,31 @@ export default function AboutPage() {
               has to get cheaper for that to happen here.
             </p>
             <p className="mt-4">
-              Which is why China&rsquo;s position matters. BYD sells its
-              Seagull in China from 69,900 yuan, about $10,300, before any
-              tariff. American manufacturers can&rsquo;t build to that price —
-              yet. The gap is real and it has
-              several causes, but the primary one is scale: high-volume
+              Which is why China&rsquo;s position matters. {abroad.name} sells its
+              smallest car in {abroad.market} from {abroad.price_yuan.toLocaleString("en-US")} yuan,
+              about {$0(abroad.price_usd_approx)}, before any tariff. The cheapest
+              new EV sold in the United States costs about three times that.
+              Transportation is the second-largest expense of an American
+              household, {$0(bls.transportation_per_year)} a year in {bls.year}, {Math.round(bls.transportation_share * 100)}% of
+              all spending, and the car itself is the biggest piece. A capable
+              $10,000 car that costs a third as much to fuel changes what a
+              working family has left each month more than any tax cut has.{" "}
+              <Link href="/learn/ten-thousand-dollar-car" className="text-brand hover:underline">
+                Here is what it would mean for a West Virginia household.
+              </Link>
+            </p>
+            <p className="mt-4">
+              That car isn&rsquo;t sold here, by policy, and both parties built
+              the wall: a 100% tariff on Chinese-made EVs since 2024, and a
+              Commerce Department rule that bars connected vehicles from
+              Chinese-owned makers starting with model year 2027. The wall
+              protects the manufacturing base in the section above. Cheaper
+              cars now and a domestic battery industry later pull against each
+              other, and nobody should pretend otherwise. The price gap itself
+              has several causes, but the primary one is scale: high-volume
               production drives down per-unit battery costs, which are still
-              the most expensive component in an EV. China has that scale.
-              The US is building toward it.
+              the most expensive component in an EV. China has that scale. The
+              US is building toward it.
             </p>
             <p className="mt-4">
               Domestic demand is what makes the investment in US scale

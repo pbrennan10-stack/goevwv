@@ -15,6 +15,7 @@ export const LEARN_PAGES = [
   { slug: "used-evs", title: "Buying a used EV", blurb: "Battery health, warranties, and what a used one should cost." },
   { slug: "checklists", title: "Scripts and checklists", blurb: "What to ask your employer, your electrician, and the dealer — ready to copy or print." },
   { slug: "hybrid-plug-in-or-electric", title: "Hybrid, plug-in hybrid, or fully electric?", blurb: "Which one fits how you drive." },
+  { slug: "ten-thousand-dollar-car", title: "What a $10,000 car would do to your budget", blurb: "The cheapest EV in the world costs about $10,000 in China. What that price would mean for a West Virginia household, and why it isn't sold here." },
 ] as const;
 
 export function LearnLayout({ slug, title, intro, children }: { slug: string; title: string; intro: React.ReactNode; children: React.ReactNode }) {

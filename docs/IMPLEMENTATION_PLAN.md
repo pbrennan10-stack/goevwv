@@ -482,6 +482,25 @@ became the Colonial Pipeline shutdown, the parts count and the Chinese price
 were corrected, the author's view is stated plainly, and a sources list ends
 the page. The argument itself is unchanged.
 
+### The $10,000 car (Oct 2026)
+
+**The idea.** Transportation is the second-largest household expense (BLS:
+$13,318 a year, 17% of spending in 2024), and the car itself is the biggest
+piece. The cheapest EV in the world, BYD's Seagull, starts around $10,300 in
+China; the cheapest new EV in our data is about three times that. What that
+price would do to a working household's budget is the strongest
+non-environmental argument the site makes, and it was one hedged sentence.
+
+**Design.** `/learn/ten-thousand-dollar-car` runs the planner's default
+household four ways through the real engine — keep the paid-off gas car, buy
+a new gas car, buy the cheapest EV sold here, buy a $10,000 clone of it —
+and shows payment, running costs, value lost and true cost per month, plus the
+year as a share of West Virginia's median income ($60,798, 50th). It states
+the wall plainly (the 100% tariff and the Commerce connected-vehicle rule,
+built by both parties), the trade-off against the domestic industry the essay
+argues for, and keeps the aggregate to one checkable multiplication. The
+essay's section 03 quotes the same data file and links to the page.
+
 ### v2.0 — Business Mode Toggle
 
 - Top-of-page toggle: Residential / Business
