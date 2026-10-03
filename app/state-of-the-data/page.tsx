@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Logo } from "@/components/Logo";
 import { SiteHeader } from "@/components/SiteHeader";
 import { cargoSeatsUpLabel } from "@/lib/capability";
-import { getBackupPower, getFederalData, getIceVehicles, getOwnershipAssumptions, getUtilities, getVehicles, getWearData } from "@/lib/data";
+import { getBackupPower, getFederalData, getHouseholdBudget, getIceVehicles, getOwnershipAssumptions, getUtilities, getVehicles, getWearData } from "@/lib/data";
 
 export const metadata: Metadata = {
   title: "State of the Data",
@@ -127,6 +127,7 @@ export default function StateOfTheDataPage() {
   const utilities = getUtilities();
   const evs = getVehicles();
   const own = getOwnershipAssumptions();
+  const budget = getHouseholdBudget();
   const gasCars = getIceVehicles();
   const backup = getBackupPower();
   const backupNames = (ids: string[]) => Array.from(new Set(ids.map((id) => { const v = evs.find((x) => x.id === id); return v ? `${v.make} ${v.model}` : id; }))).join(", ");
@@ -846,6 +847,48 @@ export default function StateOfTheDataPage() {
               retrieved={federal.calculation_notes.commercial_rate_per_kwh?.retrieved ?? "2026-09-29"}
               confidence="approximate"
               notes="The business average is verified EIA data; using it as an employer's price is our assumption: employers usually pass on their own commercial rate, which is lower per kWh than a home rate, but a given employer's tariff differs and a charging network may add a fee. Enter the real price if you know it. Applies to each driver's commute when you set it in the planner. One Level 2 session over a workday (about 20–30 miles of range an hour) covers the round trip; if charging at home is cheaper, we use that instead. A plug-in hybrid charged at work gets one battery's worth a workday there, plus a second from home when it can charge there too. Errands, road trips, and days off still charge at home (or at public chargers without home charging). A regular 120V outlet at work adds only 3–5 miles an hour and isn't modeled."
+            />
+          </Section>
+
+          <Section
+            title="Household budget and the $10,000 car"
+            summary="What transportation costs a household, West Virginia's median income, the cheapest EV in the world, and why it isn't sold here — used by /learn/ten-thousand-dollar-car and the Why EVs Matter essay."
+          >
+            <SourceRow
+              label="Average household spending on transportation"
+              value={`$${budget.bls_consumer_expenditures.transportation_per_year.toLocaleString("en-US")} a year (${Math.round(budget.bls_consumer_expenditures.transportation_share * 100)}% of spending); $${budget.bls_consumer_expenditures.vehicle_purchases_per_year.toLocaleString("en-US")} of it on vehicle purchases`}
+              source={budget.bls_consumer_expenditures.source}
+              sourceUrl={budget.bls_consumer_expenditures.source_url}
+              retrieved={budget.retrieved}
+              confidence="verified"
+              notes={`National averages for ${budget.bls_consumer_expenditures.year}, all consumer units. West Virginia-specific spending isn't published at this detail; the page says so and uses the national figure for context only.`}
+            />
+            <SourceRow
+              label="West Virginia median household income"
+              value={`$${budget.wv_median_household_income.amount_usd.toLocaleString("en-US")} (${budget.wv_median_household_income.year})`}
+              source={budget.wv_median_household_income.source}
+              sourceUrl={budget.wv_median_household_income.source_url}
+              retrieved={budget.retrieved}
+              confidence="verified"
+              notes={budget.wv_median_household_income.note}
+            />
+            <SourceRow
+              label="Cheapest EV sold anywhere"
+              value={`${budget.cheapest_ev_abroad.name}, ${budget.cheapest_ev_abroad.price_yuan.toLocaleString("en-US")} yuan (about $${budget.cheapest_ev_abroad.price_usd_approx.toLocaleString("en-US")}) in ${budget.cheapest_ev_abroad.market}`}
+              source={budget.cheapest_ev_abroad.source}
+              sourceUrl={budget.cheapest_ev_abroad.source_url}
+              retrieved={budget.retrieved}
+              confidence="approximate"
+              notes={`${budget.cheapest_ev_abroad.note ?? ""} The dollar figure moves with the exchange rate. The what-if page gives a $10,000 car the efficiency, range and resale behavior of the cheapest EV in our own data and insurance scaled to its price; it is an illustration of price, not a review of that car.`}
+            />
+            <SourceRow
+              label="Why it isn't sold in the United States"
+              value={budget.import_barriers.map((x) => x.what).join(" · ")}
+              source={budget.import_barriers.map((x) => x.source).join("; ")}
+              sourceUrl={budget.import_barriers[0]?.source_url}
+              retrieved={budget.retrieved}
+              confidence="verified"
+              notes={budget.import_barriers.map((x) => `${x.what} (${x.since}).`).join(" ")}
             />
           </Section>
 

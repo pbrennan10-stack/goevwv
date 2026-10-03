@@ -2,7 +2,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { calculate } from "../lib/calc";
-import { getBackupPower, getChecklists, getFederalData, getIceVehicles, getOwnershipAssumptions, getUtilities, getVehicles } from "../lib/data";
+import { getBackupPower, getChecklists, getFederalData, getHouseholdBudget, getIceVehicles, getOwnershipAssumptions, getUtilities, getVehicles } from "../lib/data";
+import { cheapestNewEv, tenThousandDollarCar, whatIfCases } from "../lib/tenK";
 import { backupDays, backupOptions, fmtDays, makerDays } from "../lib/backup";
 import { loanBalance, loanInterest, loanPayment, planHousehold, shoppingModels, shortName, tippingPoints, usedBreakEvenPrice, usedShoppingList, type Catalog, type HouseholdInput } from "../lib/household";
 import { TRIP_PRESETS, decodeState, encodeState, initialState, sanitizeLoaded } from "../lib/planState";
@@ -428,4 +429,27 @@ test("financing: the choice survives a share link and the verdict carries the mo
   const noGas = verdictFromLink(encodeState({ ...s, gasRef: null }), cat)!;
   assert.equal(noGas.loan!.otherPayment, null);
   assert.match(paymentWords(noGas), /^72 months at 7%$/);
+});
+
+test("the $10,000-car what-if: sane data, and price is the only thing that changes", () => {
+  const b = getHouseholdBudget();
+  assert.ok(b.wv_median_household_income.amount_usd > 40000 && b.wv_median_household_income.amount_usd < 90000, "WV median income");
+  assert.ok(b.bls_consumer_expenditures.transportation_per_year > 10000 && b.bls_consumer_expenditures.transportation_per_year < 20000);
+  assert.ok(b.bls_consumer_expenditures.transportation_share > 0.1 && b.bls_consumer_expenditures.transportation_share < 0.25);
+  const cheap = cheapestNewEv(cat);
+  assert.ok(cheap.msrp_usd + (cheap.destination_usd ?? 1500) > b.cheapest_ev_abroad.price_usd_approx * 2, "the cheapest EV here costs at least twice the Chinese one");
+  const tenK = tenThousandDollarCar(cheap);
+  assert.equal(tenK.msrp_usd + (tenK.destination_usd ?? 1500), 10000, "the what-if car lists for exactly $10,000");
+  assert.equal(tenK.efficiency_kwh_per_100mi, cheap.efficiency_kwh_per_100mi);
+  assert.ok(b.import_barriers.length >= 2);
+  const cases = whatIfCases(cat);
+  assert.deepEqual(cases.map((c) => c.key), ["keep", "gas", "ev", "tenk"]);
+  const by = Object.fromEntries(cases.map((c) => [c.key, c]));
+  assert.ok(by.tenk.totalPerMonth < by.ev.totalPerMonth, "a $10,000 car costs less per month than the cheapest real EV");
+  assert.ok(by.tenk.lostValuePerMonth < by.ev.lostValuePerMonth, "…because it loses far less value");
+  assert.ok(by.tenk.runningPerMonth <= by.ev.runningPerMonth + 1, "same efficiency, cheaper insurance: running costs are no higher");
+  assert.equal(by.keep.payment, 0, "keeping the paid-off car has no payment");
+  assert.ok(by.ev.payment > 0 && by.gas.payment > 0, "the new cars are financed");
+  assert.ok(by.tenk.payment === 0 && by.tenk.cashBack > 0, "the trade-in more than covers a $10,000 car");
+  for (const c of cases) assert.ok(close(c.totalPerMonth, c.runningPerMonth + c.lostValuePerMonth, 0.01), `${c.key} total = running + lost value`);
 });
