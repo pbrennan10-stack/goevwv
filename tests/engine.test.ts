@@ -5,7 +5,8 @@ import { calculate } from "../lib/calc";
 import { getBackupPower, getChecklists, getFederalData, getIceVehicles, getOwnershipAssumptions, getUtilities, getVehicles } from "../lib/data";
 import { backupDays, backupOptions, fmtDays, makerDays } from "../lib/backup";
 import { planHousehold, shoppingModels, shortName, tippingPoints, usedBreakEvenPrice, usedShoppingList, type Catalog, type HouseholdInput } from "../lib/household";
-import { TRIP_PRESETS, decodeState, encodeState, sanitizeLoaded } from "../lib/planState";
+import { TRIP_PRESETS, decodeState, encodeState, initialState, sanitizeLoaded } from "../lib/planState";
+import { derivePlan, rangeWords, shareText, shareTitle, verdict, verdictFromLink, verdictSentence } from "../lib/planVerdict";
 import { ASSIST_LABEL, FEATURE_GROUPS } from "../lib/features";
 
 const cat: Catalog = { evs: getVehicles(), ice: getIceVehicles(), utilities: getUtilities(), fed: getFederalData(), own: getOwnershipAssumptions() };
@@ -285,4 +286,46 @@ test("data: equipment facts use known values", () => {
       assert.ok(x === undefined || x === null || typeof x === "boolean", `${v.id} ${r.key}`);
     }
   }
+});
+
+test("share card: a plan link reproduces the results page's verdict", () => {
+  const s = initialState(cat);
+  const d = derivePlan(s, cat);
+  const eq = cat.evs.find((v) => v.id === "chevy-equinox-ev-2025")!;
+  assert.equal(d.input.candidate?.price, eq.msrp_usd + (eq.destination_usd ?? 1500), "new price = MSRP + destination");
+  assert.equal(d.input.gasAlternative?.ref, "ice:honda-crv-2024", "the gas comparison defaults to a new one of the replaced vehicle");
+  const r = planHousehold(d.input, cat);
+  const v = verdict(s, d, r)!;
+  assert.ok(close(v.saving, r.gasAlt!.totalOverPeriod - r.plan!.totalOverPeriod, 0), "saving = gas total − EV total");
+  assert.ok(close(v.monthlyRunSaving * 12, r.gasAlt!.runningPerYear - r.plan!.runningPerYear, 0), "monthly = running-cost gap / 12");
+  assert.equal(v.upfront, r.plan!.upfrontCash);
+  assert.match(verdictSentence(v), /^vs\. a new CR-V: the Equinox EV (saves about \$[\d,]+|costs about \$[\d,]+ more) over 5 years$/);
+  assert.match(shareTitle(v), /^An Equinox EV (saves about|costs about) .* vs a new CR-V over 5 years$/);
+  assert.ok(shareText(v).startsWith("Our household plan: an Equinox EV "), shareText(v));
+  assert.ok(shareText(v).includes("vs a new CR-V over 5 years in WV"), shareText(v));
+  assert.ok(v.range && v.range.lo <= v.saving + 1 && v.saving <= v.range.hi + 1, "the middle estimate sits inside the resale range");
+  assert.deepEqual(verdictFromLink(encodeState(s), cat), v, "the link gives the same verdict as the page");
+});
+
+test("share card: used plans show one estimate; unfinished or bad links have no card", () => {
+  const used = { ...initialState(cat), candUsed: { price: 24000, odometer: "under_50k" as const } };
+  const v = verdictFromLink(encodeState(used), cat)!;
+  assert.equal(v.isUsed, true);
+  assert.equal(v.range, null, "used resale is a single estimate");
+  assert.ok(v.evName.startsWith("used "), v.evName);
+  assert.match(rangeWords(v), /^(saves \$[\d,]+|costs \$[\d,]+ more)$/);
+  assert.equal(verdictFromLink(encodeState({ ...used, candUsed: { price: null, odometer: "under_50k" } }), cat), null, "no price yet → no card");
+  assert.equal(verdictFromLink("not-a-plan", cat), null);
+  assert.equal(verdictFromLink(null, cat), null);
+  assert.equal(verdictFromLink("A".repeat(7000), cat), null, "oversized links are ignored");
+});
+
+test("share card: without a gas vehicle the verdict is against keeping what you have", () => {
+  const v = verdictFromLink(encodeState({ ...initialState(cat), gasRef: null }), cat)!;
+  assert.equal(v.vsGas, false);
+  assert.equal(v.vsToday, null);
+  assert.equal(v.priceGap, null);
+  assert.match(verdictSentence(v), /^The Equinox EV (saves about|costs about) .* than keeping what you have over 5 years$/);
+  assert.ok(verdictFromLink(encodeState({ ...initialState(cat), replaces: null, gasRef: null }), cat), "keeping every vehicle and adding an EV still has a verdict");
+  assert.match(shareTitle(verdictFromLink(encodeState({ ...initialState(cat), candUsed: { price: 24000, odometer: "under_50k" } }), cat)!), /^A used Equinox EV /);
 });

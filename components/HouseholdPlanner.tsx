@@ -14,12 +14,10 @@ import { ANNUAL_WINTER_KWH_MULTIPLIER, dcfcStopMiles } from "@/lib/calc";
 import { RUNG_LABEL, backupOptions } from "@/lib/backup";
 import { cargoSeatsUpLabel } from "@/lib/capability";
 import {
-  DESTINATION_FALLBACK_USD,
   TOW_RANGE_FACTOR,
   batteryRangeFactor,
   fit,
   planHousehold,
-  retention,
   shoppingModels,
   shortName,
   tippingPoints,
@@ -35,6 +33,7 @@ import {
   type WorkCharging,
 } from "@/lib/household";
 import type { IceVehicle, Vehicle } from "@/lib/types";
+import { derivePlan, rangeWords, shareText, upfrontWords, verdict, verdictSentence } from "@/lib/planVerdict";
 import {
   CHARGING_OPTIONS,
   DEFAULT_USED_PICK,
@@ -350,44 +349,11 @@ export function HouseholdPlanner({ catalog }: Props) {
     window.history.replaceState(null, "", url);
   }, [s, hydrated]);
 
-  const cand = catalog.evs.find((v) => `ev:${v.id}` === s.candRef);
-  const defaultPrice = cand ? cand.msrp_usd + (cand.destination_usd ?? DESTINATION_FALLBACK_USD) : 0;
-  const newPrice = s.priceOverride ?? defaultPrice;
+  // State → the engine's input (prices, the gas comparison). Shared with the
+  // share-card image so a link's preview shows the same numbers as this page.
+  const derived = derivePlan(s, catalog);
+  const { cand, candName, defaultPrice, newPrice, price, buyableGas, replacedRef, autoGas, gasRef, gasVehicle, gasNewPrice, gasPrice, input, defaultRetention } = derived;
   const soldUsedOnly = cand?.status === "discontinued";
-  const candName = cand ? shortName(cand) : "EV";
-  // Bought used: the price of the one you found, or null until you enter it —
-  // then there's no plan yet rather than a guess.
-  const price = s.candUsed ? s.candUsed.price : newPrice;
-
-  const buyableGas = catalog.ice.filter((v) => v.new_status === "current" && v.new_msrp_usd);
-  const replacedRef = s.owned.find((o) => o.key === s.replaces)?.ref;
-  const autoGas = replacedRef && buyableGas.some((v) => `ice:${v.id}` === replacedRef) ? replacedRef : null;
-  const gasRef = s.gasRef === "auto" ? autoGas : s.gasRef;
-  const gasVehicle = gasRef ? buyableGas.find((v) => `ice:${v.id}` === gasRef) : undefined;
-  const gasDefaultPrice = gasVehicle ? (gasVehicle.new_msrp_usd ?? 0) + (gasVehicle.new_destination_usd ?? DESTINATION_FALLBACK_USD) : 0;
-  const gasNewPrice = s.gasPriceOverride ?? gasDefaultPrice;
-  const gasPrice = s.gasUsed ? s.gasUsed.price : gasNewPrice;
-
-  const input: HouseholdInput = {
-    owned: s.owned,
-    candidate: cand && price != null
-      ? { ref: s.candRef, price, replaces: s.replaces, used: s.candUsed && { odometer: s.candUsed.odometer } }
-      : null,
-    gasAlternative: gasVehicle && gasPrice != null
-      ? { ref: `ice:${gasVehicle.id}`, price: gasPrice, used: s.gasUsed && { odometer: s.gasUsed.odometer } }
-      : null,
-    drivers: s.drivers,
-    errandsMiPerWeek: s.errandsMiPerWeek,
-    errandsPeople: s.errandsPeople,
-    trips: s.trips.filter((t) => t.on),
-    utilityId: s.utilityId,
-    useTOU: s.useTOU,
-    gasPrice: s.gasPrice,
-    years: s.years,
-    overrides: s.overrides,
-    retention5yOverride: s.retention5yOverride,
-    homeCharging: s.homeCharging ?? "auto",
-  };
   const inputKey = JSON.stringify(input);
   const result = useMemo(() => planHousehold(input, catalog), [inputKey]); // eslint-disable-line react-hooks/exhaustive-deps
   // Tipping points only matter on the results step (and cost ~80 plan runs).
@@ -403,9 +369,6 @@ export function HouseholdPlanner({ catalog }: Props) {
   };
   const go = (step: number) => { set({ step }); window.scrollTo({ top: 0 }); };
   const utility = catalog.utilities.find((u) => u.id === s.utilityId);
-  const defaultRetention = cand
-    ? retention(cand.powertrain === "phev" ? "phev" : "bev", cand.class, 5, catalog.own)
-    : 0.43;
 
   return (
     <div className="space-y-5">
@@ -738,13 +701,9 @@ export function HouseholdPlanner({ catalog }: Props) {
           copied={copied}
           onShare={async () => {
             const url = window.location.href;
-            // Share the result, not just a link.
-            const p = result.plan, other = result.gasAlt ?? result.today;
-            const otherName = result.gasAlt && gasVehicle ? `a ${s.gasUsed ? "used" : "new"} ${shortName(gasVehicle)}` : "keeping our current car";
-            const d = p ? other.totalOverPeriod - p.totalOverPeriod : 0;
-            const text = p && cand
-              ? `Our household plan: a ${s.candUsed ? "used " : ""}${candName} ${d >= 0 ? `saves about ${Math.round(d).toLocaleString("en-US")}` : `costs about ${Math.round(-d).toLocaleString("en-US")} more`} vs ${otherName} over ${s.years} years in WV, purchase price and resale included. Try yours:`
-              : "Our household EV plan for West Virginia:";
+            // Share the result, not just a link — the sentence the link's preview card shows.
+            const v = verdict(s, derived, result);
+            const text = v ? `${shareText(v)} Try yours:` : "Our household EV plan for West Virginia:";
             if (navigator.share) { try { await navigator.share({ title: "Our household EV plan", text, url }); } catch { /* closed */ } return; }
             try { await navigator.clipboard.writeText(url); setCopied(true); setTimeout(() => setCopied(false), 1800); } catch { window.prompt("Copy this link:", url); }
           }} />
@@ -845,12 +804,6 @@ function PlanResults({
     ["Insurance (estimate)", (r) => sum(r.units.map((u) => u.insurance))],
     ["WV registration & EV fees", (r) => sum(r.units.map((u) => u.registration))],
   ];
-  const vsGas = gasAlt ? gasAlt.totalOverPeriod - plan.totalOverPeriod : null;
-  const runVsGas = gasAlt ? gasAlt.runningPerYear - plan.runningPerYear : null;
-  // Years until the EV's running-cost savings cover its extra up-front cost.
-  const priceGap = gasAlt ? plan.upfrontCash - gasAlt.upfrontCash : null;
-  const breakEvenYears =
-    priceGap != null && runVsGas != null && runVsGas > 0 && priceGap > 0 ? priceGap / runVsGas : null;
   // What a USED one of the same model would need to cost to tie each option.
   const usedVsGas = gasAlt && gasVehicle ? usedBreakEvenPrice(plan, gasAlt.totalOverPeriod, input, catalog) : null;
   const usedVsToday = usedBreakEvenPrice(plan, today.totalOverPeriod, input, catalog);
@@ -872,10 +825,8 @@ function PlanResults({
   ];
   const outlook = gasOutlook(catalog);
   // Against the plan's comparison (the gas vehicle if chosen, else keeping what you have).
-  const otherDiff = other.totalOverPeriod - plan.totalOverPeriod;   // > 0 = EV saves
-  const otherRun = other.runningPerYear - plan.runningPerYear;      // > 0 = EV cheaper to run
-  const lowD = scenarios[0].d, highD = scenarios[2].d;              // plan − other; > 0 = EV costs more
-  const savingsRange = !isUsed && lowD != null && highD != null ? { lo: Math.min(-lowD, -highD), hi: Math.max(-lowD, -highD) } : null;
+  // The card's numbers come from lib/planVerdict.ts, shared with the share-card image.
+  const v = verdict(s, { cand, candName, gasVehicle }, result)!;
 
   return (
     <section className="space-y-5">
@@ -900,45 +851,31 @@ function PlanResults({
 
       {/* The answer first: the verdict, the three numbers that decide it, and the biggest unknown. */}
       <Card className="space-y-3">
-        <p className={`text-xl font-extrabold leading-snug ${otherDiff >= 0 ? "text-emerald-800" : "text-amber-800"}`}>
-          {gasAlt && gasVehicle
-            ? <>vs. {aGas}: the {evName} {otherDiff >= 0 ? `saves about ${usd(otherDiff)}` : `costs about ${usd(-otherDiff)} more`} over {Y} years</>
-            : <>The {evName} {otherDiff >= 0 ? `saves about ${usd(otherDiff)}` : `costs about ${usd(-otherDiff)} more`} than keeping what you have over {Y} years</>}
+        <p className={`text-xl font-extrabold leading-snug ${v.saving >= 0 ? "text-emerald-800" : "text-amber-800"}`}>
+          {verdictSentence(v)}
         </p>
         <ul className="grid grid-cols-3 gap-2 text-center" aria-label="The three numbers that decide it">
           <li className="rounded-lg bg-slate-50 p-2">
             <div className="text-[11px] text-ink-soft">Each month</div>
-            <div className="text-sm font-bold text-ink">{usd(Math.abs(otherRun) / 12)} {otherRun >= 0 ? "less" : "more"}</div>
-            <div className="text-[11px] text-ink-soft">to run than {gasAlt && gasVehicle ? aGas : "today"}</div>
+            <div className="text-sm font-bold text-ink">{usd(Math.abs(v.monthlyRunSaving))} {v.monthlyRunSaving >= 0 ? "less" : "more"}</div>
+            <div className="text-[11px] text-ink-soft">to run than {v.vsGas ? v.otherLabel : "today"}</div>
           </li>
           <li className="rounded-lg bg-slate-50 p-2">
             <div className="text-[11px] text-ink-soft">Up front</div>
-            <div className="text-sm font-bold text-ink">{usd(plan.upfrontCash)}</div>
-            <div className="text-[11px] text-ink-soft">
-              {priceGap != null && gasVehicle
-                ? priceGap > 0 ? `${usd(priceGap)} more than ${aGas}` : priceGap < 0 ? `${usd(-priceGap)} less than ${aGas}` : `same as ${aGas}`
-                : s.replaces ? "after your trade-in" : "price, tax and title"}
-            </div>
+            <div className="text-sm font-bold text-ink">{usd(v.upfront)}</div>
+            <div className="text-[11px] text-ink-soft">{upfrontWords(v)}</div>
           </li>
           <li className="rounded-lg bg-slate-50 p-2">
             <div className="text-[11px] text-ink-soft">Over {Y} years</div>
-            <div className="text-sm font-bold text-ink">
-              {savingsRange
-                ? savingsRange.lo < 0 && savingsRange.hi > 0
-                  ? `from ${usd(-savingsRange.lo)} more to ${usd(savingsRange.hi)} saved`
-                  : savingsRange.lo >= 0 ? `saves ${usd(savingsRange.lo)}–${usd(savingsRange.hi)}` : `costs ${usd(-savingsRange.hi)}–${usd(-savingsRange.lo)} more`
-                : otherDiff >= 0 ? `saves ${usd(otherDiff)}` : `costs ${usd(-otherDiff)} more`}
-            </div>
-            <div className="text-[11px] text-ink-soft">{savingsRange ? "depending on resale" : isUsed ? "resale is one estimate" : "middle estimate"}</div>
+            <div className="text-sm font-bold text-ink">{rangeWords(v)}</div>
+            <div className="text-[11px] text-ink-soft">{v.range ? "depending on resale" : isUsed ? "resale is one estimate" : "middle estimate"}</div>
           </li>
         </ul>
         <p className="text-sm text-ink-muted">
-          {gasAlt && gasVehicle && priceGap != null && priceGap > 0 && otherRun > 0
-            ? breakEvenYears != null
-              ? `The lower running costs cover the higher price in about ${breakEvenYears < 1 ? "a year" : `${Math.round(breakEvenYears * 10) / 10} years`}. `
-              : ""
+          {v.breakEvenYears != null
+            ? `The lower running costs cover the higher price in about ${v.breakEvenYears < 1 ? "a year" : `${Math.round(v.breakEvenYears * 10) / 10} years`}. `
             : ""}
-          {otherDiff < 0 && otherRun > 0
+          {v.saving < 0 && v.monthlyRunSaving > 0
             ? isUsed
               ? "It costs less to run, but the value it loses outweighs that. "
               : "It costs less to run, but it's expected to be worth less when you sell it, and that outweighs the savings — the resale setting below is the lever. "
