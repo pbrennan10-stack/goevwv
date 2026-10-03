@@ -7,8 +7,18 @@ import { Logo } from "@/components/Logo";
 export const metadata: Metadata = {
   title: "Why EVs Matter",
   description:
-    "Patrick Brennan on why EV adoption matters beyond fuel savings — energy independence, manufacturing sovereignty, cost and simplicity, and why legislation alone can't get us there.",
+    "Patrick Brennan on why EV adoption matters beyond fuel savings — energy independence, manufacturing sovereignty, cost and simplicity, and why what people buy matters more than what Washington does.",
 };
+
+// Each figure the essay states, and where it comes from.
+const SOURCES = [
+  { claim: "Colonial Pipeline shutdown, May 2021, and Virginia's state of emergency:", label: "WHSV, May 11, 2021", url: "https://www.whsv.com/2021/05/11/va-governor-declares-state-of-emergency-amid-colonial-pipeline-shutdown" },
+  { claim: "China's share of lithium-ion cell production, about 80%:", label: "TechInsights, 2025", url: "https://www.techinsights.com/ko/node/61132" },
+  { claim: "About 20 moving parts in an electric drivetrain versus roughly 200 in a conventional one:", label: "Interplex", url: "https://interplex.com/?p=21228" },
+  { claim: "BYD Seagull from 69,900 yuan in China:", label: "Electrek, May 2026", url: "https://electrek.co/2026/05/11/byd-upgrades-cheapest-ev-with-lidar-still-starts-at-13k/" },
+  { claim: "Oil and gas lobbying, about $137 million and fifth among industries in 2023 (OpenSecrets data):", label: "Planet Detroit", url: "https://planetdetroit.org/?p=15870" },
+  { claim: "The federal EV credit's end for vehicles bought after September 30, 2025 (P.L. 119-21):", label: "State of the Data", url: "/state-of-the-data" },
+];
 
 export default function AboutPage() {
   return (
@@ -44,10 +54,11 @@ export default function AboutPage() {
               price. When something disrupts that supply — a war in Eastern
               Europe, a storm on the Gulf Coast, a pipeline outage, an OPEC
               decision made in a room Americans aren&rsquo;t in — the price
-              at every pump in West Virginia moves within days. In 2021,
-              Texas&rsquo;s natural-gas heating supply froze and millions
-              lost heat and power. In 2022, global fuel prices spiked because
-              of the invasion of Ukraine. A transportation system that can
+              at every pump in West Virginia moves within days. In May 2021
+              a ransomware attack shut the Colonial Pipeline for most of a
+              week; stations across Virginia and the Southeast ran dry within
+              days and Virginia declared a state of emergency. In 2022, pump
+              prices spiked when Russia invaded Ukraine. A transportation system that can
               draw from multiple domestic energy sources — much of it
               generated right here in the Appalachian basin — is more
               resilient to those shocks than one tethered to a single
@@ -69,7 +80,7 @@ export default function AboutPage() {
               autonomous drones, grid storage, and the supply chains that
               underpin modern military capability. China understood this early.
               They built the factories, secured the raw material supply chains,
-              and now produce the majority of the world&rsquo;s lithium-ion cells.
+              and now make about 80% of the world&rsquo;s lithium-ion cells.
             </p>
             <PullQuote>
               The battery is to the 21st century what steel was to the 20th.
@@ -88,36 +99,40 @@ export default function AboutPage() {
             </p>
             <p className="mt-4">
               Buying an American-assembled EV is a small act with a real
-              connection to a large strategic question.
+              connection to a large strategic question. Every{" "}
+              <Link href="/ev" className="text-brand hover:underline">vehicle page</Link> here
+              says where that model is built, so it&rsquo;s a thing you can check.
             </p>
           </Section>
 
           <Section num="03" title="Cost, simplicity, and the China question">
             <p>
               An electric drivetrain is mechanically much simpler than a gasoline
-              one. A modern ICE powertrain has roughly 2,000 moving parts in its
-              engine, transmission, cooling system, exhaust, and fuel delivery.
-              An EV drivetrain has closer to 20. No spark plugs, no timing belts,
-              no oxygen sensors, no multi-speed transmission, no oil pump, no
-              radiator for engine cooling, no catalytic converter, no exhaust
-              system, no fuel injectors, no alternator. Regenerative braking
-              removes most wear from the brake pads too.
+              one. A conventional drivetrain has roughly 200 moving parts across
+              the engine, transmission, exhaust and fuel system. An electric
+              drivetrain has about 20. No spark plugs, no timing belts, no
+              oxygen sensors, no multi-speed transmission, no oil pump, no engine
+              radiator (the battery and motor keep a smaller cooling loop), no
+              catalytic converter, no exhaust system, no fuel injectors, no
+              alternator. Regenerative braking removes most wear from the brake
+              pads too.
             </p>
             <p className="mt-4">
               That simplicity compounds across the lifecycle. Engineering is
               cheaper because there&rsquo;s less to design. Assembly is cheaper
               because there are fewer parts to install and align. Ongoing
               maintenance is cheaper — no oil changes, no timing services, no
-              transmission flushes, brake pads lasting three to five times
-              longer. None of that is marketing copy; those are the line items
-              that fall out of the bill of materials and the shop invoice.
-              Over enough vehicles produced, that simpler BOM lets an EV reach
-              price points an ICE drivetrain structurally cannot.
+              transmission flushes, brake pads that wear far more slowly. Those
+              are line items on the bill of materials and the shop invoice. At
+              enough volume, that simpler bill of materials should let an EV
+              undercut a gas car on price; the battery is the part that still
+              has to get cheaper for that to happen here.
             </p>
             <p className="mt-4">
-              Which is why China&rsquo;s position matters. Chinese automakers
-              can produce a capable electric vehicle for under $10,000 today.
-              American manufacturers cannot — yet. The gap is real and it has
+              Which is why China&rsquo;s position matters. BYD sells its
+              Seagull in China from 69,900 yuan, about $10,300, before any
+              tariff. American manufacturers can&rsquo;t build to that price —
+              yet. The gap is real and it has
               several causes, but the primary one is scale: high-volume
               production drives down per-unit battery costs, which are still
               the most expensive component in an EV. China has that scale.
@@ -128,28 +143,26 @@ export default function AboutPage() {
               defensible. Every gigafactory that opens, every battery cell
               produced in America rather than imported, moves the cost curve
               in the right direction. The path to an affordable American EV
-              runs through the purchase decisions Americans make today. That
-              is not a comfortable thing to say, but it is honest.
+              runs through the purchase decisions Americans make today.
             </p>
           </Section>
 
-          <Section num="04" title="Why legislation can't solve this alone">
+          <Section num="04" title="Why this doesn't wait on Washington">
             <p>
-              The 2010 Citizens United decision made it legal for corporations
-              to spend unlimited sums influencing elections. The fossil fuel
-              industry spends more on lobbying and political advertising than
-              almost any other sector in the American economy. The predictable
-              result: legislators who understand the strategic case for
-              domestic EV adoption face significant political costs for acting
-              on that understanding.
+              Policy is the least reliable part of this picture. Congress
+              created a $7,500 EV credit in 2008, rebuilt it in 2022, and ended
+              it for vehicles bought after September 30, 2025. State rules move
+              too. Whichever party is in power, every industry with a stake
+              lobbies hard — oil and gas was the fifth-largest lobbying industry
+              in 2023 at about $137 million, with electric utilities and
+              automakers also among the big spenders — so the rules will keep
+              changing, and a buyer who waits for them to settle will wait a
+              long time.
             </p>
             <p className="mt-4">
-              This isn&rsquo;t a partisan point. It&rsquo;s a structural
-              description of how policy gets made — and how it gets blocked.
-              Sensible, long-term energy policy is genuinely difficult to pass
-              when the companies most exposed by that policy can direct large
-              sums toward defeating the politicians who support it. That
-              dynamic exists regardless of which party is in power.
+              The signal that doesn&rsquo;t swing is what people buy. Factories
+              get built where the customers are, and a factory, once built,
+              outlasts any one Congress.
             </p>
             <PullQuote>
               When enough Americans choose EVs, the industry exists. When it
@@ -158,27 +171,42 @@ export default function AboutPage() {
               direct.
             </PullQuote>
             <p>
-              The implication is that individual decisions carry more weight
-              than they would if the policy environment were functional.
-              Markets are the one signal that even a captured legislature
-              can&rsquo;t fully suppress.
+              That puts more weight on individual decisions than most people
+              assume. A market is the one signal no legislature can switch off,
+              and it&rsquo;s the one lever a West Virginia household actually
+              holds.
             </p>
           </Section>
 
           <Section num="05" title="What this site is">
             <p>
               I built GoEV WV because West Virginians deserve honest numbers
-              instead of either fossil fuel dismissal or environmental advocacy
-              dressed up as analysis. This calculator uses publicly filed
-              utility rates, EPA vehicle data, and current federal tax credit
-              rules — no manufacturer partnerships, no affiliate revenue, no
-              agenda beyond giving you a defensible estimate.
+              instead of a sales pitch from either side. I think more EVs would
+              be good for West Virginia, for the reasons above, and you should
+              know that going in. The calculator doesn&rsquo;t care what I
+              think: it runs on publicly filed utility rates, EPA vehicle data,
+              and the current federal and state rules, including the end of the
+              federal credit in 2025 — no manufacturer partnerships, no
+              affiliate revenue. Every number&rsquo;s source is on{" "}
+              <Link href="/state-of-the-data" className="text-brand hover:underline">State of the Data</Link>.
             </p>
             <p className="mt-4">
               Make the decision that makes sense for your situation. This site
               exists to help you make it with open eyes.
             </p>
           </Section>
+
+          <section className="text-sm">
+            <h2 className="text-base font-bold text-ink mb-2">Sources for the figures above</h2>
+            <ul className="list-disc pl-5 space-y-1">
+              {SOURCES.map((s) => (
+                <li key={s.url}>
+                  {s.claim}{" "}
+                  <a href={s.url} className="text-brand hover:underline" rel="noopener">{s.label}</a>
+                </li>
+              ))}
+            </ul>
+          </section>
 
         </div>
       </article>

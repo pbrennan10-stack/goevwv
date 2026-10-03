@@ -470,6 +470,18 @@ line people actually compare: payment plus running costs per month, against
 the gas vehicle and against keeping what you have (assumed paid off). The
 chart and table show interest as its own slice; the share card follows.
 
+### Why EVs Matter, edited for the same pitfalls (Oct 2026)
+
+A review of the old whyweare50th.com forum archive surfaced writing habits to
+avoid: diagnosing the reader or the system ("a captured legislature"),
+self-certifying lines ("none of that is marketing copy"), figures without
+receipts, and claiming no agenda while arguing one. The essay on `/about`
+was edited accordingly: section 04 now argues that policy swings (the credit
+came and went) so the market signal is what lasts, the Texas freeze example
+became the Colonial Pipeline shutdown, the parts count and the Chinese price
+were corrected, the author's view is stated plainly, and a sources list ends
+the page. The argument itself is unchanged.
+
 ### v2.0 — Business Mode Toggle
 
 - Top-of-page toggle: Residential / Business
