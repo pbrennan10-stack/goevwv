@@ -871,6 +871,11 @@ function PlanResults({
     { key: "high", label: "Strong resale", d: evMinusOther(result.range.high.plan, gasAlt ? result.range.high.gasAlt : null) },
   ];
   const outlook = gasOutlook(catalog);
+  // Against the plan's comparison (the gas vehicle if chosen, else keeping what you have).
+  const otherDiff = other.totalOverPeriod - plan.totalOverPeriod;   // > 0 = EV saves
+  const otherRun = other.runningPerYear - plan.runningPerYear;      // > 0 = EV cheaper to run
+  const lowD = scenarios[0].d, highD = scenarios[2].d;              // plan − other; > 0 = EV costs more
+  const savingsRange = !isUsed && lowD != null && highD != null ? { lo: Math.min(-lowD, -highD), hi: Math.max(-lowD, -highD) } : null;
 
   return (
     <section className="space-y-5">
@@ -893,8 +898,69 @@ function PlanResults({
         </div>
       )}
 
+      {/* The answer first: the verdict, the three numbers that decide it, and the biggest unknown. */}
+      <Card className="space-y-3">
+        <p className={`text-xl font-extrabold leading-snug ${otherDiff >= 0 ? "text-emerald-800" : "text-amber-800"}`}>
+          {gasAlt && gasVehicle
+            ? <>vs. {aGas}: the {evName} {otherDiff >= 0 ? `saves about ${usd(otherDiff)}` : `costs about ${usd(-otherDiff)} more`} over {Y} years</>
+            : <>The {evName} {otherDiff >= 0 ? `saves about ${usd(otherDiff)}` : `costs about ${usd(-otherDiff)} more`} than keeping what you have over {Y} years</>}
+        </p>
+        <ul className="grid grid-cols-3 gap-2 text-center" aria-label="The three numbers that decide it">
+          <li className="rounded-lg bg-slate-50 p-2">
+            <div className="text-[11px] text-ink-soft">Each month</div>
+            <div className="text-sm font-bold text-ink">{usd(Math.abs(otherRun) / 12)} {otherRun >= 0 ? "less" : "more"}</div>
+            <div className="text-[11px] text-ink-soft">to run than {gasAlt && gasVehicle ? aGas : "today"}</div>
+          </li>
+          <li className="rounded-lg bg-slate-50 p-2">
+            <div className="text-[11px] text-ink-soft">Up front</div>
+            <div className="text-sm font-bold text-ink">{usd(plan.upfrontCash)}</div>
+            <div className="text-[11px] text-ink-soft">
+              {priceGap != null && gasVehicle
+                ? priceGap > 0 ? `${usd(priceGap)} more than ${aGas}` : priceGap < 0 ? `${usd(-priceGap)} less than ${aGas}` : `same as ${aGas}`
+                : s.replaces ? "after your trade-in" : "price, tax and title"}
+            </div>
+          </li>
+          <li className="rounded-lg bg-slate-50 p-2">
+            <div className="text-[11px] text-ink-soft">Over {Y} years</div>
+            <div className="text-sm font-bold text-ink">
+              {savingsRange
+                ? savingsRange.lo < 0 && savingsRange.hi > 0
+                  ? `from ${usd(-savingsRange.lo)} more to ${usd(savingsRange.hi)} saved`
+                  : savingsRange.lo >= 0 ? `saves ${usd(savingsRange.lo)}–${usd(savingsRange.hi)}` : `costs ${usd(-savingsRange.hi)}–${usd(-savingsRange.lo)} more`
+                : otherDiff >= 0 ? `saves ${usd(otherDiff)}` : `costs ${usd(-otherDiff)} more`}
+            </div>
+            <div className="text-[11px] text-ink-soft">{savingsRange ? "depending on resale" : isUsed ? "resale is one estimate" : "middle estimate"}</div>
+          </li>
+        </ul>
+        <p className="text-sm text-ink-muted">
+          {gasAlt && gasVehicle && priceGap != null && priceGap > 0 && otherRun > 0
+            ? breakEvenYears != null
+              ? `The lower running costs cover the higher price in about ${breakEvenYears < 1 ? "a year" : `${Math.round(breakEvenYears * 10) / 10} years`}. `
+              : ""
+            : ""}
+          {otherDiff < 0 && otherRun > 0
+            ? isUsed
+              ? "It costs less to run, but the value it loses outweighs that. "
+              : "It costs less to run, but it's expected to be worth less when you sell it, and that outweighs the savings — the resale setting below is the lever. "
+            : ""}
+          {isUsed
+            ? "Biggest unknown: what a used EV is worth later — we use one estimate, not a range."
+            : "Biggest unknown: resale value. Nobody knows what today's EVs will be worth; the range above spans weak to strong resale, and every total includes each vehicle's expected resale."}
+        </p>
+        {gasAlt && gasVehicle && (
+          <p className="text-sm text-ink-muted">
+            vs. keeping what you have: {diff >= 0 ? `saves about ${usd(diff)}` : `costs about ${usd(-diff)} more`} over {Y} years; running costs {runDiff >= 0 ? "drop" : "rise"} {usd(Math.abs(runDiff) / 12)} a month.
+          </p>
+        )}
+        {plan.unassigned.length > 0 && (
+          <p className="rounded-lg bg-red-50 ring-1 ring-red-200 p-2 text-sm text-red-900">
+            This plan&apos;s total leaves out {plan.unassigned.map((u) => u.label.toLowerCase()).join(" and ")} — no vehicle in it can do {plan.unassigned.length > 1 ? "them" : "it"}. It isn&apos;t a real option as-is.
+          </p>
+        )}
+      </Card>
+
       <Card className="bg-brand-bg ring-emerald-200 space-y-3">
-        <p className="text-sm text-ink-muted">Whole-household cost over {Y} years — buying, owning, and driving everything in your driveway.</p>
+        <p className="text-sm text-ink-muted">Whole-household cost over {Y} years — buying, owning, and driving everything in your driveway. Here&apos;s where the money goes.</p>
         <StackedBars
           ariaLabel={`Total over ${Y} years: ${cols.map((c) => `${c.label} ${usd(c.r.totalOverPeriod)}`).join("; ")}.`}
           rows={cols.map((c) => ({
@@ -910,35 +976,6 @@ function PlanResults({
             ],
           }))}
         />
-        {vsGas != null && runVsGas != null && gasVehicle && (
-          <p className={`text-lg font-bold ${vsGas >= 0 ? "text-emerald-800" : "text-amber-800"}`}>
-            vs. {aGas}: the {evName}{" "}
-            {vsGas >= 0 ? `saves about ${usd(vsGas)}` : `costs about ${usd(-vsGas)} more`} over {Y} years
-            <span className="block text-sm font-medium text-ink-muted">
-              Running costs are {usd(Math.abs(runVsGas))} a year {runVsGas >= 0 ? "lower" : "higher"}
-              {priceGap != null && priceGap > 0 ? `; it costs ${usd(priceGap)} more up front` : priceGap != null && priceGap < 0 ? `, and it costs ${usd(-priceGap)} less up front` : ""}
-              {breakEvenYears != null ? ` — the savings cover that in about ${breakEvenYears < 1 ? "a year" : `${Math.round(breakEvenYears * 10) / 10} years`}` : ""}.
-              {" "}
-              {vsGas < 0 && runVsGas > 0
-                ? isUsed
-                  ? `But the value it loses outweighs the savings over ${Y} years.`
-                  : `But it's expected to be worth less when you sell it, and that outweighs the savings over ${Y} years — try the resale setting below.`
-                : "Totals include each vehicle's expected resale value."}
-            </span>
-          </p>
-        )}
-        <p className={`${vsGas != null ? "text-base" : "text-lg"} font-bold ${diff >= 0 ? "text-emerald-800" : "text-amber-800"}`}>
-          {vsGas != null ? "vs. keeping what you have: " : ""}
-          {diff >= 0 ? `saves about ${usd(diff)} over ${Y} years` : `costs about ${usd(-diff)} more over ${Y} years`}
-          <span className="block text-sm font-medium text-ink-muted">
-            Running costs {runDiff >= 0 ? `drop ${usd(runDiff)}` : `rise ${usd(-runDiff)}`} a year; the rest is the price of the vehicle, minus what it&apos;s worth when you&apos;re done.
-          </span>
-        </p>
-        {plan.unassigned.length > 0 && (
-          <p className="rounded-lg bg-red-50 ring-1 ring-red-200 p-2 text-sm text-red-900">
-            This plan&apos;s total leaves out {plan.unassigned.map((u) => u.label.toLowerCase()).join(" and ")} — no vehicle in it can do {plan.unassigned.length > 1 ? "them" : "it"}. It isn&apos;t a real option as-is.
-          </p>
-        )}
         <div className="rounded-xl bg-white/70 ring-1 ring-emerald-200 p-3 space-y-2">
           {isUsed ? (
             <>
@@ -1003,8 +1040,8 @@ function PlanResults({
             {workCharged.some((u) => u.workCharging === "paid") && plan.charging?.mode !== "none" ? "; if home is cheaper than work, the plan charges there" : ""}.
           </p>
         )}
-        <p className="text-sm text-ink">
-          <strong>Cash up front:</strong> {usd(plan.upfrontCash)}{s.replaces ? " after your trade-in" : ""} (price + WV 6% sales tax + title{plan.charging?.setupUsd ? " + home charger" : ""}).
+        <p className="text-xs text-ink-soft">
+          Up front: {usd(plan.upfrontCash)}{s.replaces ? " after your trade-in" : ""} — price + WV 6% sales tax + title{plan.charging?.setupUsd ? " + home charger" : ""}.
         </p>
       </Card>
 

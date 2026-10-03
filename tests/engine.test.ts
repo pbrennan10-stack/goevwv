@@ -2,7 +2,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { calculate } from "../lib/calc";
-import { getBackupPower, getFederalData, getIceVehicles, getOwnershipAssumptions, getUtilities, getVehicles } from "../lib/data";
+import { getBackupPower, getChecklists, getFederalData, getIceVehicles, getOwnershipAssumptions, getUtilities, getVehicles } from "../lib/data";
 import { backupDays, backupOptions, fmtDays, makerDays } from "../lib/backup";
 import { planHousehold, shoppingModels, shortName, tippingPoints, usedBreakEvenPrice, usedShoppingList, type Catalog, type HouseholdInput } from "../lib/household";
 import { TRIP_PRESETS, decodeState, encodeState, sanitizeLoaded } from "../lib/planState";
@@ -241,6 +241,13 @@ test("data: backup power entries name real vehicles, label confidence, and the m
   assert.equal(backupOptions(ioniq9.id, ioniq9.features, backup).best, null, "no outlet, no hardware: no rung");
   assert.equal(fmtDays(0.5), "under a day");
   assert.equal(fmtDays(1.1), "about a day");
+});
+
+test("data: checklist constants are sane", () => {
+  const c = getChecklists().electrical;
+  assert.ok(c.continuous_load_share > 0.5 && c.continuous_load_share <= 1 && c.dryer_circuit_amps >= 20 && c.dryer_circuit_amps <= 50);
+  assert.equal(Math.round(c.dryer_circuit_amps * c.continuous_load_share), 24, "24 amps on a 30-amp dryer circuit");
+  assert.ok(c.nec_edition && c.nec_effective && c.sources.length > 0);
 });
 
 test("no home charging costs more than charging at home", () => {

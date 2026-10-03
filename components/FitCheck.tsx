@@ -324,7 +324,7 @@ export function FitCheck({ level2InstalledUsd }: { level2InstalledUsd: number })
   }
 
   return (
-    <section id="fit-check" aria-labelledby="fit-check-title" className="rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 p-5 sm:p-7 mb-8">
+    <section id="fit-check" aria-labelledby="fit-check-title" className="rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 p-5 sm:p-7">
       <h2 id="fit-check-title" className="text-lg font-semibold text-ink mb-1">Does an EV fit your life?</h2>
       <p className="text-sm text-ink-soft mb-5">4 questions. Honest, WV-specific answer.</p>
 

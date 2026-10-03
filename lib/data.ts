@@ -8,7 +8,7 @@ import yaml from "js-yaml";
 import type { OwnershipAssumptions } from "./household";
 import type { WearData } from "./wear";
 import type { BackupPowerData } from "./backup";
-import type { ChargingInfraData, FederalData, IceVehicle, Utility, Vehicle } from "./types";
+import type { ChargingInfraData, ChecklistData, FederalData, IceVehicle, Utility, Vehicle } from "./types";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 
@@ -116,4 +116,8 @@ export function getWearData(): WearData {
 
 export function getBackupPower(): BackupPowerData {
   return readYaml<BackupPowerData>("backup_power.yaml");
+}
+
+export function getChecklists(): ChecklistData {
+  return readYaml<ChecklistData>("checklists.yaml");
 }

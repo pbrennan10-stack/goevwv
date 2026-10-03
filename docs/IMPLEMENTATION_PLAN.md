@@ -389,6 +389,37 @@ per-home electrical advice beyond "ask an electrician."
 resolves to all three rungs with Ford's 3-day figure; the days math and its
 wording.
 
+### Answer first (Oct 2026)
+
+**The problem.** At phone width the planner results ran 8.5 screens with 123
+numbers before the reader could be sure of the answer, and the homepage put
+the fit check — the site's best door — 1.1 screens below the cost chart.
+
+**Design.** Results open with a verdict card: the verdict sentence (vs the gas
+vehicle if chosen, else vs keeping what you have), three tiles — the monthly
+running-cost difference (people budget by the month), cash up front with the
+gap to the gas vehicle, and the 5-year range across weak and strong resale —
+then one line naming the biggest unknown and, when it applies, how many years
+the lower running costs take to cover the higher price. The where-the-money-
+goes chart and all detail follow; nothing was removed, only moved below the
+answer. On the homepage the fit check now leads (left column on desktop, first
+on phones) with the 100-mile chart beside it; the "take the fit check" button
+is gone because the quiz is on screen.
+
+### Scripts and checklists (Oct 2026)
+
+**The idea.** Each result page ended in a number; the next step was left to the
+reader. `/learn/checklists` gives three ready-to-use pieces, each copyable and
+printable: an email asking an employer about charging at work (free or billed,
+outlet or Level 2, who to talk to), a checklist for the electrician visit
+(panel size, big electric loads, existing 240-volt outlets, what to ask for: a
+load calculation, a load-managing charger before a service upgrade, permit and
+inspection, an ENERGY STAR charger where a utility rebate requires it), and a
+used-EV walk-around for the dealer lot (battery health report, displayed range
+vs EPA, charge port and adapter, heat pump, cords and key cards, recalls,
+warranty transfer, WV fee and tax). Numbers come from data files; the few
+electrical constants live in `data/checklists.yaml` with sources.
+
 ### v2.0 — Business Mode Toggle
 
 - Top-of-page toggle: Residential / Business

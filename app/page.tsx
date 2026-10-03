@@ -35,6 +35,8 @@ export default function HomePage() {
         </p>
 
         <div className="mt-6 grid gap-6 md:grid-cols-2 md:items-start">
+          <FitCheck level2InstalledUsd={own.home_charging_setup.level2_installed_usd} />
+          <div className="flex flex-col gap-4">
           <div className="rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 p-5">
             <h2 className="font-bold text-ink">What 100 miles costs in West Virginia</h2>
             <p className="text-xs text-ink-soft mb-3">A typical EV vs a 25-mpg gas car, winter included</p>
@@ -48,11 +50,7 @@ export default function HomePage() {
             />
             <p className="mt-3 text-xs text-ink-soft">Where you charge matters more than which EV you pick.</p>
           </div>
-          <div className="flex flex-col gap-3">
-            <a href="#fit-check" className="inline-flex items-center justify-center rounded-xl bg-brand hover:bg-brand-dark text-white font-semibold px-5 py-3 transition shadow-sm">
-              Take the 4-question fit check ↓
-            </a>
-            <Link href="/plan" className="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white hover:border-brand text-ink font-semibold px-5 py-3 transition">
+            <Link href="/plan" className="inline-flex items-center justify-center rounded-xl bg-brand hover:bg-brand-dark text-white font-semibold px-5 py-3 transition shadow-sm">
               Plan your whole household →
             </Link>
             <p className="text-sm text-ink-soft">No sign-up, nothing stored. Every number is sourced on <Link href="/state-of-the-data" className="text-brand hover:underline">State of the Data</Link>.</p>
@@ -69,8 +67,6 @@ export default function HomePage() {
           </Link>
         </p>
       </section>
-
-      <FitCheck level2InstalledUsd={own.home_charging_setup.level2_installed_usd} />
 
       <section className="mt-14 grid gap-4 sm:grid-cols-2">
         {[
