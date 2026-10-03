@@ -7,6 +7,8 @@ import { backupDays, backupOptions, fmtDays, makerDays } from "../lib/backup";
 import { planHousehold, shoppingModels, shortName, tippingPoints, usedBreakEvenPrice, usedShoppingList, type Catalog, type HouseholdInput } from "../lib/household";
 import { TRIP_PRESETS, decodeState, encodeState, initialState, sanitizeLoaded } from "../lib/planState";
 import { derivePlan, rangeWords, shareText, shareTitle, verdict, verdictFromLink, verdictSentence } from "../lib/planVerdict";
+import { vehicleCardFacts } from "../lib/vehicleCard";
+import { costPer100Mi } from "../lib/scenario";
 import { ASSIST_LABEL, FEATURE_GROUPS } from "../lib/features";
 
 const cat: Catalog = { evs: getVehicles(), ice: getIceVehicles(), utilities: getUtilities(), fed: getFederalData(), own: getOwnershipAssumptions() };
@@ -328,4 +330,31 @@ test("share card: without a gas vehicle the verdict is against keeping what you 
   assert.match(verdictSentence(v), /^The Equinox EV (saves about|costs about) .* than keeping what you have over 5 years$/);
   assert.ok(verdictFromLink(encodeState({ ...initialState(cat), replaces: null, gasRef: null }), cat), "keeping every vehicle and adding an EV still has a verdict");
   assert.match(shareTitle(verdictFromLink(encodeState({ ...initialState(cat), candUsed: { price: 24000, odometer: "under_50k" } }), cat)!), /^A used Equinox EV /);
+});
+
+test("vehicle share cards say what the page says", () => {
+  const backup = getBackupPower();
+  const facts = (id: string) => vehicleCardFacts(cat.evs.find((v) => v.id === id)!, cat.fed, cat.utilities, cat.evs, backup);
+  const eq = cat.evs.find((v) => v.id === "chevy-equinox-ev-2025")!;
+  const f = facts(eq.id);
+  assert.equal(f.title, `${eq.year} ${eq.make} ${eq.model}`);
+  assert.equal(f.tiles.length, 3);
+  assert.equal(f.tiles[0].value, `~${eq.winter_range_mi} mi`, "winter range leads");
+  const aep = cat.utilities.find((u) => u.id === "aep")!;
+  assert.equal(f.tiles[2].value, `$${costPer100Mi(eq, aep.residential.flat_rate_per_kwh).toFixed(2)}`, "cost per 100 miles matches the page's helper");
+  assert.match(f.tiles[2].sub, /^vs \$\d+\.\d\d on gas at 25 mpg$/);
+  const phev = cat.evs.find((v) => v.powertrain === "phev" && v.epa_range_mi_electric && v.efficiency_mpg_hybrid)!;
+  const pf = facts(phev.id);
+  assert.equal(pf.tiles[0].label, "Electric range");
+  assert.equal(pf.tiles[1].value, `${phev.efficiency_mpg_hybrid} mpg`);
+  const lightning = cat.evs.find((v) => v.model.includes("Lightning"))!;
+  assert.match(facts(lightning.id).note ?? "", /^In an outage: about .* of essentials from the battery · /, "backup line for a vehicle with a sourced backup path");
+  const gone = cat.evs.find((v) => v.status === "discontinued" && !backup.transfer_switch.some((e) => e.ids.includes(v.id)) && !backup.v2h.some((e) => e.ids.includes(v.id)) && !v.features?.power_outlet_v2l)!;
+  assert.equal(facts(gone.id).note, "Discontinued — used market only");
+  assert.match(facts(gone.id).subtitle, /last sold new at \$/);
+  for (const v of cat.evs) {
+    const x = facts(v.id);
+    assert.ok(x.tiles.length >= 2 && x.tiles.length <= 3, `${v.id} tiles`);
+    assert.ok(x.title.length < 40 && x.subtitle.length < 80, `${v.id} fits the card: ${x.title} / ${x.subtitle}`);
+  }
 });

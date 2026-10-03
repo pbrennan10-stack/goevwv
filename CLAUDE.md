@@ -40,7 +40,7 @@ goevwv/
 │   ├── page.tsx        # Landing + fit check
 │   ├── plan/           # Household planner (whole driveway, purchase price, trips); share-image/ draws the preview card for shared links
 │   ├── calculator/     # Single-vehicle calculator
-│   ├── ev/             # /ev index + /ev/[id] static guide page per vehicle (SEO)
+│   ├── ev/             # /ev index + /ev/[id] static guide page per vehicle (SEO); [id]/share-image/ draws its preview card
 │   ├── utilities/      # /utilities index + /utilities/[id] EV rate page per utility
 │   ├── faq/            # WV EV FAQ built from data/* (FAQPage JSON-LD)
 │   ├── chargers/, about/, state-of-the-data/, report/
@@ -54,6 +54,7 @@ goevwv/
 │   ├── charts.tsx      # Zero-dependency chart kit (HBars, StackedBars)
 │   ├── RangeCargoExplorer.tsx # /ev range + luggage explorer
 │   ├── Term.tsx        # Tap-to-explain popover (data/glossary.json)
+│   ├── ShareCard.tsx   # Frame + tiles shared by the link-preview images (next/og)
 │   └── Logo.tsx, ChargerMap.tsx, RouteHelper.tsx, …
 ├── lib/
 │   ├── types.ts        # TS types (Vehicle, Capability, Utility, FederalData, …)
@@ -67,6 +68,7 @@ goevwv/
 │   ├── wear.ts         # Maintenance-over-time math for /learn/what-wears-out
 │   ├── planState.ts    # Planner state, trip presets, ?h= URL encoding
 │   ├── planVerdict.ts  # Plan link → engine input + verdict (results card, share text, preview image)
+│   ├── vehicleCard.ts  # What a vehicle page's preview card says (same helpers as the page)
 │   └── planCatalog.ts  # Server-only: the slimmed catalog the planner and its share image run on
 ├── data/
 │   ├── vehicles.json   # ~70 EV/PHEV models incl. cargo vans (capability + source per vehicle)
@@ -189,7 +191,7 @@ The first-time droplet setup is in `docs/REBUILD_RUNBOOK.md`. The bootstrap scri
 
 ## Guide pages (SEO)
 
-`/ev/[id]`, `/utilities/[id]`, and `/faq` are statically generated from `data/*` at build time, so they refresh automatically with every data update — no copy to maintain. They show one "typical WV driver" example (`lib/scenario.ts`: 30 mi/day, 5 days/wk, 4 long trips, 25 mpg, AEP) and deep-link into the calculator with the same inputs; keep `TYPICAL` in step with `DEFAULT_INPUT` in `components/Calculator.tsx`. New vehicles and utilities get pages and sitemap entries automatically. Co-ops are excluded from `/utilities/[id]` because their rates are unverified.
+`/ev/[id]`, `/utilities/[id]`, and `/faq` are statically generated from `data/*` at build time, so they refresh automatically with every data update — no copy to maintain. They show one "typical WV driver" example (`lib/scenario.ts`: 30 mi/day, 5 days/wk, 4 long trips, 25 mpg, AEP) and deep-link into the calculator with the same inputs; keep `TYPICAL` in step with `DEFAULT_INPUT` in `components/Calculator.tsx`. New vehicles and utilities get pages and sitemap entries automatically. Co-ops are excluded from `/utilities/[id]` because their rates are unverified. Each vehicle page's link preview is drawn on request by `app/ev/[id]/share-image/route.tsx` from `lib/vehicleCard.ts` (winter and highway range, cost per 100 miles vs gas for the typical driver, backup-power days), using the page's own helpers so the card and the page agree; the frame and tiles live in `components/ShareCard.tsx`, shared with the planner's share card.
 
 ## Household planner (/plan)
 

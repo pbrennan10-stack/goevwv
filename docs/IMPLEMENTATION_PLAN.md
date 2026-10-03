@@ -439,6 +439,16 @@ runtime (it reads `data/*`), renders in about 80 ms, and caches for a day; a
 link without a finished plan gets the general planner card. No new
 dependencies — `next/og` ships with Next.
 
+**Vehicle pages too (Oct 3).** Each `/ev/[id]` page, the search-engine entry
+point people paste into forums and Facebook groups, previews with its own card:
+year, make and model, WV winter range against EPA, realistic highway range,
+cost per 100 miles at home against gas for the typical driver (plug-in
+hybrids: electric range, mpg on gas), and the backup-power line where a
+sourced path exists. `lib/vehicleCard.ts` builds the facts from the page's own
+helpers; the card is drawn on request and cached for a day, so a Windows
+`next build` never has to render it. Both cards share one frame
+(`components/ShareCard.tsx`).
+
 ### v2.0 — Business Mode Toggle
 
 - Top-of-page toggle: Residential / Business
