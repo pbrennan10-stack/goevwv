@@ -55,6 +55,17 @@ export interface OwnershipAssumptions {
   default_owned_value_usd: number;
   owned_maintenance_multiplier: { gas: Record<OdometerBand, number>; ev: Record<OdometerBand, number> };
   home_charging_setup: { level1_usd: number; level2_installed_usd: number; level1_max_daily_mi: number };
+  // Starting APRs for the "paying monthly?" option (national averages; the user can enter their own).
+  apr_reference: { new_60mo: number; used: number; term_months: number; source: string };
+}
+
+// Paying monthly: an amortized loan on what you buy, after the trade-in and
+// any cash down. Applies to the EV and to the gas alternative alike.
+export interface FinancingInput {
+  aprNew: number;      // yearly rate on a vehicle bought new, e.g. 0.07
+  aprUsed: number;     // bought used, e.g. 0.106
+  termMonths: number;  // 60
+  cashDown: number;    // cash at signing beyond the trade-in
 }
 
 export interface OwnedInput {
@@ -115,6 +126,7 @@ export interface HouseholdInput {
   retention5yOverride: number | null;
   resaleScenario?: ResaleScenario;   // default "mid"
   homeCharging?: HomeCharging;       // default "auto"
+  financing?: FinancingInput | null; // null/absent = paying cash
 }
 
 export interface Catalog {
@@ -490,8 +502,17 @@ export interface UnitResult {
   insurance: number;
   registration: number;
   runningPerYear: number;
-  capitalOverPeriod: number;  // depreciation (owned) or net purchase cost (new)
+  capitalOverPeriod: number;  // depreciation (owned) or net purchase cost (new), incl. loan interest
   capitalNote: string;
+  interest: number;           // loan interest inside the period (0 when paying cash or kept)
+}
+
+export interface LoanResult {
+  amount: number;        // financed: price + tax − trade-in − cash down
+  payment: number;       // per month
+  months: number;
+  apr: number;
+  cashAtSigning: number; // cash down (no more than what's owed) + the home charger
 }
 
 export interface ScenarioResult {
@@ -502,8 +523,41 @@ export interface ScenarioResult {
   capitalOverPeriod: number;
   totalOverPeriod: number;
   perYear: number;
-  upfrontCash: number;       // new vehicle only: price + tax + title + charger − trade-in
+  upfrontCash: number;       // new vehicle only: price + tax + title + charger − trade-in (the cash figure, financed or not)
   charging: ChargingPlan | null;
+  interestOverPeriod: number; // loan interest inside the period, all vehicles (0 when paying cash)
+  loan: LoanResult | null;    // the vehicle bought in this scenario, when financed
+}
+
+// ---------- Loans ----------
+
+// Standard amortized payment. A zero rate is just principal / months.
+export function loanPayment(principal: number, apr: number, months: number): number {
+  if (principal <= 0 || months <= 0) return 0;
+  const r = apr / 12;
+  if (r === 0) return principal / months;
+  return (principal * r) / (1 - Math.pow(1 + r, -months));
+}
+
+// What's still owed after k payments.
+export function loanBalance(principal: number, apr: number, months: number, k: number): number {
+  if (principal <= 0 || months <= 0) return 0;
+  const n = Math.min(Math.max(0, k), months);
+  const pmt = loanPayment(principal, apr, months);
+  const r = apr / 12;
+  if (r === 0) return Math.max(0, principal - pmt * n);
+  const g = Math.pow(1 + r, n);
+  return Math.max(0, principal * g - (pmt * (g - 1)) / r);
+}
+
+// Interest inside the first k payments. A loan can outlast the ownership
+// period; what's still owed at the sale is principal, paid from the proceeds,
+// so only the interest paid by then counts.
+export function loanInterest(principal: number, apr: number, months: number, k: number): number {
+  if (principal <= 0 || months <= 0) return 0;
+  const n = Math.min(Math.max(0, k), months);
+  const paid = loanPayment(principal, apr, months) * n;
+  return Math.max(0, paid - (principal - loanBalance(principal, apr, months, n)));
 }
 
 function assign(units: Unit[], uses: Use[], rates: Rates, overrides: Record<string, string>, years: number, fed: FederalData) {
@@ -550,6 +604,7 @@ export function runScenario(units: Unit[], uses: Use[], h: HouseholdInput, cat: 
   const assignment = assign(units, uses, rates, opts.overrides, Y, cat.fed);
   const totalMiles = uses.reduce((s, u) => s + u.miles, 0);
   let upfrontCash = 0;
+  let loan: LoanResult | null = null;
   let meterCharged = false;
 
   const unitResults: UnitResult[] = units.map((unit) => {
@@ -572,6 +627,7 @@ export function runScenario(units: Unit[], uses: Use[], h: HouseholdInput, cat: 
 
     let capitalOverPeriod = 0;
     let capitalNote = "";
+    let interest = 0;
     if (unit.isNew) {
       const list = newVehiclePrice(unit);
       const price = opts.candidatePrice ?? list;
@@ -590,11 +646,22 @@ export function runScenario(units: Unit[], uses: Use[], h: HouseholdInput, cat: 
         resale = list * retentionAfter(r5, Y, own);
       }
       const setup = unit.pt !== "gas" && charging ? charging.setupUsd : 0;
-      capitalOverPeriod = price + tax + setup - resale;
+      // Paying monthly: the loan covers price + tax after the trade-in and
+      // cash down; the home charger is paid in cash. Interest paid inside the
+      // period is a real cost of buying this way, so it joins the total.
+      const fin = h.financing;
+      if (fin && fin.termMonths > 0) {
+        const apr = unit.usedOdometer ? fin.aprUsed : fin.aprNew;
+        const owed = Math.max(0, price + tax - tradeIn);
+        const amount = Math.max(0, owed - fin.cashDown);
+        interest = loanInterest(amount, apr, fin.termMonths, Y * 12);
+        loan = { amount, payment: loanPayment(amount, apr, fin.termMonths), months: fin.termMonths, apr, cashAtSigning: Math.min(fin.cashDown, owed) + setup };
+      }
+      capitalOverPeriod = price + tax + setup - resale + interest;
       upfrontCash = price + tax + setup - tradeIn;
       const $ = (n: number) => `$${Math.round(n).toLocaleString("en-US")}`;
       const priceNote = unit.usedOdometer ? " used" : destinationIsEstimated(unit) ? " (destination fee estimated)" : "";
-      capitalNote = `${$(price)}${priceNote} + ${$(tax)} tax & title${setup ? ` + ${$(setup)} home charger` : ""} − ~${$(resale)} resale after ${Y} yr`;
+      capitalNote = `${$(price)}${priceNote} + ${$(tax)} tax & title${setup ? ` + ${$(setup)} home charger` : ""}${interest ? ` + ~${$(interest)} loan interest` : ""} − ~${$(resale)} resale after ${Y} yr`;
     } else {
       const value = ownedIn?.valueNow ?? own.default_owned_value_usd;
       const later = value * Math.pow(1 - own.older_vehicle_annual_depreciation, Y);
@@ -605,7 +672,7 @@ export function runScenario(units: Unit[], uses: Use[], h: HouseholdInput, cat: 
     return {
       unit, miles, share: totalMiles ? miles / totalMiles : 0, uses: mine,
       energy, maintenance, insurance, registration, runningPerYear,
-      capitalOverPeriod, capitalNote,
+      capitalOverPeriod, capitalNote, interest,
     };
   });
 
@@ -617,6 +684,7 @@ export function runScenario(units: Unit[], uses: Use[], h: HouseholdInput, cat: 
     unassigned: uses.filter((u) => !assignment[u.id]),
     runningPerYear, capitalOverPeriod, totalOverPeriod, perYear: totalOverPeriod / Y,
     upfrontCash, charging,
+    interestOverPeriod: unitResults.reduce((s, r) => s + r.interest, 0), loan,
   };
 }
 
@@ -641,10 +709,14 @@ export function usedBreakEvenPrice(scenario: ScenarioResult, targetTotal: number
   const { rate, title_fee_usd: title, trade_in_reduces_base } = own.wv_purchase_tax;
   const sold = h.candidate?.replaces;
   const tradeIn = sold ? h.owned.find((o) => o.key === sold)?.valueNow ?? 0 : 0;
+  const fin = h.financing;
   const total = (p: number) => {
     const taxBase = trade_in_reduces_base ? Math.max(0, p - tradeIn) : p;
+    const tax = taxBase * rate + title;
     const ins = insuranceFor(ur.unit, p);
-    return fixed + ins * Y + p + taxBase * rate + title - keep * p;
+    // Financed the same way runScenario finances a used purchase.
+    const interest = fin && fin.termMonths > 0 ? loanInterest(Math.max(0, Math.max(0, p + tax - tradeIn) - fin.cashDown), fin.aprUsed, fin.termMonths, Y * 12) : 0;
+    return fixed + ins * Y + p + tax - keep * p + interest;
   };
   if (total(0) > targetTotal) return null;
   let lo = 0, hi = Math.max(1000, newVehiclePrice(ur.unit) * 3);

@@ -105,8 +105,15 @@ home_charging_setup:
     implies Level 2. Households that can't charge at home pay public charging
     prices for every mile — shown separately.
 
-# For reference if financing is added later (not used yet).
+# The planner's "paying monthly?" option: a standard amortized loan on what
+# you buy (price + tax − trade-in − cash down; the home charger is paid in
+# cash). These national averages are the starting APRs; the user can enter
+# their lender's quote. Interest inside the ownership period is added to the
+# total; a loan longer than the period is paid off from the sale.
 apr_reference:
   new_60mo: 0.07     # Bankrate weekly survey, 2026-09-23
   used: 0.106        # Edmunds, July 2026 (search excerpt)
+  term_months: 60    # the default loan length
   source: "https://www.bankrate.com/loans/auto-loans/rates/"
+  source_used: "https://www.edmunds.com/car-loan/"
+  retrieved: "2026-09-23"

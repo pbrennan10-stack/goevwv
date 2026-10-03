@@ -4,9 +4,9 @@ import assert from "node:assert/strict";
 import { calculate } from "../lib/calc";
 import { getBackupPower, getChecklists, getFederalData, getIceVehicles, getOwnershipAssumptions, getUtilities, getVehicles } from "../lib/data";
 import { backupDays, backupOptions, fmtDays, makerDays } from "../lib/backup";
-import { planHousehold, shoppingModels, shortName, tippingPoints, usedBreakEvenPrice, usedShoppingList, type Catalog, type HouseholdInput } from "../lib/household";
+import { loanBalance, loanInterest, loanPayment, planHousehold, shoppingModels, shortName, tippingPoints, usedBreakEvenPrice, usedShoppingList, type Catalog, type HouseholdInput } from "../lib/household";
 import { TRIP_PRESETS, decodeState, encodeState, initialState, sanitizeLoaded } from "../lib/planState";
-import { derivePlan, rangeWords, shareText, shareTitle, verdict, verdictFromLink, verdictSentence } from "../lib/planVerdict";
+import { allInSentence, derivePlan, paymentWords, rangeWords, shareText, shareTitle, verdict, verdictFromLink, verdictSentence } from "../lib/planVerdict";
 import { vehicleCardFacts } from "../lib/vehicleCard";
 import { costPer100Mi } from "../lib/scenario";
 import { ASSIST_LABEL, FEATURE_GROUPS } from "../lib/features";
@@ -357,4 +357,75 @@ test("vehicle share cards say what the page says", () => {
     assert.ok(x.tiles.length >= 2 && x.tiles.length <= 3, `${v.id} tiles`);
     assert.ok(x.title.length < 40 && x.subtitle.length < 80, `${v.id} fits the card: ${x.title} / ${x.subtitle}`);
   }
+});
+
+test("loans: payment, balance and interest follow standard amortization", () => {
+  assert.ok(close(loanPayment(20000, 0.07, 60), 396.02, 0.0001), `${loanPayment(20000, 0.07, 60)}`);
+  assert.equal(loanPayment(12000, 0, 60), 200);
+  assert.ok(close(loanBalance(20000, 0.07, 60, 60), 0, 0), "paid off at the end");
+  assert.ok(close(loanBalance(20000, 0.07, 60, 0), 20000, 0));
+  assert.ok(close(loanInterest(20000, 0.07, 60, 60), loanPayment(20000, 0.07, 60) * 60 - 20000, 0.0001), "full-term interest = payments − principal");
+  const inside = loanInterest(20000, 0.07, 72, 60), whole = loanInterest(20000, 0.07, 72, 72);
+  assert.ok(inside < whole && inside > whole * 0.9, "a 6-year loan sold after 5: most, not all, of the interest is paid");
+  assert.equal(loanInterest(0, 0.07, 60, 60), 0);
+  assert.equal(loanInterest(20000, 0, 60, 60), 0);
+});
+
+test("financing: a 0% loan with nothing down costs the same as cash; otherwise interest joins the total", () => {
+  const cash = planHousehold(household(), cat);
+  const free = planHousehold(household({ financing: { aprNew: 0, aprUsed: 0, termMonths: 60, cashDown: 0 } }), cat);
+  assert.ok(close(free.plan!.totalOverPeriod, cash.plan!.totalOverPeriod, 0), "0% APR ties cash");
+  assert.ok(close(free.gasAlt!.totalOverPeriod, cash.gasAlt!.totalOverPeriod, 0));
+  const fin = { aprNew: 0.07, aprUsed: 0.106, termMonths: 60, cashDown: 0 };
+  const r = planHousehold(household({ financing: fin }), cat);
+  const p = r.plan!;
+  assert.ok(p.loan && p.interestOverPeriod > 0, "the EV plan has a loan");
+  assert.ok(r.gasAlt!.loan && r.gasAlt!.interestOverPeriod > 0, "so does the gas alternative");
+  assert.ok(close(p.totalOverPeriod, cash.plan!.totalOverPeriod + p.interestOverPeriod, 0), "financed total = cash total + interest");
+  assert.ok(close(p.loan!.amount, p.upfrontCash - (p.charging?.setupUsd ?? 0), 0), "amount financed = price + tax − trade-in; the charger is paid in cash");
+  assert.ok(close(p.loan!.payment, loanPayment(p.loan!.amount, 0.07, 60), 0.0001));
+  assert.ok(close(p.interestOverPeriod, loanInterest(p.loan!.amount, 0.07, 60, 60), 0.0001));
+  assert.equal(r.today.loan, null);
+  assert.equal(r.today.interestOverPeriod, 0);
+  assert.ok(p.upfrontCash === cash.plan!.upfrontCash, "the cash figure is unchanged");
+  const down = planHousehold(household({ financing: { ...fin, cashDown: 5000 } }), cat).plan!;
+  assert.ok(close(down.loan!.amount, p.loan!.amount - 5000, 0) && down.interestOverPeriod < p.interestOverPeriod, "cash down shrinks the loan and the interest");
+  assert.ok(close(down.loan!.cashAtSigning, 5000 + (down.charging?.setupUsd ?? 0), 0));
+  const long = planHousehold(household({ financing: { ...fin, termMonths: 84 } }), cat).plan!;
+  assert.ok(close(long.interestOverPeriod, loanInterest(long.loan!.amount, 0.07, 84, 60), 0.0001), "only the interest inside the 5 years counts");
+  const used = planHousehold(household({ financing: fin, candidate: { ref: "ev:chevy-equinox-ev-2025", price: 24000, replaces: "a", used: { odometer: "under_50k" } } }), cat).plan!;
+  assert.ok(close(used.loan!.apr, 0.106, 0), "a used purchase borrows at the used rate");
+});
+
+test("financing: buying used at the break-even price still ties (interest on both sides)", () => {
+  const h = household({ financing: { aprNew: 0.07, aprUsed: 0.106, termMonths: 60, cashDown: 1000 } });
+  const r = planHousehold(h, cat);
+  for (const target of [r.today.totalOverPeriod, r.gasAlt!.totalOverPeriod]) {
+    const p = usedBreakEvenPrice(r.plan!, target, h, cat)!;
+    assert.ok(p > 0);
+    const used = planHousehold(household({ ...h, candidate: { ...h.candidate!, price: p, used: { odometer: "under_50k" } } }), cat);
+    assert.ok(close(used.plan!.totalOverPeriod, target, 0.001), `${used.plan!.totalOverPeriod} vs ${target}`);
+  }
+});
+
+test("financing: the choice survives a share link and the verdict carries the monthly view", () => {
+  const s = { ...initialState(cat), finance: { aprPct: null, months: 72, down: 2500 } };
+  const back = sanitizeLoaded(decodeState(encodeState(s)), cat)!;
+  assert.deepEqual(back.finance, { aprPct: null, months: 72, down: 2500 });
+  assert.equal(sanitizeLoaded({ finance: { aprPct: 99, months: 72, down: 0 } }, cat), null, "an impossible APR is dropped");
+  assert.equal(sanitizeLoaded({ finance: { aprPct: 6.5, months: 61, down: 0 } }, cat), null, "an odd term is dropped");
+  assert.deepEqual(sanitizeLoaded({ finance: null }, cat), { finance: null });
+  const v = verdictFromLink(encodeState(s), cat)!;
+  const l = v.loan!;
+  assert.ok(l && l.months === 72 && l.aprPct === 7 && l.otherPayment != null && l.otherPayment > 0);
+  assert.ok(close(l.allIn - l.otherAllIn, l.payment - l.otherPayment! - v.monthlyRunSaving, 0.01), "all-in gap = payment gap − running-cost saving");
+  assert.ok(l.todayAllIn < l.allIn, "keeping a paid-off car costs less per month than a payment plus running costs");
+  assert.match(paymentWords(v), /^\$[\d,]+ (more|less) a month than a new CR-V$/);
+  assert.match(allInSentence(v), /^All in, about \$[\d,]+ a month — the payment plus running costs — vs \$[\d,]+ for a new CR-V and \$[\d,]+ keeping what you have \(assumed paid off\)\. \$[\d,]+ due at signing\.$/);
+  const own = verdictFromLink(encodeState({ ...s, finance: { aprPct: 5, months: 60, down: 0 } }), cat)!;
+  assert.equal(own.loan!.aprPct, 5, "an entered rate applies");
+  assert.equal(verdictFromLink(encodeState(initialState(cat)), cat)!.loan, null, "cash by default");
+  const noGas = verdictFromLink(encodeState({ ...s, gasRef: null }), cat)!;
+  assert.equal(noGas.loan!.otherPayment, null);
+  assert.match(paymentWords(noGas), /^72 months at 7%$/);
 });

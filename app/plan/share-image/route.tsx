@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 import { CARD_HEADERS, CARD_SIZE, COSTS, Frame, GREEN, MUTED, SAVES, Tile } from "@/components/ShareCard";
 import { planCatalog } from "@/lib/planCatalog";
-import { rangeWords, upfrontWords, usd, verdictFromLink, verdictSentence, type Verdict } from "@/lib/planVerdict";
+import { paymentWords, rangeWords, upfrontWords, usd, verdictFromLink, verdictSentence, type Verdict } from "@/lib/planVerdict";
 
 // The preview image for a shared plan link (/plan?h=…): the verdict card's
 // sentence and its three numbers, drawn from the same functions as the page.
@@ -30,7 +30,7 @@ function PlanCard({ v }: { v: Verdict }) {
       </div>
       <div style={{ display: "flex", gap: 18, marginTop: 30 }}>
         <Tile label="Each month" value={`${usd(Math.abs(v.monthlyRunSaving))} ${v.monthlyRunSaving >= 0 ? "less" : "more"}`} sub={`to run than ${v.vsGas ? v.otherLabel : "today"}`} />
-        <Tile label="Up front" value={usd(v.upfront)} sub={upfrontWords(v)} />
+        <Tile label={v.loan ? "Loan payment" : "Up front"} value={v.loan ? `${usd(v.loan.payment)}/mo` : usd(v.upfront)} sub={v.loan ? paymentWords(v) : upfrontWords(v)} />
         <Tile label={`Over ${v.years} years`} value={rangeWords(v)} sub={v.range ? "depending on resale" : v.isUsed ? "resale is one estimate" : "middle estimate"} />
       </div>
       <div style={{ display: "flex", marginTop: 30, fontSize: 24, color: MUTED, lineHeight: 1.3 }}>

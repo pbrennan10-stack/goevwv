@@ -1,7 +1,7 @@
 // Shared shape of a household plan, its presets, and how it's encoded in a
 // shareable URL (?h=…). Used by the planner (components/HouseholdPlanner.tsx).
 
-import type { Catalog, HomeCharging, OdometerBand, TripInput, WorkCharging } from "./household";
+import type { Catalog, FinancingInput, HomeCharging, OdometerBand, OwnershipAssumptions, TripInput, WorkCharging } from "./household";
 
 // ---------- Presets ----------
 
@@ -47,6 +47,28 @@ export interface PlanState {
   // null until you type it, because we never guess used prices.
   candUsed: UsedPick | null;
   gasUsed: UsedPick | null;
+  // Paying monthly (null = cash). aprPct null = the sourced starting rates
+  // (new / used); the same entered rate applies to the EV and the gas vehicle.
+  finance: FinancePick | null;
+}
+
+export interface FinancePick {
+  aprPct: number | null;
+  months: number;
+  down: number;
+}
+
+export const TERM_OPTIONS = [36, 48, 60, 72, 84];
+
+export function defaultFinance(cat: Catalog): FinancePick {
+  return { aprPct: null, months: cat.own.apr_reference?.term_months ?? 60, down: 0 };
+}
+
+// The engine's view of the choice: rates by new/used, or the one you entered.
+export function financingFor(f: FinancePick | null, own: OwnershipAssumptions): FinancingInput | null {
+  if (!f) return null;
+  const apr = f.aprPct != null ? f.aprPct / 100 : null;
+  return { aprNew: apr ?? own.apr_reference.new_60mo, aprUsed: apr ?? own.apr_reference.used, termMonths: f.months, cashDown: f.down };
 }
 
 export interface UsedPick {
@@ -112,6 +134,7 @@ export function initialState(cat: Catalog): PlanState {
     homeCharging: "auto",
     candUsed: null,
     gasUsed: null,
+    finance: null,
   };
 }
 
@@ -190,6 +213,11 @@ export function sanitizeLoaded(raw: Partial<PlanState> | null, cat: Catalog): Pa
     else if (u && typeof u === "object" && ODOMETER_OPTIONS.some((o) => o.v === u.odometer) && (u.price === null || num(u.price, 1, 1e6))) {
       out[k] = { price: u.price, odometer: u.odometer };
     }
+  }
+  if (raw.finance === null) out.finance = null;
+  else if (raw.finance && typeof raw.finance === "object") {
+    const f = raw.finance;
+    if ((f.aprPct === null || num(f.aprPct, 0, 40)) && TERM_OPTIONS.includes(f.months) && num(f.down, 0, 1e6)) out.finance = { aprPct: f.aprPct, months: f.months, down: f.down };
   }
   if (raw.overrides && typeof raw.overrides === "object") out.overrides = Object.fromEntries(Object.entries(raw.overrides).filter(([a, b]) => typeof a === "string" && typeof b === "string"));
   return Object.keys(out).length ? out : null;

@@ -33,14 +33,16 @@ import {
   type WorkCharging,
 } from "@/lib/household";
 import type { IceVehicle, Vehicle } from "@/lib/types";
-import { derivePlan, rangeWords, shareText, upfrontWords, verdict, verdictSentence } from "@/lib/planVerdict";
+import { allInSentence, derivePlan, paymentWords, rangeWords, shareText, upfrontWords, verdict, verdictSentence } from "@/lib/planVerdict";
 import {
   CHARGING_OPTIONS,
   DEFAULT_USED_PICK,
   LUGGAGE,
   ODOMETER_OPTIONS,
+  TERM_OPTIONS,
   WORK_CHARGING_OPTIONS,
   decodeState,
+  defaultFinance,
   encodeState,
   gasOutlook,
   initialState,
@@ -54,6 +56,7 @@ interface Props {
 }
 
 const usd = (n: number) => `$${Math.round(n).toLocaleString("en-US")}`;
+const pct = (rate: number) => Math.round(rate * 1000) / 10;
 
 // ---------- Small UI pieces ----------
 
@@ -691,6 +694,47 @@ export function HouseholdPlanner({ catalog }: Props) {
               <p className="text-sm text-ink-soft">The vehicle you&apos;re replacing isn&apos;t in our new-vehicle price list — pick a comparable one above.</p>
             )}
           </Card>
+
+          <h3 className="text-xl font-bold text-ink pt-2">How would you pay?</h3>
+          <Card className="space-y-3">
+            <div role="group" aria-label="Paying cash or monthly?" className="inline-flex rounded-xl border border-slate-300 bg-white p-1">
+              {[false, true].map((monthly) => (
+                <button key={String(monthly)} type="button" aria-pressed={!!s.finance === monthly}
+                  onClick={() => set({ finance: monthly ? s.finance ?? defaultFinance(catalog) : null })}
+                  className={`min-h-11 px-5 rounded-lg text-sm font-semibold transition ${!!s.finance === monthly ? "bg-brand text-white" : "text-ink hover:bg-slate-50"}`}>
+                  {monthly ? "Monthly payments" : "Cash"}
+                </button>
+              ))}
+            </div>
+            {s.finance ? (
+              <>
+                <div className="grid grid-cols-2 gap-3">
+                  <Num label="APR" suffix="%" step={0.1} max={40}
+                    value={s.finance.aprPct ?? pct(s.candUsed ? catalog.own.apr_reference.used : catalog.own.apr_reference.new_60mo)}
+                    onChange={(n) => set({ finance: { ...s.finance!, aprPct: n } })} />
+                  <label className="flex flex-col gap-1">
+                    <span className="text-sm font-medium text-ink">Loan length</span>
+                    <select value={s.finance.months} onChange={(e) => set({ finance: { ...s.finance!, months: Number(e.target.value) } })}
+                      className="w-full rounded-lg border border-slate-300 px-3 py-2.5 bg-white">
+                      {TERM_OPTIONS.map((m) => <option key={m} value={m}>{m} months</option>)}
+                    </select>
+                  </label>
+                  <Num label="Cash down" prefix="$" step={500} max={200000} value={s.finance.down} onChange={(n) => set({ finance: { ...s.finance!, down: n } })} />
+                  <div className="text-sm text-ink-muted self-end pb-2">
+                    {s.finance.aprPct == null
+                      ? `Starts at the national average: ${pct(catalog.own.apr_reference.new_60mo)}% new, ${pct(catalog.own.apr_reference.used)}% used.`
+                      : <>Your rate, for both vehicles. <button type="button" className="text-brand hover:underline" onClick={() => set({ finance: { ...s.finance!, aprPct: null } })}>Reset</button></>}
+                  </div>
+                </div>
+                <p className="text-xs text-ink-soft">
+                  The loan covers price and tax after your trade-in and cash down; a home charger is paid in cash. The gas vehicle you compare is financed the same way.
+                  Interest you&apos;d pay while you own it is added to the totals; a loan longer than that is paid off when you sell.
+                </p>
+              </>
+            ) : (
+              <p className="text-xs text-ink-soft">Most buyers finance. Choose monthly payments to see the payment, what a month costs all in, and the interest.</p>
+            )}
+          </Card>
         </section>
       )}
 
@@ -827,6 +871,7 @@ function PlanResults({
   // Against the plan's comparison (the gas vehicle if chosen, else keeping what you have).
   // The card's numbers come from lib/planVerdict.ts, shared with the share-card image.
   const v = verdict(s, { cand, candName, gasVehicle }, result)!;
+  const financed = !!plan.loan || !!gasAlt?.loan;
 
   return (
     <section className="space-y-5">
@@ -861,9 +906,9 @@ function PlanResults({
             <div className="text-[11px] text-ink-soft">to run than {v.vsGas ? v.otherLabel : "today"}</div>
           </li>
           <li className="rounded-lg bg-slate-50 p-2">
-            <div className="text-[11px] text-ink-soft">Up front</div>
-            <div className="text-sm font-bold text-ink">{usd(v.upfront)}</div>
-            <div className="text-[11px] text-ink-soft">{upfrontWords(v)}</div>
+            <div className="text-[11px] text-ink-soft">{v.loan ? "Loan payment" : "Up front"}</div>
+            <div className="text-sm font-bold text-ink">{v.loan ? `${usd(v.loan.payment)}/mo` : usd(v.upfront)}</div>
+            <div className="text-[11px] text-ink-soft">{v.loan ? paymentWords(v) : upfrontWords(v)}</div>
           </li>
           <li className="rounded-lg bg-slate-50 p-2">
             <div className="text-[11px] text-ink-soft">Over {Y} years</div>
@@ -871,6 +916,7 @@ function PlanResults({
             <div className="text-[11px] text-ink-soft">{v.range ? "depending on resale" : isUsed ? "resale is one estimate" : "middle estimate"}</div>
           </li>
         </ul>
+        {v.loan && <p className="text-sm text-ink">{allInSentence(v)}</p>}
         <p className="text-sm text-ink-muted">
           {v.breakEvenYears != null
             ? `The lower running costs cover the higher price in about ${v.breakEvenYears < 1 ? "a year" : `${Math.round(v.breakEvenYears * 10) / 10} years`}. `
@@ -905,7 +951,8 @@ function PlanResults({
             sublabel: c.r.units.map((u) => u.unit.short).join(" + "),
             highlight: c.r === plan,
             segments: [
-              { key: "capital", label: "Lost value (price − resale)", value: c.r.capitalOverPeriod, color: CHART_COLORS.gas },
+              { key: "capital", label: "Lost value (price − resale)", value: c.r.capitalOverPeriod - c.r.interestOverPeriod, color: CHART_COLORS.gas },
+              ...(financed ? [{ key: "interest", label: "Loan interest", value: c.r.interestOverPeriod, color: "#b45309" }] : []),
               { key: "energy", label: "Gas & charging", value: sum(c.r.units.map((u) => u.energy)) * Y, color: CHART_COLORS.phev },
               { key: "maint", label: "Maintenance", value: sum(c.r.units.map((u) => u.maintenance)) * Y, color: "#0f766e" },
               { key: "ins", label: "Insurance", value: sum(c.r.units.map((u) => u.insurance)) * Y, color: CHART_COLORS.neutral },
@@ -978,7 +1025,9 @@ function PlanResults({
           </p>
         )}
         <p className="text-xs text-ink-soft">
-          Up front: {usd(plan.upfrontCash)}{s.replaces ? " after your trade-in" : ""} — price + WV 6% sales tax + title{plan.charging?.setupUsd ? " + home charger" : ""}.
+          {plan.loan
+            ? `Financed: ${usd(plan.loan.amount)} over ${plan.loan.months} months at ${pct(plan.loan.apr)}% — ${usd(plan.loan.payment)} a month, ${usd(plan.loan.cashAtSigning)} at signing; interest over ${Y} years ~${usd(plan.interestOverPeriod)}. Paying cash instead: ${usd(plan.upfrontCash)}.`
+            : `Up front: ${usd(plan.upfrontCash)}${s.replaces ? " after your trade-in" : ""} — price + WV 6% sales tax + title${plan.charging?.setupUsd ? " + home charger" : ""}.`}
         </p>
       </Card>
 
@@ -1067,10 +1116,16 @@ function PlanResults({
                 <td className="py-2 pr-3">Running costs</td>
                 {cols.map((c) => <td key={c.label} className="py-2 pl-2 text-right">{usd(c.r.runningPerYear)}</td>)}
               </tr>
-              <tr>
+              <tr className={financed ? "border-b border-slate-100" : ""}>
                 <td className="py-2 pr-3">Lost value over {Y} years<span className="block text-xs text-ink-soft">price minus resale for what you buy, and what your cars lose as they age</span></td>
-                {cols.map((c) => <td key={c.label} className="py-2 pl-2 text-right align-top">{usd(c.r.capitalOverPeriod)}</td>)}
+                {cols.map((c) => <td key={c.label} className="py-2 pl-2 text-right align-top">{usd(c.r.capitalOverPeriod - c.r.interestOverPeriod)}</td>)}
               </tr>
+              {financed && (
+                <tr>
+                  <td className="py-2 pr-3">Loan interest over {Y} years<span className="block text-xs text-ink-soft">paid while you own it; what&apos;s still owed at the sale is principal</span></td>
+                  {cols.map((c) => <td key={c.label} className="py-2 pl-2 text-right align-top">{usd(c.r.interestOverPeriod)}</td>)}
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
@@ -1197,7 +1252,8 @@ function PlanResults({
           <li>Winter is counted on both sides: EVs use ~13% more electricity over a WV year, gas cars ~4% more fuel (hybrids ~8%). Electricity prices rise {Math.round((catalog.fed.calculation_notes.electricity_annual_increase ?? 0) * 1000) / 10}% a year; gas uses the forecast price you chose.</li>
           <li>Charging uses your utility&apos;s marginal rate; road-trip miles beyond the first charge use public fast chargers at ${catalog.fed.calculation_notes.dcfc_rate_per_kwh?.current.toFixed(2) ?? "0.55"}/kWh (Tesla ${catalog.fed.calculation_notes.dcfc_rate_per_kwh?.member_rate?.toFixed(2) ?? "0.43"}). No home charging means public prices for every mile. EV range fades ~2% a year, which is included in trip checks. Towing cuts EV range about 45%.</li>
           <li>Charging at work, if you set it for a driver: that commute charges there — free, or at the price you enter (it starts at the average West Virginia business rate, {workDefaultCents(catalog)}¢ per kWh from EIA; businesses pay less per kWh than homes) — with one Level 2 session per workday covering the round trip. A plug-in hybrid charged at home and at work can run on electricity for up to two batteries&apos; worth a day.</li>
-          <li>Insurance is an estimate for a 35–45-year-old WV driver with a clean record; your quote will differ. Financing isn&apos;t included.</li>
+          <li>Insurance is an estimate for a 35–45-year-old WV driver with a clean record; your quote will differ.</li>
+          <li>Paying monthly, if you choose it: a standard loan on price and tax after the trade-in and cash down (the home charger is paid in cash), at the rate you enter or the national average ({pct(catalog.own.apr_reference.new_60mo)}% new, {pct(catalog.own.apr_reference.used)}% used — Bankrate and Edmunds, September 2026), for both the EV and the gas vehicle. Interest paid while you own it is added to the total; a loan longer than that is paid off from the sale. Vehicles you already own are assumed paid off.</li>
           <li>Comparing a new EV with keeping an older car usually favors keeping the older car — new vehicles lose value fastest. That&apos;s why we also compare against buying a <em>new gas vehicle</em>: the fairer question when it&apos;s time to replace one.</li>
         </ul>
         <p className="mt-3">Every source is on <Link href="/state-of-the-data" className="text-brand hover:underline">State of the Data</Link>.</p>
