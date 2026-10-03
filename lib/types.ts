@@ -215,6 +215,21 @@ export interface FederalData {
   };
 }
 
+// data/checklists.yaml — the few constants the /learn/checklists page quotes.
+export interface ChecklistData {
+  retrieved: string;
+  electrical: {
+    nec_edition: string;
+    nec_effective: string;
+    nec_source: string;
+    nec_source_url?: string;
+    continuous_load_share: number;   // a charger on an existing circuit is set to this share of the breaker rating
+    dryer_circuit_amps: number;
+    load_management_note: string;
+    sources: string[];
+  };
+}
+
 // Output of the TCO calculator, per vehicle
 export interface VehicleResult {
   vehicle: Vehicle;

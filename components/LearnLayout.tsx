@@ -13,6 +13,7 @@ export const LEARN_PAGES = [
   { slug: "myths", title: "EV myths, checked", blurb: "True, partly true, or not true — with the numbers." },
   { slug: "power-outages", title: "When the power goes out", blurb: "Three ways an EV can keep the lights on — from a fridge on its outlet to backing up the house." },
   { slug: "used-evs", title: "Buying a used EV", blurb: "Battery health, warranties, and what a used one should cost." },
+  { slug: "checklists", title: "Scripts and checklists", blurb: "What to ask your employer, your electrician, and the dealer — ready to copy or print." },
   { slug: "hybrid-plug-in-or-electric", title: "Hybrid, plug-in hybrid, or fully electric?", blurb: "Which one fits how you drive." },
 ] as const;
 

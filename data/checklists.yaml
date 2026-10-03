@@ -1,0 +1,24 @@
+# The few constants quoted on /learn/checklists (scripts and checklists).
+# Everything else on that page comes from ownership.yaml, utilities.yaml,
+# federal.yaml and wear_items.yaml. Researched 2026-09-29 to 2026-10-03.
+retrieved: "2026-10-03"
+
+electrical:
+  # West Virginia's statewide electrical code.
+  nec_edition: "2020"
+  nec_effective: "August 1, 2022"
+  nec_source: "West Virginia State Fire Commission code adoption, via ICC NTA"
+  nec_source_url: "https://www.icc-nta.org/code-update/west-virginia-state-fire-commission-adopted-new-codes/"
+  # A charger that runs for hours is a continuous load: it may draw this share
+  # of its circuit's breaker rating. On a typical dryer circuit that is 24 amps.
+  continuous_load_share: 0.8
+  dryer_circuit_amps: 30
+  load_management_note: >
+    On a 100-amp panel, two things often avoid a service upgrade: a load
+    calculation that uses the utility's recorded peak demand (NEC 220.87), and
+    a charger with load management that throttles itself when the house is busy
+    (NEC 625.42). Ask about both before agreeing to a panel upgrade.
+  sources:
+    - "NEC 2020 Articles 210.20 and 625.42; 220.87 (existing dwelling load calculation)"
+    - "https://evchargeright.com/blog/nec-220-87-utility-peak-demand-ev-charger"
+    - "https://getneocharge.com/a/blog/can-i-use-my-dryer-outlet-to-charge-my-ev-complete-guide-for-2025"
