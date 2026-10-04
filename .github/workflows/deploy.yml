@@ -81,6 +81,8 @@ jobs:
           cd /opt/goevwv
           git fetch origin && git reset --hard origin/main
           docker compose up -d --no-build
+          # Pick up Caddyfile edits (a bind mount, so compose doesn't recreate caddy for them).
+          docker compose exec -T caddy caddy reload --config /etc/caddy/Caddyfile || true
           # Keep the 3 newest commit-tagged images for rollback; remove older ones.
           docker images goevwv --format '{{.CreatedAt}}|{{.Tag}}' \
             | grep -v '|latest$' | sort -r | tail -n +4 | cut -d'|' -f2 \

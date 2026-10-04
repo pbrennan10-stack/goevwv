@@ -26,6 +26,29 @@ services:
     networks:
       - goevwv_net
 
+  # PI (Public Involvement), the sister site. Its image is built by the pi
+  # repo's own GitHub Actions deploy and loaded onto the droplet by SSH; this
+  # service only runs it. It sits in the "pi" profile so that goevwv's
+  # `docker compose up -d` never fails when the pi image isn't loaded yet;
+  # naming the service explicitly (`docker compose up -d --no-build pi`, which
+  # the pi deploy does) enables the profile for that command.
+  pi:
+    image: pi:latest
+    container_name: pi-app
+    restart: unless-stopped
+    profiles: ["pi"]
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+      HOSTNAME: "0.0.0.0"
+    volumes:
+      # The worst-intersection poll's SQLite database lives here, outside the
+      # image, so deploys never lose votes. Never delete this volume.
+      - pi_data:/app/data/runtime
+    # No ports exposed to the host; only Caddy talks to it over the internal network.
+    networks:
+      - goevwv_net
+
   caddy:
     image: caddy:2-alpine
     container_name: goevwv-caddy
@@ -46,6 +69,7 @@ services:
 volumes:
   caddy_data:
   caddy_config:
+  pi_data:
 
 networks:
   goevwv_net:

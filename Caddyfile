@@ -30,6 +30,37 @@ goevwv.com, www.goevwv.com {
     }
 }
 
+# PI (Public Involvement), the sister site: https://github.com/pbrennan10-stack/pi
+# Same droplet, same Caddy; a second container ("pi" in docker-compose.yml).
+# HOSTNAME IS A PLACEHOLDER: whyweare50th.com already points here. When the
+# site's domain is chosen, change the two names below (and www) in one edit.
+# Caddy requests a Let's Encrypt certificate the first time it sees the name,
+# so this block must not go live before DNS for that name points at the droplet.
+whyweare50th.com, www.whyweare50th.com {
+    encode zstd gzip
+
+    @www host www.whyweare50th.com
+    redir @www https://whyweare50th.com{uri} permanent
+
+    reverse_proxy pi:3000 {
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-Proto {scheme}
+    }
+
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        -Server
+    }
+
+    log {
+        output stdout
+        format console
+    }
+}
+
 # Catch-all on port 80 for any other hostnames pointing here.
 # Prevents accidental sites (like stale DNS from retired domains) from serving content.
 :80 {
